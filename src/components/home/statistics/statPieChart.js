@@ -61,7 +61,7 @@ export default function StatPieChart({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <h2 className={`text-center ${sizing.titleClass} mb-1`}>{title}</h2>
+      <h2 className={`text-center text-white dark:text-gray-200 ${sizing.titleClass} mb-1`}>{title}</h2>
 
       <div className="flex flex-col items-center">
         <div style={{ width: sizing.outerRadius * 2 + 20, height: sizing.outerRadius * 2 + 20 }}>
@@ -101,7 +101,7 @@ export default function StatPieChart({
                 className="w-2.5 h-2.5 mr-1.5"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
               ></div>
-              <span style={{ fontSize: sizing.fontSize }}>{entry.name}</span>
+              <span className="text-white dark:text-gray-200" style={{ fontSize: sizing.fontSize }}>{entry.name}</span>
             </div>
           ))}
         </div>

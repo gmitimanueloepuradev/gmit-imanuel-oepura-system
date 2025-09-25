@@ -1,14 +1,16 @@
 import JoinUs from "@/components/home/cta/joinUs";
 import WeeklySummary from "@/components/home/cta/weeklySummary";
+import DailyVerse from "@/components/home/cta/dailyVerse";
 import NewsRow from "@/components/home/newsRow";
 import OurLocation from "@/components/home/ourLocation";
 import ScheduleRow from "@/components/home/schedule/scheduleRow";
 import ChurchStatistics from "@/components/home/statistics/churchStatistics";
 import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
+import AboutSection from "@/components/home/aboutSection";
 
 export default function Home() {
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile Layout - Vertical Stack */}
       <div className="lg:hidden">
         {/* Hero Section */}
@@ -34,11 +36,15 @@ export default function Home() {
 
         {/* Rest of content */}
         <ChurchStatisticsHorizontal />
+
+        {/* About Section */}
+        <AboutSection />
+
         <NewsRow />
 
-        <div className="p-4 min-h-screen flex flex-col gap-4">
+        <div className="p-4 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900">
           <JoinUs />
-          <WeeklySummary />
+          <DailyVerse />
         </div>
 
         <div className="relative min-h-fit">
@@ -95,13 +101,16 @@ export default function Home() {
           {/* Horizontal Statistics */}
           <ChurchStatisticsHorizontal />
 
+          {/* About Section */}
+          <AboutSection />
+
           {/* News */}
           <NewsRow />
 
           {/* CTA */}
-          <div className="p-8 min-h-screen flex flex-col gap-4">
+          <div className="p-8 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900">
             <JoinUs />
-            <WeeklySummary />
+            <DailyVerse />
           </div>
 
           {/* Schedule */}

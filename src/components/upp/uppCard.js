@@ -71,13 +71,13 @@ const getPriorityColor = (prioritas) => {
 export default function UppCard({ pengumuman }) {
   if (!pengumuman) {
     return (
-      <div className="max-w-lg mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10 text-gray-950">
+      <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden mt-10 text-gray-950 dark:text-gray-100 transition-colors duration-300">
         <div className="p-6 text-center">
           <AlertCircle
-            className="mx-auto mb-4 text-gray-400"
+            className="mx-auto mb-4 text-gray-400 dark:text-gray-500"
             size={48}
           />
-          <p className="text-gray-900">Belum Ada Pengumuman</p>
+          <p className="text-gray-900 dark:text-gray-200">Belum Ada Pengumuman</p>
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function UppCard({ pengumuman }) {
   const truncatedDescription = description.length > 150 ? description.substring(0, 150) + "..." : description;
 
   return (
-    <div className="w-full bg-white shadow-lg rounded-lg overflow-hidden mt-10 text-gray-950 relative">
+    <div className="w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden mt-10 text-gray-950 dark:text-gray-100 relative transition-colors duration-300">
       {/* Priority Badge */}
       {(isPinned || prioritas === "HIGH") && (
         <div className="absolute top-2 right-2 z-10">
@@ -102,7 +102,7 @@ export default function UppCard({ pengumuman }) {
       {/* Event Info */}
       <div className="p-6 flex flex-col">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-gray-500 text-sm flex items-center">
+          <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center">
             <Calendar
               className="inline-block mr-1"
               size={16}
@@ -112,11 +112,11 @@ export default function UppCard({ pengumuman }) {
           {jenis && <span className="badge badge-outline text-xs">{jenis.nama}</span>}
         </div>
 
-        <h2 className="text-xl font-bold mt-2 h-16 overflow-y-auto flex-shrink-0 leading-tight">
+        <h2 className="text-xl font-bold mt-2 h-16 overflow-y-auto flex-shrink-0 leading-tight text-gray-900 dark:text-white">
           {judul || "No Title"}
         </h2>
 
-        <p className="text-gray-700 mt-4 h-20 overflow-y-auto flex-shrink-0 text-sm leading-relaxed text-left">
+        <p className="text-gray-700 dark:text-gray-300 mt-4 h-20 overflow-y-auto flex-shrink-0 text-sm leading-relaxed text-left">
           {truncatedDescription}
         </p>
 

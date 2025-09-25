@@ -38,10 +38,10 @@ export default function ChurchStatisticsHorizontal() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="block md:hidden w-full bg-slate-800 p-4 py-6 overflow-hidden">
+      <div className="block md:hidden w-full bg-slate-800 dark:bg-gray-900 p-4 py-6 overflow-hidden transition-colors duration-300">
         <div className="flex flex-col h-80 items-center justify-center">
           <div className="loading loading-spinner loading-lg text-blue-400"></div>
-          <p className="mt-4 text-sm text-gray-300">Memuat statistik...</p>
+          <p className="mt-4 text-sm text-gray-300 dark:text-gray-200">Memuat statistik...</p>
         </div>
       </div>
     );
@@ -50,7 +50,7 @@ export default function ChurchStatisticsHorizontal() {
   // Show error state
   if (error) {
     return (
-      <div className="block md:hidden w-full bg-slate-800 p-4 py-6 overflow-hidden">
+      <div className="block md:hidden w-full bg-slate-800 dark:bg-gray-900 p-4 py-6 overflow-hidden transition-colors duration-300">
         <div className="flex flex-col h-80 items-center justify-center">
           <div className="text-red-400 text-center">
             <svg
@@ -66,7 +66,7 @@ export default function ChurchStatisticsHorizontal() {
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
-            <p className="text-sm text-gray-300">Gagal memuat statistik gereja</p>
+            <p className="text-sm text-gray-300 dark:text-gray-200">Gagal memuat statistik gereja</p>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function ChurchStatisticsHorizontal() {
   }
 
   return (
-    <div className="block md:hidden w-full bg-base-300 p-4 py-6 overflow-hidden">
+    <div className="block md:hidden w-full bg-base-300 dark:bg-gray-800 p-4 py-6 overflow-hidden transition-colors duration-300">
       <div className="flex flex-col h-80">
         {/* Chart container that takes most of the height */}
         <div className="flex-1 relative overflow-hidden min-h-0">
@@ -125,7 +125,7 @@ export default function ChurchStatisticsHorizontal() {
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
-                  index === currentIndex ? "bg-primary" : "bg-gray-400"
+                  index === currentIndex ? "bg-primary" : "bg-gray-400 dark:bg-gray-500"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />

@@ -26,11 +26,11 @@ export default function NewsRow() {
   }, []);
 
   return (
-    <div className="w-full px-4 md:px-8 py-8 bg-gray-300">
-      <div className="divider divider-start divider-neutral text-3xl text-black">Pengumuman</div>
+    <div className="w-full px-4 md:px-8 py-8 bg-gray-300 dark:bg-gray-700 transition-colors duration-300">
+      <div className="divider divider-start divider-neutral dark:divider-gray text-3xl text-black dark:text-white">Pengumuman</div>
       <div className="max-w-full overflow-hidden">
         {newsData.length === 0 ? (
-          <div className="text-center py-12 text-lg text-gray-600">Saat ini belum ada berita.</div>
+          <div className="text-center py-12 text-lg text-gray-600 dark:text-gray-300">Saat ini belum ada berita.</div>
         ) : (
           <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
@@ -43,7 +43,7 @@ export default function NewsRow() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="flex justify-center text-black gap-4 mt-8">
+            <div className="flex justify-center text-black dark:text-white gap-4 mt-8">
               <CarouselPrevious className="relative left-0 top-0" />
               <CarouselNext className="relative right-0 top-0" />
             </div>

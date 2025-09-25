@@ -9,6 +9,7 @@ export default function Navigation({ children }) {
     { name: "Home", path: "/" },
     { name: "Gallery", path: "/gallery" },
     { name: "About", path: "/about" },
+    { name: "Sejarah", path: "/sejarah" },
   ];
 
   // Fetch kategori pengumuman data for UPP dropdown
@@ -24,7 +25,7 @@ export default function Navigation({ children }) {
         />
         <div className="drawer-content flex flex-col">
           {/* Navbar */}
-          <div className="navbar bg-black/30 dark:bg-black/50 w-full absolute top-0 left-0 z-50 transition-all duration-300">
+          <div className="navbar bg-black/30 dark:bg-black/50 w-full fixed top-0 left-0 z-50 transition-all duration-300">
             <div className="flex-none lg:hidden">
               <label
                 htmlFor="my-drawer-3"
