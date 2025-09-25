@@ -100,7 +100,7 @@ const JemaatSuperExportModal = ({
       status: [], // Selected status jemaat values
       golonganDarah: [], // Selected golongan darah values
       hasUserAccount: [], // Selected user account status
-      userRole: [] // Selected user roles
+      userRole: [], // Selected user roles
     },
   });
 
@@ -122,7 +122,7 @@ const JemaatSuperExportModal = ({
         statusKeluarga,
         keadaanRumah,
         statusKepemilikanRumah,
-        kelurahan
+        kelurahan,
       ] = await Promise.all([
         masterService.getSuku(),
         masterService.getPendidikan(),
@@ -134,7 +134,7 @@ const JemaatSuperExportModal = ({
         masterService.getStatusKeluarga(),
         masterService.getKeadaanRumah(),
         masterService.getStatusKepemilikanRumah(),
-        masterService.getKelurahan()
+        masterService.getKelurahan(),
       ]);
 
       return {
@@ -148,7 +148,7 @@ const JemaatSuperExportModal = ({
         statusKeluarga,
         keadaanRumah,
         statusKepemilikanRumah,
-        kelurahan
+        kelurahan,
       };
     },
     enabled: isOpen,
@@ -176,10 +176,9 @@ const JemaatSuperExportModal = ({
     const filterCount = Object.keys(exportConfig.customFilters).length;
 
     // Count selected values
-    const selectedValuesCount = Object.values(exportConfig.selectedValues).reduce(
-      (total, values) => total + (values?.length || 0),
-      0
-    );
+    const selectedValuesCount = Object.values(
+      exportConfig.selectedValues
+    ).reduce((total, values) => total + (values?.length || 0), 0);
 
     return {
       estimatedSize:
@@ -368,76 +367,87 @@ const JemaatSuperExportModal = ({
     if (!masterData) return {};
 
     return {
-      idRayon: masterData.rayon?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.namaRayon
-      })) || [],
-      idSuku: masterData.suku?.data?.map(item => ({
-        value: item.id,
-        label: item.namaSuku
-      })) || [],
-      idStatusDalamKeluarga: masterData.statusDalamKeluarga?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.status
-      })) || [],
-      idPendidikan: masterData.pendidikan?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.jenjang
-      })) || [],
-      idPekerjaan: masterData.pekerjaan?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.namaPekerjaan
-      })) || [],
-      idPendapatan: masterData.pendapatan?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.label
-      })) || [],
-      idJaminanKesehatan: masterData.jaminanKesehatan?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.jenisJaminan
-      })) || [],
-      idStatusKeluarga: masterData.statusKeluarga?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.status
-      })) || [],
-      idKeadaanRumah: masterData.keadaanRumah?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.keadaan
-      })) || [],
-      idStatusKepemilikanRumah: masterData.statusKepemilikanRumah?.data?.items?.map(item => ({
-        value: item.id,
-        label: item.status
-      })) || [],
-      idKelurahan: masterData.kelurahan?.data?.items?.map(item => ({
-        value: item.id,
-        label: `${item.nama} - ${item.kodepos}`
-      })) || [],
+      idRayon:
+        masterData.rayon?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaRayon,
+        })) || [],
+      idSuku:
+        masterData.suku?.data?.map((item) => ({
+          value: item.id,
+          label: item.namaSuku,
+        })) || [],
+      idStatusDalamKeluarga:
+        masterData.statusDalamKeluarga?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || [],
+      idPendidikan:
+        masterData.pendidikan?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenjang,
+        })) || [],
+      idPekerjaan:
+        masterData.pekerjaan?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaPekerjaan,
+        })) || [],
+      idPendapatan:
+        masterData.pendapatan?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.label,
+        })) || [],
+      idJaminanKesehatan:
+        masterData.jaminanKesehatan?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenisJaminan,
+        })) || [],
+      idStatusKeluarga:
+        masterData.statusKeluarga?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || [],
+      idKeadaanRumah:
+        masterData.keadaanRumah?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.keadaan,
+        })) || [],
+      idStatusKepemilikanRumah:
+        masterData.statusKepemilikanRumah?.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || [],
+      idKelurahan:
+        masterData.kelurahan?.data?.items?.map((item) => ({
+          value: item.id,
+          label: `${item.nama} - ${item.kodepos}`,
+        })) || [],
       jenisKelamin: [
-        { value: 'true', label: 'Laki-laki' },
-        { value: 'false', label: 'Perempuan' }
+        { value: "true", label: "Laki-laki" },
+        { value: "false", label: "Perempuan" },
       ],
       status: [
-        { value: 'AKTIF', label: 'Aktif' },
-        { value: 'TIDAK_AKTIF', label: 'Tidak Aktif' },
-        { value: 'KELUAR', label: 'Keluar' }
+        { value: "AKTIF", label: "Aktif" },
+        { value: "TIDAK_AKTIF", label: "Tidak Aktif" },
+        { value: "KELUAR", label: "Keluar" },
       ],
       golonganDarah: [
-        { value: 'A', label: 'A' },
-        { value: 'B', label: 'B' },
-        { value: 'AB', label: 'AB' },
-        { value: 'O', label: 'O' }
+        { value: "A", label: "A" },
+        { value: "B", label: "B" },
+        { value: "AB", label: "AB" },
+        { value: "O", label: "O" },
       ],
       hasUserAccount: [
-        { value: 'true', label: 'Memiliki Akun' },
-        { value: 'false', label: 'Tidak Ada Akun' }
+        { value: "true", label: "Memiliki Akun" },
+        { value: "false", label: "Tidak Ada Akun" },
       ],
       userRole: [
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'JEMAAT', label: 'Jemaat' },
-        { value: 'MAJELIS', label: 'Majelis' },
-        { value: 'EMPLOYEE', label: 'Employee' },
-        { value: 'PENDETA', label: 'Pendeta' }
-      ]
+        { value: "ADMIN", label: "Admin" },
+        { value: "JEMAAT", label: "Jemaat" },
+        { value: "MAJELIS", label: "Majelis" },
+        { value: "EMPLOYEE", label: "Employee" },
+        { value: "PENDETA", label: "Pendeta" },
+      ],
     };
   };
 
@@ -450,48 +460,104 @@ const JemaatSuperExportModal = ({
         title: "Data Keluarga",
         icon: Home,
         filters: [
-          { key: 'idRayon', label: 'Rayon', options: filterOptions.idRayon },
-          { key: 'idStatusDalamKeluarga', label: 'Status Dalam Keluarga', options: filterOptions.idStatusDalamKeluarga },
-          { key: 'idStatusKeluarga', label: 'Status Keluarga', options: filterOptions.idStatusKeluarga }
-        ]
+          { key: "idRayon", label: "Rayon", options: filterOptions.idRayon },
+          {
+            key: "idStatusDalamKeluarga",
+            label: "Status Dalam Keluarga",
+            options: filterOptions.idStatusDalamKeluarga,
+          },
+          {
+            key: "idStatusKeluarga",
+            label: "Status Keluarga",
+            options: filterOptions.idStatusKeluarga,
+          },
+        ],
       },
       {
         title: "Data Pribadi",
         icon: Users,
         filters: [
-          { key: 'jenisKelamin', label: 'Jenis Kelamin', options: filterOptions.jenisKelamin },
-          { key: 'status', label: 'Status Jemaat', options: filterOptions.status },
-          { key: 'golonganDarah', label: 'Golongan Darah', options: filterOptions.golonganDarah }
-        ]
+          {
+            key: "jenisKelamin",
+            label: "Jenis Kelamin",
+            options: filterOptions.jenisKelamin,
+          },
+          {
+            key: "status",
+            label: "Status Jemaat",
+            options: filterOptions.status,
+          },
+          {
+            key: "golonganDarah",
+            label: "Golongan Darah",
+            options: filterOptions.golonganDarah,
+          },
+        ],
       },
       {
         title: "Pendidikan & Pekerjaan",
         icon: Calendar,
         filters: [
-          { key: 'idSuku', label: 'Suku', options: filterOptions.idSuku },
-          { key: 'idPendidikan', label: 'Pendidikan', options: filterOptions.idPendidikan },
-          { key: 'idPekerjaan', label: 'Pekerjaan', options: filterOptions.idPekerjaan },
-          { key: 'idPendapatan', label: 'Pendapatan', options: filterOptions.idPendapatan },
-          { key: 'idJaminanKesehatan', label: 'Jaminan Kesehatan', options: filterOptions.idJaminanKesehatan }
-        ]
+          { key: "idSuku", label: "Suku", options: filterOptions.idSuku },
+          {
+            key: "idPendidikan",
+            label: "Pendidikan",
+            options: filterOptions.idPendidikan,
+          },
+          {
+            key: "idPekerjaan",
+            label: "Pekerjaan",
+            options: filterOptions.idPekerjaan,
+          },
+          {
+            key: "idPendapatan",
+            label: "Pendapatan",
+            options: filterOptions.idPendapatan,
+          },
+          {
+            key: "idJaminanKesehatan",
+            label: "Jaminan Kesehatan",
+            options: filterOptions.idJaminanKesehatan,
+          },
+        ],
       },
       {
         title: "Rumah & Alamat",
         icon: MapPin,
         filters: [
-          { key: 'idKeadaanRumah', label: 'Keadaan Rumah', options: filterOptions.idKeadaanRumah },
-          { key: 'idStatusKepemilikanRumah', label: 'Status Kepemilikan Rumah', options: filterOptions.idStatusKepemilikanRumah },
-          { key: 'idKelurahan', label: 'Kelurahan', options: filterOptions.idKelurahan }
-        ]
+          {
+            key: "idKeadaanRumah",
+            label: "Keadaan Rumah",
+            options: filterOptions.idKeadaanRumah,
+          },
+          {
+            key: "idStatusKepemilikanRumah",
+            label: "Status Kepemilikan Rumah",
+            options: filterOptions.idStatusKepemilikanRumah,
+          },
+          {
+            key: "idKelurahan",
+            label: "Kelurahan",
+            options: filterOptions.idKelurahan,
+          },
+        ],
       },
       {
         title: "Akun User",
         icon: Settings,
         filters: [
-          { key: 'hasUserAccount', label: 'Status Akun', options: filterOptions.hasUserAccount },
-          { key: 'userRole', label: 'Role User', options: filterOptions.userRole }
-        ]
-      }
+          {
+            key: "hasUserAccount",
+            label: "Status Akun",
+            options: filterOptions.hasUserAccount,
+          },
+          {
+            key: "userRole",
+            label: "Role User",
+            options: filterOptions.userRole,
+          },
+        ],
+      },
     ];
 
     return (
@@ -514,36 +580,46 @@ const JemaatSuperExportModal = ({
                       </label>
                       <div className="flex gap-2">
                         <button
-                          type="button"
                           className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                          onClick={() => selectAllFilterValues(filter.key, filter.options)}
+                          type="button"
+                          onClick={() =>
+                            selectAllFilterValues(filter.key, filter.options)
+                          }
                         >
                           Pilih Semua
                         </button>
                         <button
-                          type="button"
                           className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                          type="button"
                           onClick={() => clearFilterValues(filter.key)}
                         >
                           Hapus
                         </button>
                       </div>
                     </div>
-                    <div className="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
+                    <div className="max-h-32 overflow-y-auto overflow-x-hidden border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
                       <div className="p-2 space-y-1">
                         {filter.options?.map((option) => {
-                          const isSelected = exportConfig.selectedValues[filter.key]?.includes(option.value) || false;
+                          const isSelected =
+                            exportConfig.selectedValues[filter.key]?.includes(
+                              option.value
+                            ) || false;
+
                           return (
                             <label
                               key={option.value}
                               className="flex items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded"
                             >
                               <input
-                                type="checkbox"
-                                className="mr-2"
                                 checked={isSelected}
+                                className="mr-2"
+                                type="checkbox"
                                 onChange={(e) =>
-                                  handleValueSelection(filter.key, option.value, e.target.checked)
+                                  handleValueSelection(
+                                    filter.key,
+                                    option.value,
+                                    e.target.checked
+                                  )
                                 }
                               />
                               <span className="text-gray-700 dark:text-gray-300 truncate">
@@ -561,7 +637,8 @@ const JemaatSuperExportModal = ({
                     </div>
                     {exportConfig.selectedValues[filter.key]?.length > 0 && (
                       <div className="mt-1 text-xs text-green-600 dark:text-green-400">
-                        {exportConfig.selectedValues[filter.key].length} nilai dipilih
+                        {exportConfig.selectedValues[filter.key].length} nilai
+                        dipilih
                       </div>
                     )}
                   </div>
@@ -576,7 +653,7 @@ const JemaatSuperExportModal = ({
 
   // Handle value selection for filters
   const handleValueSelection = (filterKey, value, isSelected) => {
-    setExportConfig(prev => {
+    setExportConfig((prev) => {
       const currentValues = prev.selectedValues[filterKey] || [];
       let newValues;
 
@@ -587,38 +664,38 @@ const JemaatSuperExportModal = ({
           : [...currentValues, value];
       } else {
         // Remove value
-        newValues = currentValues.filter(v => v !== value);
+        newValues = currentValues.filter((v) => v !== value);
       }
 
       return {
         ...prev,
         selectedValues: {
           ...prev.selectedValues,
-          [filterKey]: newValues
-        }
+          [filterKey]: newValues,
+        },
       };
     });
   };
 
   // Clear all selected values for a filter
   const clearFilterValues = (filterKey) => {
-    setExportConfig(prev => ({
+    setExportConfig((prev) => ({
       ...prev,
       selectedValues: {
         ...prev.selectedValues,
-        [filterKey]: []
-      }
+        [filterKey]: [],
+      },
     }));
   };
 
   // Select all values for a filter
   const selectAllFilterValues = (filterKey, allValues) => {
-    setExportConfig(prev => ({
+    setExportConfig((prev) => ({
       ...prev,
       selectedValues: {
         ...prev.selectedValues,
-        [filterKey]: allValues.map(v => v.value)
-      }
+        [filterKey]: allValues.map((v) => v.value),
+      },
     }));
   };
 
@@ -705,7 +782,7 @@ const JemaatSuperExportModal = ({
   const preview = getExportPreview();
 
   return (
-    <div className="fixed inset-0  bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-auto">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -729,7 +806,7 @@ const JemaatSuperExportModal = ({
         {/* Content */}
         <div className="flex h-[calc(90vh-140px)]">
           {/* Left Panel - Configuration */}
-          <div className="w-2/3 p-6 overflow-y-auto border-r border-gray-200 dark:border-gray-700">
+          <div className="w-2/3 p-6 overflow-y-auto overflow-x-hidden border-r border-gray-200 dark:border-gray-700">
             {/* Quick Presets */}
             <div className="mb-6">
               <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
@@ -875,11 +952,13 @@ const JemaatSuperExportModal = ({
               </h3>
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                  <strong>💡 Tip:</strong> Pilih nilai spesifik untuk setiap kategori yang ingin diekspor.
-                  Misalnya: hanya Rayon 1,2,3 atau hanya Keluarga A,B,C.
+                  <strong>💡 Tip:</strong> Pilih nilai spesifik untuk setiap
+                  kategori yang ingin diekspor. Misalnya: hanya Rayon 1,2,3 atau
+                  hanya Keluarga A,B,C.
                 </p>
                 <p className="text-xs text-blue-600 dark:text-blue-300">
-                  Kosongkan jika ingin export semua nilai dalam kategori tersebut.
+                  Kosongkan jika ingin export semua nilai dalam kategori
+                  tersebut.
                 </p>
               </div>
               {renderValueSelectionSection()}
@@ -1020,7 +1099,7 @@ const JemaatSuperExportModal = ({
           </div>
 
           {/* Right Panel - Preview & Export */}
-          <div className="w-1/3 p-6 bg-gray-50 dark:bg-gray-900">
+          <div className="w-1/3 p-6 bg-gray-50 dark:bg-gray-900 overflow-y-auto overflow-x-hidden">
             <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">
               Preview Export
             </h3>
@@ -1112,54 +1191,68 @@ const JemaatSuperExportModal = ({
                     <Check className="h-4 w-4 mr-1" />
                     Nilai Terpilih
                   </h4>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {Object.entries(exportConfig.selectedValues).map(([key, values]) => {
-                      if (!values || values.length === 0) return null;
+                  <div className="space-y-2 max-h-32 overflow-y-auto overflow-x-hidden">
+                    {Object.entries(exportConfig.selectedValues).map(
+                      ([key, values]) => {
+                        if (!values || values.length === 0) return null;
 
-                      const filterOptions = getFilterOptions();
-                      const options = filterOptions[key] || [];
+                        const filterOptions = getFilterOptions();
+                        const options = filterOptions[key] || [];
 
-                      // Create a mapping for better labels
-                      const getFilterLabel = (key) => {
-                        const labelMap = {
-                          'idRayon': 'Rayon',
-                          'idSuku': 'Suku',
-                          'idStatusDalamKeluarga': 'Status dalam Keluarga',
-                          'jenisKelamin': 'Jenis Kelamin',
-                          'status': 'Status Jemaat',
-                          'idPendidikan': 'Pendidikan',
-                          'idPekerjaan': 'Pekerjaan',
-                          'golonganDarah': 'Golongan Darah',
-                          'hasUserAccount': 'Status Akun',
-                          'userRole': 'Role User',
-                          'idKelurahan': 'Kelurahan',
-                          'idPendapatan': 'Pendapatan',
-                          'idJaminanKesehatan': 'Jaminan Kesehatan',
-                          'idStatusKeluarga': 'Status Keluarga',
-                          'idKeadaanRumah': 'Keadaan Rumah',
-                          'idStatusKepemilikanRumah': 'Status Kepemilikan'
+                        // Create a mapping for better labels
+                        const getFilterLabel = (key) => {
+                          const labelMap = {
+                            idRayon: "Rayon",
+                            idSuku: "Suku",
+                            idStatusDalamKeluarga: "Status dalam Keluarga",
+                            jenisKelamin: "Jenis Kelamin",
+                            status: "Status Jemaat",
+                            idPendidikan: "Pendidikan",
+                            idPekerjaan: "Pekerjaan",
+                            golonganDarah: "Golongan Darah",
+                            hasUserAccount: "Status Akun",
+                            userRole: "Role User",
+                            idKelurahan: "Kelurahan",
+                            idPendapatan: "Pendapatan",
+                            idJaminanKesehatan: "Jaminan Kesehatan",
+                            idStatusKeluarga: "Status Keluarga",
+                            idKeadaanRumah: "Keadaan Rumah",
+                            idStatusKepemilikanRumah: "Status Kepemilikan",
+                          };
+
+                          return labelMap[key] || key;
                         };
-                        return labelMap[key] || key;
-                      };
 
-                      return (
-                        <div key={key} className="text-xs text-gray-600 dark:text-gray-400">
-                          <span className="font-medium">
-                            {getFilterLabel(key)}:
-                          </span>{" "}
-                          <span className="text-blue-600 dark:text-blue-400">
-                            {values.length} dipilih
-                          </span>
-                          <div className="ml-4 mt-1 text-gray-500 dark:text-gray-500 text-xs">
-                            {values.slice(0, 3).map(value => {
-                              const option = options.find(opt => opt.value === value);
-                              return option?.label;
-                            }).filter(Boolean).join(', ')}
-                            {values.length > 3 && `, +${values.length - 3} lainnya`}
+                        return (
+                          <div
+                            key={key}
+                            className="text-xs text-gray-600 dark:text-gray-400"
+                          >
+                            <span className="font-medium">
+                              {getFilterLabel(key)}:
+                            </span>{" "}
+                            <span className="text-blue-600 dark:text-blue-400">
+                              {values.length} dipilih
+                            </span>
+                            <div className="ml-4 mt-1 text-gray-500 dark:text-gray-500 text-xs">
+                              {values
+                                .slice(0, 3)
+                                .map((value) => {
+                                  const option = options.find(
+                                    (opt) => opt.value === value
+                                  );
+
+                                  return option?.label;
+                                })
+                                .filter(Boolean)
+                                .join(", ")}
+                              {values.length > 3 &&
+                                `, +${values.length - 3} lainnya`}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      }
+                    )}
                   </div>
                 </CardContent>
               </Card>

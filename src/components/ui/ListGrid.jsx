@@ -168,10 +168,12 @@ export default function ListGrid({
   // Row Actions Props - Using ButtonActions component
   rowActions = [],
   rowActionType = "vertical", // "vertical" | "horizontal"
-  maxVisibleActions = 3,
+  maxVisibleActions = 3,   
 
   // Filter & Search Props
   filters = [],
+  customFilterFunction,
+  customSearchFunction,
   searchable = true,
   searchPlaceholder = "Cari data...",
 
@@ -189,6 +191,8 @@ export default function ListGrid({
 
   // Pagination Props
   itemsPerPage = 10,
+  showPageSizeSelector = true,
+  pageSizeOptions = [5, 10, 25, 50, 100],
 
   // Loading State
   isLoading = false,
@@ -202,6 +206,7 @@ export default function ListGrid({
   const [viewMode, setViewMode] = useState("table"); // table or grid
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [showExportModal, setShowExportModal] = useState(false);
+  const [pageSize, setPageSize] = useState(itemsPerPage);
 
   // Merge legacy actions with new rowActions array for backward compatibility
   const allRowActions = [
@@ -303,23 +308,26 @@ export default function ListGrid({
 
   // Filter and search data
   const filteredData = data.filter((item) => {
-    // Search filter
-    const matchesSearch =
-      !searchable ||
-      !searchTerm ||
-      columns.some((col) =>
-        String(item[col.key] || "")
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      );
+    // Search filter - use custom search function if provided
+    const matchesSearch = customSearchFunction
+      ? customSearchFunction(item, searchTerm)
+      : !searchable ||
+        !searchTerm ||
+        columns.some((col) =>
+          String(item[col.key] || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        );
 
-    // Additional filters
-    const matchesFilters = Object.entries(selectedFilters).every(
-      ([filterKey, filterValue]) => {
-        if (!filterValue || filterValue === "all") return true;
-        return item[filterKey] === filterValue;
-      }
-    );
+    // Additional filters - use custom filter function if provided
+    const matchesFilters = customFilterFunction
+      ? customFilterFunction(item, selectedFilters)
+      : Object.entries(selectedFilters).every(
+          ([filterKey, filterValue]) => {
+            if (!filterValue || filterValue === "all") return true;
+            return item[filterKey] === filterValue;
+          }
+        );
 
     return matchesSearch && matchesFilters;
   });
@@ -328,11 +336,11 @@ export default function ListGrid({
   const sortedData = sortData(filteredData, sortConfig);
 
   // Pagination
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const totalPages = Math.ceil(sortedData.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
   const paginatedData = sortedData.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + pageSize
   );
 
   const handleFilterChange = (filterKey, value) => {
@@ -433,6 +441,29 @@ export default function ListGrid({
                   </select>
                 </div>
               ))}
+
+              {/* Page Size Selector */}
+              {showPageSizeSelector && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Show:
+                  </span>
+                  <select
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors duration-200"
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    {pageSizeOptions.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* View Mode Toggle */}
               <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 transition-colors duration-200">
@@ -611,7 +642,7 @@ export default function ListGrid({
             <div className="flex items-center justify-between mt-6">
               <div className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-200">
                 Menampilkan {startIndex + 1} hingga{" "}
-                {Math.min(startIndex + itemsPerPage, sortedData.length)} dari{" "}
+                {Math.min(startIndex + pageSize, sortedData.length)} dari{" "}
                 {sortedData.length} data
               </div>
               <div className="flex gap-2">

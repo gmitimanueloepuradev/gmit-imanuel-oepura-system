@@ -83,7 +83,7 @@ async function handlePost(req, res) {
         jemaats: {
           where: {
             statusDalamKeluarga: {
-              namaStatusDalamKeluarga: "Kepala Keluarga"
+              status: "Kepala Keluarga"
             }
           },
           select: {

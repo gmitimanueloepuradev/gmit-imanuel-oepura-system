@@ -198,8 +198,8 @@ export default function AttachmentsPage() {
         <PageHeader
           title="Lampiran Pengumuman"
           breadcrumb={[
-            { label: "Majelis", href: "/majelis/dashboard" },
-            { label: "Pengumuman", href: "/majelis/pengumuman" },
+            { label: "Admin", href: "/admin/dashboard" },
+            { label: "Pengumuman", href: "/admin/pengumuman" },
             { label: "Lampiran" },
           ]}
         />
@@ -236,8 +236,8 @@ export default function AttachmentsPage() {
         title={`Lampiran: ${pengumuman.judul || 'Loading...'}`}
         description={`${totalAttachments} file lampiran`}
         breadcrumb={[
-          { label: "Majelis", href: "/majelis/dashboard" },
-          { label: "Pengumuman", href: "/majelis/pengumuman" },
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Pengumuman", href: "/admin/pengumuman" },
           { label: "Lampiran" },
         ]}
       />

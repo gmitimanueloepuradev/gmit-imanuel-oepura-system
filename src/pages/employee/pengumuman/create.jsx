@@ -753,7 +753,7 @@ export default function CreatePengumuman() {
 
             <StepperNavigation
               currentStep={currentStep}
-              isLoading={createMutation.isLoading}
+              isLoading={createMutation.isPending}
               totalSteps={steps.length}
               onNext={handleNext}
               onPrevious={handlePrev}

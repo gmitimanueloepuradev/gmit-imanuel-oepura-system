@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Heart, UserCheck } from "lucide-react";
+import { ArrowLeft, Calendar, Heart, Search, UserCheck } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -29,6 +29,7 @@ const pernikahanSchema = z.object({
 export default function CreatePernikahanPage() {
   const router = useRouter();
   const [selectedJemaats, setSelectedJemaats] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const form = useForm({
     resolver: zodResolver(pernikahanSchema),
@@ -80,13 +81,29 @@ export default function CreatePernikahanPage() {
     });
   };
 
-  // Handle jemaat selection
+  // Handle jemaat selection with gender validation
   const handleJemaatSelect = (jemaat) => {
     const isSelected = selectedJemaats.find((j) => j.id === jemaat.id);
 
     if (isSelected) {
       setSelectedJemaats(selectedJemaats.filter((j) => j.id !== jemaat.id));
     } else {
+      // Check if trying to select 2 males
+      const maleCount = selectedJemaats.filter(
+        (j) => j.jenisKelamin === true
+      ).length;
+
+      if (jemaat.jenisKelamin === true && maleCount >= 1) {
+        showToast({
+          title: "Peringatan",
+          description:
+            "Tidak dapat memilih 2 jemaat laki-laki untuk pernikahan!",
+          color: "warning",
+        });
+
+        return;
+      }
+
       setSelectedJemaats([...selectedJemaats, jemaat]);
     }
 
@@ -101,6 +118,16 @@ export default function CreatePernikahanPage() {
   // Filter jemaat yang belum menikah
   const availableJemaats =
     jemaatData?.data?.items?.filter((j) => !j.idPernikahan) || [];
+
+  // Filter jemaats based on search term
+  const filteredJemaats = availableJemaats.filter(
+    (jemaat) =>
+      jemaat.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      jemaat.keluarga?.rayon?.namaRayon
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      jemaat.keluarga?.noBagungan?.toString().includes(searchTerm)
+  );
 
   return (
     <>
@@ -220,12 +247,27 @@ export default function CreatePernikahanPage() {
             {/* Jemaat Selection */}
             <Card>
               <div className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <UserCheck className="w-5 h-5 text-green-600" />
-                  <h3 className="text-lg font-medium">Pilih Jemaat</h3>
-                  <span className="text-sm text-gray-500">
-                    ({availableJemaats.length} jemaat tersedia)
-                  </span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <UserCheck className="w-5 h-5 text-green-600" />
+                    <h3 className="text-lg font-medium">Pilih Jemaat</h3>
+                    <span className="text-sm text-gray-500">
+                      ({filteredJemaats.length} dari {availableJemaats.length}{" "}
+                      jemaat)
+                    </span>
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="relative max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
+                      placeholder="Cari jemaat..."
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 {form.formState.errors.jemaatIds && (
@@ -237,14 +279,20 @@ export default function CreatePernikahanPage() {
                 )}
 
                 <div className="max-h-96 overflow-y-auto space-y-2">
-                  {availableJemaats.length === 0 ? (
+                  {filteredJemaats.length === 0 && searchTerm ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p>Tidak ada jemaat ditemukan</p>
+                      <p className="text-sm">Coba kata kunci lain</p>
+                    </div>
+                  ) : availableJemaats.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <UserCheck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                       <p>Tidak ada jemaat yang tersedia</p>
                       <p className="text-sm">Semua jemaat sudah menikah</p>
                     </div>
                   ) : (
-                    availableJemaats.map((jemaat) => {
+                    filteredJemaats.map((jemaat) => {
                       const isSelected = selectedJemaats.find(
                         (j) => j.id === jemaat.id
                       );

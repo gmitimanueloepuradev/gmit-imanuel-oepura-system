@@ -1,5 +1,5 @@
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import useJenisPengumuman from "@/hooks/useJenisPengumuman";
+import useKategoriPengumuman from "@/hooks/useKategoriPengumuman";
 import { Menu } from "lucide-react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
@@ -11,8 +11,8 @@ export default function Navigation({ children }) {
     { name: "About", path: "/about" },
   ];
 
-  // Fetch jenis pengumuman data for UPP dropdown
-  const { jenisOptions: uppItems, loading: uppLoading } = useJenisPengumuman();
+  // Fetch kategori pengumuman data for UPP dropdown
+  const { kategoriOptions: uppItems, loading: uppLoading } = useKategoriPengumuman();
 
   return (
     <>

@@ -1,8 +1,9 @@
-import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import rayonService from "@/services/rayonService";
+import { ArrowLeft, Home, Users } from "lucide-react";
+import { useRouter } from "next/router";
+
 import { Card } from "@/components/ui/Card";
-import { ArrowLeft, Users, Home } from "lucide-react";
+import rayonService from "@/services/rayonService";
 
 export default function RayonDetailPage() {
   const router = useRouter();
@@ -21,9 +22,9 @@ export default function RayonDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-4 text-gray-600">Memuat data rayon...</p>
         </div>
       </div>
@@ -38,8 +39,8 @@ export default function RayonDetailPage() {
             Terjadi kesalahan saat memuat data rayon
           </p>
           <button
-            onClick={() => router.back()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            onClick={() => router.back()}
           >
             Kembali
           </button>
@@ -56,8 +57,8 @@ export default function RayonDetailPage() {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => router.push("/admin/rayon")}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            onClick={() => router.push("/admin/rayon")}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali ke Daftar Rayon
@@ -104,8 +105,9 @@ export default function RayonDetailPage() {
                   </label>
                   <p className="text-gray-900">
                     {rayonData.keluargas?.reduce(
-                      (total, keluarga) => total + (keluarga.jemaats?.length || 0),
-                      0
+                      (total, keluarga) =>
+                        total + (keluarga.jemaats?.length || 0),
+                      0,
                     ) || 0}{" "}
                     jemaat
                   </p>
@@ -146,8 +148,8 @@ export default function RayonDetailPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {keluarga.alamat ? (
                               <span>
-                                {keluarga.alamat.jalan}, RT{" "}
-                                {keluarga.alamat.rt}/RW {keluarga.alamat.rw}
+                                {keluarga.alamat.jalan}, RT {keluarga.alamat.rt}
+                                /RW {keluarga.alamat.rw}
                                 <br />
                                 {keluarga.alamat.kelurahan?.nama},{" "}
                                 {keluarga.alamat.kelurahan?.kecamatan?.nama}
@@ -205,7 +207,8 @@ export default function RayonDetailPage() {
                   </div>
                   <span className="text-lg font-semibold text-gray-900">
                     {rayonData.keluargas?.reduce(
-                      (total, keluarga) => total + (keluarga.jemaats?.length || 0),
+                      (total, keluarga) =>
+                        total + (keluarga.jemaats?.length || 0),
                       0
                     ) || 0}
                   </span>
@@ -239,20 +242,20 @@ export default function RayonDetailPage() {
               </h3>
               <div className="space-y-3">
                 <button
-                  onClick={() => router.push(`/admin/rayon/${id}/edit`)}
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  onClick={() => router.push(`/admin/rayon/${id}/edit`)}
                 >
                   Edit Rayon
                 </button>
                 <button
-                  onClick={() => router.push("/admin/keluarga?rayon=" + id)}
                   className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  onClick={() => router.push("/admin/keluarga?rayon=" + id)}
                 >
                   Lihat Keluarga
                 </button>
                 <button
-                  onClick={() => router.push("/admin/jemaat?rayon=" + id)}
                   className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  onClick={() => router.push("/admin/jemaat?rayon=" + id)}
                 >
                   Lihat Jemaat
                 </button>

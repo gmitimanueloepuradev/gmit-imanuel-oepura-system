@@ -1,10 +1,11 @@
 import usePengumuman from "@/hooks/usePengumuman";
 import UppCard from "./uppCard";
 
-export default function UppCardContainer({ jenisId = null, limit = 6 }) {
+export default function UppCardContainer({ jenisId = null, kategoriId = null, limit = 6 }) {
   // Fetch pengumuman data with filters
   const { pengumumanData, loading, error } = usePengumuman({
     jenisId,
+    kategoriId,
     status: "PUBLISHED", // Only show published announcements
     limit,
     sortBy: "tanggalPengumuman",

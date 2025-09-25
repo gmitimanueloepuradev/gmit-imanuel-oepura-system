@@ -4,6 +4,7 @@ import { parseQueryParams } from "@/lib/queryParams";
 import { createApiHandler } from "@/lib/apiHandler";
 import { staffOnly } from "@/lib/apiMiddleware";
 import { requireAuth } from "@/lib/auth";
+import { processDateFields } from "@/lib/dateUtils";
 
 async function handleGet(req, res) {
   try {
@@ -117,7 +118,7 @@ async function handlePost(req, res) {
     }
 
     const { user } = authResult;
-    const data = req.body;
+    const data = processDateFields(req.body, ['tanggalLahir']);
 
     // For MAJELIS users, validate that the keluarga belongs to their rayon
     if (user.role === 'MAJELIS' && user.majelis && user.majelis.idRayon) {

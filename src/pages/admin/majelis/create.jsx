@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,6 +51,7 @@ export default function CreateMajelisPage() {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [canProceed, setCanProceed] = useState(false);
 
   const methods = useForm({
     resolver: zodResolver(majelisCreationSchema),
@@ -77,24 +78,37 @@ export default function CreateMajelisPage() {
 
   const watchedValues = watch();
 
+  // Check if current step can proceed
+  const checkCanProceed = async () => {
+    const fieldsToValidate = getFieldsForStep(currentStep);
+
+    if (fieldsToValidate.length === 0) {
+      setCanProceed(true);
+      return;
+    }
+
+    const values = getValues();
+    let canProceed = true;
+
+    // Check required fields for current step
+    for (const field of fieldsToValidate) {
+      if (!values[field] || values[field] === '') {
+        canProceed = false;
+        break;
+      }
+    }
+
+    setCanProceed(canProceed);
+  };
+
   const validateCurrentStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
-    console.log(`Validating step ${currentStep} fields:`, fieldsToValidate);
-    
+
     if (fieldsToValidate.length === 0) {
-      return true; // No validation needed for confirmation step
+      return true;
     }
-    
+
     const isValid = await trigger(fieldsToValidate);
-    console.log(`Validation result for fields ${fieldsToValidate}:`, isValid);
-    
-    // Additional manual check for required fields
-    const currentValues = getValues();
-    console.log(`Current form values:`, currentValues);
-    
-    // Let react-hook-form handle the validation
-    // We already triggered validation above, so just return that result
-    
     return isValid;
   };
 
@@ -114,16 +128,16 @@ export default function CreateMajelisPage() {
   const handleNext = async () => {
     try {
       const isValid = await validateCurrentStep();
-      console.log(`Step ${currentStep} validation result:`, isValid);
-      
+
       if (isValid) {
-        setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+        const nextStep = Math.min(currentStep + 1, steps.length);
+        setCurrentStep(nextStep);
+        // Reset can proceed for next step
+        await checkCanProceed();
       } else {
-        console.log(`Step ${currentStep} validation failed`);
-        // Show error toast if validation fails
         showToast({
           title: "Validasi Gagal",
-          description: "Mohon lengkapi semua field yang wajib diisi",
+          description: "Mohon lengkapi semua field yang wajib diisi dengan benar",
           color: "error",
         });
       }
@@ -137,8 +151,11 @@ export default function CreateMajelisPage() {
     }
   };
 
-  const handlePrevious = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handlePrevious = async () => {
+    const prevStep = Math.max(currentStep - 1, 1);
+    setCurrentStep(prevStep);
+    // Check can proceed for previous step
+    await checkCanProceed();
   };
 
   const handleStepClick = async (stepNumber) => {
@@ -184,6 +201,11 @@ export default function CreateMajelisPage() {
       setIsLoading(false);
     }
   };
+
+  // Watch for form changes and update canProceed
+  useEffect(() => {
+    checkCanProceed();
+  }, [watchedValues, currentStep]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -382,7 +404,7 @@ export default function CreateMajelisPage() {
             onNext={handleNext}
             onSubmit={handleSubmit(onSubmit)}
             isLoading={isLoading}
-            canGoNext={true}
+            canGoNext={canProceed}
             nextButtonText="Lanjut"
             submitButtonText="Buat Majelis & Akun"
           />

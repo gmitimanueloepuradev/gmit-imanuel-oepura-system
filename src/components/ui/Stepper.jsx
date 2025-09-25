@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { Button } from "./Button";
 
 export default function Stepper({ steps, currentStep, onStepClick }) {
   return (
@@ -83,49 +84,37 @@ export function StepperNavigation({
 
   return (
     <div className="flex justify-between items-center pt-6 border-t">
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={onPrevious}
         disabled={isFirstStep || isLoading}
-        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-          isFirstStep
-            ? "text-gray-400 cursor-not-allowed"
-            : "text-gray-700 hover:bg-gray-100 border border-gray-300"
-        }`}
       >
         Sebelumnya
-      </button>
+      </Button>
 
       <div className="text-sm text-gray-500">
         Langkah {currentStep} dari {totalSteps}
       </div>
 
       {isLastStep ? (
-        <button
+        <Button
           type="button"
           onClick={onSubmit}
-          disabled={isLoading || !canGoNext}
-          className={`px-6 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
-            isLoading || !canGoNext
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          disabled={!canGoNext}
+          isLoading={isLoading}
+          loadingText="Menyimpan..."
         >
-          {isLoading ? "Menyimpan..." : submitButtonText}
-        </button>
+          {submitButtonText}
+        </Button>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={onNext}
-          disabled={isLoading || !canGoNext}
-          className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
-            isLoading || !canGoNext
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          disabled={!canGoNext || isLoading}
         >
           {nextButtonText}
-        </button>
+        </Button>
       )}
     </div>
   );

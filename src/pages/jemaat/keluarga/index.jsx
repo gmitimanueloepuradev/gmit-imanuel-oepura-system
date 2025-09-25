@@ -1,10 +1,11 @@
-import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
-import { ArrowLeft, Users, User, MapPin, Home, Phone } from "lucide-react";
+import { ArrowLeft, Home, MapPin, Phone, User, Users } from "lucide-react";
 import { useRouter } from "next/router";
+
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import PageTitle from "@/components/ui/PageTitle";
+import { useAuth } from "@/contexts/AuthContext";
+import api from "@/lib/axios";
 
 export default function JemaatKeluargaPage() {
   const { user } = useAuth();
@@ -14,9 +15,8 @@ export default function JemaatKeluargaPage() {
     queryKey: ["keluarga", user?.jemaat?.idKeluarga],
     queryFn: async () => {
       // if (!user?.jemaat?.idKeluarga) return null;
-      const response = await api.get(
-        `/keluarga/${user.jemaat.keluarga.id}`
-      );
+      const response = await api.get(`/keluarga/${user.jemaat.keluarga.id}`);
+
       return response.data.data;
     },
     // enabled: !!user?.jemaat?.idKeluarga,
@@ -29,9 +29,9 @@ export default function JemaatKeluargaPage() {
   if (isLoading) {
     return (
       <ProtectedRoute allowedRoles="JEMAAT">
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto" />
             <p className="mt-4 text-gray-600">Memuat data keluarga...</p>
           </div>
         </div>
@@ -43,14 +43,14 @@ export default function JemaatKeluargaPage() {
     <ProtectedRoute allowedRoles="JEMAAT">
       <PageTitle title="Keluarga - GMIT Imanuel Oepura" />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         {/* Header */}
         <header className="bg-white shadow">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center py-6">
               <button
-                onClick={() => router.back()}
                 className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                onClick={() => router.back()}
               >
                 <ArrowLeft className="h-6 w-6 text-gray-600" />
               </button>

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Calendar, Heart, Search, UserCheck } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +14,6 @@ import jemaatService from "@/services/jemaatService";
 import klasisService from "@/services/klasisService";
 import pernikahanService from "@/services/pernikahanService";
 import { showToast } from "@/utils/showToast";
-import { ArrowLeft, Calendar, Heart, UserCheck } from "lucide-react";
 
 // Validation schema
 const pernikahanSchema = z.object({
@@ -29,6 +29,7 @@ export default function CreatePernikahanPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [selectedJemaats, setSelectedJemaats] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const form = useForm({
     resolver: zodResolver(pernikahanSchema),
@@ -84,12 +85,29 @@ export default function CreatePernikahanPage() {
     });
   };
 
-  // Handle jemaat selection
+  // Handle jemaat selection with gender validation
   const handleJemaatSelect = (jemaat) => {
     const isSelected = selectedJemaats.find((j) => j.id === jemaat.id);
+
     if (isSelected) {
       setSelectedJemaats(selectedJemaats.filter((j) => j.id !== jemaat.id));
     } else {
+      // Check if trying to select 2 males
+      const maleCount = selectedJemaats.filter(
+        (j) => j.jenisKelamin === true
+      ).length;
+
+      if (jemaat.jenisKelamin === true && maleCount >= 1) {
+        showToast({
+          title: "Peringatan",
+          description:
+            "Tidak dapat memilih 2 jemaat laki-laki untuk pernikahan!",
+          color: "warning",
+        });
+
+        return;
+      }
+
       setSelectedJemaats([...selectedJemaats, jemaat]);
     }
 
@@ -97,6 +115,7 @@ export default function CreatePernikahanPage() {
     const newIds = isSelected
       ? selectedJemaats.filter((j) => j.id !== jemaat.id).map((j) => j.id)
       : [...selectedJemaats.map((j) => j.id), jemaat.id];
+
     form.setValue("jemaatIds", newIds);
   };
 
@@ -104,17 +123,19 @@ export default function CreatePernikahanPage() {
   const availableJemaats =
     jemaatData?.data?.items?.filter((j) => !j.idPernikahan) || [];
 
+  // Filter jemaats based on search term
+  const filteredJemaats = availableJemaats.filter(
+    (jemaat) =>
+      jemaat.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      jemaat.keluarga?.rayon?.namaRayon
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      jemaat.keluarga?.noBagungan?.toString().includes(searchTerm)
+  );
+
   return (
     <>
       <PageHeader
-        title="Buat Data Pernikahan"
-        description="Tambah data pernikahan jemaat"
-        icon={Heart}
-        breadcrumb={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Data Pernikahan", href: "/admin/pernikahan" },
-          { label: "Tambah Data" },
-        ]}
         actions={[
           {
             label: "Kembali",
@@ -123,10 +144,18 @@ export default function CreatePernikahanPage() {
             onClick: () => router.back(),
           },
         ]}
+        breadcrumb={[
+          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Data Pernikahan", href: "/admin/pernikahan" },
+          { label: "Tambah Data" },
+        ]}
+        description="Tambah data pernikahan jemaat"
+        icon={Heart}
+        title="Buat Data Pernikahan"
       />
 
       <div className="max-w-4xl mx-auto space-y-6">
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
           {/* Basic Information */}
           <Card>
             <div className="p-6 space-y-4">
@@ -140,12 +169,12 @@ export default function CreatePernikahanPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <DatePicker
+                    error={form.formState.errors.tanggal?.message}
                     label="Tanggal Pernikahan"
+                    placeholder="Pilih tanggal pernikahan"
                     required={true}
                     value={form.watch("tanggal")}
                     onChange={(value) => form.setValue("tanggal", value)}
-                    placeholder="Pilih tanggal pernikahan"
-                    error={form.formState.errors.tanggal?.message}
                   />
                 </div>
 
@@ -210,9 +239,9 @@ export default function CreatePernikahanPage() {
                         </div>
                       </div>
                       <button
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
                         type="button"
                         onClick={() => handleJemaatSelect(jemaat)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
                       >
                         ✕
                       </button>
@@ -226,14 +255,29 @@ export default function CreatePernikahanPage() {
           {/* Jemaat Selection */}
           <Card>
             <div className="p-6">
-              <div className="flex items-center space-x-3 mb-4">
-                <UserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
-                  Pilih Jemaat
-                </h3>
-                <span className="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
-                  ({availableJemaats.length} jemaat tersedia)
-                </span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <UserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                    Pilih Jemaat
+                  </h3>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                    ({filteredJemaats.length} dari {availableJemaats.length}{" "}
+                    jemaat)
+                  </span>
+                </div>
+
+                {/* Search Input */}
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                    placeholder="Cari jemaat..."
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
 
               {form.formState.errors.jemaatIds && (
@@ -245,26 +289,33 @@ export default function CreatePernikahanPage() {
               )}
 
               <div className="max-h-96 overflow-y-auto space-y-2">
-                {availableJemaats.length === 0 ? (
+                {filteredJemaats.length === 0 && searchTerm ? (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                    <Search className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                    <p>Tidak ada jemaat ditemukan</p>
+                    <p className="text-sm">Coba kata kunci lain</p>
+                  </div>
+                ) : availableJemaats.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400 transition-colors duration-200">
                     <UserCheck className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
                     <p>Tidak ada jemaat yang tersedia</p>
                     <p className="text-sm">Semua jemaat sudah menikah</p>
                   </div>
                 ) : (
-                  availableJemaats.map((jemaat) => {
+                  filteredJemaats.map((jemaat) => {
                     const isSelected = selectedJemaats.find(
                       (j) => j.id === jemaat.id
                     );
+
                     return (
                       <div
                         key={jemaat.id}
-                        onClick={() => handleJemaatSelect(jemaat)}
                         className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
                           isSelected
                             ? "bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600"
                             : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                         }`}
+                        onClick={() => handleJemaatSelect(jemaat)}
                       >
                         <div className="flex items-center space-x-3">
                           <div
@@ -287,7 +338,9 @@ export default function CreatePernikahanPage() {
                             </p>
                           </div>
                           {isSelected && (
-                            <div className="text-blue-600 dark:text-blue-400">✓</div>
+                            <div className="text-blue-600 dark:text-blue-400">
+                              ✓
+                            </div>
                           )}
                         </div>
                       </div>
@@ -301,18 +354,18 @@ export default function CreatePernikahanPage() {
           {/* Submit Actions */}
           <div className="flex justify-end space-x-3">
             <Button
+              disabled={createMutation.isLoading}
               type="button"
               variant="outline"
               onClick={() => router.back()}
-              disabled={createMutation.isLoading}
             >
               Batal
             </Button>
             <Button
-              type="submit"
               disabled={
                 createMutation.isLoading || selectedJemaats.length === 0
               }
+              type="submit"
             >
               {createMutation.isLoading
                 ? "Menyimpan..."

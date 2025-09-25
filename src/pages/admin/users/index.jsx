@@ -18,11 +18,12 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CreateModal from "@/components/ui/CreateModal";
 import EditModal from "@/components/ui/EditModal";
 import ListGrid from "@/components/ui/ListGrid";
-import ViewModal from "@/components/ui/ViewModal";
 import PhoneInput from "@/components/ui/PhoneInput";
+import ViewModal from "@/components/ui/ViewModal";
 import axios from "@/lib/axios";
 import jemaatService from "@/services/jemaatService";
 import keluargaService from "@/services/keluargaService";
+import rayonService from "@/services/rayonService";
 import userService from "@/services/userService";
 
 export default function UsersPage() {
@@ -33,12 +34,14 @@ export default function UsersPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [jemaatOptions, setJemaatOptions] = useState([]);
   const [keluargaOptions, setKeluargaOptions] = useState([]);
+  const [rayonOptions, setRayonOptions] = useState([]);
   const [showInvitationModal, setShowInvitationModal] = useState(false);
   const [selectedUserForInvitation, setSelectedUserForInvitation] =
     useState(null);
   const [showAccountDataModal, setShowAccountDataModal] = useState(false);
   const [selectedUserForAccountData, setSelectedUserForAccountData] =
     useState(null);
+  const [pageSize, setPageSize] = useState(10);
 
   // Fetch users data
   const { data, isLoading, error } = useQuery({
@@ -48,7 +51,7 @@ export default function UsersPage() {
     keepPreviousData: true,
   });
 
-  // Fetch jemaat and keluarga data for select options
+  // Fetch jemaat, keluarga, and rayon data for select options
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -65,12 +68,30 @@ export default function UsersPage() {
         // Fetch keluarga options
         const keluargaResponse = await keluargaService.getAll({ limit: 1000 });
         const keluargaOptions =
-          keluargaResponse.data?.items?.map((keluarga) => ({
-            value: keluarga.id,
-            label: `Bangunan ${keluarga.noBagungan} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
-          })) || [];
+          keluargaResponse.data?.items?.map((keluarga) => {
+            const kepalaKeluarga = keluarga.jemaats?.find(
+              (j) => j.statusDalamKeluarga?.status === "Kepala Keluarga"
+            );
+            const displayName =
+              kepalaKeluarga?.nama || `Bangunan ${keluarga.noBagungan}`;
+
+            return {
+              value: keluarga.id,
+              label: `${displayName} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
+            };
+          }) || [];
 
         setKeluargaOptions(keluargaOptions);
+
+        // Fetch rayon options
+        const rayonResponse = await rayonService.getAll({ limit: 1000 });
+        const rayonOptions =
+          rayonResponse.data?.items?.map((rayon) => ({
+            value: rayon.id,
+            label: rayon.namaRayon,
+          })) || [];
+
+        setRayonOptions(rayonOptions);
       } catch (error) {
         console.error("Failed to fetch options:", error);
       }
@@ -426,6 +447,85 @@ export default function UsersPage() {
     setShowAccountDataModal(true);
   };
 
+  // Enhanced search function
+  const enhancedSearch = (item, searchTerm) => {
+    if (!searchTerm) return true;
+
+    const searchLower = searchTerm.toLowerCase();
+
+    // Search in username, email, name, and phone
+    return (
+      (item.username || "").toLowerCase().includes(searchLower) ||
+      (item.email || "").toLowerCase().includes(searchLower) ||
+      (item.noWhatsapp || "").toLowerCase().includes(searchLower) ||
+      (item.jemaat?.nama || "").toLowerCase().includes(searchLower) ||
+      (item.role || "").toLowerCase().includes(searchLower) ||
+      (item.jemaat?.keluarga?.rayon?.namaRayon || "").toLowerCase().includes(searchLower)
+    );
+  };
+
+  // Create filter options based on available data
+  const userFilters = [
+    {
+      key: "role",
+      label: "Semua Role",
+      options: [
+        { value: "ADMIN", label: "Admin" },
+        { value: "JEMAAT", label: "Jemaat" },
+        { value: "MAJELIS", label: "Majelis" },
+        { value: "PENDETA", label: "Pendeta" },
+        { value: "EMPLOYEE", label: "Pegawai" },
+      ],
+    },
+    {
+      key: "hasJemaat",
+      label: "Status Profil",
+      options: [
+        { value: "true", label: "Profil Lengkap" },
+        { value: "false", label: "Belum Lengkap" },
+      ],
+    },
+    {
+      key: "hasWhatsapp",
+      label: "Status WhatsApp",
+      options: [
+        { value: "true", label: "Ada WhatsApp" },
+        { value: "false", label: "Belum Ada WhatsApp" },
+      ],
+    },
+  ];
+
+  // Add rayon filter if rayon options are available
+  if (rayonOptions.length > 0) {
+    userFilters.push({
+      key: "rayonId",
+      label: "Semua Rayon",
+      options: rayonOptions,
+    });
+  }
+
+  // Custom filter function
+  const customFilterFunction = (item, filters) => {
+    return Object.entries(filters).every(([filterKey, filterValue]) => {
+      if (!filterValue || filterValue === "all") return true;
+
+      switch (filterKey) {
+        case "role":
+          return item.role === filterValue;
+        case "hasJemaat":
+          const hasJemaat = !!item.idJemaat;
+          return hasJemaat.toString() === filterValue;
+        case "hasWhatsapp":
+          const hasWhatsapp = !!item.noWhatsapp;
+          return hasWhatsapp.toString() === filterValue;
+        case "rayonId":
+          return item.jemaat?.keluarga?.rayon?.id === filterValue;
+        default:
+          return item[filterKey] === filterValue;
+      }
+    });
+  };
+
   return (
     <>
       <ListGrid
@@ -488,7 +588,13 @@ export default function UsersPage() {
         ]}
         exportFilename="users"
         exportable={true}
+        filters={userFilters}
+        customFilterFunction={customFilterFunction}
+        customSearchFunction={enhancedSearch}
         isLoading={isLoading}
+        itemsPerPage={pageSize}
+        showPageSizeSelector={true}
+        pageSizeOptions={[10, 25, 50, 100]}
         rowActionType="horizontal"
         rowActions={[
           {
@@ -528,7 +634,7 @@ export default function UsersPage() {
             tooltip: "Hapus user",
           },
         ]}
-        searchPlaceholder="Cari berdasarkan username, email, nama..."
+        searchPlaceholder="Cari username, email, nama jemaat, role, rayon..."
         searchable={true}
         title="Manajemen Users"
         onAdd={() => setShowCreate(true)}

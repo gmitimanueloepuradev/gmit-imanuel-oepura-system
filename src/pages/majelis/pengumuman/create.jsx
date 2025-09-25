@@ -352,11 +352,12 @@ const FileUploadSection = ({ form, attachments, setAttachments }) => {
                 onChange={handleFileUpload}
                 disabled={uploading}
               />
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 className="mt-2"
                 disabled={uploading}
+                onClick={() => document.getElementById('file-upload').click()}
               >
                 {uploading ? "Mengupload..." : "Pilih File"}
               </Button>
@@ -762,7 +763,7 @@ export default function CreatePengumuman() {
               onPrevious={handlePrev}
               onNext={handleNext}
               onSubmit={handleFinish}
-              isLoading={createMutation.isLoading}
+              isLoading={createMutation.isPending}
             />
           </form>
         </FormProvider>

@@ -352,11 +352,12 @@ const FileUploadSection = ({ form, attachments, setAttachments }) => {
                 onChange={handleFileUpload}
                 disabled={uploading}
               />
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 className="mt-2"
                 disabled={uploading}
+                onClick={() => document.getElementById('file-upload').click()}
               >
                 {uploading ? "Mengupload..." : "Pilih File"}
               </Button>
@@ -467,7 +468,7 @@ export default function CreatePengumuman() {
         description: "Pengumuman berhasil dibuat",
         color: "success",
       });
-      router.push("/majelis/pengumuman");
+      router.push("/admin/pengumuman");
     },
     onError: (error) => {
       showToast({
@@ -576,10 +577,10 @@ export default function CreatePengumuman() {
     <div className="space-y-6 p-4">
       <PageHeader
         title="Buat Pengumuman Baru"
-        description="Buat pengumuman untuk jemaat dan majelis gereja"
+        description="Buat pengumuman untuk seluruh gereja dengan akses penuh"
         breadcrumb={[
-          { label: "Majelis", href: "/majelis/dashboard" },
-          { label: "Pengumuman", href: "/majelis/pengumuman" },
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Pengumuman", href: "/admin/pengumuman" },
           { label: "Buat Baru" },
         ]}
       />
@@ -762,7 +763,7 @@ export default function CreatePengumuman() {
               onPrevious={handlePrev}
               onNext={handleNext}
               onSubmit={handleFinish}
-              isLoading={createMutation.isLoading}
+              isLoading={createMutation.isPending}
             />
           </form>
         </FormProvider>

@@ -5,11 +5,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function Navbar({
-  menuItems,
-  uppItems = [],
-  uppLoading = false,
-}) {
+export default function Navbar({ menuItems, uppItems = [], uppLoading = false }) {
   const authContext = useAuth();
   const { user, logout } = authContext || {};
   const router = useRouter();
@@ -25,7 +21,10 @@ export default function Navbar({
     <div className="hidden flex-none lg:block">
       <ul className="menu menu-horizontal items-center">
         {menuItems.map((item) => (
-          <li key={item.name} className="flex items-center">
+          <li
+            key={item.name}
+            className="flex items-center"
+          >
             <a
               className="flex items-center text-white hover:text-blue-200 dark:hover:text-blue-300 transition-colors duration-200"
               href={item.path}
@@ -40,26 +39,43 @@ export default function Navbar({
             <summary className="btn btn-ghost flex items-center px-4 py-2 text-white hover:text-blue-200 dark:hover:text-blue-300 hover:bg-white/10 dark:hover:bg-white/20 transition-all duration-200">
               UPP
             </summary>
-            <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-40 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+            <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-60 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 max-h-96 overflow-y-auto">
               {uppLoading ? (
                 <li className="text-center py-2">
                   <span className="loading loading-spinner loading-sm" />
                 </li>
               ) : uppItems.length > 0 ? (
-                uppItems.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      className="hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                      href={`/upp/${item.nama.toLowerCase().replace(/\s+/g, "-")}`}
-                    >
-                      {item.nama}
-                    </Link>
+                uppItems.map((kategori) => (
+                  <li key={kategori.id}>
+                    {/* Category Header */}
+                    <div className="font-semibold px-2 py-1 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                      <Link
+                        className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                        href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}`}
+                      >
+                        {kategori.nama}
+                      </Link>
+                    </div>
+
+                    {/* Subcategories */}
+                    {kategori.jenisPengumuman && kategori.jenisPengumuman.length > 0 && (
+                      <ul className="ml-4 mb-2">
+                        {kategori.jenisPengumuman.map((jenis) => (
+                          <li key={jenis.id}>
+                            <Link
+                              className="block px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
+                              href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}/${jenis.nama.toLowerCase().replace(/\s+/g, "-")}`}
+                            >
+                              {jenis.nama}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))
               ) : (
-                <li className="text-center py-2 text-gray-500 dark:text-gray-400">
-                  No items available
-                </li>
+                <li className="text-center py-2 text-gray-500 dark:text-gray-400">No categories available</li>
               )}
             </ul>
           </details>

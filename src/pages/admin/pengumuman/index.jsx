@@ -197,21 +197,21 @@ export default function PengumumanPage() {
     {
       icon: Eye,
       label: "Detail",
-      onClick: (item) => router.push(`/majelis/pengumuman/${item.id}`),
+      onClick: (item) => router.push(`/admin/pengumuman/${item.id}`),
       variant: "outline",
     },
     {
       icon: Download,
       label: "Lampiran",
       onClick: (item) =>
-        router.push(`/majelis/pengumuman/${item.id}/attachments`),
+        router.push(`/admin/pengumuman/${item.id}/attachments`),
       variant: "outline",
       show: (item) => true, // Selalu tampilkan, nanti di halaman attachments baru cek ada atau tidak
     },
     {
       icon: Edit,
       label: "Edit",
-      onClick: (item) => router.push(`/majelis/pengumuman/${item.id}/edit`),
+      onClick: (item) => router.push(`/admin/pengumuman/${item.id}/edit`),
       variant: "outline",
     },
     {
@@ -235,15 +235,15 @@ export default function PengumumanPage() {
         actions={[
           {
             label: "Buat Pengumuman",
-            onClick: () => router.push("/majelis/pengumuman/create"),
+            onClick: () => router.push("/admin/pengumuman/create"),
             icon: Plus,
           },
         ]}
         breadcrumb={[
-          { label: "Majelis", href: "/majelis/dashboard" },
+          { label: "Admin", href: "/admin/dashboard" },
           { label: "Pengumuman" },
         ]}
-        description="Kelola pengumuman untuk jemaat dan majelis gereja"
+        description="Kelola pengumuman untuk seluruh gereja dengan akses penuh"
         title="Daftar Pengumuman"
       />
 

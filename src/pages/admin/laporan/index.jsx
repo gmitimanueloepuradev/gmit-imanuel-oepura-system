@@ -15,14 +15,19 @@ import {
   GraduationCap,
   Building2,
   MapPin,
+  FileText,
+  Table,
 } from "lucide-react";
 
 import statisticsService from "@/services/statisticsService";
+import { showToast } from "@/utils/showToast";
 
 export default function LaporanPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
+  const [isExporting, setIsExporting] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // Queries
   const { data: overview, isLoading: overviewLoading, refetch: refetchOverview } = useQuery({
@@ -82,6 +87,254 @@ export default function LaporanPage() {
 
   const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 
+  // Handle export functionality
+  const handleExport = async (format = 'pdf', type = null) => {
+    setIsExporting(true);
+
+    try {
+      const exportType = type || activeTab;
+
+      // Try API export first
+      try {
+        await statisticsService.exportReport({
+          format,
+          type: exportType,
+          period: selectedPeriod,
+          year: selectedYear,
+          includeCharts: true
+        });
+
+        showToast({
+          title: "Berhasil",
+          description: `Laporan ${exportType} berhasil diunduh`,
+          color: "success",
+        });
+      } catch (apiError) {
+        console.log('API export failed, using fallback:', apiError);
+
+        // Fallback: Generate and download report data
+        const reportData = await statisticsService.generateReportData(exportType);
+
+        // Create CSV format as fallback
+        if (format === 'csv' || format === 'excel') {
+          downloadCSVReport(reportData.data, exportType);
+        } else {
+          // For PDF, show a message that it's not available
+          showToast({
+            title: "Info",
+            description: "Export PDF tidak tersedia saat ini. Data akan diunduh dalam format CSV.",
+            color: "warning",
+          });
+          downloadCSVReport(reportData.data, exportType);
+        }
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      showToast({
+        title: "Gagal",
+        description: "Gagal mengekspor laporan. Silakan coba lagi.",
+        color: "error",
+      });
+    } finally {
+      setIsExporting(false);
+      setShowExportModal(false);
+    }
+  };
+
+  // Fallback CSV download function
+  const downloadCSVReport = (data, type) => {
+    let csvContent = "";
+    const timestamp = new Date().toISOString().split('T')[0];
+
+    if (type === 'overview' && data.overview) {
+      csvContent = generateOverviewCSV(data.overview);
+    } else if (type === 'demographics' && data.demographics) {
+      csvContent = generateDemographicsCSV(data.demographics);
+    } else if (type === 'growth' && data.growth) {
+      csvContent = generateGrowthCSV(data.growth);
+    } else if (type === 'all') {
+      csvContent = generateFullReportCSV(data);
+    }
+
+    // Create and download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `laporan-${type}-${timestamp}.csv`;
+    link.click();
+  };
+
+  // CSV generation functions
+  const generateOverviewCSV = (data) => {
+    let csv = "LAPORAN RINGKASAN JEMAAT\n\n";
+    csv += "Statistik Utama\n";
+    csv += "Total Jemaat," + (data?.totalMembers || 0) + "\n";
+    csv += "Total Keluarga," + (data?.totalFamilies || 0) + "\n";
+    csv += "Laki-laki," + (data?.membersByGender?.male || 0) + "\n";
+    csv += "Perempuan," + (data?.membersByGender?.female || 0) + "\n\n";
+
+    csv += "Sakramen\n";
+    csv += "Baptis (Total)," + (data?.sacraments?.baptis?.total || 0) + "\n";
+    csv += "Baptis (Tahun Ini)," + (data?.sacraments?.baptis?.thisYear || 0) + "\n";
+    csv += "Sidi (Total)," + (data?.sacraments?.sidi?.total || 0) + "\n";
+    csv += "Sidi (Tahun Ini)," + (data?.sacraments?.sidi?.thisYear || 0) + "\n";
+    csv += "Pernikahan (Total)," + (data?.sacraments?.pernikahan?.total || 0) + "\n";
+    csv += "Pernikahan (Tahun Ini)," + (data?.sacraments?.pernikahan?.thisYear || 0) + "\n\n";
+
+    if (data?.rayonDistribution) {
+      csv += "Distribusi per Rayon\n";
+      csv += "Rayon,Keluarga,Jemaat\n";
+      data.rayonDistribution.forEach(rayon => {
+        csv += `"${rayon.rayon}",${rayon.families},${rayon.members}\n`;
+      });
+    }
+
+    return csv;
+  };
+
+  const generateDemographicsCSV = (data) => {
+    let csv = "LAPORAN DEMOGRAFI JEMAAT\n\n";
+    csv += "Ringkasan\n";
+    csv += "Total Anggota," + (data?.summary?.totalMembers || 0) + "\n";
+    csv += "Total Keluarga," + (data?.summary?.totalFamilies || 0) + "\n";
+    csv += "Rata-rata Umur," + (data?.summary?.averageAge || 0) + " tahun\n\n";
+
+    if (data?.education) {
+      csv += "Distribusi Pendidikan\n";
+      csv += "Tingkat Pendidikan,Jumlah,Persentase\n";
+      data.education.forEach(item => {
+        csv += `"${item.label}",${item.count},${item.percentage}%\n`;
+      });
+      csv += "\n";
+    }
+
+    if (data?.jobs) {
+      csv += "Pekerjaan Teratas\n";
+      csv += "Pekerjaan,Jumlah,Persentase\n";
+      data.jobs.slice(0, 10).forEach(item => {
+        csv += `"${item.label}",${item.count},${item.percentage}%\n`;
+      });
+    }
+
+    return csv;
+  };
+
+  const generateGrowthCSV = (data) => {
+    let csv = "LAPORAN PERTUMBUHAN JEMAAT\n\n";
+    csv += "Ringkasan\n";
+    csv += "Anggota Baru," + (data?.summary?.totalNewMembers || 0) + "\n";
+    csv += "Rata-rata Pertumbuhan," + (data?.summary?.averageGrowth || 0) + "\n\n";
+
+    if (data?.sacramentTrends) {
+      csv += "Tren Sakramen\n";
+      csv += "Periode,Baptis,Sidi,Pernikahan,Total\n";
+      data.sacramentTrends.forEach(trend => {
+        const total = trend.baptis + trend.sidi + trend.pernikahan;
+        csv += `"${trend.period}",${trend.baptis},${trend.sidi},${trend.pernikahan},${total}\n`;
+      });
+    }
+
+    return csv;
+  };
+
+  const generateFullReportCSV = (data) => {
+    let csv = "LAPORAN LENGKAP GMIT IMANUEL OEPURA\n\n";
+
+    if (data.overview) {
+      csv += generateOverviewCSV(data.overview) + "\n\n";
+    }
+
+    if (data.demographics) {
+      csv += generateDemographicsCSV(data.demographics) + "\n\n";
+    }
+
+    if (data.growth) {
+      csv += generateGrowthCSV(data.growth);
+    }
+
+    return csv;
+  };
+
+  // Export Modal Component
+  const ExportModal = () => {
+    if (!showExportModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Export Laporan
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Pilih Format:
+              </label>
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleExport('pdf')}
+                  disabled={isExporting}
+                  className="w-full flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  <FileText className="w-5 h-5 mr-3 text-red-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900 dark:text-white">PDF Document</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Cocok untuk cetak dan arsip</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleExport('csv')}
+                  disabled={isExporting}
+                  className="w-full flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  <Table className="w-5 h-5 mr-3 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900 dark:text-white">CSV File</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Cocok untuk analisis data</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Pilih Data:
+              </label>
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleExport('csv', activeTab)}
+                  disabled={isExporting}
+                  className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  Tab Saat Ini ({activeTab === 'overview' ? 'Ringkasan' : activeTab === 'growth' ? 'Pertumbuhan' : 'Demografi'})
+                </button>
+                <button
+                  onClick={() => handleExport('csv', 'all')}
+                  disabled={isExporting}
+                  className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  Semua Data Lengkap
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              onClick={() => setShowExportModal(false)}
+              disabled={isExporting}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 p-4">
       {/* Header */}
@@ -106,9 +359,22 @@ export default function LaporanPage() {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Perbarui
               </button>
-              <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-50 dark:hover:bg-gray-600 h-9 px-4 py-2">
-                <Download className="w-4 h-4 mr-2" />
-                Export
+              <button
+                onClick={() => setShowExportModal(true)}
+                disabled={isExporting}
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-50 dark:hover:bg-gray-600 h-9 px-4 py-2"
+              >
+                {isExporting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                    Mengekspor...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -528,6 +794,9 @@ export default function LaporanPage() {
           </div>
         )}
       </div>
+
+      {/* Export Modal */}
+      <ExportModal />
     </div>
   );
 }
