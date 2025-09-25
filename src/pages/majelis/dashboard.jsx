@@ -15,6 +15,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import PageTitle from "@/components/ui/PageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import dashboardService from "@/services/dashboardService";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 function MajelisDashboard() {
   const { user } = useAuth();
@@ -221,6 +222,11 @@ function MajelisDashboard() {
               </div>
             </div>
           )}
+
+          {/* Daily Verse */}
+          <div className="mb-8">
+            <DailyVerse />
+          </div>
 
           {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-8 transition-colors">

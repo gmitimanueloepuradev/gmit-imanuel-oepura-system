@@ -8,6 +8,7 @@ import {
   Menu,
   User,
   X,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -285,6 +286,17 @@ export default function AppNavbar({
 
             {/* Right side */}
             <div className="flex items-center gap-2">
+              {/* View Public Website Button */}
+              <Link
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
+                title="Lihat Website Public"
+              >
+                <Globe className="w-5 h-5" />
+              </Link>
+
               {/* Theme Toggle */}
               <ThemeToggle />
 

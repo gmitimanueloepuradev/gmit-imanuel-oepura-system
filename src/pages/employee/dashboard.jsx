@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import { getRoleConfig } from "@/config/navigationItem";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 function EmployeeDashboard() {
   const { user } = useAuth();
@@ -209,6 +210,11 @@ function EmployeeDashboard() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Daily Verse */}
+          <div className="mb-8">
+            <DailyVerse />
           </div>
 
           {/* Quick Actions */}

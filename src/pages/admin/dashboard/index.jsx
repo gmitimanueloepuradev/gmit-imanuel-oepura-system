@@ -23,6 +23,7 @@ import {
 import PageHeader from "@/components/ui/PageHeader";
 import { formatNumber } from "@/lib/formatUtils";
 import dashboardService from "@/services/dashboardService";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 export default function DashboardPageAdmin() {
   const [stats, setStats] = useState({
@@ -198,6 +199,11 @@ export default function DashboardPageAdmin() {
               </p>
             </CardContent>
           </Card>
+
+          {/* Daily Verse Card */}
+          <div className="md:col-span-2 lg:col-span-1">
+            <DailyVerse />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
