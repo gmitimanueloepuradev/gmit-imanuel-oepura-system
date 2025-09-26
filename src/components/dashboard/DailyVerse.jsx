@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { Book, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function DailyVerse() {
   const [verse, setVerse] = useState(null);
@@ -11,10 +11,12 @@ export default function DailyVerse() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('https://beta.ourmanna.com/api/v1/get?format=json');
+      const response = await fetch(
+        "https://beta.ourmanna.com/api/v1/get?format=json"
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch verse');
+        throw new Error("Failed to fetch verse");
       }
 
       const data = await response.json();
@@ -22,16 +24,16 @@ export default function DailyVerse() {
       if (data.verse && data.verse.details) {
         setVerse(data.verse.details);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (err) {
-      console.error('Error fetching daily verse:', err);
+      console.error("Error fetching daily verse:", err);
       setError(err.message);
       // Fallback verse
       setVerse({
         text: "For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.",
         reference: "John 3:16",
-        version: "NIV"
+        version: "NIV",
       });
     } finally {
       setLoading(false);
@@ -55,13 +57,13 @@ export default function DailyVerse() {
           </h3>
         </div>
         <button
-          onClick={fetchVerse}
-          disabled={loading}
           className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200 disabled:opacity-50"
+          disabled={loading}
           title="New Verse"
+          onClick={fetchVerse}
         >
           {loading ? (
-            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}
@@ -71,7 +73,7 @@ export default function DailyVerse() {
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full" />
         </div>
       ) : (
         <div>
@@ -84,10 +86,10 @@ export default function DailyVerse() {
 
           {verse?.verseurl && (
             <a
-              href={verse.verseurl}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-block mt-3 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              href={verse.verseurl}
+              rel="noopener noreferrer"
+              target="_blank"
             >
               Powered by OurManna.com
             </a>

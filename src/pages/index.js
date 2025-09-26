@@ -1,12 +1,11 @@
-import JoinUs from "@/components/home/cta/joinUs";
-import WeeklySummary from "@/components/home/cta/weeklySummary";
+import AboutSection from "@/components/home/aboutSection";
 import DailyVerse from "@/components/home/cta/dailyVerse";
+import JoinUs from "@/components/home/cta/joinUs";
 import NewsRow from "@/components/home/newsRow";
 import OurLocation from "@/components/home/ourLocation";
 import ScheduleRow from "@/components/home/schedule/scheduleRow";
 import ChurchStatistics from "@/components/home/statistics/churchStatistics";
 import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
-import AboutSection from "@/components/home/aboutSection";
 
 export default function Home() {
   return (
@@ -18,7 +17,7 @@ export default function Home() {
           <img
             alt="Home Head"
             className="object-cover w-full h-full"
-            src="/header/home.jpg"
+            src="/header/f92411b3.webp"
           />
           <div className="absolute flex flex-col p-8">
             <p className="text-white text-2xl font-bold">Welcome to</p>
@@ -42,7 +41,7 @@ export default function Home() {
 
         <NewsRow />
 
-        <div className="p-4 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900">
+        <div className="p-4 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900 items-center justify-center">
           <JoinUs />
           <DailyVerse />
         </div>
@@ -51,7 +50,7 @@ export default function Home() {
           <img
             alt="Home Head"
             className="absolute inset-0 object-cover w-full h-full"
-            src="/header/home.jpg"
+            src="/header/f92411b3.webp"
           />
           <div className="relative z-10 flex flex-col w-full p-4">
             <ScheduleRow
@@ -84,8 +83,8 @@ export default function Home() {
           <div className="relative flex justify-start items-center h-screen">
             <img
               alt="Home Head"
-              className="object-cover w-full h-full"
-              src="/header/home.jpg"
+              className="object-cover w-full h-full brightness-60"
+              src="/header/f92411b3.webp"
             />
             <div className="absolute flex flex-col p-16">
               <p className="text-white text-4xl font-bold">Welcome to</p>
@@ -108,7 +107,7 @@ export default function Home() {
           <NewsRow />
 
           {/* CTA */}
-          <div className="p-8 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900">
+          <div className="p-8 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900 items-center justify-center">
             <JoinUs />
             <DailyVerse />
           </div>
@@ -117,8 +116,8 @@ export default function Home() {
           <div className="relative min-h-fit">
             <img
               alt="Home Head"
-              className="absolute inset-0 object-cover w-full h-full"
-              src="/header/home.jpg"
+              className="absolute inset-0 object-cover w-full h-full brightness-75"
+              src="/header/5dd0a95e.webp"
             />
             <div className="relative z-10 flex flex-col w-full p-8">
               <ScheduleRow

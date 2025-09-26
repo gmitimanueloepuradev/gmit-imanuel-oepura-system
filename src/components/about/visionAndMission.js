@@ -10,11 +10,11 @@ export default function VisionAndMission() {
         <div className="flex-1 order-2 md:order-1 group">
           <div className="relative overflow-hidden rounded-xl shadow-2xl transform group-hover:scale-105 transition-all duration-300">
             <img
-              src="/about/vision.png"
               alt="Visi GMIT Imanuel Oepura"
               className="w-full h-64 md:h-96 object-cover"
+              src="/bible-on-church.webp"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent" />
           </div>
         </div>
 
@@ -24,9 +24,9 @@ export default function VisionAndMission() {
           </h2>
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
             <p className="text-lg md:text-xl leading-relaxed text-gray-700">
-              Menjadi gereja yang hidup, bertumbuh dalam iman, pengharapan dan kasih,
-              serta menjadi berkat bagi sesama dan lingkungan, dengan berpedoman pada
-              Alkitab sebagai Firman Allah yang hidup.
+              Menjadi gereja yang hidup, bertumbuh dalam iman, pengharapan dan
+              kasih, serta menjadi berkat bagi sesama dan lingkungan, dengan
+              berpedoman pada Alkitab sebagai Firman Allah yang hidup.
             </p>
           </div>
         </div>
@@ -58,7 +58,8 @@ export default function VisionAndMission() {
               </li>
               <li className="flex items-start">
                 <span className="text-green-600 mr-3 font-bold">•</span>
-                Melestarikan dan mengembangkan budaya lokal yang selaras dengan iman Kristen
+                Melestarikan dan mengembangkan budaya lokal yang selaras dengan
+                iman Kristen
               </li>
             </ul>
           </div>
@@ -67,14 +68,14 @@ export default function VisionAndMission() {
         <div className="flex-1 order-2 group">
           <div className="relative overflow-hidden rounded-xl shadow-2xl transform group-hover:scale-105 transition-all duration-300">
             <img
-              src="/about/vision.png"
               alt="Misi GMIT Imanuel Oepura"
               className="w-full h-64 md:h-96 object-cover"
+              src="/salib.webp"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent" />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
