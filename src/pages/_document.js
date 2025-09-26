@@ -1,46 +1,107 @@
-import { Html, Head, Main, NextScript } from "next/document";
+import { Head, Html, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
     <Html lang="id">
       <Head>
-        <meta name="application-name" content="GMIT Imanuel Oepura" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="GMIT JIO" />
-        <meta name="description" content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi." />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
-        <meta name="msapplication-TileColor" content="#2B5797" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="theme-color" content="#000000" />
+        <meta content="GMIT Imanuel Oepura" name="application-name" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <meta content="default" name="apple-mobile-web-app-status-bar-style" />
+        <meta content="GMIT JIO" name="apple-mobile-web-app-title" />
+        <meta
+          content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi di Kupang, Nusa Tenggara Timur."
+          name="description"
+        />
+        <meta content="telephone=no" name="format-detection" />
+        <meta content="yes" name="mobile-web-app-capable" />
+        <meta content="/browserconfig.xml" name="msapplication-config" />
+        <meta content="#2B5797" name="msapplication-TileColor" />
+        <meta content="no" name="msapplication-tap-highlight" />
+        <meta content="#2B5797" name="theme-color" />
 
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-        <link rel="shortcut icon" href="/favicon.ico" />
+        {/* Additional SEO meta tags */}
+        <meta
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+          name="robots"
+        />
+        <meta
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+          name="googlebot"
+        />
+        <meta
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+          name="bingbot"
+        />
+        <meta content="GMIT Jemaat Imanuel Oepura" name="author" />
+        <meta content="GMIT Jemaat Imanuel Oepura" name="publisher" />
+        <meta content="id" name="language" />
+        <meta content="ID-NT" name="geo.region" />
+        <meta content="Kupang" name="geo.placename" />
+        <meta content="-10.1718;123.6044" name="geo.position" />
+        <meta content="-10.1718, 123.6044" name="ICBM" />
 
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:url" content="https://www.gmitjio-oepura.org" />
-        <meta name="twitter:title" content="GMIT Imanuel Oepura" />
-        <meta name="twitter:description" content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi." />
-        <meta name="twitter:image" content="https://www.gmitjio-oepura.org/logo-GMIT.png" />
-        <meta name="twitter:creator" content="@gmitjio" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="GMIT Imanuel Oepura" />
-        <meta property="og:description" content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi." />
-        <meta property="og:site_name" content="GMIT Imanuel Oepura" />
-        <meta property="og:url" content="https://www.gmitjio-oepura.org" />
-        <meta property="og:image" content="https://www.gmitjio-oepura.org/logo-GMIT.png" />
+        <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
+        <link
+          href="/apple-touch-icon.png"
+          rel="apple-touch-icon"
+          sizes="180x180"
+        />
+        <link
+          href="/favicon-32x32.png"
+          rel="icon"
+          sizes="32x32"
+          type="image/png"
+        />
+        <link
+          href="/favicon-16x16.png"
+          rel="icon"
+          sizes="16x16"
+          type="image/png"
+        />
+        <link href="/site.webmanifest" rel="manifest" />
+        <link color="#5bbad5" href="/safari-pinned-tab.svg" rel="mask-icon" />
+        <link href="/favicon.ico" rel="shortcut icon" />
 
-        <link rel="canonical" href="https://www.gmitjio-oepura.org" />
+        {/* Preload critical resources for better LCP */}
+        <link rel="preload" href="/header/f92411b3.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/logo-GMIT.png" as="image" type="image/png" />
 
-        <script dangerouslySetInnerHTML={{
-          __html: `
+        {/* DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="//beta.ourmanna.com" />
+
+        {/* Preconnect to external origins */}
+        <link rel="preconnect" href="https://beta.ourmanna.com" />
+
+        <meta content="summary" name="twitter:card" />
+        <meta content="https://www.gmitjio-oepura.org" name="twitter:url" />
+        <meta content="GMIT Imanuel Oepura" name="twitter:title" />
+        <meta
+          content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi."
+          name="twitter:description"
+        />
+        <meta
+          content="https://www.gmitjio-oepura.org/logo-GMIT.png"
+          name="twitter:image"
+        />
+        <meta content="@gmitjio" name="twitter:creator" />
+        <meta content="website" property="og:type" />
+        <meta content="GMIT Imanuel Oepura" property="og:title" />
+        <meta
+          content="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi."
+          property="og:description"
+        />
+        <meta content="GMIT Imanuel Oepura" property="og:site_name" />
+        <meta content="https://www.gmitjio-oepura.org" property="og:url" />
+        <meta
+          content="https://www.gmitjio-oepura.org/logo-GMIT.png"
+          property="og:image"
+        />
+
+        <link href="https://www.gmitjio-oepura.org" rel="canonical" />
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js')
@@ -51,8 +112,9 @@ export default function Document() {
                   });
               });
             }
-          `
-        }} />
+          `,
+          }}
+        />
       </Head>
       <body className="antialiased">
         <Main />

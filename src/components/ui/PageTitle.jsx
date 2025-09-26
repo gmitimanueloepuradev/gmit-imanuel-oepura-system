@@ -1,15 +1,92 @@
 import Head from "next/head";
 
-export default function PageTitle({ title, description }) {
+export default function PageTitle({
+  title,
+  description,
+  keywords,
+  image = "/logo-GMIT.png",
+  url,
+  type = "website",
+}) {
   const baseTitle = "GMIT Imanuel Oepura";
   const fullTitle = title ? `${title} - ${baseTitle}` : baseTitle;
+  const baseDescription =
+    description ||
+    "GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi di Kupang, Nusa Tenggara Timur.";
+  const baseUrl = "https://www.gmitjio-oepura.org";
+  const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
+  const fullImage = image.startsWith("http") ? image : `${baseUrl}${image}`;
 
   return (
     <Head>
       <title>{fullTitle}</title>
-      {description && <meta content={description} name="description" />}
+      <meta content={baseDescription} name="description" />
+      {keywords && <meta content={keywords} name="keywords" />}
       <meta content="width=device-width, initial-scale=1" name="viewport" />
+      <meta content="index, follow" name="robots" />
+      <meta content="GMIT Jemaat Imanuel Oepura" name="author" />
+      <meta content="GMIT Jemaat Imanuel Oepura" name="publisher" />
+      <meta content="id" name="language" />
+
+      {/* Favicon */}
       <link href="/favicon.ico" rel="icon" />
+      <link
+        href="/favicon-32x32.png"
+        rel="icon"
+        sizes="32x32"
+        type="image/png"
+      />
+      <link
+        href="/favicon-16x16.png"
+        rel="icon"
+        sizes="16x16"
+        type="image/png"
+      />
+      <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
+
+      {/* Open Graph */}
+      <meta content={type} property="og:type" />
+      <meta content={fullTitle} property="og:title" />
+      <meta content={baseDescription} property="og:description" />
+      <meta content={fullImage} property="og:image" />
+      <meta content={fullUrl} property="og:url" />
+      <meta content="GMIT Imanuel Oepura" property="og:site_name" />
+      <meta content="id_ID" property="og:locale" />
+
+      {/* Twitter Card */}
+      <meta content="summary_large_image" name="twitter:card" />
+      <meta content={fullTitle} name="twitter:title" />
+      <meta content={baseDescription} name="twitter:description" />
+      <meta content={fullImage} name="twitter:image" />
+      <meta content="@gmitjio" name="twitter:site" />
+
+      {/* Canonical URL */}
+      <link href={fullUrl} rel="canonical" />
+
+      {/* Schema.org structured data */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "GMIT Jemaat Imanuel Oepura",
+            alternateName: "JIO",
+            url: baseUrl,
+            logo: fullImage,
+            description: baseDescription,
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Kupang",
+              addressRegion: "Nusa Tenggara Timur",
+              addressCountry: "ID",
+            },
+            sameAs: [
+              // Add social media URLs when available
+            ],
+          }),
+        }}
+        type="application/ld+json"
+      />
     </Head>
   );
 }

@@ -6,9 +6,9 @@ import Sidebar from "./Sidebar";
 
 export default function Navigation({ children }) {
   const menuItems = [
-    { name: "Home", path: "/" },
-    { name: "Gallery", path: "/gallery" },
-    { name: "About", path: "/about" },
+    { name: "Beranda", path: "/" },
+    { name: "Galeri", path: "/galeri" },
+    { name: "Tentang", path: "/tentang" },
     { name: "Sejarah", path: "/sejarah" },
   ];
 

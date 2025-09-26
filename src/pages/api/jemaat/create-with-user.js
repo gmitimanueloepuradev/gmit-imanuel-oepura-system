@@ -88,7 +88,7 @@ async function handlePost(req, res) {
             idPendapatan,
             idJaminanKesehatan,
             nama,
-            jenisKelamin: jenisKelamin === "true" || jenisKelamin === true,
+            jenisKelamin: jenisKelamin === true || jenisKelamin === 'true' || jenisKelamin === 1,
             tanggalLahir: new Date(tanggalLahir),
             golonganDarah,
           },

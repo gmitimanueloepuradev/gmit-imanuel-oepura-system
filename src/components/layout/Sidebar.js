@@ -85,7 +85,7 @@ export default function Sidebar({
                   <div className="flex flex-col items-center space-y-1">
                     <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Loading...
+                      Memuat...
                     </span>
                   </div>
                 </div>
@@ -137,10 +137,10 @@ export default function Sidebar({
                       />
                     </svg>
                     <p className="text-xs font-medium">
-                      No categories available
+                      Tidak ada kategori tersedia
                     </p>
                     <p className="text-xs mt-0.5 opacity-75">
-                      Categories will appear here when added
+                      Kategori akan muncul di sini ketika ditambahkan
                     </p>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default function Sidebar({
                     onClick={closeSidebar}
                   >
                     <Home className="w-4 h-4 mr-2" />
-                    Dashboard
+                    Dasbor
                   </Link>
                 )}
 
@@ -214,7 +214,7 @@ export default function Sidebar({
               onClick={closeSidebar}
             >
               <User className="w-4 h-4 mr-2" />
-              Masuk / Login
+              Masuk
             </Link>
           )}
         </div>

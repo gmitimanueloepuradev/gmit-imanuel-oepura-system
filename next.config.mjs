@@ -1,12 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   
   // Fix untuk messaging timeout issues
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb',
     },
+  },
+
+  // Fix Fast Refresh issues
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+    }
+    return config;
   },
   
   // WebSocket configuration untuk development

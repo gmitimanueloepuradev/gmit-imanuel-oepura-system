@@ -93,7 +93,7 @@ export default function News() {
   }, [newsId]);
 
   if (!news) {
-    return <div className="min-h-screen py-24 px-4 md:px-24 bg-gray-100">Loading...</div>;
+    return <div className="min-h-screen py-24 px-4 md:px-24 bg-gray-100">Memuat...</div>;
   }
 
   return (
