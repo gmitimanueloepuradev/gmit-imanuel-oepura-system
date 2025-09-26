@@ -35,9 +35,16 @@ export default function Navigation({ children }) {
                 <Menu className="w-8 h-8" />
               </label>
             </div>
-            <div className="mx-2 flex-1 px-2 text-white">
-              <p className="font-extrabold text-2xl">GMIT Imanuel</p>
-              <p className="text-2xl">Oepura</p>
+            <div className="mx-2 flex-1 px-2 text-white flex items-center gap-3">
+              <img
+                src="/logo-GMIT.png"
+                alt="GMIT Imanuel Oepura Logo"
+                className="h-12 w-12 object-contain"
+              />
+              <div>
+                <p className="font-extrabold text-2xl">GMIT Imanuel</p>
+                <p className="text-2xl">Oepura</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />

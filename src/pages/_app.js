@@ -8,7 +8,10 @@ import Footer from "@/components/layout/footer";
 import JemaatLayout from "@/components/layout/JemaatLayout";
 import MajelisLayout from "@/components/layout/MajelisLayout";
 import Navigation from "@/components/layout/navigation";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
+import PWAInstallBanner from "@/components/pwa/PWAInstallBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PWAProvider } from "@/contexts/PWAContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { queryClient } from "@/lib/queryClient";
 import "@/styles/globals.css";
@@ -126,14 +129,18 @@ export default function App({ Component, pageProps, router }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AuthProvider>
-          <Navigation>
-            <Toaster richColors position="top-right" />
+        <PWAProvider>
+          <AuthProvider>
+            <Navigation>
+              <Toaster richColors position="top-right" />
+              <PWAInstallBanner />
 
-            <Component {...pageProps} />
-            <Footer />
-          </Navigation>
-        </AuthProvider>
+              <Component {...pageProps} />
+              <Footer />
+              <InstallPrompt />
+            </Navigation>
+          </AuthProvider>
+        </PWAProvider>
       </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
