@@ -122,7 +122,7 @@ export default function UppCard({ pengumuman }) {
 
         <div className="mt-4 flex justify-between items-center flex-shrink-0">
           <Link href={`/news/${id}`}>
-            <button className="btn btn-outline btn-sm">Read More</button>
+            <button className="btn btn-outline btn-sm">Baca Selengkapnya</button>
           </Link>
 
           {prioritas && prioritas !== "MEDIUM" && (

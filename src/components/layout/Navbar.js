@@ -75,7 +75,7 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
                   </li>
                 ))
               ) : (
-                <li className="text-center py-2 text-gray-500 dark:text-gray-400">No categories available</li>
+                <li className="text-center py-2 text-gray-500 dark:text-gray-400">Tidak ada kategori tersedia</li>
               )}
             </ul>
           </details>
@@ -144,7 +144,7 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
               className="border border-green-500 dark:border-green-400 rounded-full text-green-500 dark:text-green-400 hover:bg-green-500 dark:hover:bg-green-400 hover:text-white dark:hover:text-gray-900 px-4 py-1 font-bold flex items-center transition-all duration-200"
               href="/login"
             >
-              Login
+              Masuk
             </Link>
           )}
         </li>

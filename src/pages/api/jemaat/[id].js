@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
 import { processDateFields } from "@/lib/dateUtils";
+import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
@@ -20,20 +20,20 @@ async function handleGet(req, res) {
                       include: {
                         kotaKab: {
                           include: {
-                            provinsi: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+                            provinsi: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
             statusKeluarga: true,
             statusKepemilikanRumah: true,
             keadaanRumah: true,
-            rayon: true
-          }
+            rayon: true,
+          },
         },
         statusDalamKeluarga: true,
         suku: true,
@@ -41,8 +41,8 @@ async function handleGet(req, res) {
         pekerjaan: true,
         pendapatan: true,
         jaminanKesehatan: true,
-        User: true
-      }
+        User: true,
+      },
     });
 
     if (!jemaat) {
@@ -56,15 +56,11 @@ async function handleGet(req, res) {
       .json(apiResponse(true, jemaat, "Data berhasil diambil"));
   } catch (error) {
     console.error("Error fetching jemaat:", error);
+
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal mengambil data jemaat",
-          error.message
-        )
+        apiResponse(false, null, "Gagal mengambil data jemaat", error.message)
       );
   }
 }
@@ -103,13 +99,13 @@ async function handlePatch(req, res) {
           idPendapatan,
           idJaminanKesehatan,
           idPernikahan,
-          status
+          status,
         } = jemaatFields;
 
         // Create data object with only valid jemaat fields
         const jemaatUpdateData = {
           ...(nama !== undefined && { nama }),
-          ...(jenisKelamin !== undefined && { jenisKelamin }),
+          ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin === true || jenisKelamin === 'true' || jenisKelamin === 1 }),
           ...(tanggalLahir !== undefined && { tanggalLahir }),
           ...(golonganDarah !== undefined && { golonganDarah }),
           ...(idStatusDalamKeluarga !== undefined && { idStatusDalamKeluarga }),
@@ -119,24 +115,26 @@ async function handlePatch(req, res) {
           ...(idPendapatan !== undefined && { idPendapatan }),
           ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
           ...(idPernikahan !== undefined && { idPernikahan }),
-          ...(status !== undefined && { status })
+          ...(status !== undefined && { status }),
         };
 
         // Process date fields
-        const processedJemaatData = processDateFields(jemaatUpdateData, ['tanggalLahir']);
+        const processedJemaatData = processDateFields(jemaatUpdateData, [
+          "tanggalLahir",
+        ]);
 
         // 1. Update Alamat if requested
         if (updateAlamat && alamatData) {
           // First get the jemaat to find keluarga
           const currentJemaat = await tx.jemaat.findUnique({
             where: { id },
-            include: { keluarga: true }
+            include: { keluarga: true },
           });
 
           if (currentJemaat && currentJemaat.keluarga.idAlamat) {
             await tx.alamat.update({
               where: { id: currentJemaat.keluarga.idAlamat },
-              data: alamatData
+              data: alamatData,
             });
           }
         }
@@ -146,13 +144,13 @@ async function handlePatch(req, res) {
           // First get the jemaat to find keluarga
           const currentJemaat = await tx.jemaat.findUnique({
             where: { id },
-            include: { keluarga: true }
+            include: { keluarga: true },
           });
 
           if (currentJemaat) {
             await tx.keluarga.update({
               where: { id: currentJemaat.idKeluarga },
-              data: keluargaData
+              data: keluargaData,
             });
           }
         }
@@ -166,12 +164,12 @@ async function handlePatch(req, res) {
               include: {
                 alamat: {
                   include: {
-                    kelurahan: true
-                  }
+                    kelurahan: true,
+                  },
                 },
                 statusKeluarga: true,
-                rayon: true
-              }
+                rayon: true,
+              },
             },
             statusDalamKeluarga: true,
             suku: true,
@@ -179,21 +177,21 @@ async function handlePatch(req, res) {
             pekerjaan: true,
             pendapatan: true,
             jaminanKesehatan: true,
-            User: true
-          }
+            User: true,
+          },
         });
 
         // 4. Update User if requested
         if (updateUser && updatedJemaat.User) {
           const userUpdateData = {
             ...(email !== undefined && { email }),
-            ...(role !== undefined && { role })
+            ...(role !== undefined && { role }),
           };
 
           if (Object.keys(userUpdateData).length > 0) {
             await tx.user.update({
               where: { id: updatedJemaat.User.id },
-              data: userUpdateData
+              data: userUpdateData,
             });
           }
         }
@@ -220,13 +218,13 @@ async function handlePatch(req, res) {
         idPendapatan,
         idJaminanKesehatan,
         idPernikahan,
-        status
+        status,
       } = jemaatFields;
 
       // Create data object with only valid fields
       const jemaatData = {
         ...(nama !== undefined && { nama }),
-        ...(jenisKelamin !== undefined && { jenisKelamin }),
+        ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin === true || jenisKelamin === 'true' || jenisKelamin === 1 }),
         ...(tanggalLahir !== undefined && { tanggalLahir }),
         ...(golonganDarah !== undefined && { golonganDarah }),
         ...(idKeluarga !== undefined && { idKeluarga }),
@@ -237,11 +235,11 @@ async function handlePatch(req, res) {
         ...(idPendapatan !== undefined && { idPendapatan }),
         ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
         ...(idPernikahan !== undefined && { idPernikahan }),
-        ...(status !== undefined && { status })
+        ...(status !== undefined && { status }),
       };
 
       // Process date fields
-      const data = processDateFields(jemaatData, ['tanggalLahir']);
+      const data = processDateFields(jemaatData, ["tanggalLahir"]);
 
       const updatedJemaat = await prisma.jemaat.update({
         where: { id: id },
@@ -251,20 +249,20 @@ async function handlePatch(req, res) {
             include: {
               alamat: {
                 include: {
-                  kelurahan: true
-                }
+                  kelurahan: true,
+                },
               },
               statusKeluarga: true,
-              rayon: true
-            }
+              rayon: true,
+            },
           },
           statusDalamKeluarga: true,
           suku: true,
           pendidikan: true,
           pekerjaan: true,
           pendapatan: true,
-          jaminanKesehatan: true
-        }
+          jaminanKesehatan: true,
+        },
       });
 
       return res
@@ -275,15 +273,11 @@ async function handlePatch(req, res) {
     }
   } catch (error) {
     console.error("Error updating jemaat:", error);
+
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal memperbarui data jemaat",
-          error.message
-        )
+        apiResponse(false, null, "Gagal memperbarui data jemaat", error.message)
       );
   }
 }
@@ -294,7 +288,7 @@ async function handleDelete(req, res) {
 
     // Check if jemaat has a user account
     const userCount = await prisma.user.count({
-      where: { idJemaat: id }
+      where: { idJemaat: id },
     });
 
     if (userCount > 0) {
@@ -319,15 +313,11 @@ async function handleDelete(req, res) {
       .json(apiResponse(true, deletedJemaat, "Data berhasil dihapus"));
   } catch (error) {
     console.error("Error deleting jemaat:", error);
+
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal menghapus data jemaat",
-          error.message
-        )
+        apiResponse(false, null, "Gagal menghapus data jemaat", error.message)
       );
   }
 }

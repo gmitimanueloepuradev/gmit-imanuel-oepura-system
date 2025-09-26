@@ -6,7 +6,7 @@ import Images from "@/components/gallery/images";
 import PageTitle from "@/components/ui/PageTitle";
 import axios from "@/lib/axios";
 
-export default function Gallery() {
+export default function Galeri() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,17 +40,17 @@ export default function Gallery() {
     <div>
       <PageTitle
         description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
-        title="Gallery"
+        title="Galeri"
       />
       <div className="flex justify-center items-center h-screen relative">
         <Image
           priority
-          alt="Gallery Head"
+          alt="Galeri Head"
           layout="fill"
           objectFit="cover"
           src="/header/gallery.webp"
         />
-        <h1 className="absolute text-8xl font-bold mt-4 text-white">Gallery</h1>
+        <h1 className="absolute text-8xl font-bold mt-4 text-white">Galeri</h1>
       </div>
       <div className="bg-gray-500 min-h-screen">
         {loading ? (

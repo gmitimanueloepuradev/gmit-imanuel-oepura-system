@@ -10,8 +10,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -484,7 +485,7 @@ model JenisPengumuman {
   kategori   KategoriPengumuman @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
   pengumuman Pengumuman[]
 
-  @@unique([kategoriId], name: "unique_kode_per_kategori")
+  @@unique([kategoriId, nama], name: "unique_nama_per_kategori")
   @@map("jenis_pengumuman")
 }
 

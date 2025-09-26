@@ -7,6 +7,7 @@ import ScheduleRow from "@/components/home/schedule/scheduleRow";
 import ChurchStatistics from "@/components/home/statistics/churchStatistics";
 import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
 import PageTitle from "@/components/ui/PageTitle";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -26,12 +27,12 @@ export default function Home() {
               src="/header/f92411b3.webp"
             />
             <div className="absolute flex flex-col p-8">
-              <p className="text-white text-2xl font-bold">Welcome to</p>
+              <p className="text-white text-2xl font-bold">Selamat Datang di</p>
               <h1 className="text-white text-4xl font-bold">
                 GMIT Imanuel Oepura
               </h1>
               <p className="text-white text-base">
-                Together in love, growing in faith, serving in hope.
+                Bersama dalam kasih, bertumbuh dalam iman, melayani dalam pengharapan.
               </p>
             </div>
           </div>
@@ -53,10 +54,12 @@ export default function Home() {
           </div>
 
           <div className="relative min-h-fit">
-            <img
+            <Image
               alt="Home Head"
-              className="absolute inset-0 object-cover w-full h-full"
+              className="object-cover"
               src="/header/f92411b3.webp"
+              fill
+              sizes="100vw"
             />
             <div className="relative z-10 flex flex-col w-full p-4">
               <ScheduleRow
@@ -93,12 +96,12 @@ export default function Home() {
                 src="/header/f92411b3.webp"
               />
               <div className="absolute flex flex-col p-16">
-                <p className="text-white text-4xl font-bold">Welcome to</p>
+                <p className="text-white text-4xl font-bold">Selamat Datang di</p>
                 <h1 className="text-white text-6xl font-bold">
                   GMIT Imanuel Oepura
                 </h1>
                 <p className="text-white text-lg">
-                  Together in love, growing in faith, serving in hope.
+                  Bersama dalam kasih, bertumbuh dalam iman, melayani dalam pengharapan.
                 </p>
               </div>
             </div>
@@ -120,10 +123,12 @@ export default function Home() {
 
             {/* Schedule */}
             <div className="relative min-h-fit">
-              <img
+              <Image
                 alt="Home Head"
-                className="absolute inset-0 object-cover w-full h-full brightness-75"
+                className="object-cover brightness-75"
                 src="/header/5dd0a95e.webp"
+                fill
+                sizes="100vw"
               />
               <div className="relative z-10 flex flex-col w-full p-8">
                 <ScheduleRow

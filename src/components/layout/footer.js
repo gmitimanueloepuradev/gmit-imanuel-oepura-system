@@ -9,7 +9,7 @@ export default function Footer() {
         </p>
       </nav>
       <nav>
-        <h6 className="footer-title">Contact Us</h6>
+        <h6 className="footer-title">Kontak Kami </h6>
         <div className="grid grid-flow-row gap-2">
           <p>0822-4793-0215</p>
           <p>Kota Kupang, NTT 85142</p>
@@ -17,7 +17,7 @@ export default function Footer() {
         </div>
       </nav>
       <nav>
-        <h6 className="footer-title">Follow Us</h6>
+        <h6 className="footer-title">Ikuti Kami</h6>
         <div className="grid grid-flow-col gap-4">
           <a
             href="https://www.facebook.com/GMITJIO/"

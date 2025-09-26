@@ -118,7 +118,12 @@ async function handlePost(req, res) {
     }
 
     const { user } = authResult;
-    const data = processDateFields(req.body, ['tanggalLahir']);
+    let data = processDateFields(req.body, ['tanggalLahir']);
+
+    // Convert jenisKelamin to boolean if it exists
+    if (data.jenisKelamin !== undefined) {
+      data.jenisKelamin = data.jenisKelamin === true || data.jenisKelamin === 'true' || data.jenisKelamin === 1;
+    }
 
     // For MAJELIS users, validate that the keluarga belongs to their rayon
     if (user.role === 'MAJELIS' && user.majelis && user.majelis.idRayon) {

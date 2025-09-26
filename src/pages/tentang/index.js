@@ -4,7 +4,7 @@ import History from "@/components/about/history";
 import VisionAndMission from "@/components/about/visionAndMission";
 import PageTitle from "@/components/ui/PageTitle";
 
-export default function About() {
+export default function Tentang() {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function About() {
     <div className="bg-gray-50">
       <PageTitle
         description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
-        title="About Us"
+        title="Tentang Kami"
       />
       {/* Hero Section with Parallax */}
       <div className="relative h-screen flex justify-center items-center overflow-hidden">
@@ -76,37 +76,6 @@ export default function About() {
 
       {/* Vision and Mission */}
       <VisionAndMission />
-
-      {/* History */}
-      <History />
-
-      {/* Call to Action */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-20 px-4 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Bergabunglah Bersama Kami
-          </h2>
-          <p className="text-lg md:text-xl mb-8 opacity-90">
-            Jadilah bagian dari komunitas yang hidup dalam kasih dan pelayanan.
-            Kami mengundang Anda untuk merasakan kehangatan keluarga GMIT
-            Imanuel Oepura.
-          </p>
-          <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <a
-              className="inline-block bg-white text-blue-600 font-semibold px-8 py-3 rounded-full hover:bg-gray-100 transform hover:scale-105 transition-all duration-300"
-              href="/contact"
-            >
-              Hubungi Kami
-            </a>
-            <a
-              className="inline-block border-2 border-white text-white font-semibold px-8 py-3 rounded-full hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300"
-              href="/schedule"
-            >
-              Lihat Jadwal Ibadah
-            </a>
-          </div>
-        </div>
-      </div>
 
       <style jsx>{`
         @keyframes fade-in-up {

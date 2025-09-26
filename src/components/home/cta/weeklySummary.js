@@ -31,7 +31,7 @@ export default function WeeklySummary() {
           — Mattew 3 : 2
         </p>
         <button className="btn btn-success btn-wide self-start rounded-full">
-          More Info
+          Info Lebih Lanjut
         </button>
       </div>
     </div>

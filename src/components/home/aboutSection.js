@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useState, useRef } from "react";
 
 export default function AboutSection() {
   const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     // Add fallback timeout to ensure content shows even if IntersectionObserver fails
@@ -23,7 +25,7 @@ export default function AboutSection() {
       }
     );
 
-    const element = document.getElementById("about-section");
+    const element = sectionRef.current;
 
     if (element) {
       observer.observe(element);
@@ -39,6 +41,7 @@ export default function AboutSection() {
 
   return (
     <div
+      ref={sectionRef}
       className="py-16 lg:py-24 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 transition-colors duration-300"
       id="about-section"
     >
@@ -146,11 +149,15 @@ export default function AboutSection() {
             <div className="relative">
               {/* Main Image */}
               <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  alt="GMIT Imanuel Oepura"
-                  className="w-full h-80 lg:h-96 object-cover transform hover:scale-110 transition-transform duration-700"
-                  src="/header/108d22eb.webp"
-                />
+                <div className="relative w-full h-80 lg:h-96">
+                  <Image
+                    alt="GMIT Imanuel Oepura"
+                    className="object-cover transform hover:scale-110 transition-transform duration-700"
+                    src="/header/108d22eb.webp"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
                 {/* Overlay Content */}
@@ -160,7 +167,7 @@ export default function AboutSection() {
                       GMIT Imanuel Oepura
                     </h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      "Together in love, growing in faith, serving in hope"
+                      "Bersama dalam kasih, bertumbuh dalam iman, melayani dalam pengharapan"
                     </p>
                   </div>
                 </div>
