@@ -221,6 +221,8 @@ export default function KotaKabupatenPage() {
         searchPlaceholder="Cari kota kabupaten..."
         title={"Daftar Kota / Kabupaten"}
         onAdd={() => modal.open()}
+        exportable={true}
+        exportFilename="kota-kabupaten"
       />
 
       <CreateOrEditModal

@@ -3,13 +3,34 @@ import { apiResponse } from "@/lib/apiHelper";
 import { parseQueryParams } from "@/lib/queryParams";
 import { createApiHandler } from "@/lib/apiHandler";
 import { staffOnly } from "@/lib/apiMiddleware";
+import { requireAuth } from "@/lib/auth";
+import { processDateFields } from "@/lib/dateUtils";
 
 async function handleGet(req, res) {
   try {
+    // Get authenticated user for role-based filtering
+    const authResult = await requireAuth(req, res);
+
+    if (authResult.error) {
+      return res
+        .status(authResult.status)
+        .json(apiResponse(false, null, authResult.error));
+    }
+
+    const { user } = authResult;
+
     const { pagination, sort, where } = parseQueryParams(req.query, {
       searchField: "nama",
       defaultSortBy: "nama",
     });
+
+    // Apply rayon-based filtering for MAJELIS users
+    if (user.role === 'MAJELIS' && user.majelis && user.majelis.idRayon) {
+      where.keluarga = {
+        ...where.keluarga,
+        idRayon: user.majelis.idRayon
+      };
+    }
 
     const total = await prisma.jemaat.count({ where });
 
@@ -87,7 +108,37 @@ async function handleGet(req, res) {
 
 async function handlePost(req, res) {
   try {
-    const data = req.body;
+    // Get authenticated user for role-based validation
+    const authResult = await requireAuth(req, res);
+
+    if (authResult.error) {
+      return res
+        .status(authResult.status)
+        .json(apiResponse(false, null, authResult.error));
+    }
+
+    const { user } = authResult;
+    const data = processDateFields(req.body, ['tanggalLahir']);
+
+    // For MAJELIS users, validate that the keluarga belongs to their rayon
+    if (user.role === 'MAJELIS' && user.majelis && user.majelis.idRayon) {
+      const keluarga = await prisma.keluarga.findUnique({
+        where: { id: data.idKeluarga },
+        select: { idRayon: true }
+      });
+
+      if (!keluarga) {
+        return res.status(404).json(
+          apiResponse(false, null, "Keluarga tidak ditemukan")
+        );
+      }
+
+      if (keluarga.idRayon !== user.majelis.idRayon) {
+        return res.status(403).json(
+          apiResponse(false, null, "Anda hanya dapat menambahkan jemaat ke keluarga dalam rayon yang Anda kelola")
+        );
+      }
+    }
 
     const newJemaat = await prisma.jemaat.create({
       data,

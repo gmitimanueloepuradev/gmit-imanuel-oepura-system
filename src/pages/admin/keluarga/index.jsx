@@ -238,6 +238,8 @@ export default function KeluargaPage() {
         error={error}
         searchable={true}
         searchPlaceholder="Cari berdasarkan alamat, kepala keluarga..."
+        exportable={true}
+        exportFilename="keluarga"
       />
 
       <ConfirmDialog

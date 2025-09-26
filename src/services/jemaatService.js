@@ -51,6 +51,16 @@ const jemaatService = {
 
     return response.data;
   },
+
+  // Export jemaat data
+  exportData: async (filters, exportConfig) => {
+    const response = await axios.post("/jemaat/export", {
+      filters,
+      exportConfig,
+    });
+
+    return response.data;
+  },
 };
 
 export default jemaatService;

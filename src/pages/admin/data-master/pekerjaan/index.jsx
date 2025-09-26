@@ -66,6 +66,9 @@ export default function PekerjaanPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Pekerjaan" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["namaPekerjaan"]}
     />
   );
 }

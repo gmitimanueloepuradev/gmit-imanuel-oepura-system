@@ -1,14 +1,14 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Trash, Plus, Crown, Users, Pen } from "lucide-react";
+import { Crown, Eye, Pen, Trash } from "lucide-react";
+import { useState } from "react";
 
+import CreateOrEditModal from "@/components/common/CreateOrEditModal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import ListGrid from "@/components/ui/ListGrid";
+import useConfirm from "@/hooks/useConfirm";
+import useModalForm from "@/hooks/useModalForm";
 import masterService from "@/services/masterService";
 import { jenisJabatanSchema } from "@/validations/masterSchema";
-import useModalForm from "@/hooks/useModalForm";
-import CreateOrEditModal from "@/components/common/CreateOrEditModal";
-import ListGrid from "@/components/ui/ListGrid";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import useConfirm from "@/hooks/useConfirm";
 
 const jenisJabatanFields = [
   {
@@ -65,6 +65,7 @@ export default function JenisJabatanPage() {
         formData
       );
     }
+
     return await masterService.createJenisJabatan(formData);
   };
 
@@ -102,6 +103,8 @@ export default function JenisJabatanPage() {
         columns={columns}
         data={data?.data?.items || []}
         description="Kelola data jenis-jenis jabatan dalam gereja"
+        exportFilename={"jenis-jabatan"}
+        exportable={true}
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
@@ -145,19 +148,19 @@ export default function JenisJabatanPage() {
       />
 
       <ConfirmDialog
+        cancelText={confirm.config.cancelText}
+        confirmText={confirm.config.confirmText}
         isOpen={confirm.isOpen}
+        message={confirm.config.message}
+        title={confirm.config.title}
+        variant={confirm.config.variant}
         onClose={confirm.hideConfirm}
         onConfirm={confirm.handleConfirm}
-        title={confirm.config.title}
-        message={confirm.config.message}
-        confirmText={confirm.config.confirmText}
-        cancelText={confirm.config.cancelText}
-        variant={confirm.config.variant}
       />
 
       {isViewModalOpen && viewData && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity"></div>
+          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity" />
 
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
@@ -184,8 +187,8 @@ export default function JenisJabatanPage() {
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
-                  type="button"
                   className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
+                  type="button"
                   onClick={() => setIsViewModalOpen(false)}
                 >
                   Tutup

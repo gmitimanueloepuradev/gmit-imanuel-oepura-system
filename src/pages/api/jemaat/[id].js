@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
+import { processDateFields } from "@/lib/dateUtils";
 
 async function handleGet(req, res) {
   try {
@@ -71,37 +72,207 @@ async function handleGet(req, res) {
 async function handlePatch(req, res) {
   try {
     const { id } = req.query;
-    const data = req.body;
+    const requestData = req.body;
 
-    const updatedJemaat = await prisma.jemaat.update({
-      where: { id: id },
-      data,
-      include: {
-        keluarga: {
+    // Check if this is a complex update (includes related entities)
+    const {
+      updateUser,
+      updateKeluarga,
+      updateAlamat,
+      email,
+      role,
+      keluargaData,
+      alamatData,
+      ...jemaatFields
+    } = requestData;
+
+    if (updateUser || updateKeluarga || updateAlamat) {
+      // Handle complex update with transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Extract only valid Jemaat fields
+        const {
+          nama,
+          jenisKelamin,
+          tanggalLahir,
+          golonganDarah,
+          idKeluarga,
+          idStatusDalamKeluarga,
+          idSuku,
+          idPendidikan,
+          idPekerjaan,
+          idPendapatan,
+          idJaminanKesehatan,
+          idPernikahan,
+          status
+        } = jemaatFields;
+
+        // Create data object with only valid jemaat fields
+        const jemaatUpdateData = {
+          ...(nama !== undefined && { nama }),
+          ...(jenisKelamin !== undefined && { jenisKelamin }),
+          ...(tanggalLahir !== undefined && { tanggalLahir }),
+          ...(golonganDarah !== undefined && { golonganDarah }),
+          ...(idStatusDalamKeluarga !== undefined && { idStatusDalamKeluarga }),
+          ...(idSuku !== undefined && { idSuku }),
+          ...(idPendidikan !== undefined && { idPendidikan }),
+          ...(idPekerjaan !== undefined && { idPekerjaan }),
+          ...(idPendapatan !== undefined && { idPendapatan }),
+          ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
+          ...(idPernikahan !== undefined && { idPernikahan }),
+          ...(status !== undefined && { status })
+        };
+
+        // Process date fields
+        const processedJemaatData = processDateFields(jemaatUpdateData, ['tanggalLahir']);
+
+        // 1. Update Alamat if requested
+        if (updateAlamat && alamatData) {
+          // First get the jemaat to find keluarga
+          const currentJemaat = await tx.jemaat.findUnique({
+            where: { id },
+            include: { keluarga: true }
+          });
+
+          if (currentJemaat && currentJemaat.keluarga.idAlamat) {
+            await tx.alamat.update({
+              where: { id: currentJemaat.keluarga.idAlamat },
+              data: alamatData
+            });
+          }
+        }
+
+        // 2. Update Keluarga if requested
+        if (updateKeluarga && keluargaData) {
+          // First get the jemaat to find keluarga
+          const currentJemaat = await tx.jemaat.findUnique({
+            where: { id },
+            include: { keluarga: true }
+          });
+
+          if (currentJemaat) {
+            await tx.keluarga.update({
+              where: { id: currentJemaat.idKeluarga },
+              data: keluargaData
+            });
+          }
+        }
+
+        // 3. Update Jemaat
+        const updatedJemaat = await tx.jemaat.update({
+          where: { id },
+          data: processedJemaatData,
           include: {
-            alamat: {
+            keluarga: {
               include: {
-                kelurahan: true
+                alamat: {
+                  include: {
+                    kelurahan: true
+                  }
+                },
+                statusKeluarga: true,
+                rayon: true
               }
             },
-            statusKeluarga: true,
-            rayon: true
+            statusDalamKeluarga: true,
+            suku: true,
+            pendidikan: true,
+            pekerjaan: true,
+            pendapatan: true,
+            jaminanKesehatan: true,
+            User: true
           }
-        },
-        statusDalamKeluarga: true,
-        suku: true,
-        pendidikan: true,
-        pekerjaan: true,
-        pendapatan: true,
-        jaminanKesehatan: true
-      }
-    });
+        });
 
-    return res
-      .status(200)
-      .json(
-        apiResponse(true, updatedJemaat, "Data jemaat berhasil diperbarui")
-      );
+        // 4. Update User if requested
+        if (updateUser && updatedJemaat.User) {
+          const userUpdateData = {
+            ...(email !== undefined && { email }),
+            ...(role !== undefined && { role })
+          };
+
+          if (Object.keys(userUpdateData).length > 0) {
+            await tx.user.update({
+              where: { id: updatedJemaat.User.id },
+              data: userUpdateData
+            });
+          }
+        }
+
+        return updatedJemaat;
+      });
+
+      return res
+        .status(200)
+        .json(apiResponse(true, result, "Data jemaat berhasil diperbarui"));
+    } else {
+      // Simple jemaat-only update
+      // Extract only valid Jemaat fields from the request
+      const {
+        nama,
+        jenisKelamin,
+        tanggalLahir,
+        golonganDarah,
+        idKeluarga,
+        idStatusDalamKeluarga,
+        idSuku,
+        idPendidikan,
+        idPekerjaan,
+        idPendapatan,
+        idJaminanKesehatan,
+        idPernikahan,
+        status
+      } = jemaatFields;
+
+      // Create data object with only valid fields
+      const jemaatData = {
+        ...(nama !== undefined && { nama }),
+        ...(jenisKelamin !== undefined && { jenisKelamin }),
+        ...(tanggalLahir !== undefined && { tanggalLahir }),
+        ...(golonganDarah !== undefined && { golonganDarah }),
+        ...(idKeluarga !== undefined && { idKeluarga }),
+        ...(idStatusDalamKeluarga !== undefined && { idStatusDalamKeluarga }),
+        ...(idSuku !== undefined && { idSuku }),
+        ...(idPendidikan !== undefined && { idPendidikan }),
+        ...(idPekerjaan !== undefined && { idPekerjaan }),
+        ...(idPendapatan !== undefined && { idPendapatan }),
+        ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
+        ...(idPernikahan !== undefined && { idPernikahan }),
+        ...(status !== undefined && { status })
+      };
+
+      // Process date fields
+      const data = processDateFields(jemaatData, ['tanggalLahir']);
+
+      const updatedJemaat = await prisma.jemaat.update({
+        where: { id: id },
+        data,
+        include: {
+          keluarga: {
+            include: {
+              alamat: {
+                include: {
+                  kelurahan: true
+                }
+              },
+              statusKeluarga: true,
+              rayon: true
+            }
+          },
+          statusDalamKeluarga: true,
+          suku: true,
+          pendidikan: true,
+          pekerjaan: true,
+          pendapatan: true,
+          jaminanKesehatan: true
+        }
+      });
+
+      return res
+        .status(200)
+        .json(
+          apiResponse(true, updatedJemaat, "Data jemaat berhasil diperbarui")
+        );
+    }
   } catch (error) {
     console.error("Error updating jemaat:", error);
     return res

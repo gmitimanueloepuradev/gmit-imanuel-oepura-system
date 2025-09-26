@@ -66,6 +66,9 @@ export default function PendidikanPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Pendidikan" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["jenjang"]}
     />
   );
 }

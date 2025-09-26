@@ -1,24 +1,23 @@
-import WeeklySummary from "@/components/home/cta/weeklySummary";
+import AboutSection from "@/components/home/aboutSection";
+import DailyVerse from "@/components/home/cta/dailyVerse";
 import JoinUs from "@/components/home/cta/joinUs";
-import ScheduleRow from "@/components/home/schedule/scheduleRow";
-import OurLocation from "@/components/home/ourLocation";
-import ChurchStatistics from "@/components/home/statistics/churchStatistics";
-
-import { ctaTexts, schedules } from "@/json/dummyHome";
-import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
 import NewsRow from "@/components/home/newsRow";
+import OurLocation from "@/components/home/ourLocation";
+import ScheduleRow from "@/components/home/schedule/scheduleRow";
+import ChurchStatistics from "@/components/home/statistics/churchStatistics";
+import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
 
 export default function Home() {
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile Layout - Vertical Stack */}
       <div className="lg:hidden">
         {/* Hero Section */}
         <div className="relative flex justify-start items-center h-screen">
           <img
-            src="/header/home.jpg"
             alt="Home Head"
             className="object-cover w-full h-full"
+            src="/header/f92411b3.webp"
           />
           <div className="absolute flex flex-col p-8">
             <p className="text-white text-2xl font-bold">Welcome to</p>
@@ -36,34 +35,35 @@ export default function Home() {
 
         {/* Rest of content */}
         <ChurchStatisticsHorizontal />
+
+        {/* About Section */}
+        <AboutSection />
+
         <NewsRow />
 
-        <div className="p-4 min-h-screen flex flex-col gap-4">
+        <div className="p-4 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900 items-center justify-center">
           <JoinUs />
-          <WeeklySummary />
+          <DailyVerse />
         </div>
 
         <div className="relative min-h-fit">
           <img
-            src="/header/home.jpg"
             alt="Home Head"
             className="absolute inset-0 object-cover w-full h-full"
+            src="/header/f92411b3.webp"
           />
           <div className="relative z-10 flex flex-col w-full p-4">
-            <ScheduleRow 
-              jenisIbadah="Cell Group/Kelompok Kecil" 
-              title="Jadwal Cell Group" 
-              limit={4} 
+            <ScheduleRow
+              jenisIbadah="Cell Group/Kelompok Kecil"
+              limit={4}
+              title="Jadwal Cell Group"
             />
-            <ScheduleRow 
-              kategori="Keluarga" 
-              title="Jadwal Ibadah Keluarga" 
-              limit={6} 
+            <ScheduleRow
+              kategori="Keluarga"
+              limit={6}
+              title="Jadwal Ibadah Keluarga"
             />
-            <ScheduleRow 
-              title="Semua Jadwal Ibadah" 
-              limit={4} 
-            />
+            <ScheduleRow limit={4} title="Semua Jadwal Ibadah" />
           </div>
         </div>
 
@@ -82,9 +82,9 @@ export default function Home() {
           {/* Hero */}
           <div className="relative flex justify-start items-center h-screen">
             <img
-              src="/header/home.jpg"
               alt="Home Head"
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full brightness-60"
+              src="/header/f92411b3.webp"
             />
             <div className="absolute flex flex-col p-16">
               <p className="text-white text-4xl font-bold">Welcome to</p>
@@ -100,37 +100,37 @@ export default function Home() {
           {/* Horizontal Statistics */}
           <ChurchStatisticsHorizontal />
 
+          {/* About Section */}
+          <AboutSection />
+
           {/* News */}
           <NewsRow />
 
           {/* CTA */}
-          <div className="p-8 min-h-screen flex flex-col gap-4">
+          <div className="p-8 min-h-screen flex flex-col gap-4 bg-gray-100 dark:bg-gray-900 items-center justify-center">
             <JoinUs />
-            <WeeklySummary />
+            <DailyVerse />
           </div>
 
           {/* Schedule */}
           <div className="relative min-h-fit">
             <img
-              src="/header/home.jpg"
               alt="Home Head"
-              className="absolute inset-0 object-cover w-full h-full"
+              className="absolute inset-0 object-cover w-full h-full brightness-75"
+              src="/header/5dd0a95e.webp"
             />
             <div className="relative z-10 flex flex-col w-full p-8">
-              <ScheduleRow 
-                jenisIbadah="Cell Group/Kelompok Kecil" 
-                title="Jadwal Cell Group" 
-                limit={4} 
+              <ScheduleRow
+                jenisIbadah="Cell Group/Kelompok Kecil"
+                limit={4}
+                title="Jadwal Cell Group"
               />
-              <ScheduleRow 
-                kategori="Keluarga" 
-                title="Jadwal Ibadah Keluarga" 
-                limit={6} 
+              <ScheduleRow
+                kategori="Keluarga"
+                limit={6}
+                title="Jadwal Ibadah Keluarga"
               />
-              <ScheduleRow 
-                title="Semua Jadwal Ibadah" 
-                limit={4} 
-              />
+              <ScheduleRow limit={4} title="Semua Jadwal Ibadah" />
             </div>
           </div>
 

@@ -1,51 +1,38 @@
-import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import prisma from "@/lib/prisma";
+import { apiResponse } from "@/lib/apiHelper";
+import { createApiHandler } from "@/lib/apiHandler";
+import { majelisOrAdmin } from "@/lib/apiMiddleware";
+import { requireAuth } from "@/lib/auth";
 
-const prisma = new PrismaClient();
-
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({
-      success: false,
-      message: "Method tidak diizinkan",
-    });
-  }
-
+async function handleGet(req, res) {
   try {
-    // Get token from header
-    const token = req.headers.authorization?.replace("Bearer ", "");
-    
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Token tidak ditemukan",
-      });
+    // Get authenticated user for role-based filtering - this loads full user data
+    const authResult = await requireAuth(req, res, ['MAJELIS', 'ADMIN']);
+
+    if (authResult.error) {
+      return res
+        .status(authResult.status)
+        .json(apiResponse(false, null, authResult.error));
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const { user } = authResult;
 
-    // Get user with majelis info
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        majelis: {
-          include: {
-            rayon: true
-          }
-        }
-      }
-    });
-
-    if (!user || !user.majelis) {
-      return res.status(403).json({
-        success: false,
-        message: "Akses ditolak. User bukan majelis",
-      });
+    // For ADMIN users, allow access but might need rayon selection
+    // For MAJELIS users, must have majelis data
+    if (user.role === 'MAJELIS' && !user.majelis) {
+      return res.status(403).json(
+        apiResponse(false, null, "Akses ditolak. Data majelis tidak ditemukan untuk user ini.")
+      );
     }
 
-    const rayonId = user.majelis.idRayon;
+    // For MAJELIS users, must have assigned rayon
+    if (user.role === 'MAJELIS' && user.majelis && !user.majelis.idRayon) {
+      return res.status(403).json(
+        apiResponse(false, null, "Akses ditolak. Anda belum memiliki rayon yang ditugaskan.")
+      );
+    }
+
+    const rayonId = user.role === 'MAJELIS' ? user.majelis?.idRayon : null;
 
     // Get statistics berdasarkan rayon
     const [
@@ -55,33 +42,52 @@ export default async function handler(req, res) {
       baptisBulanIni,
       sidiTahunIni
     ] = await Promise.all([
-      // Total jemaat di rayon ini
+      // Total jemaat di rayon ini (atau semua jika admin)
       prisma.jemaat.count({
-        where: {
+        where: rayonId ? {
           keluarga: {
             idRayon: rayonId
+          }
+        } : {}
+      }),
+
+      // Total keluarga di rayon ini (atau semua jika admin)
+      prisma.keluarga.count({
+        where: rayonId ? {
+          idRayon: rayonId
+        } : {}
+      }),
+
+      // Jadwal ibadah bulan ini untuk rayon ini (atau semua jika admin)
+      prisma.jadwalIbadah.count({
+        where: {
+          ...(rayonId ? {
+            OR: [
+              { idRayon: rayonId },
+              {
+                keluarga: {
+                  idRayon: rayonId
+                }
+              }
+            ]
+          } : {}),
+          tanggal: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
           }
         }
       }),
 
-      // Total keluarga di rayon ini  
-      prisma.keluarga.count({
+      // Baptis bulan ini untuk jemaat di rayon ini (atau semua jika admin)
+      prisma.baptis.count({
         where: {
-          idRayon: rayonId
-        }
-      }),
-
-      // Jadwal ibadah bulan ini untuk rayon ini
-      prisma.jadwalIbadah.count({
-        where: {
-          OR: [
-            { idRayon: rayonId },
-            { 
+          ...(rayonId ? {
+            jemaat: {
               keluarga: {
                 idRayon: rayonId
               }
             }
-          ],
+          } : {}),
           tanggal: {
             gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
@@ -89,29 +95,16 @@ export default async function handler(req, res) {
         }
       }),
 
-      // Baptis bulan ini untuk jemaat di rayon ini
-      prisma.baptis.count({
-        where: {
-          jemaat: {
-            keluarga: {
-              idRayon: rayonId
-            }
-          },
-          tanggal: {
-            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
-          }
-        }
-      }),
-
-      // Sidi tahun ini untuk jemaat di rayon ini
+      // Sidi tahun ini untuk jemaat di rayon ini (atau semua jika admin)
       prisma.sidi.count({
         where: {
-          jemaat: {
-            keluarga: {
-              idRayon: rayonId
+          ...(rayonId ? {
+            jemaat: {
+              keluarga: {
+                idRayon: rayonId
+              }
             }
-          },
+          } : {}),
           tanggal: {
             gte: new Date(new Date().getFullYear(), 0, 1),
             lt: new Date(new Date().getFullYear() + 1, 0, 1)
@@ -123,14 +116,16 @@ export default async function handler(req, res) {
     // Get recent jadwal ibadah (5 terbaru)
     const recentJadwal = await prisma.jadwalIbadah.findMany({
       where: {
-        OR: [
-          { idRayon: rayonId },
-          { 
-            keluarga: {
-              idRayon: rayonId
+        ...(rayonId ? {
+          OR: [
+            { idRayon: rayonId },
+            {
+              keluarga: {
+                idRayon: rayonId
+              }
             }
-          }
-        ],
+          ]
+        } : {}),
         tanggal: {
           gte: new Date()
         }
@@ -155,14 +150,16 @@ export default async function handler(req, res) {
     // Get upcoming events this month
     const upcomingEvents = await prisma.jadwalIbadah.findMany({
       where: {
-        OR: [
-          { idRayon: rayonId },
-          { 
-            keluarga: {
-              idRayon: rayonId
+        ...(rayonId ? {
+          OR: [
+            { idRayon: rayonId },
+            {
+              keluarga: {
+                idRayon: rayonId
+              }
             }
-          }
-        ],
+          ]
+        } : {}),
         tanggal: {
           gte: new Date(),
           lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
@@ -178,29 +175,39 @@ export default async function handler(req, res) {
       take: 3
     });
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        statistics: {
-          totalJemaat,
-          totalKeluarga, 
-          jadwalBulanIni,
-          baptisBulanIni,
-          sidiTahunIni
-        },
-        rayon: user.majelis.rayon,
-        recentJadwal,
-        upcomingEvents
+    const result = {
+      statistics: {
+        totalJemaat,
+        totalKeluarga,
+        jadwalBulanIni,
+        baptisBulanIni,
+        sidiTahunIni
       },
-      message: "Data dashboard berhasil diambil",
-    });
+      rayon: user.role === 'MAJELIS' ? user.majelis?.rayon : null,
+      recentJadwal,
+      upcomingEvents
+    };
+
+    return res
+      .status(200)
+      .json(apiResponse(true, result, "Data dashboard berhasil diambil"));
 
   } catch (error) {
     console.error("Error fetching majelis dashboard:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan server",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json(
+        apiResponse(
+          false,
+          null,
+          "Gagal mengambil data dashboard",
+          error.message
+        )
+      );
   }
 }
+
+// Export using createApiHandler
+export default createApiHandler({
+  GET: handleGet,
+});

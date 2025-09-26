@@ -1,85 +1,49 @@
 import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/apiHelper";
-import { parseQueryParams } from "@/lib/queryParams";
 import { createApiHandler } from "@/lib/apiHandler";
+import { staffOnly } from "@/lib/apiMiddleware";
+import { z } from "zod";
 
-async function handleGet(req, res) {
-  try {
-    const { pagination, sort, where } = parseQueryParams(req.query, {
-      searchField: "jalan",
-      defaultSortBy: "jalan",
-    });
-
-    const total = await prisma.alamat.count({ where });
-
-    const items = await prisma.alamat.findMany({
-      where,
-      skip: pagination.skip,
-      take: pagination.take,
-      orderBy: {
-        [sort.sortBy]: sort.sortOrder,
-      },
-      include: {
-        kelurahan: {
-          include: {
-            kecamatan: {
-              include: {
-                kotaKab: {
-                  include: {
-                    provinsi: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    const totalPages = Math.ceil(total / pagination.limit);
-
-    const result = {
-      items,
-      pagination: {
-        ...pagination,
-        total,
-        totalPages,
-        hasNext: pagination.page < totalPages,
-        hasPrev: pagination.page > 1,
-      },
-    };
-
-    return res
-      .status(200)
-      .json(apiResponse(true, result, "Data berhasil diambil"));
-  } catch (error) {
-    console.error("Error fetching alamat:", error);
-
-    return res
-      .status(500)
-      .json(
-        apiResponse(false, null, "Gagal mengambil data alamat", error.message)
-      );
-  }
-}
+// Validation schema
+const alamatSchema = z.object({
+  rt: z.number().int().min(1, "RT wajib diisi"),
+  rw: z.number().int().min(1, "RW wajib diisi"),
+  jalan: z.string().min(1, "Jalan wajib diisi"),
+  idKelurahan: z.string().nonempty("Kelurahan wajib dipilih"),
+});
 
 async function handlePost(req, res) {
   try {
-    const data = req.body;
+    // Validate request body
+    const validation = alamatSchema.safeParse(req.body);
 
-    // Validate kelurahan exists
+    if (!validation.success) {
+      return res.status(400).json(
+        apiResponse(false, null, "Data tidak valid", validation.error.errors)
+      );
+    }
+
+    const { rt, rw, jalan, idKelurahan } = validation.data;
+
+    // Check if kelurahan exists
     const kelurahan = await prisma.kelurahan.findUnique({
-      where: { id: data.idKelurahan },
+      where: { id: idKelurahan }
     });
 
     if (!kelurahan) {
-      return res
-        .status(404)
-        .json(apiResponse(false, null, "Kelurahan tidak ditemukan"));
+      return res.status(404).json(
+        apiResponse(false, null, "Kelurahan tidak ditemukan")
+      );
     }
 
-    const newAlamat = await prisma.alamat.create({
-      data,
+    // Create alamat
+    const alamat = await prisma.alamat.create({
+      data: {
+        rt,
+        rw,
+        jalan,
+        idKelurahan,
+      },
       include: {
         kelurahan: {
           include: {
@@ -87,31 +51,70 @@ async function handlePost(req, res) {
               include: {
                 kotaKab: {
                   include: {
-                    provinsi: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+                    provinsi: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     });
 
-    return res
-      .status(201)
-      .json(apiResponse(true, newAlamat, "Data berhasil ditambahkan"));
+    return res.status(201).json(
+      apiResponse(true, alamat, "Alamat berhasil dibuat")
+    );
+
   } catch (error) {
     console.error("Error creating alamat:", error);
-
-    return res
-      .status(500)
-      .json(
-        apiResponse(false, null, "Gagal menambahkan data alamat", error.message)
-      );
+    return res.status(500).json(
+      apiResponse(false, null, "Gagal membuat alamat", error.message)
+    );
   }
 }
 
-export default createApiHandler({
+async function handleGet(req, res) {
+  try {
+    const alamats = await prisma.alamat.findMany({
+      include: {
+        kelurahan: {
+          include: {
+            kecamatan: {
+              include: {
+                kotaKab: {
+                  include: {
+                    provinsi: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        keluargas: {
+          select: {
+            id: true,
+            noBagungan: true
+          }
+        }
+      },
+      orderBy: {
+        id: 'desc'
+      }
+    });
+
+    return res.status(200).json(
+      apiResponse(true, alamats, "Data alamat berhasil diambil")
+    );
+
+  } catch (error) {
+    console.error("Error fetching alamats:", error);
+    return res.status(500).json(
+      apiResponse(false, null, "Gagal mengambil data alamat", error.message)
+    );
+  }
+}
+
+export default staffOnly(createApiHandler({
   GET: handleGet,
   POST: handlePost,
-});
+}));

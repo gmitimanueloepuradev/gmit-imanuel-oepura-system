@@ -35,6 +35,29 @@ const keluargaService = {
 
     return response.data;
   },
+
+  // Create alamat
+  createAlamat: async (data) => {
+    const response = await axios.post("/alamat", data);
+
+    return response.data;
+  },
+
+  // Get keluarga options for admin (filtered by user role)
+  getOptionsAdmin: async () => {
+    const response = await axios.get("/keluarga/options-admin");
+
+    return response.data;
+  },
+
+  // Get keluarga by rayon (for majelis)
+  getByRayon: async (idRayon, params = {}) => {
+    const response = await axios.get("/keluarga", {
+      params: { ...params, idRayon }
+    });
+
+    return response.data;
+  },
 };
 
 export default keluargaService;

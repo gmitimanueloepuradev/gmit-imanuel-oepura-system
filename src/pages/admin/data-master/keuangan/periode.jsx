@@ -1,41 +1,47 @@
-import MasterDataPage from "@/components/ui/MasterDataPage";
 import axios from "axios";
+
+import MasterDataPage from "@/components/ui/MasterDataPage";
 
 const periodeAnggaranService = {
   get: async (params) => {
     const response = await axios.get("/api/keuangan/periode", { params });
+
     return response.data;
   },
   create: async (data) => {
     const response = await axios.post("/api/keuangan/periode", data);
+
     return response.data;
   },
   update: async (id, data) => {
     const response = await axios.patch(`/api/keuangan/periode/${id}`, data);
+
     return response.data;
   },
   delete: async (id) => {
     const response = await axios.delete(`/api/keuangan/periode/${id}`);
+
     return response.data;
   },
 };
 
 export default function PeriodeAnggaranPage() {
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      'DRAFT': { text: 'Draft', variant: 'secondary' },
-      'ACTIVE': { text: 'Aktif', variant: 'success' },
-      'CLOSED': { text: 'Tutup', variant: 'destructive' },
+      DRAFT: { text: "Draft", variant: "secondary" },
+      ACTIVE: { text: "Aktif", variant: "success" },
+      CLOSED: { text: "Tutup", variant: "destructive" },
     };
-    return statusMap[status] || { text: status, variant: 'secondary' };
+
+    return statusMap[status] || { text: status, variant: "secondary" };
   };
 
   const columns = [
@@ -54,7 +60,8 @@ export default function PeriodeAnggaranPage() {
       key: "tanggalMulai",
       label: "Periode",
       type: "custom",
-      render: (item) => `${formatDate(item.tanggalMulai)} - ${formatDate(item.tanggalAkhir)}`,
+      render: (item) =>
+        `${formatDate(item.tanggalMulai)} - ${formatDate(item.tanggalAkhir)}`,
     },
     {
       key: "status",
@@ -78,18 +85,22 @@ export default function PeriodeAnggaranPage() {
       type: "custom",
       render: (item) => {
         if (item && item._count) {
-          const total = (item._count.transaksiPenerimaan || 0) + (item._count.transaksiPengeluaran || 0);
+          const total =
+            (item._count.transaksiPenerimaan || 0) +
+            (item._count.transaksiPengeluaran || 0);
+
           return `${total} transaksi`;
         }
+
         return "0 transaksi";
       },
     },
     {
       key: "isActive",
       label: "Aktif",
-      type: "badge",
-      render: (item) => item.isActive ? "Aktif" : "Tidak Aktif",
-      variant: (item) => item.isActive ? "success" : "secondary",
+      type: "boolean",
+      variant: (item) => (item.isActive ? "success" : "secondary"),
+      // variant: (item) => (item.isActive ? "success" : "secondary"),
     },
   ];
 
@@ -102,7 +113,7 @@ export default function PeriodeAnggaranPage() {
       render: (item) => formatDate(item.tanggalMulai),
     },
     {
-      key: "tanggalAkhir", 
+      key: "tanggalAkhir",
       label: "Tanggal Akhir",
       render: (item) => formatDate(item.tanggalAkhir),
     },
@@ -124,21 +135,26 @@ export default function PeriodeAnggaranPage() {
       key: "_count.transaksiPenerimaan",
       label: "Total Transaksi Penerimaan",
       render: (item) =>
-        item && item._count && typeof item._count.transaksiPenerimaan === "number"
+        item &&
+        item._count &&
+        typeof item._count.transaksiPenerimaan === "number"
           ? `${item._count.transaksiPenerimaan} transaksi`
           : "0 transaksi",
     },
     {
       key: "_count.transaksiPengeluaran",
-      label: "Total Transaksi Pengeluaran", 
+      label: "Total Transaksi Pengeluaran",
       render: (item) =>
-        item && item._count && typeof item._count.transaksiPengeluaran === "number"
+        item &&
+        item._count &&
+        typeof item._count.transaksiPengeluaran === "number"
           ? `${item._count.transaksiPengeluaran} transaksi`
           : "0 transaksi",
     },
     {
       key: "isActive",
       label: "Status Aktif",
+      type: "boolean",
       render: (item) => (item.isActive ? "Aktif" : "Tidak Aktif"),
     },
     { key: "createdAt", label: "Dibuat Pada", type: "datetime" },
@@ -216,36 +232,30 @@ export default function PeriodeAnggaranPage() {
     {
       key: "isActive",
       label: "Status Aktif",
-      type: "switch",
+      type: "boolean",
       defaultValue: true,
       description: "Periode aktif dapat digunakan untuk transaksi keuangan",
     },
     {
       key: "autoPopulateItems",
       label: "Auto Populate Item Anggaran",
-      type: "switch",
+      type: "boolean",
       defaultValue: true,
-      description: "Otomatis copy semua item keuangan sebagai template anggaran untuk periode ini",
+      description:
+        "Otomatis copy semua item keuangan sebagai template anggaran untuk periode ini",
     },
   ];
 
   return (
     <MasterDataPage
-      title="Kelola Periode Anggaran"
-      description="Kelola periode anggaran untuk sistem keuangan gereja"
-      service={periodeAnggaranService}
-      queryKey="periode-anggaran"
-      columns={columns}
-      viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="nama"
-      searchFields={["nama", "keterangan"]}
+      allowBulkDelete={false}
       breadcrumb={[
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Data Master" },
         { label: "Periode Anggaran" },
       ]}
-      allowBulkDelete={false}
+      columns={columns}
+      description="Kelola periode anggaran untuk sistem keuangan gereja"
       exportable={true}
       filters={[
         {
@@ -254,6 +264,7 @@ export default function PeriodeAnggaranPage() {
           type: "select",
           options: Array.from({ length: 11 }, (_, i) => {
             const year = currentYear - 5 + i;
+
             return { value: year.toString(), label: year.toString() };
           }),
         },
@@ -268,6 +279,13 @@ export default function PeriodeAnggaranPage() {
           ],
         },
       ]}
+      formFields={formFields}
+      itemNameField="nama"
+      queryKey="periode-anggaran"
+      searchFields={["nama", "keterangan"]}
+      service={periodeAnggaranService}
+      title="Kelola Periode Anggaran"
+      viewFields={viewFields}
     />
   );
 }

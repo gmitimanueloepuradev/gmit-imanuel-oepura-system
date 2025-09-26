@@ -35,16 +35,62 @@ async function handleGet(req, res) {
       }
     }
 
-    const { pagination, sort, where } = parseQueryParams(req.query, {
-      searchField: "kepalaKeluarga",
-      defaultSortBy: "noBagungan",
-    });
+    // Handle query parameters manually for keluarga
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+    const sortBy = req.query.sortBy || "noBagungan";
+    const sortOrder = req.query.sortOrder || "asc";
 
-    // Combine rayon filter with existing where clause
-    const finalWhere = {
-      ...where,
+    const pagination = { page, limit, skip };
+    const sort = { sortBy, sortOrder };
+
+    // Build where clause for keluarga
+    let where = {
       ...rayonFilter
     };
+
+    // Add search functionality for keluarga
+    if (search) {
+      where.OR = [
+        {
+          noBagungan: {
+            equals: parseInt(search) || 0
+          }
+        },
+        {
+          jemaats: {
+            some: {
+              nama: {
+                contains: search,
+                mode: "insensitive"
+              }
+            }
+          }
+        }
+      ];
+    }
+
+    // Handle idRayon filter from query (for masterService.getKeluargaByRayon)
+    if (req.query.idRayon) {
+      where.idRayon = req.query.idRayon;
+    }
+
+    // Other keluarga-specific filters
+    if (req.query.idStatusKeluarga) {
+      where.idStatusKeluarga = req.query.idStatusKeluarga;
+    }
+
+    if (req.query.idKeadaanRumah) {
+      where.idKeadaanRumah = req.query.idKeadaanRumah;
+    }
+
+    if (req.query.idStatusKepemilikanRumah) {
+      where.idStatusKepemilikanRumah = req.query.idStatusKepemilikanRumah;
+    }
+
+    const finalWhere = where;
 
     const total = await prisma.keluarga.count({ where: finalWhere });
 

@@ -128,7 +128,24 @@ export const majelisCreationSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
-  noWhatsapp: z.string().optional(),
+  noWhatsapp: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true; // Optional field
+        // Check if it's a valid Indonesian phone number format
+        const cleaned = val.replace(/\D/g, '');
+        if (cleaned.startsWith('62')) {
+          const afterCountryCode = cleaned.substring(2);
+          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+        }
+        return false;
+      },
+      {
+        message: 'Format nomor WhatsApp tidak valid. Gunakan format +6281234567890',
+      }
+    ),
 });
 
 // Majelis Edit Schema (without user account data)
@@ -169,6 +186,53 @@ export const jenisPengumumanSchema = z.object({
 });
 
 
+
+// Jemaat Create Schema
+export const jemaatCreateSchema = z.object({
+  // Basic info
+  nama: z.string().min(2, "Nama lengkap wajib diisi"),
+  jenisKelamin: z.union([
+    z.boolean(),
+    z.string().refine(val => val === 'true' || val === 'false', "Jenis kelamin harus dipilih")
+  ]),
+  tanggalLahir: z.string().min(1, "Tanggal lahir wajib diisi"),
+  tempatLahir: z.string().min(2, "Tempat lahir wajib diisi"),
+  golonganDarah: z.string().optional(),
+  nomorTelepon: z
+    .string()
+    .min(10, "Nomor telepon minimal 10 digit")
+    .refine(
+      (val) => {
+        // Check if it's a valid Indonesian phone number format
+        const cleaned = val.replace(/\D/g, '');
+        if (cleaned.startsWith('62')) {
+          const afterCountryCode = cleaned.substring(2);
+          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+        }
+        return false;
+      },
+      {
+        message: 'Format nomor telepon tidak valid. Gunakan format +6281234567890',
+      }
+    ),
+  email: z.string().email("Format email tidak valid"),
+  username: z.string().min(3, "Username minimal 3 karakter"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+
+  // Required relations based on Prisma schema
+  idStatusDalamKeluarga: z.string().nonempty("Status dalam keluarga wajib dipilih"),
+  idSuku: z.string().nonempty("Suku wajib dipilih"),
+  idPendidikan: z.string().nonempty("Pendidikan wajib dipilih"),
+  idPekerjaan: z.string().nonempty("Pekerjaan wajib dipilih"),
+  idPendapatan: z.string().nonempty("Pendapatan wajib dipilih"),
+  idJaminanKesehatan: z.string().nonempty("Jaminan kesehatan wajib dipilih"),
+
+  // Optional relations
+  idPernikahan: z.string().optional(),
+
+  // Family relation
+  isKepalaKeluarga: z.boolean().default(false),
+});
 
 function testForking(){
   console.log("test forking");

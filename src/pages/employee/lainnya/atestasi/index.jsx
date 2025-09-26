@@ -1,28 +1,27 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
 import {
+  Building2,
+  Calendar,
   Eye,
-  Trash,
-  Plus,
   LogIn,
   LogOut,
-  Calendar,
-  Building2,
-  User,
   MapPin,
-  Users,
   Pen,
+  Trash,
+  User,
   UserPlus,
+  Users,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
+import CreateOrEditModal from "@/components/common/CreateOrEditModal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import ListGrid from "@/components/ui/ListGrid";
+import useConfirm from "@/hooks/useConfirm";
+import useModalForm from "@/hooks/useModalForm";
 import atestasiService from "@/services/atestasiService";
 import { atestasiSchema } from "@/validations/masterSchema";
-import useModalForm from "@/hooks/useModalForm";
-import CreateOrEditModal from "@/components/common/CreateOrEditModal";
-import ListGrid from "@/components/ui/ListGrid";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import useConfirm from "@/hooks/useConfirm";
 
 // Daftar field yang akan ditampilkan sesuai tipe atestasi
 const getAtestasiFields = (formData) => {
@@ -140,6 +139,7 @@ export default function AtestasiPage() {
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
+
     return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
@@ -230,7 +230,9 @@ export default function AtestasiPage() {
       type: "text",
       render: (value, row) => {
         const keluarga = row.jemaat?.keluarga;
+
         if (!keluarga) return "-";
+
         return (
           <div className="text-sm">
             <div className="flex items-center">
@@ -270,6 +272,7 @@ export default function AtestasiPage() {
     if (isEdit) {
       return await atestasiService.update(modal.editData.id, formData);
     }
+
     return await atestasiService.create(formData);
   };
 
@@ -356,6 +359,7 @@ export default function AtestasiPage() {
         columns={columns}
         data={data?.data?.items || []}
         description="Kelola data atestasi jemaat masuk dan keluar GMIT Imanuel Oepura"
+        exportable={true}
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
@@ -386,9 +390,10 @@ export default function AtestasiPage() {
           },
         ]}
         searchPlaceholder="Cari nama jemaat atau calon jemaat..."
-        title="Manajemen Atestasi Jemaat"
         stats={stats}
-        onAdd={()=> router.push('/employee/lainnya/atestasi/create')}
+        title="Manajemen Atestasi Jemaat"
+        onAdd={() => router.push("/employee/lainnya/atestasi/create")}
+        exportFilename="atestasi"
         // onAdd={() => modal.open()}
         filters={[
           {
@@ -416,9 +421,6 @@ export default function AtestasiPage() {
         }}
         editData={modal.editData}
         fields={getAtestasiFields(modal.formData)}
-        isOpen={modal.isOpen}
-        schema={atestasiSchema}
-        title="Data Atestasi"
         helperText={
           modal.formData?.tipe === "MASUK"
             ? "Setelah atestasi masuk dibuat, Anda akan diarahkan untuk membuat data jemaat lengkap."
@@ -426,25 +428,28 @@ export default function AtestasiPage() {
               ? "Jemaat yang dipilih akan diubah statusnya menjadi KELUAR setelah atestasi disimpan."
               : "Pilih tipe atestasi untuk melihat field yang perlu diisi."
         }
+        isOpen={modal.isOpen}
+        schema={atestasiSchema}
+        title="Data Atestasi"
         onClose={modal.close}
         onSubmit={handleAtestasiSubmit}
         onSuccess={handleAtestasiSuccess}
       />
 
       <ConfirmDialog
+        cancelText={confirm.config.cancelText}
+        confirmText={confirm.config.confirmText}
         isOpen={confirm.isOpen}
+        message={confirm.config.message}
+        title={confirm.config.title}
+        variant={confirm.config.variant}
         onClose={confirm.hideConfirm}
         onConfirm={confirm.handleConfirm}
-        title={confirm.config.title}
-        message={confirm.config.message}
-        confirmText={confirm.config.confirmText}
-        cancelText={confirm.config.cancelText}
-        variant={confirm.config.variant}
       />
 
       {isViewModalOpen && viewData && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity"></div>
+          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity" />
 
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
@@ -531,8 +536,8 @@ export default function AtestasiPage() {
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
-                  type="button"
                   className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
+                  type="button"
                   onClick={() => setIsViewModalOpen(false)}
                 >
                   Tutup

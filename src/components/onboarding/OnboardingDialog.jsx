@@ -1,22 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
 import { showToast } from "@/utils/showToast";
+import { useAuth } from "@/contexts/AuthContext";
+import authService from "@/services/authService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import TextInput from "@/components/ui/inputs/TextInput";
 import SelectInput from "@/components/ui/inputs/SelectInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
-import { 
-  User, 
+import {
+  User,
   Clock,
   CheckCircle,
   X,
-  AlertTriangle
+  AlertTriangle,
+  LogOut
 } from "lucide-react";
 
 const validationSchema = z.object({
@@ -56,6 +60,8 @@ const golonganDarahOptions = [
 
 export default function OnboardingDialog({ user, onComplete }) {
   const queryClient = useQueryClient();
+  const { logout } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const methods = useForm({
     resolver: zodResolver(validationSchema),
@@ -128,21 +134,72 @@ export default function OnboardingDialog({ user, onComplete }) {
     onboardingMutation.mutate(data);
   };
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      setShowLogoutDialog(false);
+
+      // Use the AuthContext logout function which handles everything properly
+      await logout();
+
+      // Additional cleanup for onboarding
+      queryClient.clear();
+
+      // Clear all storage to be absolutely sure
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Force a hard redirect to login page
+      window.location.replace("/login");
+
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      // Fallback: force logout even if something fails
+      authService.logout();
+      queryClient.clear();
+      localStorage.clear();
+      sessionStorage.clear();
+
+      showToast({
+        title: "Logout",
+        description: "Mengarahkan ke halaman login...",
+        color: "success"
+      });
+
+      // Hard redirect as fallback
+      setTimeout(() => {
+        window.location.replace("/login");
+      }, 500);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto transition-colors">
         {/* Header */}
-        <div className="bg-red-50 border-b border-red-200 p-6">
-          <div className="flex items-center">
-            <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
-            <div>
-              <h2 className="text-xl font-bold text-red-900">
-                Profil Belum Lengkap
-              </h2>
-              <p className="text-sm text-red-700 mt-1">
-                Anda harus melengkapi profil terlebih dahulu untuk dapat menggunakan sistem
-              </p>
+        <div className="bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 p-6 transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400 mr-3" />
+              <div>
+                <h2 className="text-xl font-bold text-red-900 dark:text-red-100">
+                  Profil Belum Lengkap
+                </h2>
+                <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                  Anda harus melengkapi profil terlebih dahulu untuk dapat menggunakan sistem
+                </p>
+              </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLogoutDialog(true)}
+              className="flex items-center text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/30"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
 
@@ -270,6 +327,18 @@ export default function OnboardingDialog({ user, onComplete }) {
           </Card>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmDialog
+        confirmText="Ya, Logout"
+        cancelText="Batal"
+        isOpen={showLogoutDialog}
+        message="Apakah Anda yakin ingin logout? Data yang sedang diisi akan hilang dan Anda harus login ulang untuk melengkapi profil."
+        title="Konfirmasi Logout"
+        variant="danger"
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }

@@ -66,6 +66,9 @@ export default function StatusKeluargaPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Status Keluarga" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["status"]}
     />
   );
 }

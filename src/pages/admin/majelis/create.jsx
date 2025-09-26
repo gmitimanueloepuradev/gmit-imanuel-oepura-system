@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   User,
@@ -47,8 +48,10 @@ const steps = [
 
 export default function CreateMajelisPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [canProceed, setCanProceed] = useState(false);
 
   const methods = useForm({
     resolver: zodResolver(majelisCreationSchema),
@@ -75,24 +78,37 @@ export default function CreateMajelisPage() {
 
   const watchedValues = watch();
 
+  // Check if current step can proceed
+  const checkCanProceed = async () => {
+    const fieldsToValidate = getFieldsForStep(currentStep);
+
+    if (fieldsToValidate.length === 0) {
+      setCanProceed(true);
+      return;
+    }
+
+    const values = getValues();
+    let canProceed = true;
+
+    // Check required fields for current step
+    for (const field of fieldsToValidate) {
+      if (!values[field] || values[field] === '') {
+        canProceed = false;
+        break;
+      }
+    }
+
+    setCanProceed(canProceed);
+  };
+
   const validateCurrentStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
-    console.log(`Validating step ${currentStep} fields:`, fieldsToValidate);
-    
+
     if (fieldsToValidate.length === 0) {
-      return true; // No validation needed for confirmation step
+      return true;
     }
-    
+
     const isValid = await trigger(fieldsToValidate);
-    console.log(`Validation result for fields ${fieldsToValidate}:`, isValid);
-    
-    // Additional manual check for required fields
-    const currentValues = getValues();
-    console.log(`Current form values:`, currentValues);
-    
-    // Let react-hook-form handle the validation
-    // We already triggered validation above, so just return that result
-    
     return isValid;
   };
 
@@ -112,16 +128,16 @@ export default function CreateMajelisPage() {
   const handleNext = async () => {
     try {
       const isValid = await validateCurrentStep();
-      console.log(`Step ${currentStep} validation result:`, isValid);
-      
+
       if (isValid) {
-        setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+        const nextStep = Math.min(currentStep + 1, steps.length);
+        setCurrentStep(nextStep);
+        // Reset can proceed for next step
+        await checkCanProceed();
       } else {
-        console.log(`Step ${currentStep} validation failed`);
-        // Show error toast if validation fails
         showToast({
           title: "Validasi Gagal",
-          description: "Mohon lengkapi semua field yang wajib diisi",
+          description: "Mohon lengkapi semua field yang wajib diisi dengan benar",
           color: "error",
         });
       }
@@ -135,8 +151,11 @@ export default function CreateMajelisPage() {
     }
   };
 
-  const handlePrevious = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handlePrevious = async () => {
+    const prevStep = Math.max(currentStep - 1, 1);
+    setCurrentStep(prevStep);
+    // Check can proceed for previous step
+    await checkCanProceed();
   };
 
   const handleStepClick = async (stepNumber) => {
@@ -160,6 +179,9 @@ export default function CreateMajelisPage() {
           color: "success",
         });
 
+        // Invalidate majelis query to refresh the list
+        queryClient.invalidateQueries({ queryKey: ["majelis"] });
+
         router.push("/admin/majelis");
       } else {
         showToast({
@@ -179,6 +201,11 @@ export default function CreateMajelisPage() {
       setIsLoading(false);
     }
   };
+
+  // Watch for form changes and update canProceed
+  useEffect(() => {
+    checkCanProceed();
+  }, [watchedValues, currentStep]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -273,31 +300,31 @@ export default function CreateMajelisPage() {
       case 3:
         return (
           <StepContent>
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 transition-colors duration-300">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                 Konfirmasi Data Majelis
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-3">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3">
                     Data Majelis
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Nama Lengkap:</span>
-                      <span className="font-medium">
+                      <span className="text-gray-600 dark:text-gray-400">Nama Lengkap:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {watchedValues.namaLengkap}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Tanggal Mulai:</span>
-                      <span className="font-medium">{watchedValues.mulai}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Tanggal Mulai:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{watchedValues.mulai}</span>
                     </div>
                     {watchedValues.selesai && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tanggal Selesai:</span>
-                        <span className="font-medium">
+                        <span className="text-gray-600 dark:text-gray-400">Tanggal Selesai:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {watchedValues.selesai}
                         </span>
                       </div>
@@ -306,22 +333,22 @@ export default function CreateMajelisPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Data Akun</h4>
+                  <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3">Data Akun</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Username:</span>
-                      <span className="font-medium">
+                      <span className="text-gray-600 dark:text-gray-400">Username:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {watchedValues.username}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Email:</span>
-                      <span className="font-medium">{watchedValues.email}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Email:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{watchedValues.email}</span>
                     </div>
                     {watchedValues.noWhatsapp && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">WhatsApp:</span>
-                        <span className="font-medium">
+                        <span className="text-gray-600 dark:text-gray-400">WhatsApp:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {watchedValues.noWhatsapp}
                         </span>
                       </div>
@@ -330,8 +357,8 @@ export default function CreateMajelisPage() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg transition-colors duration-300">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
                   <strong>Catatan:</strong> Setelah data disimpan, akun majelis
                   akan otomatis dibuat dan dapat digunakan untuk login dengan
                   username dan password yang telah ditentukan.
@@ -350,10 +377,10 @@ export default function CreateMajelisPage() {
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Tambah Majelis Baru
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Buat data majelis baru beserta akun login dalam satu proses
         </p>
       </div>
@@ -367,7 +394,7 @@ export default function CreateMajelisPage() {
 
       {/* Form */}
       <HookForm methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 transition-colors duration-300">
           {renderStepContent()}
 
           <StepperNavigation
@@ -377,7 +404,7 @@ export default function CreateMajelisPage() {
             onNext={handleNext}
             onSubmit={handleSubmit(onSubmit)}
             isLoading={isLoading}
-            canGoNext={true}
+            canGoNext={canProceed}
             nextButtonText="Lanjut"
             submitButtonText="Buat Majelis & Akun"
           />

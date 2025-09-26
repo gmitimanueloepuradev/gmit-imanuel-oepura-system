@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
 import { Card, CardContent } from "@/components/ui/Card";
 import PageTitle from "@/components/ui/PageTitle";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import keluargaService from "@/services/keluargaService";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
@@ -10,7 +12,9 @@ import {
   Home,
   MapPin,
   Search,
-  Users
+  Users,
+  Plus,
+  UserPlus
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -69,12 +73,12 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
           </div>
 
           {/* Actions */}
-          {/* <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
+          <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
             <Button onClick={onAdd}>
               <Plus className="w-4 h-4 mr-2" />
               Tambah Keluarga
             </Button>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
@@ -116,8 +120,9 @@ function TableSkeleton() {
   );
 }
 
-export default function KeluargaPage() {
+export default function MajelisKeluargaPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [pagination, setPagination] = useState({
     page: 1,
@@ -125,16 +130,21 @@ export default function KeluargaPage() {
   });
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch keluarga data from API
+  // Fetch keluarga data from API - only for majelis's rayon
   const {
     data: keluargaData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["keluarga", pagination, searchTerm],
+    queryKey: ["keluarga-majelis", pagination, searchTerm, user?.majelis?.idRayon],
     queryFn: () =>
-      keluargaService.getAll({ ...pagination, search: searchTerm }),
+      keluargaService.getAll({
+        ...pagination,
+        search: searchTerm,
+        idRayon: user?.majelis?.idRayon // Filter by majelis's rayon
+      }),
     keepPreviousData: true,
+    enabled: !!user?.majelis?.idRayon, // Only fetch if majelis has rayon
   });
 
   const handlePageChange = (page) => {
@@ -153,25 +163,31 @@ export default function KeluargaPage() {
       onClick: (item) => router.push(`/majelis/keluarga/${item.id}`),
       variant: "outline",
     },
+    {
+      icon: UserPlus,
+      label: "Tambah Jemaat",
+      onClick: (item) => router.push(`/majelis/jemaat/create?keluargaId=${item.id}`),
+      variant: "default",
+    },
   ];
 
   const items = keluargaData?.data?.items || [];
   const paginationInfo = keluargaData?.data?.pagination || {};
 
   return (
-    <>
+    <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
         title="Data Keluarga"
-        description="Kelola data keluarga di rayon Anda - GMIT Imanuel Oepura"
+        description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'} - GMIT Imanuel Oepura`}
       />
 
       <div className="space-y-6 p-4">
         {/* Page Header */}
         <PageHeader
           title="Data Keluarga"
-          description="Kelola data keluarga di rayon Anda"
+          description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
           breadcrumb={[
-            { label: "Majelis", href: "/majelis/dashboard" },
+            { label: "Majelis", href: "/majelis" },
             { label: "Data Keluarga" },
           ]}
           onAdd={() => router.push("/majelis/keluarga/create")}
@@ -375,6 +391,6 @@ export default function KeluargaPage() {
           </Card>
         )}
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

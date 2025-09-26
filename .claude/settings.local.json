@@ -59,7 +59,13 @@
       "Bash(git checkout:*)",
       "Bash(npm uninstall:*)",
       "Bash(cd:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(echo \"\"ESLint errors found\"\")",
+      "Bash(npx tailwindcss:*)",
+      "Bash(git remote add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

@@ -171,6 +171,8 @@ export default function KecamatanPage() {
         columns={columns}
         isLoading={isLoading}
         title={"Daftar Kecamatan"}
+        exportable={true}
+        exportFilename="kecamatan"
         searchPlaceholder="Cari kecamatan..."
         description={"Kelola data kecamatan"}
         rowActionType="horizontal"

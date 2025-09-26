@@ -94,6 +94,9 @@ export default function PendapatanPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Pendapatan" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["rentangPendapatan"]}
     />
   );
 }

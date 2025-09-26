@@ -1,22 +1,25 @@
-import { useRouter } from "next/router";
-import { useState, useRef, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUser } from "@/hooks/useUser";
-
-import { getRoleConfig } from "@/config/navigationItem";
-import Link from "next/link";
 import {
   Bell,
-  Menu,
   ChevronDown,
-  ChevronRight,
   ChevronLeft,
+  ChevronRight,
+  Home,
   LogOut,
-  Settings,
+  Menu,
   User,
   X,
+  Globe,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
+
 import HeaderDateTimeWidget from "../HeaderDateTimeWidget";
+
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import { getRoleConfig } from "@/config/navigationItem";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/hooks/useUser";
 
 export default function AppNavbar({
   role = "admin",
@@ -74,6 +77,7 @@ export default function AppNavbar({
 
       if (triggerRef.current) {
         const rect = triggerRef.current.getBoundingClientRect();
+
         setTooltipPosition({
           top: rect.top + rect.height / 2,
         });
@@ -110,7 +114,7 @@ export default function AppNavbar({
 
         {isVisible && (
           <div
-            className="fixed left-20 px-3 py-2 bg-gray-900 text-white text-sm rounded-md whitespace-nowrap pointer-events-none shadow-lg transition-opacity duration-200 opacity-100"
+            className="fixed left-20 px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm rounded-md whitespace-nowrap pointer-events-none shadow-lg transition-all duration-200 opacity-100"
             style={{
               top: tooltipPosition.top,
               transform: "translateY(-50%)",
@@ -118,7 +122,7 @@ export default function AppNavbar({
             }}
           >
             {content}
-            <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900"></div>
+            <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-100" />
           </div>
         )}
       </>
@@ -139,11 +143,11 @@ export default function AppNavbar({
           <Tooltip content={item.label} show={isCollapsed}>
             <div
               className={`
-                flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-3 text-sm font-medium rounded-lg transition-colors cursor-pointer group
+                flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group
                 ${
                   isParentActiveState
-                    ? "bg-blue-100 text-blue-700"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
                 }
               `}
               onClick={() => !isCollapsed && toggleSubmenu(item.href)}
@@ -153,11 +157,11 @@ export default function AppNavbar({
               >
                 <IconComponent
                   className={`
-                    w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors
+                    w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors duration-200
                     ${
                       isParentActiveState
-                        ? "text-blue-700"
-                        : "text-gray-500 group-hover:text-blue-600"
+                        ? "text-blue-700 dark:text-blue-300"
+                        : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                     }
                   `}
                 />
@@ -183,11 +187,11 @@ export default function AppNavbar({
                   <li key={child.href}>
                     <Link
                       className={`
-                        flex items-center p-2 text-sm rounded-lg transition-colors group
+                        flex items-center p-2 text-sm rounded-lg transition-all duration-200 group
                         ${
                           isChildActive
-                            ? "bg-blue-50 text-blue-700 border-r-4 border-blue-700"
-                            : "text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-400"
+                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
                         }
                       `}
                       href={child.href}
@@ -195,11 +199,11 @@ export default function AppNavbar({
                     >
                       <ChildIconComponent
                         className={`
-                          w-4 h-4 mr-3 transition-colors
+                          w-4 h-4 mr-3 transition-colors duration-200
                           ${
                             isChildActive
-                              ? "text-blue-700"
-                              : "text-gray-400 group-hover:text-blue-600"
+                              ? "text-blue-700 dark:text-blue-300"
+                              : "text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                           }
                         `}
                       />
@@ -220,11 +224,11 @@ export default function AppNavbar({
         <Tooltip content={item.label} show={isCollapsed}>
           <Link
             className={`
-              flex items-center ${isCollapsed ? "justify-center" : ""} p-3 text-sm font-medium rounded-lg transition-colors group
+              flex items-center ${isCollapsed ? "justify-center" : ""} p-3 text-sm font-medium rounded-lg transition-all duration-200 group
               ${
                 isActive
-                  ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-400"
+                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
               }
             `}
             href={item.href}
@@ -232,11 +236,11 @@ export default function AppNavbar({
           >
             <IconComponent
               className={`
-                w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors
+                w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors duration-200
                 ${
                   isActive
-                    ? "text-blue-700"
-                    : "text-gray-500 group-hover:text-blue-600"
+                    ? "text-blue-700 dark:text-blue-300"
+                    : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                 }
               `}
             />
@@ -250,13 +254,13 @@ export default function AppNavbar({
   return (
     <>
       {/* Top Navigation Bar */}
-      <nav className="bg-white border-b border-gray-200 fixed w-full z-30 top-0">
+      <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 fixed w-full z-30 top-0 transition-colors duration-200">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start">
               {/* Mobile/Desktop sidebar toggle */}
               <button
-                className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="inline-flex items-center p-2 text-sm text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <Menu className="w-6 h-6" />
@@ -267,7 +271,7 @@ export default function AppNavbar({
                 className="flex ml-2 lg:hidden"
                 href={config.dashboardRoute}
               >
-                <span className="self-center text-xl font-semibold whitespace-nowrap text-blue-600">
+                <span className="self-center text-xl font-semibold whitespace-nowrap text-blue-600 dark:text-blue-400">
                   {config.fullTitle}
                 </span>
               </Link>
@@ -281,16 +285,30 @@ export default function AppNavbar({
             </div>
 
             {/* Right side */}
-            <div className="flex items-center ">
+            <div className="flex items-center gap-2">
+              {/* View Public Website Button */}
+              <Link
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
+                title="Lihat Website Public"
+              >
+                <Globe className="w-5 h-5" />
+              </Link>
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
               {/* Notifications */}
-              <button className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+              <button className="p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200">
                 <Bell className="w-5 h-5" />
               </button>
 
               {/* Profile dropdown */}
               <div className="relative ml-3">
                 <button
-                  className="flex items-center text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300"
+                  className="flex items-center text-sm bg-gray-800 dark:bg-gray-600 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-500 transition-colors duration-200"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
@@ -299,13 +317,23 @@ export default function AppNavbar({
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                    <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                  <div className="absolute right-0 z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 dark:ring-gray-600 transition-colors duration-200">
+                    <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
                       <div className="font-medium">{currentUser.name}</div>
-                      <div className="text-gray-500">{currentUser.email}</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        {currentUser.email}
+                      </div>
                     </div>
+                    {/* <Link
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                      href={config.dashboardRoute}
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Home className="w-4 h-4 mr-2" />
+                      Kembali ke Dashboard
+                    </Link> */}
                     <Link
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                       href={`${config.baseRoute}/profile`}
                       onClick={() => setIsProfileOpen(false)}
                     >
@@ -321,7 +349,7 @@ export default function AppNavbar({
                       Pengaturan
                     </Link> */}
                     <button
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                       onClick={() => {
                         setIsProfileOpen(false);
                         logout();
@@ -349,15 +377,15 @@ export default function AppNavbar({
       {/* Sidebar */}
       <aside
         className={`
-        fixed top-0 left-0 z-40 ${isCollapsed ? "w-16" : "w-64"} h-screen ${isCollapsed ? "pt-16" : "pt-2"}transition-all duration-300 bg-white border-r border-gray-200 shadow-lg
+        fixed top-0 left-0 z-40 ${isCollapsed ? "w-16" : "w-64"} h-screen pt-2 transition-all duration-300 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0
       `}
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white custom-scrollbar">
+        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800 custom-scrollbar transition-colors duration-300">
           {/* Sidebar Header */}
           <div
-            className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-4 border-b border-gray-200 lg:border-none`}
+            className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-4 border-b border-gray-200 dark:border-gray-700 lg:border-none transition-colors duration-300`}
           >
             <Link
               className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
@@ -371,7 +399,7 @@ export default function AppNavbar({
                 </div>
               </Tooltip>
               {!isCollapsed && (
-                <span className="text-xl font-semibold text-blue-600">
+                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">
                   {config.fullTitle}
                 </span>
               )}
@@ -381,7 +409,7 @@ export default function AppNavbar({
               <>
                 {/* Collapse button for desktop */}
                 <button
-                  className="hidden lg:block p-2 text-gray-500 rounded-lg hover:bg-gray-100"
+                  className="hidden lg:block p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                   onClick={() => setIsCollapsed(true)}
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -389,7 +417,7 @@ export default function AppNavbar({
 
                 {/* Close button for mobile */}
                 <button
-                  className="lg:hidden p-2 text-gray-500 rounded-lg hover:bg-gray-100"
+                  className="lg:hidden p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <X className="w-5 h-5" />
@@ -400,7 +428,7 @@ export default function AppNavbar({
             {/* Expand button when collapsed */}
             {isCollapsed && (
               <button
-                className="hidden lg:block absolute top-4 left-12 p-2 text-gray-500 rounded-4xl hover:bg-gray-100"
+                className="hidden lg:block absolute top-4 left-12 p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                 onClick={() => setIsCollapsed(false)}
               >
                 <ChevronRight className="w-5 h-5" />
@@ -416,26 +444,26 @@ export default function AppNavbar({
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
             {isCollapsed ? (
               <Tooltip
                 content={`${currentUser.name} - ${currentUser.organization}`}
                 show={isCollapsed}
               >
                 <div className="flex justify-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center transition-colors duration-300">
+                    <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                   </div>
                 </div>
               </Tooltip>
             ) : (
-              <div className="flex items-center text-sm text-gray-600">
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                  <User className="w-4 h-4" />
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 transition-colors duration-300">
+                  <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </div>
                 <div>
                   <div className="font-medium">{currentUser.name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {currentUser.organization}
                   </div>
                 </div>

@@ -1,41 +1,70 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import {
   ArrowLeft,
-  Edit,
   Calendar,
-  MapPin,
+  Edit,
   Eye,
   EyeOff,
-  Trash2,
-  Download,
-  Share2,
   Image as ImageIcon,
+  MapPin,
+  Trash2,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+
+import EmployeeLayout from "@/components/layout/EmployeeLayout";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import PageHeader from "@/components/ui/PageHeader";
-import EmployeeLayout from "@/components/layout/EmployeeLayout";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import PageHeader from "@/components/ui/PageHeader";
 import { showToast } from "@/utils/showToast";
-import axios from "axios";
 
 export default function GaleriDetailPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { id } = router.query;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const { data: galeri, isLoading, error, refetch } = useQuery({
+  const {
+    data: galeri,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["galeri", id],
     queryFn: async () => {
       const response = await axios.get(`/api/galeri/${id}`);
+
       return response.data.data;
     },
     enabled: !!id,
   });
+
+  // Handle fotos - can be array (detail API) or JSON string (list API)
+  const fotos = React.useMemo(() => {
+    if (!galeri?.fotos) return [];
+
+    // If it's already an array, return it directly
+    if (Array.isArray(galeri.fotos)) {
+      return galeri.fotos;
+    }
+
+    // If it's a string, try to parse as JSON
+    if (typeof galeri.fotos === "string") {
+      try {
+        return JSON.parse(galeri.fotos);
+      } catch (error) {
+        console.error("Failed to parse fotos JSON:", error);
+
+        return [];
+      }
+    }
+
+    return [];
+  }, [galeri?.fotos]);
 
   const handleDelete = async () => {
     try {
@@ -43,14 +72,16 @@ export default function GaleriDetailPage() {
       showToast({
         title: "Berhasil",
         description: "Galeri berhasil dihapus",
-        color: "success"
+        color: "success",
       });
+      // Invalidate galeri queries to refresh the list
+      queryClient.invalidateQueries(["galeri"]);
       router.push("/employee/galeri");
     } catch (error) {
       showToast({
         title: "Gagal",
         description: error.response?.data?.message || "Gagal menghapus galeri",
-        color: "error"
+        color: "error",
       });
     }
   };
@@ -58,29 +89,34 @@ export default function GaleriDetailPage() {
   const handleTogglePublish = async () => {
     try {
       await axios.patch(`/api/galeri/${id}`, {
-        isPublished: !galeri.isPublished
+        isPublished: !galeri.isPublished,
       });
       showToast({
-        title: "Berhasil", 
-        description: `Galeri berhasil ${galeri.isPublished ? 'disembunyikan' : 'dipublikasikan'}`,
-        color: "success"
+        title: "Berhasil",
+        description: `Galeri berhasil ${galeri.isPublished ? "disembunyikan" : "dipublikasikan"}`,
+        color: "success",
       });
+      // Invalidate galeri queries to refresh the list and detail
+      queryClient.invalidateQueries(["galeri"]);
       refetch();
     } catch (error) {
       showToast({
         title: "Gagal",
-        description: error.response?.data?.message || "Gagal mengubah status publikasi",
-        color: "error"
+        description:
+          error.response?.data?.message || "Gagal mengubah status publikasi",
+        color: "error",
       });
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600">Memuat detail galeri...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
+          <p className="text-gray-600 dark:text-gray-400">
+            Memuat detail galeri...
+          </p>
         </div>
       </div>
     );
@@ -88,9 +124,11 @@ export default function GaleriDetailPage() {
 
   if (error || !galeri) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
         <div className="text-center">
-          <p className="text-red-600 mb-2">Gagal memuat detail galeri</p>
+          <p className="text-red-600 dark:text-red-400 mb-2">
+            Gagal memuat detail galeri
+          </p>
           <Button onClick={() => router.back()}>Kembali</Button>
         </div>
       </div>
@@ -100,31 +138,31 @@ export default function GaleriDetailPage() {
   return (
     <>
       <PageHeader
-        title="Detail Galeri"
-        description="Detail informasi galeri kegiatan"
         breadcrumb={[
           { label: "Employee", href: "/employee/dashboard" },
           { label: "Galeri", href: "/employee/galeri" },
           { label: galeri.namaKegiatan },
         ]}
+        description="Detail informasi galeri kegiatan"
+        title="Detail Galeri"
       />
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
         <div className="mb-6 flex items-center justify-between">
           <Button
+            className="flex items-center"
             variant="outline"
             onClick={() => router.back()}
-            className="flex items-center"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali
           </Button>
-          
+
           <div className="flex items-center gap-2">
             <Button
+              className="flex items-center"
               variant="outline"
               onClick={handleTogglePublish}
-              className="flex items-center"
             >
               {galeri.isPublished ? (
                 <>
@@ -139,17 +177,17 @@ export default function GaleriDetailPage() {
               )}
             </Button>
             <Button
+              className="flex items-center"
               variant="outline"
               onClick={() => router.push(`/employee/galeri/${id}/edit`)}
-              className="flex items-center"
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
             <Button
+              className="flex items-center"
               variant="destructive"
               onClick={() => setShowDeleteDialog(true)}
-              className="flex items-center"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Hapus
@@ -164,28 +202,28 @@ export default function GaleriDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <ImageIcon className="h-5 w-5 mr-2" />
-                  Foto Kegiatan ({galeri.fotos?.length || 0})
+                  Foto Kegiatan ({fotos.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {galeri.fotos && galeri.fotos.length > 0 ? (
+                {fotos.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {galeri.fotos.map((foto, index) => (
+                    {fotos.map((foto, index) => (
                       <div
                         key={index}
-                        className="relative group cursor-pointer aspect-square bg-gray-100 rounded-lg overflow-hidden"
+                        className="relative group cursor-pointer aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden transition-colors"
                         onClick={() => setSelectedImage(foto)}
                       >
                         <img
-                          src={foto.url}
                           alt={foto.caption || `Foto ${index + 1}`}
                           className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                          src={foto.url}
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                        <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
                           <Eye className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         {foto.caption && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-xs">
+                          <div className="absolute bottom-0 left-0 right-0  bg-opacity-70 text-white p-2 text-xs">
                             {foto.caption}
                           </div>
                         )}
@@ -193,7 +231,7 @@ export default function GaleriDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Belum ada foto untuk kegiatan ini</p>
                   </div>
@@ -220,28 +258,41 @@ export default function GaleriDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Nama Kegiatan</label>
-                  <p className="text-gray-900 font-medium">{galeri.namaKegiatan}</p>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Nama Kegiatan
+                  </label>
+                  <p className="text-gray-900 dark:text-white font-medium transition-colors">
+                    {galeri.namaKegiatan}
+                  </p>
                 </div>
 
                 {galeri.deskripsi && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Deskripsi</label>
-                    <p className="text-gray-700">{galeri.deskripsi}</p>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Deskripsi
+                    </label>
+                    <p className="text-gray-700 dark:text-gray-300 transition-colors">
+                      {galeri.deskripsi}
+                    </p>
                   </div>
                 )}
 
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Tanggal Kegiatan</label>
-                    <p className="text-gray-900">
-                      {new Date(galeri.tanggalKegiatan).toLocaleDateString("id-ID", {
-                        weekday: "long",
-                        year: "numeric", 
-                        month: "long",
-                        day: "numeric"
-                      })}
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Tanggal Kegiatan
+                    </label>
+                    <p className="text-gray-900 dark:text-white transition-colors">
+                      {new Date(galeri.tanggalKegiatan).toLocaleDateString(
+                        "id-ID",
+                        {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )}
                     </p>
                   </div>
                 </div>
@@ -249,17 +300,32 @@ export default function GaleriDetailPage() {
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 text-gray-400 mr-2" />
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Tempat</label>
-                    <p className="text-gray-900">{galeri.tempat}</p>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Tempat
+                    </label>
+                    <p className="text-gray-900 dark:text-white transition-colors">
+                      {galeri.tempat}
+                    </p>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t">
-                  <div className="text-sm text-gray-500 space-y-1">
-                    <p>Dibuat: {new Date(galeri.createdAt).toLocaleDateString("id-ID")}</p>
-                    <p>Diperbarui: {new Date(galeri.updatedAt).toLocaleDateString("id-ID")}</p>
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 transition-colors">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1 transition-colors">
+                    <p>
+                      Dibuat:{" "}
+                      {new Date(galeri.createdAt).toLocaleDateString("id-ID")}
+                    </p>
+                    <p>
+                      Diperbarui:{" "}
+                      {new Date(galeri.updatedAt).toLocaleDateString("id-ID")}
+                    </p>
                     {galeri.publishedAt && (
-                      <p>Dipublikasi: {new Date(galeri.publishedAt).toLocaleDateString("id-ID")}</p>
+                      <p>
+                        Dipublikasi:{" "}
+                        {new Date(galeri.publishedAt).toLocaleDateString(
+                          "id-ID"
+                        )}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -271,25 +337,25 @@ export default function GaleriDetailPage() {
 
       {/* Image Modal */}
       {selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0  bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl max-h-full">
             <button
-              onClick={() => setSelectedImage(null)}
               className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 z-10"
+              onClick={() => setSelectedImage(null)}
             >
               ✕
             </button>
             <img
-              src={selectedImage.url}
               alt={selectedImage.caption || "Foto kegiatan"}
               className="max-w-full max-h-full object-contain"
+              src={selectedImage.url}
               onClick={(e) => e.stopPropagation()}
             />
             {selectedImage.caption && (
-              <div className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-70 text-white p-3 rounded">
+              <div className="absolute bottom-4 left-4 right-4 bg-opacity-70 text-white p-3 rounded">
                 {selectedImage.caption}
               </div>
             )}
@@ -299,13 +365,13 @@ export default function GaleriDetailPage() {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
+        confirmText="Hapus"
         isOpen={showDeleteDialog}
+        message={`Yakin ingin menghapus galeri "${galeri.namaKegiatan}"? Tindakan ini tidak dapat dibatalkan.`}
+        title="Hapus Galeri"
+        type="danger"
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleDelete}
-        title="Hapus Galeri"
-        message={`Yakin ingin menghapus galeri "${galeri.namaKegiatan}"? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Hapus"
-        type="danger"
       />
     </>
   );

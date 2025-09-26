@@ -54,13 +54,17 @@ async function handleGet(req, res) {
 
     // Format for options dropdown
     const options = keluargas.map(keluarga => {
-      const kepalaKeluarga = keluarga.jemaats?.[0]?.nama || "Belum ada";
+      const kepalaKeluarga = keluarga.jemaats?.find(j =>
+        j.statusDalamKeluarga?.status === "Kepala Keluarga"
+      );
+      const displayName = kepalaKeluarga?.nama || `Bangunan ${keluarga.noBagungan}`;
+
       return {
         value: keluarga.id,
-        label: `Bangunan ${keluarga.noBagungan} - ${keluarga.rayon.namaRayon} (${kepalaKeluarga})`,
+        label: `${displayName} - ${keluarga.rayon.namaRayon}`,
         noBagungan: keluarga.noBagungan,
         rayon: keluarga.rayon,
-        kepalaKeluarga: kepalaKeluarga
+        kepalaKeluarga: kepalaKeluarga?.nama || null
       };
     });
 

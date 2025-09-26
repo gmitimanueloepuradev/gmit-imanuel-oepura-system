@@ -173,7 +173,8 @@ export default function KlasisPage() {
         searchPlaceholder="Cari nama klasis..."
         title="Manajemen Klasis"
         onAdd={() => modal.open()}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="klasis"
       />
 
       <CreateOrEditModal

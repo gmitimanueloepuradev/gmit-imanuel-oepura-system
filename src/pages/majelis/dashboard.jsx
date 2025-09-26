@@ -1,25 +1,21 @@
-import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import LogoutButton from "@/components/auth/LogoutButton";
-import PageTitle from "@/components/ui/PageTitle";
+import { useQuery } from "@tanstack/react-query";
 import {
-  User,
-  Shield,
-  Users,
-  FileText,
   Calendar,
   Home,
-  Clock,
+  Megaphone,
+  Shield,
   UserCheck,
   UserPlus,
-  Megaphone,
+  Users,
   UsersRound,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import dashboardService from "@/services/dashboardService";
-import { format } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
 import { useRouter } from "next/router";
+
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import PageTitle from "@/components/ui/PageTitle";
+import { useAuth } from "@/contexts/AuthContext";
+import dashboardService from "@/services/dashboardService";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 function MajelisDashboard() {
   const { user } = useAuth();
@@ -53,21 +49,21 @@ function MajelisDashboard() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Dashboard Majelis"
         description={`Dashboard untuk Majelis ${rayon.namaRayon || ""} - GMIT Imanuel Oepura`}
+        title="Dashboard Majelis"
       />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
         {/* Header */}
-        <header className="bg-white shadow">
+        <header className="bg-white dark:bg-gray-800 shadow transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
-                <Shield className="h-8 w-8 text-blue-600 mr-3" />
+                <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400 mr-3" />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Dashboard Majelis
                   </h1>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {rayon.namaRayon
                       ? `${rayon.namaRayon} - GMIT Imanuel Oepura`
                       : "GMIT Imanuel Oepura"}
@@ -81,17 +77,17 @@ function MajelisDashboard() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           {/* Welcome Card */}
-          <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg mb-6 transition-colors">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Shield className="h-12 w-12 text-blue-600" />
+                  <Shield className="h-12 w-12 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div className="ml-5">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                     Selamat datang, {user?.username}!
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Anda masuk sebagai Majelis {rayon.namaRayon || ""}. Kelola
                     administrasi gereja dengan bijak.
                   </p>
@@ -107,16 +103,16 @@ function MajelisDashboard() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white overflow-hidden shadow rounded-lg animate-pulse"
+                  className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg animate-pulse transition-colors"
                 >
                   <div className="p-5">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 bg-gray-300 rounded"></div>
+                        <div className="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded" />
                       </div>
                       <div className="ml-5 w-0 flex-1">
-                        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                        <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+                        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2" />
+                        <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/2" />
                       </div>
                     </div>
                   </div>
@@ -125,18 +121,18 @@ function MajelisDashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <Users className="h-8 w-8 text-blue-600" />
+                      <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           Total Jemaat
                         </dt>
-                        <dd className="text-lg font-medium text-gray-900">
+                        <dd className="text-lg font-medium text-gray-900 dark:text-white">
                           {stats.totalJemaat || 0}
                         </dd>
                       </dl>
@@ -145,18 +141,18 @@ function MajelisDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <Home className="h-8 w-8 text-green-600" />
+                      <Home className="h-8 w-8 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           Total Keluarga
                         </dt>
-                        <dd className="text-lg font-medium text-gray-900">
+                        <dd className="text-lg font-medium text-gray-900 dark:text-white">
                           {stats.totalKeluarga || 0}
                         </dd>
                       </dl>
@@ -165,18 +161,18 @@ function MajelisDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <Calendar className="h-8 w-8 text-purple-600" />
+                      <Calendar className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           Ibadah Bulan Ini
                         </dt>
-                        <dd className="text-lg font-medium text-gray-900">
+                        <dd className="text-lg font-medium text-gray-900 dark:text-white">
                           {stats.jadwalBulanIni || 0}
                         </dd>
                       </dl>
@@ -185,18 +181,18 @@ function MajelisDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <UserCheck className="h-8 w-8 text-orange-600" />
+                      <UserCheck className="h-8 w-8 text-orange-600 dark:text-orange-400" />
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           Baptis Bulan Ini
                         </dt>
-                        <dd className="text-lg font-medium text-gray-900">
+                        <dd className="text-lg font-medium text-gray-900 dark:text-white">
                           {stats.baptisBulanIni || 0}
                         </dd>
                       </dl>
@@ -205,18 +201,18 @@ function MajelisDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <UserPlus className="h-8 w-8 text-indigo-600" />
+                      <UserPlus className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           Sidi Tahun Ini
                         </dt>
-                        <dd className="text-lg font-medium text-gray-900">
+                        <dd className="text-lg font-medium text-gray-900 dark:text-white">
                           {stats.sidiTahunIni || 0}
                         </dd>
                       </dl>
@@ -227,98 +223,80 @@ function MajelisDashboard() {
             </div>
           )}
 
+          {/* Daily Verse */}
+          <div className="mb-8">
+            <DailyVerse />
+          </div>
+
           {/* Quick Actions */}
-          <div className="bg-white shadow rounded-lg mb-8">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-8 transition-colors">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Akses Cepat
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
+                  className="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   onClick={() => handleNavigateTo("/majelis/pengumuman")}
-                  className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <Megaphone className="h-6 w-6 text-blue-600 mr-3" />
+                  <Megaphone className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       Pengumuman Rayon
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Kelola pengumuman untuk rayon
                     </p>
                   </div>
                 </button>
 
                 <button
+                  className="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-green-300 dark:hover:border-green-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   onClick={() => handleNavigateTo("/majelis/jadwal-ibadah")}
-                  className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-green-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 >
-                  <Calendar className="h-6 w-6 text-green-600 mr-3" />
+                  <Calendar className="h-6 w-6 text-green-600 dark:text-green-400 mr-3" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       Jadwal Ibadah
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Atur jadwal kegiatan ibadah
                     </p>
                   </div>
                 </button>
 
                 <button
+                  className="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-purple-300 dark:hover:border-purple-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   onClick={() => handleNavigateTo("/majelis/keluarga")}
-                  className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-purple-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  <UsersRound className="h-6 w-6 text-purple-600 mr-3" />
+                  <UsersRound className="h-6 w-6 text-purple-600 dark:text-purple-400 mr-3" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       Data Keluarga
                     </p>
-                    <p className="text-xs text-gray-500">
-                      Lihat data keluarga di rayon
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Kelola data keluarga di rayon
                     </p>
                   </div>
                 </button>
               </div>
-            </div>
-          </div>
 
-          {/* User Info */}
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Informasi Akun
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Username
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">{user?.username}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    No. WhatsApp
-                  </label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {user?.noWhatsapp || "-"}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Role
-                  </label>
-                  <p className="mt-1">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {user?.role}
-                    </span>
-                  </p>
-                </div>
+              {/* Second row of quick actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <button
+                  className="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  onClick={() => handleNavigateTo("/majelis/jemaat")}
+                >
+                  <Users className="h-6 w-6 text-indigo-600 dark:text-indigo-400 mr-3" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      Data Jemaat
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Kelola data jemaat di rayon
+                    </p>
+                  </div>
+                </button>
               </div>
             </div>
           </div>

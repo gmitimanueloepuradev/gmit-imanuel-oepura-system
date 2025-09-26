@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useMutation } from "@tanstack/react-query";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { showToast } from "@/utils/showToast";
-import PageTitle from "@/components/ui/PageTitle";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import {
-  User,
-  Calendar,
-  Users,
-  MapPin,
-  Shield,
-  Clock,
-  CheckCircle,
   AlertCircle,
+  CheckCircle,
+  Clock,
+  Shield,
+  User,
+  Users,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import PageTitle from "@/components/ui/PageTitle";
+import { showToast } from "@/utils/showToast";
 
 const validationSchema = z.object({
   nama: z.string().min(1, "Nama lengkap harus diisi"),
@@ -30,6 +29,7 @@ const validationSchema = z.object({
     if (typeof val === "string") {
       return val === "true";
     }
+
     return val;
   }),
   tanggalLahir: z
@@ -146,6 +146,7 @@ export default function OnboardingPage() {
         token,
         jemaatData: jemaatData,
       });
+
       return response.data;
     },
     onSuccess: () => {
@@ -168,21 +169,21 @@ export default function OnboardingPage() {
   });
 
   const onSubmit = (data) => {
-    onboardingMutation.mutate(data);
+  onboardingMutation.mutate(data);
   };
 
   if (!token) {
     return (
       <>
         <PageTitle title="Token Tidak Ditemukan - Onboarding" />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardContent className="text-center py-12">
               <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Token Tidak Ditemukan
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Link undangan tidak lengkap atau tidak valid.
               </p>
               <Button onClick={() => router.push("/login")}>
@@ -199,14 +200,14 @@ export default function OnboardingPage() {
     return (
       <>
         <PageTitle title="Validasi Token - Onboarding" />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardContent className="text-center py-12">
               <Clock className="mx-auto h-12 w-12 text-blue-500 mb-4 animate-spin" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Memvalidasi Token
               </h3>
-              <p className="text-sm text-gray-500">Mohon tunggu sebentar...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Mohon tunggu sebentar...</p>
             </CardContent>
           </Card>
         </div>
@@ -218,14 +219,14 @@ export default function OnboardingPage() {
     return (
       <>
         <PageTitle title="Token Tidak Valid - Onboarding" />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardContent className="text-center py-12">
               <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Token Tidak Valid
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Link undangan tidak valid, telah kedaluwarsa, atau sudah
                 digunakan.
               </p>
@@ -242,21 +243,21 @@ export default function OnboardingPage() {
   return (
     <>
       <PageTitle
-        title="Lengkapi Profil - GMIT Imanuel Oepura"
         description="Lengkapi profil jemaat GMIT Imanuel Oepura"
+        title="Lengkapi Profil - GMIT Imanuel Oepura"
       />
 
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-4">
               <Shield className="h-12 w-12 text-blue-600 mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   GMIT Imanuel Oepura
                 </h1>
-                <p className="text-sm text-gray-600">Lengkapi Profil Jemaat</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Lengkapi Profil Jemaat</p>
               </div>
             </div>
           </div>
@@ -272,22 +273,22 @@ export default function OnboardingPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <label className="font-medium text-gray-700">Nama User</label>
-                  <p className="text-gray-900">{tokenData.user.username}</p>
+                  <label className="font-medium text-gray-700 dark:text-gray-300">Nama User</label>
+                  <p className="text-gray-900 dark:text-white">{tokenData.user.username}</p>
                 </div>
                 <div>
-                  <label className="font-medium text-gray-700">Email</label>
-                  <p className="text-gray-900">{tokenData.user.email}</p>
+                  <label className="font-medium text-gray-700 dark:text-gray-300">Email</label>
+                  <p className="text-gray-900 dark:text-white">{tokenData.user.email}</p>
                 </div>
                 <div>
-                  <label className="font-medium text-gray-700">Keluarga</label>
-                  <p className="text-gray-900">
-                    Bangunan {tokenData.keluarga.noBagungan}
+                  <label className="font-medium text-gray-700 dark:text-gray-300">Keluarga</label>
+                  <p className="text-gray-900 dark:text-white">
+                    {tokenData.keluarga.namaKepalaKeluarga || `Bangunan ${tokenData.keluarga.noBagungan}`}
                   </p>
                 </div>
                 <div>
-                  <label className="font-medium text-gray-700">Rayon</label>
-                  <p className="text-gray-900">
+                  <label className="font-medium text-gray-700 dark:text-gray-300">Rayon</label>
+                  <p className="text-gray-900 dark:text-white">
                     {tokenData.keluarga.rayon.namaRayon}
                   </p>
                 </div>
@@ -305,93 +306,93 @@ export default function OnboardingPage() {
             </CardHeader>
             <CardContent>
               <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <TextInput
-                        name="nama"
-                        label="Nama Lengkap"
-                        placeholder="Masukkan nama lengkap"
                         required
+                        label="Nama Lengkap"
+                        name="nama"
+                        placeholder="Masukkan nama lengkap"
                       />
                     </div>
 
                     <SelectInput
-                      name="jenisKelamin"
+                      required
                       label="Jenis Kelamin"
+                      name="jenisKelamin"
                       options={jenisKelaminOptions}
                       placeholder="Pilih jenis kelamin"
-                      required
                     />
 
                     <DatePicker
-                      name="tanggalLahir"
+                      required
                       label="Tanggal Lahir"
+                      name="tanggalLahir"
                       placeholder="Pilih tanggal lahir"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idStatusDalamKeluarga"
+                      required
+                      apiEndpoint="/status-dalam-keluarga/options"
                       label="Status dalam Keluarga"
-                      apiEndpoint="/api/status-dalam-keluarga/options"
+                      name="idStatusDalamKeluarga"
                       placeholder="Pilih status dalam keluarga"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idSuku"
+                      required
+                      apiEndpoint="/suku/options"
                       label="Suku"
-                      apiEndpoint="/api/suku/options"
+                      name="idSuku"
                       placeholder="Pilih suku"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPendidikan"
+                      required
+                      apiEndpoint="/pendidikan/options"
                       label="Pendidikan"
-                      apiEndpoint="/api/pendidikan/options"
+                      name="idPendidikan"
                       placeholder="Pilih pendidikan terakhir"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPekerjaan"
+                      required
+                      apiEndpoint="/pekerjaan/options"
                       label="Pekerjaan"
-                      apiEndpoint="/api/pekerjaan/options"
+                      name="idPekerjaan"
                       placeholder="Pilih pekerjaan"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPendapatan"
+                      required
+                      apiEndpoint="/pendapatan/options"
                       label="Kategori Pendapatan"
-                      apiEndpoint="/api/pendapatan/options"
+                      name="idPendapatan"
                       placeholder="Pilih kategori pendapatan"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idJaminanKesehatan"
-                      label="Jaminan Kesehatan"
-                      apiEndpoint="/api/jaminan-kesehatan/options"
-                      placeholder="Pilih jaminan kesehatan"
                       required
+                      apiEndpoint="/jaminan-kesehatan/options"
+                      label="Jaminan Kesehatan"
+                      name="idJaminanKesehatan"
+                      placeholder="Pilih jaminan kesehatan"
                     />
 
                     <div className="md:col-span-2">
                       <AutoCompleteInput
-                        name="idKeluarga"
-                        label="Kepala Keluarga"
-                        apiEndpoint="/api/keluarga/options"
-                        placeholder="Pilih kepala keluarga Anda"
                         required
+                        apiEndpoint="/keluarga/options"
+                        label="Kepala Keluarga"
+                        name="idKeluarga"
+                        placeholder="Pilih kepala keluarga Anda"
                       />
                     </div>
 
                     <SelectInput
-                      name="golonganDarah"
                       label="Golongan Darah"
+                      name="golonganDarah"
                       options={golonganDarahOptions}
                       placeholder="Pilih golongan darah (opsional)"
                     />
@@ -408,9 +409,9 @@ export default function OnboardingPage() {
                     </Button>
 
                     <Button
-                      type="submit"
-                      disabled={!isValid || onboardingMutation.isLoading}
                       className="min-w-[120px]"
+                      disabled={!isValid || onboardingMutation.isLoading}
+                      type="submit"
                     >
                       {onboardingMutation.isLoading ? (
                         <Clock className="h-4 w-4 mr-2 animate-spin" />

@@ -66,6 +66,9 @@ export default function SukuPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Suku" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["namaSuku"]}
     />
   );
 }

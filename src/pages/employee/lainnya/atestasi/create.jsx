@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { atestasiSchema } from "@/validations/masterSchema";
 import atestasiService from "@/services/atestasiService";
@@ -11,10 +12,14 @@ import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import TextInput from "@/components/ui/inputs/TextInput";
 import SelectInput from "@/components/ui/inputs/SelectInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export default function CreateAtestasiPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCreateJemaatDialog, setShowCreateJemaatDialog] = useState(false);
+  const [atestasiId, setAtestasiId] = useState(null);
 
   const methods = useForm({
     resolver: zodResolver(atestasiSchema),
@@ -52,22 +57,13 @@ export default function CreateAtestasiPage() {
           color: "success",
         });
 
+        // Invalidate queries to refresh list
+        queryClient.invalidateQueries(["atestasi"]);
+
         // Jika tipe MASUK, tanyakan apakah ingin create jemaat
         if (data.tipe === "MASUK") {
-          setTimeout(() => {
-            if (
-              confirm(
-                "Atestasi masuk berhasil dibuat! Apakah ingin langsung membuat data jemaat?"
-              )
-            ) {
-              router.push(
-                `/employee/lainnya/atestasi/create-jemaat/${response.data.id}`
-              );
-
-              return;
-            }
-            router.push("/employee/lainnya/atestasi");
-          }, 500);
+          setAtestasiId(response.data.id);
+          setShowCreateJemaatDialog(true);
         } else {
           router.push("/employee/lainnya/atestasi");
         }
@@ -92,6 +88,17 @@ export default function CreateAtestasiPage() {
     }
 
     return "Pilih tipe atestasi untuk melihat field yang perlu diisi.";
+  };
+
+  // Handle create jemaat confirmation
+  const handleCreateJemaat = () => {
+    setShowCreateJemaatDialog(false);
+    router.push(`/employee/lainnya/atestasi/create-jemaat/${atestasiId}`);
+  };
+
+  const handleSkipCreateJemaat = () => {
+    setShowCreateJemaatDialog(false);
+    router.push("/employee/lainnya/atestasi");
   };
 
   return (
@@ -291,6 +298,18 @@ export default function CreateAtestasiPage() {
           </div>
         </div>
       )}
+
+      {/* Create Jemaat Confirmation Dialog */}
+      <ConfirmDialog
+        confirmText="Ya, Buat Data Jemaat"
+        cancelText="Tidak, Nanti Saja"
+        isOpen={showCreateJemaatDialog}
+        message="Atestasi masuk berhasil dibuat! Apakah Anda ingin langsung membuat data jemaat untuk orang ini?"
+        title="Buat Data Jemaat"
+        variant="success"
+        onClose={handleSkipCreateJemaat}
+        onConfirm={handleCreateJemaat}
+      />
     </div>
   );
 }

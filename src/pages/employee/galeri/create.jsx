@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useForm, FormProvider } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "@/utils/showToast";
 import galeriService from "@/services/galeriService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -194,6 +194,7 @@ function PhotoUploadSection({ photos, setPhotos }) {
 
 export default function CreateGaleri() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [photos, setPhotos] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -217,6 +218,8 @@ export default function CreateGaleri() {
         description: "Galeri berhasil dibuat",
         color: "success",
       });
+      // Invalidate galeri queries to refresh the list
+      queryClient.invalidateQueries(["galeri"]);
       router.push("/employee/galeri");
     },
     onError: (error) => {

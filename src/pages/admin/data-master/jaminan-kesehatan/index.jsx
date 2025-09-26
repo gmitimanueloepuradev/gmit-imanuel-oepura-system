@@ -66,6 +66,9 @@ export default function JaminanKesehatanPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Jaminan Kesehatan" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["jenisJaminan"]}
     />
   );
 }

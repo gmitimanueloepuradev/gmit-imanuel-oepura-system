@@ -202,6 +202,8 @@ export default function ProvinsiPage() {
         searchPlaceholder="Cari provinsi..."
         title={"Daftar Provinsi"}
         onAdd={() => modal.open()}
+        exportable={true}
+        exportFilename="provinsi"
       />
 
       {/* Provinsi Modal */}

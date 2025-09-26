@@ -18,10 +18,12 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CreateModal from "@/components/ui/CreateModal";
 import EditModal from "@/components/ui/EditModal";
 import ListGrid from "@/components/ui/ListGrid";
+import PhoneInput from "@/components/ui/PhoneInput";
 import ViewModal from "@/components/ui/ViewModal";
 import axios from "@/lib/axios";
 import jemaatService from "@/services/jemaatService";
 import keluargaService from "@/services/keluargaService";
+import rayonService from "@/services/rayonService";
 import userService from "@/services/userService";
 
 export default function UsersPage() {
@@ -32,12 +34,14 @@ export default function UsersPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [jemaatOptions, setJemaatOptions] = useState([]);
   const [keluargaOptions, setKeluargaOptions] = useState([]);
+  const [rayonOptions, setRayonOptions] = useState([]);
   const [showInvitationModal, setShowInvitationModal] = useState(false);
   const [selectedUserForInvitation, setSelectedUserForInvitation] =
     useState(null);
   const [showAccountDataModal, setShowAccountDataModal] = useState(false);
   const [selectedUserForAccountData, setSelectedUserForAccountData] =
     useState(null);
+  const [pageSize, setPageSize] = useState(10);
 
   // Fetch users data
   const { data, isLoading, error } = useQuery({
@@ -47,7 +51,7 @@ export default function UsersPage() {
     keepPreviousData: true,
   });
 
-  // Fetch jemaat and keluarga data for select options
+  // Fetch jemaat, keluarga, and rayon data for select options
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -58,16 +62,36 @@ export default function UsersPage() {
             value: jemaat.id,
             label: `${jemaat.nama} (${jemaat.keluarga?.noBagungan || "No Bangunan"})`,
           })) || [];
+
         setJemaatOptions(jemaatOptions);
 
         // Fetch keluarga options
         const keluargaResponse = await keluargaService.getAll({ limit: 1000 });
         const keluargaOptions =
-          keluargaResponse.data?.items?.map((keluarga) => ({
-            value: keluarga.id,
-            label: `Bangunan ${keluarga.noBagungan} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
-          })) || [];
+          keluargaResponse.data?.items?.map((keluarga) => {
+            const kepalaKeluarga = keluarga.jemaats?.find(
+              (j) => j.statusDalamKeluarga?.status === "Kepala Keluarga"
+            );
+            const displayName =
+              kepalaKeluarga?.nama || `Bangunan ${keluarga.noBagungan}`;
+
+            return {
+              value: keluarga.id,
+              label: `${displayName} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
+            };
+          }) || [];
+
         setKeluargaOptions(keluargaOptions);
+
+        // Fetch rayon options
+        const rayonResponse = await rayonService.getAll({ limit: 1000 });
+        const rayonOptions =
+          rayonResponse.data?.items?.map((rayon) => ({
+            value: rayon.id,
+            label: rayon.namaRayon,
+          })) || [];
+
+        setRayonOptions(rayonOptions);
       } catch (error) {
         console.error("Failed to fetch options:", error);
       }
@@ -78,6 +102,7 @@ export default function UsersPage() {
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
+
     return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
@@ -113,7 +138,8 @@ export default function UsersPage() {
     {
       key: "noWhatsapp",
       label: "No. WhatsApp",
-      type: "text",
+      type: "custom",
+      component: PhoneInput,
       render: (value) => (
         <span className="flex items-center text-sm">
           <Phone className="w-4 h-4 mr-2 text-green-500" />
@@ -156,6 +182,7 @@ export default function UsersPage() {
       type: "text",
       render: (value, row) => {
         const gender = row.jemaat?.jenisKelamin;
+
         if (gender === null || gender === undefined) return "-";
 
         return (
@@ -205,7 +232,9 @@ export default function UsersPage() {
       label: "Jenis Kelamin",
       getValue: (item) => {
         const gender = item?.jemaat?.jenisKelamin;
+
         if (gender === null || gender === undefined) return "-";
+
         return gender ? "Laki-laki" : "Perempuan";
       },
     },
@@ -316,6 +345,7 @@ export default function UsersPage() {
       }
 
       console.log("Sending user data:", cleanData);
+
       return userService.create(cleanData);
     },
     onSuccess: () => {
@@ -336,6 +366,7 @@ export default function UsersPage() {
         keluargaId,
         whatsappNumber,
       });
+
       return response.data;
     },
     onSuccess: (data) => {
@@ -362,6 +393,7 @@ export default function UsersPage() {
         whatsappNumber,
         tempPassword,
       });
+
       return response.data;
     },
     onSuccess: (data) => {
@@ -384,16 +416,19 @@ export default function UsersPage() {
   const handleSendInvitation = (user) => {
     if (user.role !== "JEMAAT") {
       toast.error("Hanya user dengan role JEMAAT yang dapat diundang");
+
       return;
     }
 
     if (user.idJemaat) {
       toast.error("User sudah memiliki profil lengkap");
+
       return;
     }
 
     if (!user.noWhatsapp) {
       toast.error("User belum memiliki nomor WhatsApp");
+
       return;
     }
 
@@ -404,11 +439,91 @@ export default function UsersPage() {
   const handleSendAccountData = (user) => {
     if (!user.noWhatsapp) {
       toast.error("User belum memiliki nomor WhatsApp");
+
       return;
     }
 
     setSelectedUserForAccountData(user);
     setShowAccountDataModal(true);
+  };
+
+  // Enhanced search function
+  const enhancedSearch = (item, searchTerm) => {
+    if (!searchTerm) return true;
+
+    const searchLower = searchTerm.toLowerCase();
+
+    // Search in username, email, name, and phone
+    return (
+      (item.username || "").toLowerCase().includes(searchLower) ||
+      (item.email || "").toLowerCase().includes(searchLower) ||
+      (item.noWhatsapp || "").toLowerCase().includes(searchLower) ||
+      (item.jemaat?.nama || "").toLowerCase().includes(searchLower) ||
+      (item.role || "").toLowerCase().includes(searchLower) ||
+      (item.jemaat?.keluarga?.rayon?.namaRayon || "").toLowerCase().includes(searchLower)
+    );
+  };
+
+  // Create filter options based on available data
+  const userFilters = [
+    {
+      key: "role",
+      label: "Semua Role",
+      options: [
+        { value: "ADMIN", label: "Admin" },
+        { value: "JEMAAT", label: "Jemaat" },
+        { value: "MAJELIS", label: "Majelis" },
+        { value: "PENDETA", label: "Pendeta" },
+        { value: "EMPLOYEE", label: "Pegawai" },
+      ],
+    },
+    {
+      key: "hasJemaat",
+      label: "Status Profil",
+      options: [
+        { value: "true", label: "Profil Lengkap" },
+        { value: "false", label: "Belum Lengkap" },
+      ],
+    },
+    {
+      key: "hasWhatsapp",
+      label: "Status WhatsApp",
+      options: [
+        { value: "true", label: "Ada WhatsApp" },
+        { value: "false", label: "Belum Ada WhatsApp" },
+      ],
+    },
+  ];
+
+  // Add rayon filter if rayon options are available
+  if (rayonOptions.length > 0) {
+    userFilters.push({
+      key: "rayonId",
+      label: "Semua Rayon",
+      options: rayonOptions,
+    });
+  }
+
+  // Custom filter function
+  const customFilterFunction = (item, filters) => {
+    return Object.entries(filters).every(([filterKey, filterValue]) => {
+      if (!filterValue || filterValue === "all") return true;
+
+      switch (filterKey) {
+        case "role":
+          return item.role === filterValue;
+        case "hasJemaat":
+          const hasJemaat = !!item.idJemaat;
+          return hasJemaat.toString() === filterValue;
+        case "hasWhatsapp":
+          const hasWhatsapp = !!item.noWhatsapp;
+          return hasWhatsapp.toString() === filterValue;
+        case "rayonId":
+          return item.jemaat?.keluarga?.rayon?.id === filterValue;
+        default:
+          return item[filterKey] === filterValue;
+      }
+    });
   };
 
   return (
@@ -421,9 +536,65 @@ export default function UsersPage() {
         columns={columns}
         data={data?.data?.items || []}
         description="Kelola data pengguna sistem"
-        title="Manajemen Users"
-        isLoading={isLoading}
+        emptyStateProps={{
+          title: "Belum Ada Data User",
+          description: "Mulai dengan menambahkan user pertama",
+          actionLabel: "Tambah User",
+          onAction: () => setShowCreate(true),
+        }}
         error={error}
+        exportColumns={[
+          {
+            key: "username",
+            label: "Username",
+            type: "text",
+          },
+          {
+            key: "email",
+            label: "Email",
+            type: "text",
+          },
+          {
+            key: "noWhatsapp",
+            label: "No WhatsApp",
+            type: "text",
+          },
+          {
+            key: "role",
+            label: "Role",
+            type: "text",
+          },
+          {
+            key: "jemaat",
+            label: "Nama Jemaat",
+            render: (value) => value?.nama || "-",
+          },
+          {
+            key: "jenisKelamin",
+            label: "Jenis Kelamin",
+            render: (value, row) => {
+              const gender = row.jemaat?.jenisKelamin;
+
+              if (gender === null || gender === undefined) return "-";
+
+              return gender ? "Laki-laki" : "Perempuan";
+            },
+          },
+          {
+            key: "createdAt",
+            label: "Tgl Dibuat",
+            type: "datetime",
+          },
+        ]}
+        exportFilename="users"
+        exportable={true}
+        filters={userFilters}
+        customFilterFunction={customFilterFunction}
+        customSearchFunction={enhancedSearch}
+        isLoading={isLoading}
+        itemsPerPage={pageSize}
+        showPageSizeSelector={true}
+        pageSizeOptions={[10, 25, 50, 100]}
         rowActionType="horizontal"
         rowActions={[
           {
@@ -439,6 +610,7 @@ export default function UsersPage() {
             tooltip: "Edit user",
           },
           {
+            label: "Kirim Undangan WA",
             icon: MessageCircle,
             onClick: (item) => handleSendInvitation(item),
             variant: "outline",
@@ -447,6 +619,7 @@ export default function UsersPage() {
               item.role === "JEMAAT" && !item.idJemaat && item.noWhatsapp,
           },
           {
+            label: "Kirim Data Akun WA",
             icon: Send,
             onClick: (item) => handleSendAccountData(item),
             variant: "outline",
@@ -454,37 +627,30 @@ export default function UsersPage() {
             condition: (item) => item.noWhatsapp,
           },
           {
+            label: "Hapus",
             icon: Trash2,
             onClick: (item) => setDeleteItem(item),
             variant: "outline",
             tooltip: "Hapus user",
           },
         ]}
-        onAdd={() => setShowCreate(true)}
+        searchPlaceholder="Cari username, email, nama jemaat, role, rayon..."
         searchable={true}
-        searchPlaceholder="Cari berdasarkan username, email, nama..."
-        emptyStateProps={{
-          title: "Belum Ada Data User",
-          description: "Mulai dengan menambahkan user pertama",
-          actionLabel: "Tambah User",
-          onAction: () => setShowCreate(true),
-        }}
+        title="Manajemen Users"
+        onAdd={() => setShowCreate(true)}
       />
 
       <ConfirmDialog
+        isLoading={deleteMutation.isPending}
         isOpen={!!deleteItem}
+        message={`Apakah Anda yakin ingin menghapus user "${deleteItem?.username}" (${deleteItem?.email})? Data yang sudah dihapus tidak dapat dikembalikan.`}
+        title="Hapus User"
+        variant="danger"
         onClose={() => setDeleteItem(null)}
         onConfirm={() => deleteMutation.mutate(deleteItem.id)}
-        title="Hapus User"
-        message={`Apakah Anda yakin ingin menghapus user "${deleteItem?.username}" (${deleteItem?.email})? Data yang sudah dihapus tidak dapat dikembalikan.`}
-        variant="danger"
-        isLoading={deleteMutation.isPending}
       />
 
       <ViewModal
-        isOpen={!!viewItem}
-        onClose={() => setViewItem(null)}
-        title="Detail User"
         data={
           viewItem && Array.isArray(viewFields)
             ? viewFields.map((field) => ({
@@ -495,45 +661,35 @@ export default function UsersPage() {
               }))
             : []
         }
+        isOpen={!!viewItem}
+        title="Detail User"
+        onClose={() => setViewItem(null)}
       />
 
       <EditModal
+        fields={formFields.filter((field) => field.key !== "password")} // Don't show password field in edit
+        initialData={editItem}
+        isLoading={updateMutation.isPending}
         isOpen={!!editItem}
+        title="Edit User"
         onClose={() => setEditItem(null)}
         onSubmit={(formData) =>
           updateMutation.mutate({ id: editItem.id, data: formData })
         }
-        title="Edit User"
-        fields={formFields.filter((field) => field.key !== "password")} // Don't show password field in edit
-        initialData={editItem}
-        isLoading={updateMutation.isPending}
       />
 
       <CreateModal
-        isOpen={showCreate}
-        onClose={() => setShowCreate(false)}
-        onSubmit={(formData) => createMutation.mutate(formData)}
-        title="Tambah User"
         fields={formFields}
         isLoading={createMutation.isPending}
+        isOpen={showCreate}
+        title="Tambah User"
+        onClose={() => setShowCreate(false)}
+        onSubmit={(formData) => createMutation.mutate(formData)}
       />
 
       {/* Invitation Modal */}
       <CreateModal
-        isOpen={showInvitationModal}
-        onClose={() => {
-          setShowInvitationModal(false);
-          setSelectedUserForInvitation(null);
-        }}
-        onSubmit={(formData) =>
-          invitationMutation.mutate({
-            userId: selectedUserForInvitation?.id,
-            keluargaId: formData.keluargaId,
-            whatsappNumber:
-              selectedUserForInvitation?.noWhatsapp || formData.whatsappNumber,
-          })
-        }
-        title="Kirim Undangan WhatsApp"
+        description="Undangan akan dikirim melalui WhatsApp dengan link onboarding yang berlaku selama 7 hari."
         fields={[
           {
             key: "userInfo",
@@ -546,7 +702,8 @@ export default function UsersPage() {
           {
             key: "whatsappNumber",
             label: "No. WhatsApp",
-            type: "text",
+            type: "custom",
+            component: PhoneInput,
             value: selectedUserForInvitation?.noWhatsapp || "",
             placeholder: "Masukkan nomor WhatsApp jika kosong",
           },
@@ -560,27 +717,30 @@ export default function UsersPage() {
           },
         ]}
         isLoading={invitationMutation.isPending}
+        isOpen={showInvitationModal}
         submitLabel="Kirim Undangan"
-        description="Undangan akan dikirim melalui WhatsApp dengan link onboarding yang berlaku selama 7 hari."
+        title="Kirim Undangan WhatsApp"
+        onClose={() => {
+          setShowInvitationModal(false);
+          setSelectedUserForInvitation(null);
+        }}
+        onSubmit={(formData) =>
+          invitationMutation.mutate({
+            userId: selectedUserForInvitation?.id,
+            keluargaId: formData.keluargaId,
+            whatsappNumber:
+              selectedUserForInvitation?.noWhatsapp || formData.whatsappNumber,
+          })
+        }
       />
 
       {/* Account Data Modal */}
       <CreateModal
-        isOpen={showAccountDataModal}
-        onClose={() => {
-          setShowAccountDataModal(false);
-          setSelectedUserForAccountData(null);
-        }}
-        onSubmit={(formData) =>
-          accountDataMutation.mutate({
-            userId: selectedUserForAccountData?.id,
-            whatsappNumber:
-              selectedUserForAccountData?.noWhatsapp || formData.whatsappNumber,
-            tempPassword: formData.tempPassword,
-            keluargaId: formData.keluargaId,
-          })
+        description={
+          selectedUserForAccountData?.role === "JEMAAT"
+            ? "Data akun akan dikirim bersama informasi kepala keluarga. User akan diminta memilih kepala keluarga saat pertama login dan melengkapi profil."
+            : "Data akun (username, email, password, role) akan dikirim melalui WhatsApp. Pastikan user segera mengganti password setelah login pertama."
         }
-        title="Kirim Data Akun via WhatsApp"
         fields={[
           {
             key: "userInfo",
@@ -593,7 +753,8 @@ export default function UsersPage() {
           {
             key: "whatsappNumber",
             label: "No. WhatsApp",
-            type: "text",
+            type: "custom",
+            component: PhoneInput,
             value: selectedUserForAccountData?.noWhatsapp || "",
             placeholder: "Masukkan nomor WhatsApp jika kosong",
             required: true,
@@ -617,11 +778,21 @@ export default function UsersPage() {
           },
         ]}
         isLoading={accountDataMutation.isPending}
+        isOpen={showAccountDataModal}
         submitLabel="Kirim Data Akun"
-        description={
-          selectedUserForAccountData?.role === "JEMAAT"
-            ? "Data akun akan dikirim bersama informasi kepala keluarga. User akan diminta memilih kepala keluarga saat pertama login dan melengkapi profil."
-            : "Data akun (username, email, password, role) akan dikirim melalui WhatsApp. Pastikan user segera mengganti password setelah login pertama."
+        title="Kirim Data Akun via WhatsApp"
+        onClose={() => {
+          setShowAccountDataModal(false);
+          setSelectedUserForAccountData(null);
+        }}
+        onSubmit={(formData) =>
+          accountDataMutation.mutate({
+            userId: selectedUserForAccountData?.id,
+            whatsappNumber:
+              selectedUserForAccountData?.noWhatsapp || formData.whatsappNumber,
+            tempPassword: formData.tempPassword,
+            keluargaId: formData.keluargaId,
+          })
         }
       />
     </>

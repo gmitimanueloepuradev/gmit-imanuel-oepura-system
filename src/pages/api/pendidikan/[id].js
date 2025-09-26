@@ -25,9 +25,28 @@ export default async function handler(req, res) {
         .status(500)
         .json(apiResponse(false, null, "Gagal mengambil data", error.message));
     }
-  } else if (method === "PUT") {
+  } else if (method === "PATCH" || method === "PUT") {
     try {
       const { jenjang, isActive } = req.body;
+
+      // Check if jenjang already exists (exclude current record)
+      if (jenjang) {
+        const duplicatePendidikan = await prisma.pendidikan.findFirst({
+          where: {
+            jenjang: {
+              equals: jenjang,
+              mode: "insensitive",
+            },
+            NOT: { id: id },
+          },
+        });
+
+        if (duplicatePendidikan) {
+          return res
+            .status(409)
+            .json(apiResponse(false, null, "Jenjang pendidikan sudah ada"));
+        }
+      }
 
       const updated = await prisma.pendidikan.update({
         where: { id },
@@ -55,7 +74,7 @@ export default async function handler(req, res) {
         .json(apiResponse(false, null, "Gagal hapus data", error.message));
     }
   } else {
-    res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+    res.setHeader("Allow", ["GET", "PATCH", "PUT", "DELETE"]);
     res.status(405).end(`Method ${method} Not Allowed`);
   }
 }

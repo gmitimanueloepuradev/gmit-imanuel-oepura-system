@@ -1,23 +1,28 @@
-import MasterDataPage from "@/components/ui/MasterDataPage";
 import axios from "axios";
+
+import MasterDataPage from "@/components/ui/MasterDataPage";
 
 const kategoriKeuanganService = {
   get: async (params) => {
-    const response = await axios.get("/api/keuangan/kategori", { 
-      params: { ...params, includeCount: true } 
+    const response = await axios.get("/api/keuangan/kategori", {
+      params: { ...params, includeCount: true },
     });
+
     return response.data;
   },
   create: async (data) => {
     const response = await axios.post("/api/keuangan/kategori", data);
+
     return response.data;
   },
   update: async (id, data) => {
     const response = await axios.patch(`/api/keuangan/kategori/${id}`, data);
+
     return response.data;
   },
   delete: async (id) => {
     const response = await axios.delete(`/api/keuangan/kategori/${id}`);
+
     return response.data;
   },
 };
@@ -47,9 +52,9 @@ export default function KategoriKeuanganPage() {
     {
       key: "isActive",
       label: "Status",
-      type: "badge",
-      render: (item) => item.isActive ? "Aktif" : "Tidak Aktif",
-      variant: (item) => item.isActive ? "success" : "secondary",
+      type: "boolean",
+      // render: (item) => (item.isActive ? "Aktif" : "Tidak Aktif"),
+      variant: (item) => (item.isActive ? "success" : "secondary"),
     },
   ];
 
@@ -123,22 +128,22 @@ export default function KategoriKeuanganPage() {
 
   return (
     <MasterDataPage
-      title="Kelola Kategori Keuangan"
-      description="Kelola kategori keuangan sesuai kebutuhan gereja Anda. Contoh: PENERIMAAN, PENGELUARAN, DANA PEMBANGUNAN, dll."
-      service={kategoriKeuanganService}
-      queryKey="kategori-keuangan"
-      columns={columns}
-      viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="nama"
-      searchFields={["nama", "kode"]}
+      allowBulkDelete={false}
       breadcrumb={[
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Data Master" },
         { label: "Kategori Keuangan" },
       ]}
-      allowBulkDelete={false}
+      columns={columns}
+      description="Kelola kategori keuangan sesuai kebutuhan gereja Anda. Contoh: PENERIMAAN, PENGELUARAN, DANA PEMBANGUNAN, dll."
       exportable={true}
+      formFields={formFields}
+      itemNameField="nama"
+      queryKey="kategori-keuangan"
+      searchFields={["nama", "kode"]}
+      service={kategoriKeuanganService}
+      title="Kelola Kategori Keuangan"
+      viewFields={viewFields}
     />
   );
 }

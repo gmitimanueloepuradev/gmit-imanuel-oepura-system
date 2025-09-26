@@ -76,6 +76,9 @@ export default function RayonPage() {
       }}
       title="Kelola Rayon"
       viewFields={viewFields}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["namaRayon", "deskripsi"]}
     />
   );
 }

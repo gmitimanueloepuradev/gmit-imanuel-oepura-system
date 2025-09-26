@@ -49,13 +49,13 @@ async function handleGet(req, res) {
 // POST - Tambah data jaminan kesehatan baru
 async function handlePost(req, res) {
   try {
-    const { jaminanKesehatan } = req.body;
+    const { jenisJaminan } = req.body;
 
     // Validasi input
-    if (!jaminanKesehatan || jaminanKesehatan.trim() === "") {
+    if (!jenisJaminan || jenisJaminan.trim() === "") {
       return res.status(400).json(
         apiResponse(false, null, "Validasi gagal", {
-          jaminanKesehatan: "Nama jaminan kesehatan wajib diisi",
+          jenisJaminan: "Nama jenis jaminan wajib diisi",
         })
       );
     }
@@ -63,8 +63,8 @@ async function handlePost(req, res) {
     // Cek duplikasi
     const existingJaminanKesehatan = await prisma.jaminanKesehatan.findFirst({
       where: {
-        jaminanKesehatan: {
-          equals: jaminanKesehatan.trim(),
+        jenisJaminan: {
+          equals: jenisJaminan.trim(),
           mode: "insensitive",
         },
       },
@@ -73,7 +73,7 @@ async function handlePost(req, res) {
     if (existingJaminanKesehatan) {
       return res.status(409).json(
         apiResponse(false, null, "Data sudah ada", {
-          jaminanKesehatan: "Jaminan kesehatan ini sudah terdaftar",
+          jenisJaminan: "Jenis jaminan ini sudah terdaftar",
         })
       );
     }
@@ -81,7 +81,7 @@ async function handlePost(req, res) {
     // Buat data baru
     const newJaminanKesehatan = await prisma.jaminanKesehatan.create({
       data: {
-        jaminanKesehatan: jaminanKesehatan.trim(),
+        jenisJaminan: jenisJaminan.trim(),
       },
     });
 
@@ -114,7 +114,7 @@ async function handlePost(req, res) {
 // PUT - Update data jaminan kesehatan
 async function handlePut(req, res) {
   try {
-    const { id, jaminanKesehatan } = req.body;
+    const { id, jenisJaminan } = req.body;
 
     // Validasi input
     if (!id) {
@@ -125,10 +125,10 @@ async function handlePut(req, res) {
       );
     }
 
-    if (!jaminanKesehatan || jaminanKesehatan.trim() === "") {
+    if (!jenisJaminan || jenisJaminan.trim() === "") {
       return res.status(400).json(
         apiResponse(false, null, "Validasi gagal", {
-          jaminanKesehatan: "Nama jaminan kesehatan wajib diisi",
+          jenisJaminan: "Nama jenis jaminan wajib diisi",
         })
       );
     }
@@ -149,8 +149,8 @@ async function handlePut(req, res) {
       where: {
         AND: [
           {
-            jaminanKesehatan: {
-              equals: jaminanKesehatan.trim(),
+            jenisJaminan: {
+              equals: jenisJaminan.trim(),
               mode: "insensitive",
             },
           },
@@ -166,7 +166,7 @@ async function handlePut(req, res) {
     if (duplicateCheck) {
       return res.status(409).json(
         apiResponse(false, null, "Data sudah ada", {
-          jaminanKesehatan: "Jaminan kesehatan ini sudah terdaftar",
+          jenisJaminan: "Jenis jaminan ini sudah terdaftar",
         })
       );
     }
@@ -175,7 +175,7 @@ async function handlePut(req, res) {
     const updatedJaminanKesehatan = await prisma.jaminanKesehatan.update({
       where: { id },
       data: {
-        jaminanKesehatan: jaminanKesehatan.trim(),
+        jenisJaminan: jenisJaminan.trim(),
       },
     });
 

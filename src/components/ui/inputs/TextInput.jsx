@@ -32,9 +32,9 @@ export default function TextInput({
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            {label} {required && <span className="text-red-500">*</span>}
+            {label} {required && <span className="text-red-500 dark:text-red-400">*</span>}
           </label>
         )}
         <input
@@ -42,13 +42,13 @@ export default function TextInput({
           type={type}
           {...field}
           placeholder={placeholder}
-          className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-            error ? "border-red-300 focus:ring-red-500 focus:border-red-500" : ""
+          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+            error ? "border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500" : ""
           } ${className}`}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error.message}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error.message}</p>
         )}
       </div>
     );
@@ -60,9 +60,9 @@ export default function TextInput({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
         >
-          {label} {required && <span className="text-red-500">*</span>}
+          {label} {required && <span className="text-red-500 dark:text-red-400">*</span>}
         </label>
       )}
       <input
@@ -72,13 +72,13 @@ export default function TextInput({
         value={value || ""}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-          externalError ? "border-red-300 focus:ring-red-500 focus:border-red-500" : ""
+        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+          externalError ? "border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500" : ""
         } ${className}`}
         {...props}
       />
       {externalError && (
-        <p className="mt-1 text-sm text-red-600">{externalError}</p>
+        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{externalError}</p>
       )}
     </div>
   );

@@ -1,24 +1,24 @@
 import {
-  Activity,
+  Baby,
   BarChart3,
   Bell,
-  BookOpen,
   Building,
   Building2,
   Calendar,
-  CheckSquare,
+  Church,
   ClipboardList,
+  Crown,
   Database,
   DollarSign,
   FileText,
+  GraduationCap,
   Heart,
   Home,
+  Image,
   List,
-  Mail,
   Map,
   MapPin,
-  MessageSquare,
-  Settings,
+  MoreHorizontal,
   Shield,
   Tag,
   UserCheck,
@@ -26,12 +26,6 @@ import {
   UserPlus,
   Users,
   UsersRound,
-  Baby,
-  GraduationCap,
-  Crown,
-  Church,
-  MoreHorizontal,
-  Image,
 } from "lucide-react";
 
 // Role-based configurations
@@ -57,6 +51,11 @@ export const roleConfigs = {
       { href: "/admin/kegiatan", label: "Kegiatan", icon: Calendar },
       { href: "/admin/keluarga", label: "Keluarga", icon: UsersRound },
       { href: "/admin/rayon", label: "Rayon", icon: MapPin },
+      {
+        href: "/admin/pengumuman",
+        label: "Pengumuman",
+        icon: Bell,
+      },
       {
         href: "/admin/sidi",
         label: "Sidi",
@@ -229,8 +228,7 @@ export const roleConfigs = {
   majelis: {
     roleTitle: "Majelis",
     fullTitle: "Portal Majelis",
-    description:
-      "Sistem manajemen untuk majelis gereja dalam mengawasi dan mengelola kegiatan pelayanan.",
+    description: "Sistem manajemen untuk majelis gereja dalam mengawasi dan mengelola kegiatan pelayanan.",
     baseRoute: "/majelis",
     dashboardRoute: "/majelis/dashboard",
     logoIcon: Building2,
@@ -242,14 +240,19 @@ export const roleConfigs = {
     navigation: [
       { href: "/majelis/dashboard", label: "Dashboard", icon: Home },
       {
-        href: "/majelis/jadwal-ibadah",
-        label: "Jadwal Ibadah",
-        icon: Calendar,
+        href: "/majelis/jemaat",
+        label: "Data Jemaat",
+        icon: Users,
       },
       {
         href: "/majelis/keluarga",
         label: "Data Keluarga",
         icon: UsersRound,
+      },
+      {
+        href: "/majelis/jadwal-ibadah",
+        label: "Jadwal Ibadah",
+        icon: Calendar,
       },
       {
         href: "/majelis/pengumuman",
@@ -273,8 +276,7 @@ export const roleConfigs = {
   employee: {
     roleTitle: "Pegawai",
     fullTitle: "Portal Pegawai",
-    description:
-      "Sistem untuk pegawai gereja dalam mengelola tugas harian dan koordinasi pelayanan.",
+    description: "Sistem untuk pegawai gereja dalam mengelola tugas harian dan koordinasi pelayanan.",
     baseRoute: "/employee",
     dashboardRoute: "/employee/dashboard",
     logoIcon: UserPlus,

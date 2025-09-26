@@ -60,13 +60,12 @@ async function handlePost(req, res) {
         keluargaInfo = `
 
 👨‍👩‍👧‍👦 *Informasi Keluarga:*
-- Kepala Keluarga: ${kepalaKeluarga}
-- No. Bangunan: ${keluarga.noBagungan}
+- Kepala Keluarga: ${kepalaKeluarga || `Bangunan ${keluarga.noBagungan}`}
 - Rayon: ${keluarga.rayon?.namaRayon || '-'}
 
 📝 *Catatan untuk Role Jemaat:*
 - Setelah login pertama, Anda akan diminta melengkapi profil pribadi
-- Pastikan pilih keluarga yang sesuai dengan No. Bangunan: ${keluarga.noBagungan}`;
+- Pastikan pilih keluarga yang sesuai dengan kepala keluarga: ${kepalaKeluarga || `Bangunan ${keluarga.noBagungan}`}`;
       }
     }
 

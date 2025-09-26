@@ -173,13 +173,19 @@ export default function CreateJemaat() {
     })) || [];
 
   const keluargaListOptions =
-    keluargaList?.data?.items?.map((item) => ({
-      value: item.id,
-      label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
-    })) || [];
+    keluargaList?.data?.items?.map((item) => {
+      const kepalaKeluarga = item.jemaats?.find(j =>
+        j.statusDalamKeluarga?.status?.toLowerCase().includes('kepala')
+      );
+      const kepalaName = kepalaKeluarga?.nama || 'Belum ada kepala keluarga';
+      return {
+        value: item.id,
+        label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
+      };
+    }) || [];
 
   const sukuOptions =
-    suku?.data?.items?.map((item) => ({
+    suku?.data?.map((item) => ({
       value: item.id,
       label: item.namaSuku,
     })) || [];
@@ -403,6 +409,10 @@ export default function CreateJemaat() {
     "idKeadaanRumah",
     "idRayon",
     "noBagungan",
+    "idKelurahan",
+    "rt",
+    "rw",
+    "jalan",
   ]);
 
   const canGoNext = () => {
@@ -596,8 +606,8 @@ export default function CreateJemaat() {
 
                   {preSelectedKeluarga && (
                     <div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p className="text-sm text-blue-700">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <p className="text-sm text-blue-700 dark:text-blue-300">
                           <strong>Kepala Keluarga</strong> - Jemaat ini akan
                           menjadi kepala keluarga yang baru dibuat.
                         </p>
@@ -689,7 +699,7 @@ export default function CreateJemaat() {
                       type="checkbox"
                       onChange={(e) => setCreateUserAccount(e.target.checked)}
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Buatkan akun user untuk jemaat ini
                     </span>
                   </label>
@@ -744,8 +754,8 @@ export default function CreateJemaat() {
             {currentStep === 3 && createKeluarga && (
               <StepContent>
                 <div className="mb-6">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-700">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
                       Jemaat ini adalah kepala keluarga. Silakan lengkapi data
                       keluarga.
                     </p>
@@ -821,8 +831,8 @@ export default function CreateJemaat() {
                 </div>
 
                 <div className="mt-6">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-sm text-yellow-700">
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
                       Alamat akan otomatis dibuat untuk keluarga baru ini.
                     </p>
                   </div>
@@ -834,8 +844,8 @@ export default function CreateJemaat() {
             {currentStep === 4 && createKeluarga && (
               <StepContent>
                 <div className="mb-6">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-sm text-green-700">
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <p className="text-sm text-green-700 dark:text-green-300">
                       Lengkapi alamat untuk keluarga baru ini.
                     </p>
                   </div>

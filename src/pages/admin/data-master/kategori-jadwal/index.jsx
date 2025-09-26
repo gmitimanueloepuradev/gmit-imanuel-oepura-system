@@ -131,7 +131,8 @@ export default function KategoriJadwalPage() {
         searchPlaceholder="Cari nama kategori..."
         title="Manajemen Kategori Jadwal"
         onAdd={() => modal.open()}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="kategori-jadwal"
       />
 
       <CreateOrEditModal

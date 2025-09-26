@@ -1,19 +1,18 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { useEffect } from "react"; // Tambahkan import useEffect
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react"; // Tambahkan import useEffect
-
-import masterService from "@/services/masterService";
 
 import CardWrapper from "@/components/common/CardWrapper";
 import CreateOrEditButton from "@/components/common/CreateOrEditButton";
 import HookForm from "@/components/form/HookForm";
 import TextInput from "@/components/ui/inputs/TextInput";
-import PageHeader from "@/components/ui/PageHeader";
-import { showToast } from "@/utils/showToast";
 import ToggleInput from "@/components/ui/inputs/ToggleInput";
+import PageHeader from "@/components/ui/PageHeader";
+import masterService from "@/services/masterService";
+import { showToast } from "@/utils/showToast";
 
 // ✅ Schema Zod
 const schema = z.object({
@@ -50,7 +49,6 @@ export default function EditPendidikanPage() {
   // ✅ Effect untuk reset form ketika data berhasil di-load
   useEffect(() => {
     if (data?.success && data?.data) {
-      console.log("Data loaded:", data.data); // Debug log
       reset({
         jenjang: data.data.jenjang,
         isActive: data.data.isActive,
@@ -121,23 +119,23 @@ export default function EditPendidikanPage() {
   return (
     <>
       <PageHeader
-        title={"Edit Data Pendidikan"}
         breadcrumb={[
           { label: "Dashboard", href: "/admin/dashboard" },
           { label: "Data Pendidikan", href: "/admin/data-master/pendidikan" },
           { label: "Edit Pendidikan" },
         ]}
+        title={"Edit Data Pendidikan"}
       />
       <CardWrapper>
         <HookForm methods={methods} onSubmit={onSubmit}>
           <TextInput
-            name="jenjang"
             label="Jenjang Pendidikan"
+            name="jenjang"
             placeholder="Contoh: SMA"
           />
 
-          <ToggleInput name="isActive" label="Aktif?" />
-          <CreateOrEditButton label="Perbarui" isLoading={mutation.isLoading} />
+          <ToggleInput label="Aktif?" name="isActive" />
+          <CreateOrEditButton isLoading={mutation.isLoading} label="Perbarui" />
         </HookForm>
       </CardWrapper>
     </>

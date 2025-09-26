@@ -56,18 +56,19 @@ export default function EditModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       <div
         aria-hidden="true"
         className="fixed inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="bg-white rounded-lg shadow-lg">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <div className="bg-white dark:bg-gray-800 transition-colors duration-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 transition-colors duration-200">{title}</h3>
             <button
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
               onClick={onClose}
             >
               <X className="w-5 h-5" />
@@ -76,7 +77,7 @@ export default function EditModal({
 
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="p-4">
+              <div className="p-4 max-h-96 overflow-y-auto">
                 <div className="space-y-4">
                   {fields.map((field) => {
                     const fieldProps = {
@@ -118,7 +119,7 @@ export default function EditModal({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 p-4 border-t bg-gray-50">
+              <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
                 <Button
                   disabled={isLoading}
                   type="button"
@@ -137,6 +138,7 @@ export default function EditModal({
               </div>
             </form>
           </FormProvider>
+          </div>
         </div>
       </div>
     </div>

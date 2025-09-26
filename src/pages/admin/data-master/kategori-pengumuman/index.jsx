@@ -1,5 +1,5 @@
-import masterService from "@/services/masterService";
 import MasterDataPage from "@/components/ui/MasterDataPage";
+import masterService from "@/services/masterService";
 
 export default function KategoriPengumumanPage() {
   const columns = [
@@ -35,9 +35,8 @@ export default function KategoriPengumumanPage() {
     {
       key: "isActive",
       label: "Status",
-      type: "badge",
-      render: (item) => item.isActive ? "Aktif" : "Tidak Aktif",
-      variant: (item) => item.isActive ? "success" : "secondary",
+      type: "boolean",
+      badgeVariant: (value) => (value === true ? "success" : "danger"),
     },
   ];
 
@@ -97,7 +96,7 @@ export default function KategoriPengumumanPage() {
     {
       key: "isActive",
       label: "Status Aktif",
-      type: "switch",
+      type: "boolean",
       defaultValue: true,
       description: "Kategori aktif dapat digunakan untuk membuat pengumuman",
     },
@@ -105,8 +104,18 @@ export default function KategoriPengumumanPage() {
 
   return (
     <MasterDataPage
-      title="Kelola Kategori Pengumuman"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Kategori Pengumuman" },
+      ]}
+      columns={columns}
       description="Kelola data kategori pengumuman untuk pengelompokan jenis pengumuman"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="nama"
+      queryKey="kategori-pengumuman"
+      searchFields={["nama", "deskripsi"]}
       service={{
         get: (params) =>
           masterService.getKategoriPengumuman({
@@ -117,18 +126,8 @@ export default function KategoriPengumumanPage() {
         update: (id, data) => masterService.updateKategoriPengumuman(id, data),
         delete: (id) => masterService.deleteKategoriPengumuman(id),
       }}
-      queryKey="kategori-pengumuman"
-      columns={columns}
+      title="Kelola Kategori Pengumuman"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="nama"
-      searchFields={["nama", "deskripsi"]}
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Kategori Pengumuman" },
-      ]}
-      allowBulkDelete={true}
-      exportable={true}
     />
   );
 }

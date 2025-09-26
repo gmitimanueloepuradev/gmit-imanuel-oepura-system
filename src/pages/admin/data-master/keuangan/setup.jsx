@@ -1,19 +1,20 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Alert, AlertDescription } from "@/components/ui/Alert";
-import { 
-  Database, 
-  Trash2, 
-  Download, 
-  Info, 
-  AlertTriangle,
-  CheckCircle 
-} from "lucide-react";
-import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Database,
+  Download,
+  Info,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { Alert, AlertDescription } from "@/components/ui/Alert";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export default function KeuanganSetupPage() {
@@ -27,21 +28,22 @@ export default function KeuanganSetupPage() {
       const [kategoriRes, itemRes, periodeRes] = await Promise.all([
         axios.get("/api/keuangan/kategori"),
         axios.get("/api/keuangan/item"),
-        axios.get("/api/keuangan/periode")
+        axios.get("/api/keuangan/periode"),
       ]);
-      
+
       return {
         kategori: kategoriRes.data.data?.pagination?.total || 0,
         items: itemRes.data.data?.pagination?.total || 0,
-        periode: periodeRes.data.data?.pagination?.total || 0
+        periode: periodeRes.data.data?.pagination?.total || 0,
       };
-    }
+    },
   });
 
   // Mutation untuk seed data
   const seedMutation = useMutation({
     mutationFn: async (force = false) => {
       const response = await axios.post("/api/keuangan/seed", { force });
+
       return response.data;
     },
     onSuccess: () => {
@@ -52,13 +54,14 @@ export default function KeuanganSetupPage() {
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Gagal membuat seed data");
-    }
+    },
   });
 
   // Mutation untuk clear data
   const clearMutation = useMutation({
     mutationFn: async () => {
       const response = await axios.delete("/api/keuangan/seed");
+
       return response.data;
     },
     onSuccess: () => {
@@ -71,10 +74,11 @@ export default function KeuanganSetupPage() {
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Gagal menghapus data");
       setShowClearDialog(false);
-    }
+    },
   });
 
-  const hasData = statusData && (statusData.kategori > 0 || statusData.items > 0);
+  const hasData =
+    statusData && (statusData.kategori > 0 || statusData.items > 0);
 
   return (
     <div className="space-y-6 p-6">
@@ -96,7 +100,9 @@ export default function KeuanganSetupPage() {
             <Database className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusData?.kategori || 0}</div>
+            <div className="text-2xl font-bold">
+              {statusData?.kategori || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               Total kategori terdaftar
             </p>
@@ -105,9 +111,7 @@ export default function KeuanganSetupPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Item Keuangan
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Item Keuangan</CardTitle>
             <Database className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -127,9 +131,7 @@ export default function KeuanganSetupPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{statusData?.periode || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Total periode aktif
-            </p>
+            <p className="text-xs text-muted-foreground">Total periode aktif</p>
           </CardContent>
         </Card>
       </div>
@@ -141,19 +143,21 @@ export default function KeuanganSetupPage() {
           {hasData ? (
             <>
               <strong>Status:</strong>{" "}
-              <Badge variant="success" className="mr-2">
+              <Badge className="mr-2" variant="success">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 Data Tersedia
               </Badge>
-              Sistem keuangan sudah memiliki data master. Anda dapat menambah kategori dan item baru sesuai kebutuhan.
+              Sistem keuangan sudah memiliki data master. Anda dapat menambah
+              kategori dan item baru sesuai kebutuhan.
             </>
           ) : (
             <>
               <strong>Status:</strong>{" "}
-              <Badge variant="secondary" className="mr-2">
+              <Badge className="mr-2" variant="secondary">
                 Data Kosong
               </Badge>
-              Sistem belum memiliki data master keuangan. Silahkan buat data seed atau tambah manual.
+              Sistem belum memiliki data master keuangan. Silahkan buat data
+              seed atau tambah manual.
             </>
           )}
         </AlertDescription>
@@ -169,26 +173,27 @@ export default function KeuanganSetupPage() {
           <div className="border rounded-lg p-4">
             <h3 className="font-semibold text-lg mb-2">Data Seed (Contoh)</h3>
             <p className="text-gray-600 text-sm mb-4">
-              Buat data contoh untuk memulai. Akan membuat kategori PENERIMAAN & PENGELUARAN 
-              beserta beberapa item standar seperti Perpuluhan, Operasional, dll.
+              Buat data contoh untuk memulai. Akan membuat kategori PENERIMAAN &
+              PENGELUARAN beserta beberapa item standar seperti Perpuluhan,
+              Operasional, dll.
             </p>
-            
+
             <div className="flex gap-3">
               <Button
-                onClick={() => seedMutation.mutate(false)}
-                disabled={seedMutation.isPending}
                 className="flex items-center gap-2"
+                disabled={seedMutation.isPending}
+                onClick={() => seedMutation.mutate(false)}
               >
                 <Download className="w-4 h-4" />
                 {seedMutation.isPending ? "Membuat..." : "Buat Data Seed"}
               </Button>
-              
+
               {hasData && (
                 <Button
+                  className="flex items-center gap-2"
+                  disabled={seedMutation.isPending}
                   variant="outline"
                   onClick={() => seedMutation.mutate(true)}
-                  disabled={seedMutation.isPending}
-                  className="flex items-center gap-2"
                 >
                   <Download className="w-4 h-4" />
                   Force Seed (Timpa)
@@ -201,23 +206,28 @@ export default function KeuanganSetupPage() {
           <div className="border rounded-lg p-4">
             <h3 className="font-semibold text-lg mb-2">Setup Manual</h3>
             <p className="text-gray-600 text-sm mb-4">
-              Buat kategori dan item keuangan sesuai kebutuhan gereja Anda secara manual.
+              Buat kategori dan item keuangan sesuai kebutuhan gereja Anda
+              secara manual.
             </p>
-            
+
             <div className="flex gap-3">
               <Button
-                variant="outline"
-                onClick={() => window.open('/admin/data-master/keuangan/kategori', '_blank')}
                 className="flex items-center gap-2"
+                variant="outline"
+                onClick={() =>
+                  window.open("/admin/data-master/keuangan/kategori", "_blank")
+                }
               >
                 <Database className="w-4 h-4" />
                 Kelola Kategori
               </Button>
-              
+
               <Button
-                variant="outline"
-                onClick={() => window.open('/admin/data-master/keuangan/item', '_blank')}
                 className="flex items-center gap-2"
+                variant="outline"
+                onClick={() =>
+                  window.open("/admin/data-master/keuangan/item", "_blank")
+                }
               >
                 <Database className="w-4 h-4" />
                 Kelola Item
@@ -228,18 +238,21 @@ export default function KeuanganSetupPage() {
           {/* Danger Zone */}
           {hasData && (
             <div className="border-red-200 border rounded-lg p-4 bg-red-50">
-              <h3 className="font-semibold text-lg mb-2 text-red-800">Danger Zone</h3>
+              <h3 className="font-semibold text-lg mb-2 text-red-800">
+                Danger Zone
+              </h3>
               <p className="text-red-700 text-sm mb-4">
                 <AlertTriangle className="w-4 h-4 inline mr-1" />
-                Aksi ini akan menghapus SEMUA data keuangan (kategori, item, transaksi, dll). 
-                Data yang sudah dihapus tidak dapat dikembalikan!
+                Aksi ini akan menghapus SEMUA data keuangan (kategori, item,
+                transaksi, dll). Data yang sudah dihapus tidak dapat
+                dikembalikan!
               </p>
-              
+
               <Button
+                className="flex items-center gap-2"
+                disabled={clearMutation.isPending}
                 variant="destructive"
                 onClick={() => setShowClearDialog(true)}
-                disabled={clearMutation.isPending}
-                className="flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Hapus Semua Data
@@ -251,10 +264,9 @@ export default function KeuanganSetupPage() {
 
       {/* Confirm Dialog */}
       <ConfirmDialog
+        confirmText="Ya, Hapus Semua"
+        isLoading={clearMutation.isPending}
         isOpen={showClearDialog}
-        onClose={() => setShowClearDialog(false)}
-        onConfirm={() => clearMutation.mutate()}
-        title="Hapus Semua Data Keuangan"
         message={
           <>
             <p className="mb-2">
@@ -272,9 +284,10 @@ export default function KeuanganSetupPage() {
             </p>
           </>
         }
+        title="Hapus Semua Data Keuangan"
         variant="danger"
-        isLoading={clearMutation.isPending}
-        confirmText="Ya, Hapus Semua"
+        onClose={() => setShowClearDialog(false)}
+        onConfirm={() => clearMutation.mutate()}
       />
     </div>
   );

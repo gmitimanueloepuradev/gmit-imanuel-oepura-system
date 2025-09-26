@@ -279,7 +279,8 @@ export default function BaptisPage() {
         title="Manajemen Data Baptis"
         stats={stats}
         onAdd={() => modal.open()}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="baptis"
       />
 
       <CreateOrEditModal

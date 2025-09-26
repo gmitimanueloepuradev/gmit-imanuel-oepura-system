@@ -11,7 +11,7 @@ export default function PageHeader({
   className = "",
 }) {
   return (
-    <div className={`bg-white border-b border-gray-200 ${className}`}>
+    <div className={`bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 ${className}`}>
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
@@ -21,7 +21,7 @@ export default function PageHeader({
                 <li key={index} className="inline-flex items-center">
                   {index > 0 && (
                     <svg
-                      className="w-6 h-6 text-gray-400"
+                      className="w-6 h-6 text-gray-400 dark:text-gray-500"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -35,12 +35,12 @@ export default function PageHeader({
                   {item.href ? (
                     <a
                       href={item.href}
-                      className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                      className="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 md:ml-2 transition-colors"
                     >
                       {item.label}
                     </a>
                   ) : (
-                    <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                    <span className="ml-1 text-sm font-medium text-gray-500 dark:text-gray-400 md:ml-2">
                       {item.label}
                     </span>
                   )}
@@ -53,11 +53,11 @@ export default function PageHeader({
         {/* Header Content */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+            <h1 className="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
               {title}
             </h1>
             {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
             )}
           </div>
 
@@ -85,7 +85,7 @@ export default function PageHeader({
           <div className="mt-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4">
+                <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                   <div className="flex items-center">
                     {stat.icon && (
                       <div
@@ -101,10 +101,10 @@ export default function PageHeader({
                       </div>
                     )}
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-500">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {stat.label}
                       </p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         {stat.value}
                       </p>
                       {stat.change && (

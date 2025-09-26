@@ -66,6 +66,9 @@ export default function StatusKepemilikanRumahPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Status Kepemilikan Rumah" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["status"]}
     />
   );
 }

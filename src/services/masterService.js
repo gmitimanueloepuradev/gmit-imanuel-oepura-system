@@ -1,77 +1,5 @@
+import handleApiCall from "@/lib/apiErrorHandler";
 import axios from "@/lib/axios";
-
-// Helper function for API error handling
-const handleApiCall = async (apiCall) => {
-  try {
-    const response = await apiCall();
-    return {
-      success: true,
-      data: response.data,
-      message: response.data?.message || "Operasi berhasil"
-    };
-  } catch (error) {
-    console.error("API Error:", error);
-
-    // Handle different types of errors
-    if (error.response) {
-      // Server responded with error status
-      const { status, data } = error.response;
-
-      switch (status) {
-        case 409:
-          return {
-            success: false,
-            message: data?.message || "Data sudah ada. Silakan gunakan data yang berbeda.",
-            errors: data?.errors || {}
-          };
-        case 400:
-          return {
-            success: false,
-            message: data?.message || "Data tidak valid. Silakan periksa kembali.",
-            errors: data?.errors || {}
-          };
-        case 404:
-          return {
-            success: false,
-            message: data?.message || "Data tidak ditemukan.",
-            errors: data?.errors || {}
-          };
-        case 422:
-          return {
-            success: false,
-            message: data?.message || "Validasi gagal. Silakan periksa data yang dimasukkan.",
-            errors: data?.errors || {}
-          };
-        case 500:
-          return {
-            success: false,
-            message: "Terjadi kesalahan pada server. Silakan coba lagi nanti.",
-            errors: {}
-          };
-        default:
-          return {
-            success: false,
-            message: data?.message || `Terjadi kesalahan (${status}). Silakan coba lagi.`,
-            errors: data?.errors || {}
-          };
-      }
-    } else if (error.request) {
-      // Network error
-      return {
-        success: false,
-        message: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
-        errors: {}
-      };
-    } else {
-      // Other errors
-      return {
-        success: false,
-        message: "Terjadi kesalahan tak terduga. Silakan coba lagi.",
-        errors: {}
-      };
-    }
-  }
-};
 
 const masterService = {
   // =================== PENDIDIKAN ===================
@@ -89,21 +17,15 @@ const masterService = {
   },
 
   createPendidikan: async (data) => {
-    const res = await axios.post("/pendidikan", data);
-
-    return res.data;
+    return handleApiCall(() => axios.post("/pendidikan", data));
   },
 
   updatePendidikan: async (id, data) => {
-    const res = await axios.patch(`/pendidikan/${id}`, data);
-
-    return res.data;
+    return handleApiCall(() => axios.patch(`/pendidikan/${id}`, data));
   },
 
   deletePendidikan: async (id) => {
-    const res = await axios.delete(`/pendidikan/${id}`);
-
-    return res.data;
+    return handleApiCall(() => axios.delete(`/pendidikan/${id}`));
   },
 
   // =================== PEKERJAAN ===================
@@ -141,7 +63,9 @@ const masterService = {
   // =================== SUKU ===================
 
   getSuku: async (params = {}) => {
-    const res = await axios.get("/suku", { params });
+    // Remove pagination params for simple master data display
+    const { page, limit, ...otherParams } = params;
+    const res = await axios.get("/suku", { params: otherParams });
 
     return res.data;
   },
@@ -159,13 +83,13 @@ const masterService = {
   },
 
   updateSuku: async (id, data) => {
-    const res = await axios.patch(`/suku/${id}`, data);
+    const res = await axios.put("/suku", { id, ...data });
 
     return res.data;
   },
 
   deleteSuku: async (id) => {
-    const res = await axios.delete(`/suku/${id}`);
+    const res = await axios.delete("/suku", { data: { id } });
 
     return res.data;
   },
@@ -185,21 +109,15 @@ const masterService = {
   },
 
   createJaminanKesehatan: async (data) => {
-    const res = await axios.post("/jaminan-kesehatan", data);
-
-    return res.data;
+    return handleApiCall(() => axios.post("/jaminan-kesehatan", data));
   },
 
   updateJaminanKesehatan: async (id, data) => {
-    const res = await axios.patch(`/jaminan-kesehatan/${id}`, data);
-
-    return res.data;
+    return handleApiCall(() => axios.patch(`/jaminan-kesehatan/${id}`, data));
   },
 
   deleteJaminanKesehatan: async (id) => {
-    const res = await axios.delete(`/jaminan-kesehatan/${id}`);
-
-    return res.data;
+    return handleApiCall(() => axios.delete(`/jaminan-kesehatan/${id}`));
   },
 
   // =================== STATUS DALAM KELUARGA ===================
@@ -438,7 +356,9 @@ const masterService = {
   },
 
   updateKotaKabupaten: async (id, data) => {
-    return handleApiCall(() => axios.patch(`/geografi/kota-kabupaten/${id}`, data));
+    return handleApiCall(() =>
+      axios.patch(`/geografi/kota-kabupaten/${id}`, data)
+    );
   },
 
   getKotaKabupatenByProvinsi: async (idProvinsi) => {
@@ -512,7 +432,9 @@ const masterService = {
   },
 
   updateKelurahanDesa: async (id, data) => {
-    return handleApiCall(() => axios.patch(`/geografi/kelurahan-desa/${id}`, data));
+    return handleApiCall(() =>
+      axios.patch(`/geografi/kelurahan-desa/${id}`, data)
+    );
   },
 
   deleteKelurahanDesa: async (id) => {
@@ -527,6 +449,17 @@ const masterService = {
   // =================== KELUARGA (for dropdown) ===================
   getKeluarga: async (params = {}) => {
     const res = await axios.get("/keluarga", { params });
+
+    return res.data;
+  },
+
+  getKeluargaByRayon: async (rayonId, params = {}) => {
+    const res = await axios.get("/keluarga", {
+      params: {
+        ...params,
+        idRayon: rayonId
+      }
+    });
 
     return res.data;
   },
@@ -647,21 +580,15 @@ const masterService = {
   },
 
   createKategoriPengumuman: async (data) => {
-    const res = await axios.post("/kategori-pengumuman", data);
-
-    return res.data;
+    return handleApiCall(() => axios.post("/kategori-pengumuman", data));
   },
 
   updateKategoriPengumuman: async (id, data) => {
-    const res = await axios.patch(`/kategori-pengumuman/${id}`, data);
-
-    return res.data;
+    return handleApiCall(() => axios.patch(`/kategori-pengumuman/${id}`, data));
   },
 
   deleteKategoriPengumuman: async (id) => {
-    const res = await axios.delete(`/kategori-pengumuman/${id}`);
-
-    return res.data;
+    return handleApiCall(() => axios.delete(`/kategori-pengumuman/${id}`));
   },
 
   // =================== JENIS PENGUMUMAN ===================
@@ -700,6 +627,32 @@ const masterService = {
     const res = await axios.delete(`/jenis-pengumuman/${id}`);
 
     return res.data;
+  },
+
+  // =================== PERNIKAHAN ===================
+
+  getPernikahan: async (params = {}) => {
+    const res = await axios.get("/pernikahan", { params });
+
+    return res.data;
+  },
+
+  getPernikahanById: async (id) => {
+    const res = await axios.get(`/pernikahan/${id}`);
+
+    return res.data;
+  },
+
+  createPernikahan: async (data) => {
+    return handleApiCall(() => axios.post("/pernikahan", data));
+  },
+
+  updatePernikahan: async (id, data) => {
+    return handleApiCall(() => axios.patch(`/pernikahan/${id}`, data));
+  },
+
+  deletePernikahan: async (id) => {
+    return handleApiCall(() => axios.delete(`/pernikahan/${id}`));
   },
 };
 

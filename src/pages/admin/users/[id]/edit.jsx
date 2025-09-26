@@ -1,20 +1,21 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import userService from "@/services/userService";
-import jemaatService from "@/services/jemaatService";
-import { showToast } from "@/utils/showToast";
+import { ArrowLeft, Mail, Save, User, UserCog } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+
 import FormPage from "@/components/ui/FormPage";
-import { ArrowLeft, Save, User, Mail, UserCog } from "lucide-react";
+import jemaatService from "@/services/jemaatService";
+import userService from "@/services/userService";
+import { showToast } from "@/utils/showToast";
 
 export default function EditUser() {
   const router = useRouter();
   const { id } = router.query;
   const queryClient = useQueryClient();
-  
+
   const [formData, setFormData] = useState({
     email: "",
-    role: "JEMAAT", 
+    role: "JEMAAT",
     idJemaat: "",
   });
 
@@ -35,6 +36,7 @@ export default function EditUser() {
   useEffect(() => {
     if (userData?.data) {
       const user = userData.data;
+
       setFormData({
         email: user.email || "",
         role: user.role || "JEMAAT",
@@ -75,17 +77,17 @@ export default function EditUser() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === "role" && value !== "JEMAAT" && { idJemaat: "" })
+      ...(name === "role" && value !== "JEMAAT" && { idJemaat: "" }),
     }));
   };
 
   // Get available jemaat (exclude current user's jemaat from filtering)
-  const availableJemaat = jemaatData?.data?.items?.filter(j => 
-    !j.User || j.User.id === id
-  ) || [];
+  const availableJemaat =
+    jemaatData?.data?.items?.filter((j) => !j.User || j.User.id === id) || [];
 
   const fields = [
     {
@@ -108,18 +110,22 @@ export default function EditUser() {
         { value: "JEMAAT", label: "Jemaat" },
       ],
     },
-    ...(formData.role === "JEMAAT" ? [{
-      name: "idJemaat",
-      label: "Pilih Jemaat",
-      type: "select",
-      required: true,
-      icon: User,
-      options: availableJemaat.map(jemaat => ({
-        value: jemaat.id,
-        label: `${jemaat.nama} - ${jemaat.keluarga?.noBagungan || 'No Bagungan N/A'}`
-      })),
-      placeholder: "Pilih jemaat"
-    }] : [])
+    ...(formData.role === "JEMAAT"
+      ? [
+          {
+            name: "idJemaat",
+            label: "Pilih Jemaat",
+            type: "select",
+            required: true,
+            icon: User,
+            options: availableJemaat.map((jemaat) => ({
+              value: jemaat.id,
+              label: `${jemaat.nama} - ${jemaat.keluarga?.noBagungan || "No Bagungan N/A"}`,
+            })),
+            placeholder: "Pilih jemaat",
+          },
+        ]
+      : []),
   ];
 
   const actions = [
@@ -139,9 +145,9 @@ export default function EditUser() {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-4 text-gray-600">Memuat data user...</p>
         </div>
       </div>
@@ -150,20 +156,20 @@ export default function EditUser() {
 
   return (
     <FormPage
-      title="Edit User"
-      description="Update informasi pengguna sistem"
+      actions={actions}
       breadcrumb={[
         { label: "Dashboard", href: "/admin/dashboard" },
         { label: "Users", href: "/admin/users" },
         { label: userData?.data?.email || "User", href: `/admin/users/${id}` },
         { label: "Edit" },
       ]}
+      description="Update informasi pengguna sistem"
       fields={fields}
       formData={formData}
+      isLoading={updateMutation.isLoading}
+      title="Edit User"
       onInputChange={handleInputChange}
       onSubmit={handleSubmit}
-      actions={actions}
-      isLoading={updateMutation.isLoading}
     />
   );
 }

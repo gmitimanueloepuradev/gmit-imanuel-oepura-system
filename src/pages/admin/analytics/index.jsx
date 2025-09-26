@@ -75,7 +75,7 @@ export default function AnalyticsPageAdmin() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600">Memuat analitik...</p>
+          <p className="text-gray-600 dark:text-gray-400">Memuat analitik...</p>
         </div>
       </div>
     );
@@ -148,7 +148,7 @@ export default function AnalyticsPageAdmin() {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Period Selector */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">📊 Visualisasi Data Komprehensif</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">📊 Visualisasi Data Komprehensif</h2>
           <div className="flex gap-2">
             <Button
               variant={selectedPeriod === 'month' ? 'default' : 'outline'}
@@ -430,41 +430,41 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Rata-rata per Keluarga</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Rata-rata per Keluarga</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {(analytics.distributions.avgMembersPerFamily || 0).toFixed(1)}
                   </p>
-                  <p className="text-xs text-gray-500">orang/keluarga</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">orang/keluarga</p>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Rasio Gender</p>
-                  <p className="text-2xl font-bold text-green-600">
+                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Rasio Gender</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {((analytics.demographics.maleCount || 0) / (analytics.demographics.femaleCount || 1)).toFixed(2)}
                   </p>
-                  <p className="text-xs text-gray-500">pria:wanita</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">pria:wanita</p>
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Aktivitas Baptis/Bulan</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Aktivitas Baptis/Bulan</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {analytics.trends.avgBaptisPerMonth || 0}
                   </p>
-                  <p className="text-xs text-gray-500">rata-rata</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">rata-rata</p>
                 </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Total Sakramen</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {(analytics.sacraments.baptisTotal || 0) + 
-                     (analytics.sacraments.sidiTotal || 0) + 
+                <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Sakramen</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {(analytics.sacraments.baptisTotal || 0) +
+                     (analytics.sacraments.sidiTotal || 0) +
                      (analytics.sacraments.pernikahanTotal || 0)}
                   </p>
-                  <p className="text-xs text-gray-500">sepanjang masa</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">sepanjang masa</p>
                 </div>
               </div>
               
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold mb-2">📈 Insight Utama:</h4>
-                <ul className="text-sm space-y-1 text-gray-700">
+              <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">📈 Insight Utama:</h4>
+                <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
                   <li>• Kelompok terbesar: Dewasa ({formatPercentage(analytics.demographics.adultPercentage || 0)}%)</li>
                   <li>• Gender balance: {analytics.demographics.malePercentage > analytics.demographics.femalePercentage ? 'Pria lebih dominan' : 'Wanita lebih dominan'}</li>
                   <li>• Total keluarga aktif: {analytics.overview.activeFamilies || 0} keluarga</li>

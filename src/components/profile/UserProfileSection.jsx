@@ -3,6 +3,7 @@ import { Edit2, Save, X, User, Mail, Phone, Key } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import TextInput from "@/components/ui/inputs/TextInput";
+import PhoneInput from "@/components/ui/PhoneInput";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,7 +15,24 @@ import { useAuth } from "@/contexts/AuthContext";
 const userSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Email tidak valid"),
-  noWhatsapp: z.string().optional(),
+  noWhatsapp: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true; // Optional field
+        // Check if it's a valid Indonesian phone number format
+        const cleaned = val.replace(/\D/g, '');
+        if (cleaned.startsWith('62')) {
+          const afterCountryCode = cleaned.substring(2);
+          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+        }
+        return false;
+      },
+      {
+        message: 'Format nomor WhatsApp tidak valid. Gunakan format +6281234567890',
+      }
+    ),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional()
@@ -219,10 +237,13 @@ export default function UserProfileSection({ user }) {
                 />
                 
                 <div className="md:col-span-2">
-                  <TextInput
-                    name="noWhatsapp"
-                    label="No. WhatsApp"
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    No. WhatsApp
+                  </label>
+                  <PhoneInput
+                    {...register("noWhatsapp")}
                     placeholder="Masukkan nomor WhatsApp"
+                    error={errors.noWhatsapp?.message}
                   />
                 </div>
               </div>

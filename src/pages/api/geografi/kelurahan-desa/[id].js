@@ -34,6 +34,36 @@ async function handleGet(req, res) {
   }
 }
 
+async function handlePatch(req, res) {
+  try {
+    const { id } = req.query;
+    const data = req.body;
+
+    const updatedKelurahan = await prisma.kelurahan.update({
+      where: { id: id },
+      data,
+    });
+
+    return res
+      .status(200)
+      .json(
+        apiResponse(true, updatedKelurahan, "Data kelurahan/desa berhasil diperbarui")
+      );
+  } catch (error) {
+    console.error("Error updating kelurahan:", error);
+    return res
+      .status(500)
+      .json(
+        apiResponse(
+          false,
+          null,
+          "Gagal memperbarui data kelurahan/desa",
+          error.message
+        )
+      );
+  }
+}
+
 async function handlePut(req, res) {
   try {
     const { id } = req.query;
@@ -92,6 +122,7 @@ async function handleDelete(req, res) {
 
 export default createApiHandler({
   GET: handleGet,
+  PATCH: handlePatch,
   PUT: handlePut,
   DELETE: handleDelete,
 });

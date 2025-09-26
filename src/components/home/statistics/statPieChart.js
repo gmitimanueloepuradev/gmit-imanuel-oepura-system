@@ -1,4 +1,4 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Legend } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const RADIAN = Math.PI / 180;
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
@@ -22,34 +22,37 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
-export default function StatPieChart({ 
-  title = "Statistik Jenis Kelamin", 
-  data = [{ name: "Pria", value: 400 }, { name: "Wanita", value: 300 }],
-  size = "normal" // "small", "normal", "large"
+export default function StatPieChart({
+  title = "Statistik Jenis Kelamin",
+  data = [
+    { name: "Pria", value: 400 },
+    { name: "Wanita", value: 300 },
+  ],
+  size = "normal", // "small", "normal", "large"
 }) {
   // Dynamic sizing based on size prop
   const getSizing = () => {
-    switch(size) {
+    switch (size) {
       case "small":
         return {
-          titleClass: "text-sm font-medium mb-2",
+          titleClass: "text-base font-medium mb-1",
           outerRadius: 50,
-          legendHeight: 24,
-          fontSize: "10"
+          legendHeight: 20,
+          fontSize: "16px",
         };
       case "large":
         return {
-          titleClass: "text-xl font-medium mb-6",
+          titleClass: "text-2xl font-medium mb-2",
           outerRadius: 100,
-          legendHeight: 48,
-          fontSize: "14"
+          legendHeight: 40,
+          fontSize: "20px",
         };
       default: // normal
         return {
-          titleClass: "text-base font-medium mb-3",
+          titleClass: "text-lg font-medium mb-2",
           outerRadius: 65,
-          legendHeight: 32,
-          fontSize: "12"
+          legendHeight: 28,
+          fontSize: "18px",
         };
     }
   };
@@ -57,38 +60,52 @@ export default function StatPieChart({
   const sizing = getSizing();
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <h2 className={`text-center ${sizing.titleClass}`}>{title}</h2>
-      
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={sizing.outerRadius}
-            fill="#8884d8"
-            dataKey="value"
+    <div className="w-full h-full flex flex-col items-center justify-center">
+      <h2 className={`text-center text-white dark:text-gray-200 ${sizing.titleClass} mb-1`}>{title}</h2>
+
+      <div className="flex flex-col items-center">
+        <div style={{ width: sizing.outerRadius * 2 + 20, height: sizing.outerRadius * 2 + 20 }}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
           >
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${entry.name}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Legend
-            verticalAlign="bottom"
-            height={sizing.legendHeight}
-            wrapperStyle={{ 
-              paddingTop: '10px',
-              fontSize: sizing.fontSize
-            }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={sizing.outerRadius}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${entry.name}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="mt-1 flex flex-wrap justify-center gap-x-2 gap-y-1 text-sm">
+          {data.map((entry, index) => (
+            <div
+              key={entry.name}
+              className="flex items-center"
+            >
+              <div
+                className="w-2.5 h-2.5 mr-1.5"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              ></div>
+              <span className="text-white dark:text-gray-200" style={{ fontSize: sizing.fontSize }}>{entry.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

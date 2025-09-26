@@ -56,6 +56,17 @@ async function handlePost(req, res) {
             id: true,
             namaRayon: true
           }
+        },
+        jemaats: {
+          where: {
+            statusDalamKeluarga: {
+              status: "Kepala Keluarga"
+            }
+          },
+          select: {
+            nama: true
+          },
+          take: 1
         }
       }
     });
@@ -79,15 +90,23 @@ async function handlePost(req, res) {
     // Create WhatsApp invitation URL
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const onboardingUrl = `${baseUrl}/onboarding?token=${invitationToken}`;
+
+    // Ensure URL has proper protocol for WhatsApp link detection
+    const cleanUrl = onboardingUrl.startsWith('http') ? onboardingUrl : `https://${onboardingUrl}`;
     
+    const keluargaDisplayName = keluarga.jemaats[0]?.nama || `Bangunan ${keluarga.noBagungan}`;
+
     const whatsappMessage = encodeURIComponent(
+      `🙏 *GMIT Imanuel Oepura*\n\n` +
       `Halo ${user.username}!\n\n` +
-      `Anda telah diundang untuk melengkapi profil jemaat GMIT Imanuel Oepura.\n\n` +
-      `Keluarga: Bangunan ${keluarga.noBagungan} - ${keluarga.rayon.namaRayon}\n\n` +
-      `Silakan klik link berikut untuk melengkapi data:\n` +
-      `${onboardingUrl}\n\n` +
-      `Link berlaku hingga 7 hari ke depan.\n\n` +
-      `Terima kasih!`
+      `Anda telah diundang untuk melengkapi profil jemaat.\n\n` +
+      `👨‍👩‍👧‍👦 *Keluarga:* ${keluargaDisplayName}\n` +
+      `📍 *Rayon:* ${keluarga.rayon.namaRayon}\n\n` +
+      `👆 *KLIK LINK DI BAWAH INI:*\n` +
+      `${cleanUrl}\n\n` +
+      `⏰ Link berlaku 7 hari\n` +
+      `📝 Lengkapi data pribadi Anda\n\n` +
+      `Terima kasih! 🙏`
     );
 
     // Format WhatsApp number for Indonesia (+62)
@@ -124,6 +143,7 @@ async function handlePost(req, res) {
         },
         keluarga: {
           noBagungan: keluarga.noBagungan,
+          namaKepalaKeluarga: keluarga.jemaats[0]?.nama || null,
           rayon: keluarga.rayon.namaRayon
         },
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()

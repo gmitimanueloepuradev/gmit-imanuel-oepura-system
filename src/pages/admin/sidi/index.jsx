@@ -280,7 +280,8 @@ export default function SidiPage() {
         title="Manajemen Data Sidi"
         stats={stats}
         onAdd={() => modal.open()}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="sidi"
       />
 
       <CreateOrEditModal

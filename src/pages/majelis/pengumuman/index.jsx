@@ -1,94 +1,26 @@
-import pengumumanService from "@/services/pengumumanService";
-import { showToast } from "@/utils/showToast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import {
   Bell,
   Calendar,
+  Download,
   Edit,
   Eye,
-  Plus,
-  Trash2,
-  Search,
-  Filter,
   Pin,
-  Download,
-  FileText,
-  Image as ImageIcon,
-  AlertCircle,
+  Plus,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { format } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
-
-// Page Header Component
-function PageHeader({ title, description, breadcrumb, onAdd }) {
-  return (
-    <div className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Breadcrumb */}
-        {breadcrumb && (
-          <nav className="flex mb-4" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              {breadcrumb.map((item, index) => (
-                <li key={index} className="inline-flex items-center">
-                  {index > 0 && (
-                    <svg
-                      className="w-6 h-6 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                      {item.label}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
-
-        {/* Header Content */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-              {title}
-            </h1>
-            {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
-            <Button onClick={onAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Buat Pengumuman
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import pengumumanService from "@/services/pengumumanService";
+import { showToast } from "@/utils/showToast";
 
 // Loading Skeleton
 function TableSkeleton() {
@@ -98,36 +30,36 @@ function TableSkeleton() {
         <tr key={i} className="border-b">
           <td className="p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
             </div>
           </td>
           <td className="p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+              <div className="h-3 bg-gray-200 rounded w-1/3" />
             </div>
           </td>
           <td className="p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3" />
             </div>
           </td>
           <td className="p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
             </div>
           </td>
           <td className="p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
             </div>
           </td>
           <td className="p-4">
             <div className="animate-pulse flex gap-2">
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded" />
+              <div className="h-8 w-8 bg-gray-200 rounded" />
+              <div className="h-8 w-8 bg-gray-200 rounded" />
             </div>
           </td>
         </tr>
@@ -147,7 +79,9 @@ function StatusBadge({ status }) {
   const config = statusConfig[status] || statusConfig.DRAFT;
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}
+    >
       {config.label}
     </span>
   );
@@ -165,26 +99,11 @@ function PriorityBadge({ priority }) {
   const config = priorityConfig[priority] || priorityConfig.MEDIUM;
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}
+    >
       {config.label}
     </span>
-  );
-}
-
-// Attachment Indicator Component - hanya show jumlah, tanpa load data
-function AttachmentIndicator({ hasAttachments }) {
-  if (!hasAttachments) return (
-    <div className="text-sm text-gray-400">
-      <FileText className="h-4 w-4 inline mr-1" />
-      Tidak ada lampiran
-    </div>
-  );
-
-  return (
-    <div className="text-sm text-green-600 flex items-center gap-1">
-      <FileText className="h-4 w-4" />
-      Ada lampiran
-    </div>
   );
 }
 
@@ -210,11 +129,11 @@ export default function PengumumanPage() {
   } = useQuery({
     queryKey: ["pengumuman", pagination, searchTerm, filters],
     queryFn: () =>
-      pengumumanService.getAll({ 
-        ...pagination, 
+      pengumumanService.getAll({
+        ...pagination,
         search: searchTerm,
         includeRelations: true,
-        ...filters
+        ...filters,
       }),
     keepPreviousData: true,
   });
@@ -239,16 +158,15 @@ export default function PengumumanPage() {
     onError: (error) => {
       showToast({
         title: "Gagal",
-        description: error.response?.data?.message || "Gagal menghapus pengumuman",
+        description:
+          error.response?.data?.message || "Gagal menghapus pengumuman",
         color: "danger",
       });
     },
   });
 
   const handleDelete = (id) => {
-    if (
-      window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")
-    ) {
+    if (window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
       deleteMutation.mutate(id);
     }
   };
@@ -285,7 +203,8 @@ export default function PengumumanPage() {
     {
       icon: Download,
       label: "Lampiran",
-      onClick: (item) => router.push(`/majelis/pengumuman/${item.id}/attachments`),
+      onClick: (item) =>
+        router.push(`/majelis/pengumuman/${item.id}/attachments`),
       variant: "outline",
       show: (item) => true, // Selalu tampilkan, nanti di halaman attachments baru cek ada atau tidak
     },
@@ -313,13 +232,19 @@ export default function PengumumanPage() {
     <div className="space-y-6 p-4">
       {/* Page Header */}
       <PageHeader
-        title="Daftar Pengumuman"
-        description="Kelola pengumuman untuk jemaat dan majelis gereja"
+        actions={[
+          {
+            label: "Buat Pengumuman",
+            onClick: () => router.push("/majelis/pengumuman/create"),
+            icon: Plus,
+          },
+        ]}
         breadcrumb={[
           { label: "Majelis", href: "/majelis/dashboard" },
           { label: "Pengumuman" },
         ]}
-        onAdd={() => router.push("/majelis/pengumuman/create")}
+        description="Kelola pengumuman untuk jemaat dan majelis gereja"
+        title="Daftar Pengumuman"
       />
 
       {/* Search and Filters */}
@@ -331,9 +256,9 @@ export default function PengumumanPage() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
-                  type="text"
-                  placeholder="Cari pengumuman..."
                   className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Cari pengumuman..."
+                  type="text"
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -344,7 +269,9 @@ export default function PengumumanPage() {
                 <select
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={filters.kategoriId}
-                  onChange={(e) => handleFilterChange("kategoriId", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("kategoriId", e.target.value)
+                  }
                 >
                   <option value="">Semua Kategori</option>
                   {kategoriOptions.map((kategori) => (
@@ -370,7 +297,9 @@ export default function PengumumanPage() {
                 <select
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={filters.prioritas}
-                  onChange={(e) => handleFilterChange("prioritas", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("prioritas", e.target.value)
+                  }
                 >
                   <option value="">Semua Prioritas</option>
                   {prioritasOptions.map((prioritas) => (
@@ -471,15 +400,15 @@ export default function PengumumanPage() {
                         <ButtonActions
                           actions={actions}
                           item={item}
-                          type="horizontal"
                           maxVisible={3}
+                          type="horizontal"
                         />
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center py-8 text-gray-500">
+                    <td className="text-center py-8 text-gray-500" colSpan="5">
                       <div className="flex flex-col items-center gap-2">
                         <Bell className="h-12 w-12 text-gray-300" />
                         <span>Belum ada pengumuman</span>
@@ -499,16 +428,16 @@ export default function PengumumanPage() {
                 {(paginationInfo.page - 1) * paginationInfo.limit + 1} hingga{" "}
                 {Math.min(
                   paginationInfo.page * paginationInfo.limit,
-                  paginationInfo.total
+                  paginationInfo.total,
                 )}{" "}
                 dari {paginationInfo.total} data
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(paginationInfo.page - 1)}
                   disabled={!paginationInfo.hasPrev}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(paginationInfo.page - 1)}
                 >
                   Sebelumnya
                 </Button>
@@ -516,13 +445,13 @@ export default function PengumumanPage() {
                 {/* Page Numbers */}
                 {Array.from(
                   { length: paginationInfo.totalPages },
-                  (_, i) => i + 1
+                  (_, i) => i + 1,
                 )
                   .filter(
                     (page) =>
                       page === 1 ||
                       page === paginationInfo.totalPages ||
-                      Math.abs(page - paginationInfo.page) <= 2
+                      Math.abs(page - paginationInfo.page) <= 2,
                   )
                   .map((page, index, array) => (
                     <React.Fragment key={page}>
@@ -530,10 +459,10 @@ export default function PengumumanPage() {
                         <span className="px-2 py-1 text-gray-500">...</span>
                       )}
                       <Button
+                        size="sm"
                         variant={
                           paginationInfo.page === page ? "default" : "outline"
                         }
-                        size="sm"
                         onClick={() => handlePageChange(page)}
                       >
                         {page}
@@ -542,10 +471,10 @@ export default function PengumumanPage() {
                   ))}
 
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(paginationInfo.page + 1)}
                   disabled={!paginationInfo.hasNext}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(paginationInfo.page + 1)}
                 >
                   Selanjutnya
                 </Button>

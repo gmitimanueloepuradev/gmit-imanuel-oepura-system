@@ -1,5 +1,5 @@
-import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/apiHelper";
+import prisma from "@/lib/prisma";
 
 export default async function handler(req, res) {
   const { method } = req;
@@ -31,17 +31,7 @@ export default async function handler(req, res) {
 // GET - Ambil semua data suku
 async function handleGet(req, res) {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      search = "",
-      sortBy = "namaSuku",
-      sortOrder = "asc",
-    } = req.query;
-
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const skip = (pageNum - 1) * limitNum;
+    const { search = "", sortBy = "namaSuku", sortOrder = "asc" } = req.query;
 
     // Filter untuk search
     const where = search
@@ -53,36 +43,18 @@ async function handleGet(req, res) {
         }
       : {};
 
-    // Get total count untuk pagination
-    const total = await prisma.suku.count({ where });
-
-    // Get data dengan pagination
+    // Get semua data tanpa pagination (untuk data master yang tidak banyak)
     const suku = await prisma.suku.findMany({
       where,
-      skip,
-      take: limitNum,
       orderBy: {
         [sortBy]: sortOrder,
       },
     });
 
-    const totalPages = Math.ceil(total / limitNum);
-
-    const result = {
-      items: suku,
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total,
-        totalPages,
-        hasNext: pageNum < totalPages,
-        hasPrev: pageNum > 1,
-      },
-    };
-
+    // Return semua data tanpa pagination
     return res
       .status(200)
-      .json(apiResponse(true, result, "Data suku berhasil diambil"));
+      .json(apiResponse(true, suku, "Data suku berhasil diambil"));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching suku:", error);
@@ -98,7 +70,7 @@ async function handleGet(req, res) {
 // POST - Tambah data suku baru
 async function handlePost(req, res) {
   try {
-    const { namaSuku } = req.body;
+    const { namaSuku, isActive = true } = req.body;
 
     // Validasi input
     if (!namaSuku || namaSuku.trim() === "") {
@@ -131,6 +103,7 @@ async function handlePost(req, res) {
     const newSuku = await prisma.suku.create({
       data: {
         namaSuku: namaSuku.trim(),
+        isActive: isActive,
       },
     });
 
@@ -152,7 +125,7 @@ async function handlePost(req, res) {
 // PUT - Update data suku
 async function handlePut(req, res) {
   try {
-    const { id, namaSuku } = req.body;
+    const { id, namaSuku, isActive } = req.body;
 
     // Validasi input
     if (!id) {
@@ -214,6 +187,7 @@ async function handlePut(req, res) {
       where: { id },
       data: {
         namaSuku: namaSuku.trim(),
+        ...(typeof isActive !== "undefined" && { isActive: isActive }),
       },
     });
 

@@ -20,6 +20,10 @@ export default function MasterDataPage({
   formFields = [],
   itemNameField = "name",
   breadcrumb = [],
+  exportable = false,
+  allowBulkDelete = false,
+  searchFields = [],
+  filterFields = [],
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -28,45 +32,70 @@ export default function MasterDataPage({
   const [editItem, setEditItem] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
 
+  // Load all available data without pagination
   const { data, isLoading } = useQuery({
-    queryKey: [queryKey],
-    queryFn: () => service.get(),
+    queryKey: [queryKey, "all-data"],
+    queryFn: () => service.get(), // Get all data without pagination parameters
     staleTime: 5 * 60 * 1000,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => service.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      toast.success(`${title} berhasil dihapus`);
+    mutationFn: async (id) => {
+      const result = await service.delete(id);
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      return result;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey, "all-data"] });
+      toast.success(result.message || `${title} berhasil dihapus`);
       setDeleteItem(null);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Gagal menghapus data");
+      toast.error(error?.message || "Gagal menghapus data");
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => service.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      toast.success(`${title} berhasil diperbarui`);
+    mutationFn: async ({ id, data }) => {
+      const result = await service.update(id, data);
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      return result;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey, "all-data"] });
+      toast.success(result.message || `${title} berhasil diperbarui`);
       setEditItem(null);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Gagal memperbarui data");
+      toast.error(error?.message || "Gagal memperbarui data");
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => service.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-      toast.success(`${title} berhasil ditambahkan`);
+    mutationFn: async (data) => {
+      const result = await service.create(data);
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      return result;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey, "all-data"] });
+      toast.success(result.message || `${title} berhasil ditambahkan`);
       setShowCreate(false);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Gagal menambahkan data");
+      toast.error(error?.message || "Gagal menambahkan data");
     },
   });
 
@@ -75,9 +104,13 @@ export default function MasterDataPage({
       <ListGrid
         breadcrumb={breadcrumb}
         columns={columns}
-        data={data?.data?.items || []}
+        data={Array.isArray(data?.data) ? data.data : data?.data?.items || []}
         description={description}
+        exportFilename={title?.toLowerCase().replace(/\s+/g, "-")}
+        exportable={exportable}
+        filters={filterFields}
         isLoading={isLoading}
+        itemsPerPage={8}
         rowActionType="horizontal"
         rowActions={[
           {
@@ -99,9 +132,10 @@ export default function MasterDataPage({
             tooltip: "Hapus data",
           },
         ]}
+        searchPlaceholder={`Cari ${title.toLowerCase()}...`}
+        searchable={searchFields.length > 0}
         title={title}
         onAdd={() => setShowCreate(true)}
-        onExport={() => {}}
       />
 
       <ConfirmDialog

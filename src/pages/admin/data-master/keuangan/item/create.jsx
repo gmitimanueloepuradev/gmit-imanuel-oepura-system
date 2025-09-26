@@ -1,24 +1,30 @@
 // pages/admin/master-data/item-keuangan/create.jsx
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { ArrowLeft, Plus, Save, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
+import NumberInput from "@/components/ui/inputs/NumberInput";
 
 const itemKeuanganService = {
   create: async (data) => {
     const response = await axios.post("/api/keuangan/item", data);
+
     return response.data;
   },
   getByKategoriAndPeriode: async (kategoriId, periodeId) => {
     const response = await axios.get(
       `/api/keuangan/item?kategoriId=${kategoriId}&periodeId=${periodeId}`
     );
+
     return response.data;
   },
 };
@@ -35,6 +41,7 @@ export default function CreateItemKeuanganPage() {
     queryKey: ["kategori-keuangan-options"],
     queryFn: async () => {
       const response = await axios.get("/api/keuangan/kategori/options");
+
       return response.data;
     },
   });
@@ -44,6 +51,7 @@ export default function CreateItemKeuanganPage() {
     queryKey: ["periode-anggaran-options"],
     queryFn: async () => {
       const response = await axios.get("/api/keuangan/periode/options");
+
       return response.data;
     },
   });
@@ -51,7 +59,11 @@ export default function CreateItemKeuanganPage() {
   // Query untuk existing items berdasarkan kategori dan periode
   const { data: existingItems, refetch: refetchItems } = useQuery({
     queryKey: ["existing-items", selectedKategori, selectedPeriode],
-    queryFn: () => itemKeuanganService.getByKategoriAndPeriode(selectedKategori, selectedPeriode),
+    queryFn: () =>
+      itemKeuanganService.getByKategoriAndPeriode(
+        selectedKategori,
+        selectedPeriode
+      ),
     enabled: !!(selectedKategori && selectedPeriode),
   });
 
@@ -59,6 +71,7 @@ export default function CreateItemKeuanganPage() {
   useEffect(() => {
     if (selectedKategori && selectedPeriode && existingItems?.data?.items) {
       const existing = existingItems.data.items;
+
       if (existing.length === 0) {
         // Kategori kosong, buat item level 1 pertama
         setItems([
@@ -107,6 +120,7 @@ export default function CreateItemKeuanganPage() {
 
       if (item.parentId) {
         const parent = itemMap.get(item.parentId);
+
         if (parent) {
           parent.children.push(itemWithChildren);
         }
@@ -190,6 +204,7 @@ export default function CreateItemKeuanganPage() {
     };
 
     const updatedItems = addChildToTree(items);
+
     setItems(updateKodes(updatedItems));
   };
 
@@ -203,6 +218,7 @@ export default function CreateItemKeuanganPage() {
         const afterIndex = itemList.findIndex(
           (item) => item.id === afterItemId
         );
+
         if (afterIndex !== -1) {
           const newSibling = {
             id: tempId,
@@ -219,7 +235,9 @@ export default function CreateItemKeuanganPage() {
           };
 
           const newList = [...itemList];
+
           newList.splice(afterIndex + 1, 0, newSibling);
+
           return newList;
         }
       }
@@ -231,14 +249,17 @@ export default function CreateItemKeuanganPage() {
             children: addSiblingToTree(item.children, targetLevel),
           };
         }
+
         return item;
       });
     };
 
     let updatedItems;
+
     if (level === 1) {
       // Add sibling di root level
       const afterIndex = items.findIndex((item) => item.id === afterItemId);
+
       if (afterIndex !== -1) {
         const newSibling = {
           id: tempId,
@@ -328,11 +349,13 @@ export default function CreateItemKeuanganPage() {
   const saveItems = async () => {
     if (!selectedKategori) {
       toast.error("Pilih kategori terlebih dahulu");
+
       return;
     }
 
     if (!selectedPeriode) {
       toast.error("Pilih periode terlebih dahulu");
+
       return;
     }
 
@@ -353,6 +376,7 @@ export default function CreateItemKeuanganPage() {
       validateItems(items);
     } catch (error) {
       toast.error(error.message);
+
       return;
     }
 
@@ -386,6 +410,7 @@ export default function CreateItemKeuanganPage() {
 
           // Save parent first
           let savedItem;
+
           if (item.id.startsWith("temp_")) {
             // New item
             savedItem = await itemKeuanganService.create(itemData);
@@ -403,9 +428,10 @@ export default function CreateItemKeuanganPage() {
           // Save children dengan parent ID yang benar
           if (item.children && item.children.length > 0) {
             const childResults = await flattenItems(
-              item.children, 
+              item.children,
               savedItem.data?.id || savedItem.id
             );
+
             result.push(...childResults);
           }
         }
@@ -439,16 +465,16 @@ export default function CreateItemKeuanganPage() {
                 <Badge variant="outline">
                   {item.kode} (Level {item.level})
                 </Badge>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   Urutan: {item.urutan}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Button
+                  size="sm"
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => addChild(item.id, item.level)}
                 >
                   <Plus className="w-4 h-4 mr-1" />
@@ -456,9 +482,9 @@ export default function CreateItemKeuanganPage() {
                 </Button>
 
                 <Button
+                  size="sm"
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => addSibling(item.id, item.level)}
                 >
                   <Plus className="w-4 h-4 mr-1" />
@@ -467,9 +493,9 @@ export default function CreateItemKeuanganPage() {
 
                 {items.length > 1 && (
                   <Button
+                    size="sm"
                     type="button"
                     variant="outline"
-                    size="sm"
                     onClick={() => deleteItem(item.id)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -483,104 +509,73 @@ export default function CreateItemKeuanganPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nama Item */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">
-                  Nama Item *
-                </label>
-                <input
-                  type="text"
-                  value={item.nama}
-                  onChange={(e) => updateItem(item.id, "nama", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                <TextInput
+                  label="Nama Item"
                   placeholder="Contoh: Persembahan Perpuluhan"
+                  value={item.nama}
+                  onChange={(value) => updateItem(item.id, "nama", value)}
                   required
                 />
               </div>
 
               {/* Deskripsi */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">
-                  Deskripsi
-                </label>
-                <textarea
-                  value={item.deskripsi}
-                  onChange={(e) =>
-                    updateItem(item.id, "deskripsi", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  rows="2"
+                <TextAreaInput
+                  label="Deskripsi"
                   placeholder="Deskripsi detail item"
+                  rows={2}
+                  value={item.deskripsi}
+                  onChange={(value) => updateItem(item.id, "deskripsi", value)}
                 />
               </div>
 
               {/* Target Frekuensi */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Target Frekuensi
-                </label>
-                <input
-                  type="number"
-                  value={item.targetFrekuensi}
-                  onChange={(e) =>
-                    updateItem(item.id, "targetFrekuensi", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                <NumberInput
+                  label="Target Frekuensi"
                   placeholder="12"
+                  value={item.targetFrekuensi}
+                  onChange={(value) => updateItem(item.id, "targetFrekuensi", value)}
                 />
               </div>
 
               {/* Satuan Frekuensi */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Satuan Frekuensi
-                </label>
-                <select
+                <SelectInput
+                  label="Satuan Frekuensi"
+                  placeholder="Pilih satuan"
                   value={item.satuanFrekuensi}
-                  onChange={(e) =>
-                    updateItem(item.id, "satuanFrekuensi", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Pilih satuan</option>
-                  <option value="Kali">Kali</option>
-                  <option value="Bulan">Per Bulan</option>
-                  <option value="Tahun">Per Tahun</option>
-                  <option value="Minggu">Per Minggu</option>
-                  <option value="Hari">Per Hari</option>
-                </select>
+                  onChange={(value) => updateItem(item.id, "satuanFrekuensi", value)}
+                  options={[
+                    { value: "Kali", label: "Kali" },
+                    { value: "Bulan", label: "Per Bulan" },
+                    { value: "Tahun", label: "Per Tahun" },
+                    { value: "Minggu", label: "Per Minggu" },
+                    { value: "Hari", label: "Per Hari" }
+                  ]}
+                />
               </div>
 
               {/* Nominal Satuan */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Nominal Per Satuan
-                </label>
-                <input
-                  type="number"
-                  value={item.nominalSatuan}
-                  onChange={(e) =>
-                    updateItem(item.id, "nominalSatuan", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                <NumberInput
+                  label="Nominal Per Satuan"
                   placeholder="1000000"
+                  value={item.nominalSatuan}
+                  onChange={(value) => updateItem(item.id, "nominalSatuan", value)}
                 />
               </div>
 
               {/* Total Target */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Total Target Anggaran
-                </label>
-                <input
-                  type="number"
-                  value={item.totalTarget}
-                  onChange={(e) =>
-                    updateItem(item.id, "totalTarget", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                <NumberInput
+                  label="Total Target Anggaran"
                   placeholder="12000000"
+                  value={item.totalTarget}
+                  onChange={(value) => updateItem(item.id, "totalTarget", value)}
                 />
                 {item.targetFrekuensi && item.nominalSatuan && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Auto: {item.targetFrekuensi} × {item.nominalSatuan} ={" "}
                     {(
                       parseFloat(item.targetFrekuensi || 0) *
@@ -615,17 +610,17 @@ export default function CreateItemKeuanganPage() {
             Kembali
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Buat Item Keuangan</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Buat Item Keuangan</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               Buat struktur hierarkis item keuangan
             </p>
           </div>
         </div>
 
         <Button
-          onClick={saveItems}
-          disabled={saving || !selectedKategori || !selectedPeriode}
           className="min-w-32"
+          disabled={saving || !selectedKategori || !selectedPeriode}
+          onClick={saveItems}
         >
           <Save className="w-4 h-4 mr-2" />
           {saving ? "Menyimpan..." : "Simpan"}
@@ -639,18 +634,15 @@ export default function CreateItemKeuanganPage() {
             <CardTitle>Pilih Kategori</CardTitle>
           </CardHeader>
           <CardContent>
-            <select
+            <SelectInput
+              placeholder="Pilih kategori keuangan"
               value={selectedKategori}
-              onChange={(e) => setSelectedKategori(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Pilih kategori keuangan</option>
-              {kategoriOptions?.data?.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.kode} - {cat.nama}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setSelectedKategori(value)}
+              options={kategoriOptions?.data?.map((cat) => ({
+                value: cat.id,
+                label: `${cat.kode} - ${cat.nama}`
+              })) || []}
+            />
           </CardContent>
         </Card>
 
@@ -659,18 +651,15 @@ export default function CreateItemKeuanganPage() {
             <CardTitle>Pilih Periode Anggaran</CardTitle>
           </CardHeader>
           <CardContent>
-            <select
+            <SelectInput
+              placeholder="Pilih periode anggaran"
               value={selectedPeriode}
-              onChange={(e) => setSelectedPeriode(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Pilih periode anggaran</option>
-              {periodeOptions?.data?.map((periode) => (
-                <option key={periode.value} value={periode.value}>
-                  {periode.label}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setSelectedPeriode(value)}
+              options={periodeOptions?.data?.map((periode) => ({
+                value: periode.value,
+                label: periode.label
+              })) || []}
+            />
           </CardContent>
         </Card>
       </div>
@@ -681,7 +670,7 @@ export default function CreateItemKeuanganPage() {
           <Card>
             <CardHeader>
               <CardTitle>Struktur Item Keuangan</CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Kode akan di-generate otomatis berdasarkan hierarki dan urutan
               </p>
             </CardHeader>

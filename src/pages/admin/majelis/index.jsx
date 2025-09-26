@@ -203,7 +203,8 @@ export default function MajelisPage() {
         searchPlaceholder="Cari nama majelis..."
         title="Manajemen Majelis"
         onAdd={handleCreate}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="majelis"
         customAddButton={{
           icon: <UserPlus className="w-4 h-4 mr-2" />,
           text: "Tambah Majelis + Akun",

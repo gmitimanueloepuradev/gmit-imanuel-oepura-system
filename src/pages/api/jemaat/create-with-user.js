@@ -1,7 +1,8 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
-import { createApiHandler } from "@/lib/apiHandler";
 import bcrypt from "bcryptjs";
+
+import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import prisma from "@/lib/prisma";
 
 async function handlePost(req, res) {
   try {
@@ -31,103 +32,124 @@ async function handlePost(req, res) {
       alamatData,
     } = req.body;
 
-    // Start transaction
-    const result = await prisma.$transaction(async (tx) => {
-      let alamatId = null;
-      let keluargaId = idKeluarga;
+    // Hash password outside transaction to reduce transaction time
+    let hashedPassword = null;
 
-      // Step 1: Create Alamat if needed (for new Keluarga)
-      if (createKeluarga && createAlamat && alamatData) {
-        // Validate kelurahan exists
-        const kelurahan = await tx.kelurahan.findUnique({
-          where: { id: alamatData.idKelurahan }
-        });
-        
-        if (!kelurahan) {
-          throw new Error(`Kelurahan dengan ID ${alamatData.idKelurahan} tidak ditemukan`);
-        }
-        
-        const newAlamat = await tx.alamat.create({
-          data: alamatData,
-        });
-        alamatId = newAlamat.id;
-      }
+    if (createUser && email && password) {
+      hashedPassword = await bcrypt.hash(password, 12);
+    }
 
-      // Step 2: Create Keluarga if status is Kepala Keluarga
-      if (createKeluarga && keluargaData) {
-        const newKeluarga = await tx.keluarga.create({
-          data: {
-            ...keluargaData,
-            idAlamat: alamatId || keluargaData.idAlamat,
-          },
-        });
-        keluargaId = newKeluarga.id;
-      }
+    // Start transaction with increased timeout
+    const result = await prisma.$transaction(
+      async (tx) => {
+        let alamatId = null;
+        let keluargaId = idKeluarga;
 
-      // Step 3: Create Jemaat
-      const newJemaat = await tx.jemaat.create({
-        data: {
-          idKeluarga: keluargaId,
-          idStatusDalamKeluarga,
-          idSuku,
-          idPendidikan,
-          idPekerjaan,
-          idPendapatan,
-          idJaminanKesehatan,
-          nama,
-          jenisKelamin: jenisKelamin === "true" || jenisKelamin === true,
-          tanggalLahir: new Date(tanggalLahir),
-          golonganDarah,
-        },
-      });
+        // Step 1: Create Alamat if needed (for new Keluarga)
+        if (createKeluarga && createAlamat && alamatData) {
+          // Validate kelurahan exists
+          const kelurahan = await tx.kelurahan.findUnique({
+            where: { id: alamatData.idKelurahan },
+          });
 
-      // Step 4: Create User if requested
-      let newUser = null;
-      if (createUser && email && password) {
-        // Check if email already exists
-        const existingUser = await tx.user.findUnique({
-          where: { email },
-        });
+          if (!kelurahan) {
+            throw new Error(
+              `Kelurahan dengan ID ${alamatData.idKelurahan} tidak ditemukan`
+            );
+          }
 
-        if (existingUser) {
-          throw new Error("Email sudah terdaftar");
+          const newAlamat = await tx.alamat.create({
+            data: alamatData,
+          });
+
+          alamatId = newAlamat.id;
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 12);
+        // Step 2: Create Keluarga if status is Kepala Keluarga
+        if (createKeluarga && keluargaData) {
+          const newKeluarga = await tx.keluarga.create({
+            data: {
+              ...keluargaData,
+              idAlamat: alamatId || keluargaData.idAlamat,
+            },
+          });
 
-        newUser = await tx.user.create({
+          keluargaId = newKeluarga.id;
+        }
+
+        // Step 3: Create Jemaat
+        const newJemaat = await tx.jemaat.create({
           data: {
-            email,
-            password: hashedPassword,
-            role,
-            idJemaat: newJemaat.id,
-          },
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            idJemaat: true,
+            idKeluarga: keluargaId,
+            idStatusDalamKeluarga,
+            idSuku,
+            idPendidikan,
+            idPekerjaan,
+            idPendapatan,
+            idJaminanKesehatan,
+            nama,
+            jenisKelamin: jenisKelamin === "true" || jenisKelamin === true,
+            tanggalLahir: new Date(tanggalLahir),
+            golonganDarah,
           },
         });
-      }
 
-      // Return complete data with includes
-      const completeJemaat = await tx.jemaat.findUnique({
-        where: { id: newJemaat.id },
-        include: {
-          keluarga: {
-            include: {
-              alamat: {
-                include: {
-                  kelurahan: {
-                    include: {
-                      kecamatan: {
-                        include: {
-                          kotaKab: {
-                            include: {
-                              provinsi: true,
-                            },
+        // Step 4: Create User if requested
+        let newUser = null;
+
+        if (createUser && email && hashedPassword) {
+          // Check if email already exists
+          const existingUser = await tx.user.findUnique({
+            where: { email },
+          });
+
+          if (existingUser) {
+            throw new Error("Email sudah terdaftar");
+          }
+
+          newUser = await tx.user.create({
+            data: {
+              email,
+              password: hashedPassword,
+              role,
+              idJemaat: newJemaat.id,
+            },
+            select: {
+              id: true,
+              email: true,
+              role: true,
+              idJemaat: true,
+            },
+          });
+        }
+
+        return {
+          jemaatId: newJemaat.id,
+          userId: newUser?.id,
+          createdKeluarga: createKeluarga,
+          createdAlamat: createAlamat,
+        };
+      },
+      {
+        timeout: 20000, // Increase timeout to 10 seconds
+      }
+    );
+
+    // Fetch complete data outside transaction
+    const completeJemaat = await prisma.jemaat.findUnique({
+      where: { id: result.jemaatId },
+      include: {
+        keluarga: {
+          include: {
+            alamat: {
+              include: {
+                kelurahan: {
+                  include: {
+                    kecamatan: {
+                      include: {
+                        kotaKab: {
+                          include: {
+                            provinsi: true,
                           },
                         },
                       },
@@ -135,34 +157,35 @@ async function handlePost(req, res) {
                   },
                 },
               },
-              statusKeluarga: true,
-              statusKepemilikanRumah: true,
-              keadaanRumah: true,
-              rayon: true,
             },
+            statusKeluarga: true,
+            statusKepemilikanRumah: true,
+            keadaanRumah: true,
+            rayon: true,
           },
-          statusDalamKeluarga: true,
-          suku: true,
-          pendidikan: true,
-          pekerjaan: true,
-          pendapatan: true,
-          jaminanKesehatan: true,
         },
-      });
-
-      return {
-        jemaat: completeJemaat,
-        user: newUser,
-        createdKeluarga: createKeluarga,
-        createdAlamat: createAlamat,
-      };
+        statusDalamKeluarga: true,
+        suku: true,
+        pendidikan: true,
+        pekerjaan: true,
+        pendapatan: true,
+        jaminanKesehatan: true,
+      },
     });
+
+    const finalResult = {
+      jemaat: completeJemaat,
+      user: result.userId ? { id: result.userId } : null,
+      createdKeluarga: result.createdKeluarga,
+      createdAlamat: result.createdAlamat,
+    };
 
     return res
       .status(201)
-      .json(apiResponse(true, result, "Data jemaat berhasil ditambahkan"));
+      .json(apiResponse(true, finalResult, "Data jemaat berhasil ditambahkan"));
   } catch (error) {
     console.error("Error creating jemaat with user:", error);
+
     return res
       .status(500)
       .json(

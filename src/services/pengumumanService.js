@@ -26,8 +26,8 @@ const pengumumanService = {
   },
 
   // Update pengumuman
-  update: async (data) => {
-    const response = await api.put("/pengumuman", data);
+  update: async (id, data) => {
+    const response = await api.put("/pengumuman", { ...data, id });
     return response.data;
   },
 

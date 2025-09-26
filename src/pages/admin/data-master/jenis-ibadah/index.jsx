@@ -164,7 +164,8 @@ export default function JenisIbadahPage() {
         searchPlaceholder="Cari nama ibadah..."
         title="Manajemen Jenis Ibadah"
         onAdd={() => modal.open()}
-        onExport={() => {}}
+        exportable={true}
+        exportFilename="jenis-ibadah"
       />
 
       <CreateOrEditModal

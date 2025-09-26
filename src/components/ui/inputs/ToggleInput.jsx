@@ -1,6 +1,12 @@
 import { useController, useFormContext } from "react-hook-form";
 
-export default function ToggleInput({ name, label, value, onChange, required = false }) {
+export default function ToggleInput({
+  name,
+  label,
+  value,
+  onChange,
+  required = false,
+}) {
   // Try to get form context, but handle case where it doesn't exist
   const formContext = useFormContext();
 
@@ -13,15 +19,15 @@ export default function ToggleInput({ name, label, value, onChange, required = f
 
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
         <label className="relative inline-block w-12 h-7 cursor-pointer">
           <input
-            type="checkbox"
             checked={fieldValue}
-            onChange={(e) => fieldOnChange(e.target.checked)}
             className="sr-only"
+            type="checkbox"
+            onChange={(e) => fieldOnChange(e.target.checked)}
           />
           <span
             className={`absolute inset-0 rounded-full transition-colors duration-300 ${
@@ -47,11 +53,11 @@ export default function ToggleInput({ name, label, value, onChange, required = f
       </label>
       <label className="relative inline-block w-12 h-7 cursor-pointer">
         <input
-          type="checkbox"
-          name={name}
           checked={value || false}
-          onChange={(e) => onChange?.(e.target.checked)}
           className="sr-only"
+          name={name}
+          type="checkbox"
+          onChange={(e) => onChange?.(e.target.checked)}
         />
         <span
           className={`absolute inset-0 rounded-full transition-colors duration-300 ${

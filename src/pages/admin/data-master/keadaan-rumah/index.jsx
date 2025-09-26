@@ -66,6 +66,9 @@ export default function KeadaanRumahPage() {
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Keadaan Rumah" },
       ]}
+      exportable={true}
+      allowBulkDelete={true}
+      searchFields={["keadaan"]}
     />
   );
 }

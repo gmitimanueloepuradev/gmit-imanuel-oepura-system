@@ -1,14 +1,9 @@
-import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ScheduleCard from "./scheduleCard";
+import { useEffect, useState } from "react";
 import publicJadwalService from "../../../services/publicJadwalService";
+import ScheduleCard from "./scheduleCard";
 
-export default function ScheduleRow({ 
-  jenisIbadah = null, 
-  kategori = null, 
-  title = "Schedule",
-  limit = 6 
-}) {
+export default function ScheduleRow({ jenisIbadah = null, kategori = null, title = "Schedule", limit = 6 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,18 +14,24 @@ export default function ScheduleRow({
     const fetchSchedules = async () => {
       try {
         setLoading(true);
+        console.log(`Fetching schedules for: ${title}`, { jenisIbadah, kategori, limit });
+
         const response = await publicJadwalService.getJadwalIbadah({
           jenisIbadah,
-          kategori, 
+          kategori,
           limit,
-          upcoming: true
+          upcoming: true,
         });
-        
+
+        console.log(`Response for ${title}:`, response);
+
         const formattedSchedules = publicJadwalService.formatForScheduleRow(response);
+        console.log(`Formatted schedules for ${title}:`, formattedSchedules);
+
         setSchedules(formattedSchedules);
       } catch (err) {
-        console.error('Failed to fetch schedules:', err);
-        setError('Gagal memuat jadwal ibadah');
+        console.error(`Failed to fetch schedules for ${title}:`, err);
+        setError("Gagal memuat jadwal ibadah");
         setSchedules([]);
       } finally {
         setLoading(false);
@@ -38,7 +39,7 @@ export default function ScheduleRow({
     };
 
     fetchSchedules();
-  }, [jenisIbadah, kategori, limit]);
+  }, [jenisIbadah, kategori, limit, title]);
 
   const nextSlide = () => {
     if (schedules.length > 0) {
@@ -53,8 +54,7 @@ export default function ScheduleRow({
   };
 
   const getSlidePosition = (index) => {
-    const position =
-      (index - currentIndex + schedules.length) % schedules.length;
+    const position = (index - currentIndex + schedules.length) % schedules.length;
 
     switch (position) {
       case 0:
@@ -88,8 +88,18 @@ export default function ScheduleRow({
         <div className="divider text-3xl font-bold text-white">{title}</div>
         <div className="flex items-center justify-center h-80">
           <div className="text-red-300 text-center">
-            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            <svg
+              className="w-16 h-16 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
             </svg>
             <p className="text-sm">{error}</p>
           </div>
@@ -105,7 +115,9 @@ export default function ScheduleRow({
         <div className="divider text-3xl font-bold text-white">{title}</div>
         <div className="flex items-center justify-center h-80">
           <div className="text-white text-center">
-            <p className="text-lg">Tidak ada jadwal {jenisIbadah ? jenisIbadah.toLowerCase() : 'ibadah'} yang akan datang</p>
+            <p className="text-lg">
+              Tidak ada jadwal {jenisIbadah ? jenisIbadah.toLowerCase() : "ibadah"} yang akan datang
+            </p>
           </div>
         </div>
       </div>

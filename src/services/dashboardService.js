@@ -15,9 +15,10 @@ class DashboardService {
     } catch (error) {
       console.error("Majelis Dashboard Service Error:", error);
       
-      // Handle 403 error specifically - user is not a majelis
+      // Handle 403 error specifically - show the actual API error message
       if (error.response && error.response.status === 403) {
-        throw new Error("Akses ditolak. Anda bukan majelis atau tidak memiliki izin untuk mengakses dashboard majelis.");
+        const apiErrorMessage = error.response.data?.message || "Akses ditolak. Anda bukan majelis atau tidak memiliki izin untuk mengakses dashboard majelis.";
+        throw new Error(apiErrorMessage);
       }
       
       throw error;

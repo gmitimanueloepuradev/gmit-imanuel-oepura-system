@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 function JemaatDashboard() {
   const { user, refreshUser } = useAuth();
@@ -176,6 +177,11 @@ function JemaatDashboard() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Daily Verse */}
+          <div className="mb-6">
+            <DailyVerse />
           </div>
 
           {/* Upcoming Worship Schedules */}

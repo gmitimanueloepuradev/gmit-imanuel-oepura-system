@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import masterService from "@/services/masterService";
+import { useEffect, useState } from "react";
+
 import MasterDataPage from "@/components/ui/MasterDataPage";
+import masterService from "@/services/masterService";
 
 export default function JenisPengumumanPage() {
   const [kategoriOptions, setKategoriOptions] = useState([]);
@@ -18,6 +19,7 @@ export default function JenisPengumumanPage() {
           label: kategori.nama,
           data: kategori,
         }));
+
         setKategoriOptions(options);
       } catch (error) {
         console.error("Error fetching kategori options:", error);
@@ -31,9 +33,10 @@ export default function JenisPengumumanPage() {
 
   const columns = [
     {
-      key: "kategori.nama",
+      key: "kategori",
       label: "Kategori",
       type: "text",
+      render: (value, item) => item?.kategori?.nama || "-",
     },
     {
       key: "nama",
@@ -47,35 +50,35 @@ export default function JenisPengumumanPage() {
       truncate: true,
     },
     {
-      key: "_count.pengumuman",
+      key: "_count",
       label: "Jumlah Pengumuman",
       type: "custom",
-      render: (item) =>
-        item && item._count && typeof item._count.pengumuman === "number"
+      render: (value, item) =>
+        item?._count?.pengumuman >= 0
           ? `${item._count.pengumuman} pengumuman`
           : "0 pengumuman",
     },
     {
       key: "isActive",
       label: "Status",
-      type: "badge",
-      render: (item) => item.isActive ? "Aktif" : "Tidak Aktif",
-      variant: (item) => item.isActive ? "success" : "secondary",
+      type: "boolean",
+      badgeVariant: (value) => (value === true ? "success" : "danger"),
     },
   ];
 
   const viewFields = [
     {
-      key: "kategori.nama",
+      key: "kategori",
       label: "Nama Kategori",
+      getValue: (item) => item?.kategori?.nama || "-",
     },
     { key: "nama", label: "Nama Jenis" },
     { key: "deskripsi", label: "Deskripsi" },
     {
-      key: "_count.pengumuman",
+      key: "_count",
       label: "Jumlah Pengumuman",
-      render: (item) =>
-        item && item._count && typeof item._count.pengumuman === "number"
+      getValue: (item) =>
+        item?._count?.pengumuman >= 0
           ? `${item._count.pengumuman} pengumuman`
           : "0 pengumuman",
     },
@@ -125,7 +128,7 @@ export default function JenisPengumumanPage() {
     {
       key: "isActive",
       label: "Status Aktif",
-      type: "switch",
+      type: "boolean",
       defaultValue: true,
       description: "Jenis aktif dapat digunakan untuk membuat pengumuman",
     },
@@ -137,26 +140,13 @@ export default function JenisPengumumanPage() {
 
   return (
     <MasterDataPage
-      title="Kelola Jenis Pengumuman"
-      description="Kelola data jenis pengumuman berdasarkan kategori yang tersedia"
-      service={{
-        get: (params) =>
-          masterService.getJenisPengumuman({ ...params, includeCount: true }),
-        create: (data) => masterService.createJenisPengumuman(data),
-        update: (id, data) => masterService.updateJenisPengumuman(id, data),
-        delete: (id) => masterService.deleteJenisPengumuman(id),
-      }}
-      queryKey="jenis-pengumuman"
-      columns={columns}
-      viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="nama"
-      searchFields={["nama", "deskripsi", "kategori.nama"]}
+      allowBulkDelete={true}
       breadcrumb={[
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Jenis Pengumuman" },
       ]}
-      allowBulkDelete={true}
+      columns={columns}
+      description="Kelola data jenis pengumuman berdasarkan kategori yang tersedia"
       exportable={true}
       filterFields={[
         {
@@ -166,6 +156,19 @@ export default function JenisPengumumanPage() {
           options: [{ value: "", label: "Semua Kategori" }, ...kategoriOptions],
         },
       ]}
+      formFields={formFields}
+      itemNameField="nama"
+      queryKey="jenis-pengumuman"
+      searchFields={["nama", "deskripsi"]}
+      service={{
+        get: (params) =>
+          masterService.getJenisPengumuman({ ...params, includeCount: true }),
+        create: (data) => masterService.createJenisPengumuman(data),
+        update: (id, data) => masterService.updateJenisPengumuman(id, data),
+        delete: (id) => masterService.deleteJenisPengumuman(id),
+      }}
+      title="Kelola Jenis Pengumuman"
+      viewFields={viewFields}
     />
   );
 }

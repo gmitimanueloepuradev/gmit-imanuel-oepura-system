@@ -78,14 +78,14 @@ export default function SearchBar({
           }}
           className="input input-bordered w-full pl-10 pr-10"
         />
-        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
 
         {searchValue && (
           <button
             className="absolute right-3 top-1/2 -translate-y-1/2"
             onClick={handleClear}
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
         )}
       </div>

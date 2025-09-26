@@ -23,6 +23,7 @@ import {
 import PageHeader from "@/components/ui/PageHeader";
 import { formatNumber } from "@/lib/formatUtils";
 import dashboardService from "@/services/dashboardService";
+import DailyVerse from "@/components/dashboard/DailyVerse";
 
 export default function DashboardPageAdmin() {
   const [stats, setStats] = useState({
@@ -198,6 +199,11 @@ export default function DashboardPageAdmin() {
               </p>
             </CardContent>
           </Card>
+
+          {/* Daily Verse Card */}
+          <div className="md:col-span-2 lg:col-span-1">
+            <DailyVerse />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -226,11 +232,11 @@ export default function DashboardPageAdmin() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4">
+              {/* <div className="mt-4">
                 <Button className="w-full" variant="outline">
                   Lihat Semua Aktivitas
                 </Button>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
@@ -303,14 +309,14 @@ export default function DashboardPageAdmin() {
                   </div>
                 )}
               </div>
-              <div className="mt-4 flex gap-2">
+              {/* <div className="mt-4 flex gap-2">
                 <Button className="flex-1" variant="outline">
                   Kelola Jadwal
                 </Button>
                 <Button size="sm" variant="outline">
                   Lihat Semua
                 </Button>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>

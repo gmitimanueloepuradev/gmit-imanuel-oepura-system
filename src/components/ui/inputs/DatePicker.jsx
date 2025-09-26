@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { useController, useFormContext } from "react-hook-form";
+
 import { formatUtils } from "@/lib/formatUtils";
 
 const DatePicker = forwardRef(function DatePicker(
@@ -25,6 +26,7 @@ const DatePicker = forwardRef(function DatePicker(
 
     try {
       const date = new Date(dateValue);
+
       return formatUtils.formatDate(date, "DD/MM/YYYY");
     } catch (error) {
       return dateValue;
@@ -36,7 +38,7 @@ const DatePicker = forwardRef(function DatePicker(
     const { control } = formContext;
     const {
       field,
-      fieldState: { error },
+    fieldState: { error },
     } = useController({ name, control });
 
     const handleChange = (e) => {
@@ -46,7 +48,7 @@ const DatePicker = forwardRef(function DatePicker(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
             {label} {required && <span className="text-red-500">*</span>}
           </label>
         )}
@@ -61,11 +63,11 @@ const DatePicker = forwardRef(function DatePicker(
             ref={ref}
             type="date"
             {...field}
-            onChange={handleChange}
-            placeholder={placeholder}
-            className={`w-full ${leftIcon ? 'pl-10' : 'pl-3'} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            className={`w-full ${leftIcon ? "pl-10" : "pl-3"} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               error ? "border-red-500 focus:ring-red-500" : ""
             } ${className}`}
+            placeholder={placeholder}
+            onChange={handleChange}
             {...props}
             style={{
               colorScheme: "light", // Ensures consistent styling across browsers
@@ -101,14 +103,14 @@ const DatePicker = forwardRef(function DatePicker(
         )}
         <input
           ref={ref}
-          type="date"
-          name={name}
-          value={value || ""}
-          onChange={(e) => onChange?.(e.target.value)}
-          placeholder={placeholder}
-          className={`w-full ${leftIcon ? 'pl-10' : 'pl-3'} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`w-full ${leftIcon ? "pl-10" : "pl-3"} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             externalError ? "border-red-500 focus:ring-red-500" : ""
           } ${className}`}
+          name={name}
+          placeholder={placeholder}
+          type="date"
+          value={value || ""}
+          onChange={(e) => onChange?.(e.target.value)}
           {...props}
           style={{
             colorScheme: "light", // Ensures consistent styling across browsers
@@ -122,7 +124,9 @@ const DatePicker = forwardRef(function DatePicker(
         )}
       </div>
 
-      {externalError && <p className="text-sm text-red-500 mt-1">{externalError}</p>}
+      {externalError && (
+        <p className="text-sm text-red-500 mt-1">{externalError}</p>
+      )}
     </div>
   );
 });
