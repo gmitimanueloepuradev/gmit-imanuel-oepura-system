@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import EmptyState from "@/components/common/EmptyState";
 import Images from "@/components/gallery/images";
+import PageTitle from "@/components/ui/PageTitle";
 import axios from "@/lib/axios";
 
 export default function Gallery() {
@@ -37,6 +38,10 @@ export default function Gallery() {
 
   return (
     <div>
+      <PageTitle
+        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
+        title="Gallery"
+      />
       <div className="flex justify-center items-center h-screen relative">
         <Image
           priority

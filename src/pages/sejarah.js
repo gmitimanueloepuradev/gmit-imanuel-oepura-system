@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import History from "@/components/about/history";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function SejarahPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -14,7 +15,12 @@ export default function SejarahPage() {
   }, []);
 
   return (
-    <div className="bg-gray-50">
+    <>
+      <PageTitle
+        title="Sejarah"
+        description="Sejarah perjalanan GMIT Jemaat Imanuel Oepura dari masa ke masa. Mengenal jejak pelayanan dan perkembangan jemaat dalam melayani Tuhan dan sesama."
+      />
+      <div className="bg-gray-50">
       {/* Hero Section with Parallax */}
       <div className="relative h-screen flex justify-center items-center overflow-hidden">
         <div
@@ -215,6 +221,7 @@ export default function SejarahPage() {
           animation: fade-in-up 1s ease-out;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import History from "@/components/about/history";
 import VisionAndMission from "@/components/about/visionAndMission";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function About() {
   const [scrollY, setScrollY] = useState(0);
@@ -16,6 +17,10 @@ export default function About() {
 
   return (
     <div className="bg-gray-50">
+      <PageTitle
+        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
+        title="About Us"
+      />
       {/* Hero Section with Parallax */}
       <div className="relative h-screen flex justify-center items-center overflow-hidden">
         <div

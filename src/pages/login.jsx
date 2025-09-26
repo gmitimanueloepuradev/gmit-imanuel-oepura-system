@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { Eye, EyeOff, Lock, LogIn, User } from "lucide-react";
 import { useRouter } from "next/router";
-import { Eye, EyeOff, User, Lock, LogIn } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import PageTitle from "@/components/ui/PageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import authService from "@/services/authService";
 
@@ -59,6 +60,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors">
+      <PageTitle
+        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
+        title="Login Page"
+      />
       <div className="max-w-md w-full space-y-8">
         {/* Logo and Title */}
         <div className="text-center">
