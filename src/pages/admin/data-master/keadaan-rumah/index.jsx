@@ -49,26 +49,26 @@ export default function KeadaanRumahPage() {
 
   return (
     <MasterDataPage
-      title="Data Keadaan Rumah"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Keadaan Rumah" },
+      ]}
+      columns={columns}
       description="Kelola data keadaan rumah"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="keadaan"
+      queryKey="keadaan-rumah"
+      searchFields={["keadaan"]}
       service={{
         get: () => masterService.getKeadaanRumah(),
         create: (data) => masterService.createKeadaanRumah(data),
         update: (id, data) => masterService.updateKeadaanRumah(id, data),
         delete: (id) => masterService.deleteKeadaanRumah(id)
       }}
-      queryKey="keadaan-rumah"
-      columns={columns}
+      title="Data Keadaan Rumah"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="keadaan"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Keadaan Rumah" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["keadaan"]}
     />
   );
 }

@@ -49,11 +49,21 @@ function parseFilters(query) {
   }
 
   if (query.status) {
-    where.status = query.status;
+    // Handle array of status values
+    if (Array.isArray(query.status)) {
+      where.status = { in: query.status };
+    } else {
+      where.status = query.status;
+    }
   }
 
   if (query.golonganDarah) {
-    where.golonganDarah = query.golonganDarah;
+    // Handle array of blood types
+    if (Array.isArray(query.golonganDarah)) {
+      where.golonganDarah = { in: query.golonganDarah };
+    } else {
+      where.golonganDarah = query.golonganDarah;
+    }
   }
 
   // Date range filters

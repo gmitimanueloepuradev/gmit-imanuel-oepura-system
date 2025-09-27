@@ -1,8 +1,9 @@
+import { User } from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ProfileGrid from '@/components/profile/ProfileGrid';
 import PageTitle from '@/components/ui/PageTitle';
-import { User } from 'lucide-react';
 
 export default function JemaatProfilePage() {
   const { user } = useAuth();

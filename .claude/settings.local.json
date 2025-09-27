@@ -66,7 +66,14 @@
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
       "Bash(npm run lint)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(npx cap init:*)",
+      "Bash(npx cap add:*)",
+      "Bash(npm run build:static:*)",
+      "Bash(npm run wrangler:dev:*)",
+      "Bash(set BUILD_TARGET=capacitor)",
+      "Bash(npm run cap:build:*)",
+      "Bash(ren:*)"
     ],
     "deny": [],
     "ask": []

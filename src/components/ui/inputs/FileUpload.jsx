@@ -68,12 +68,12 @@ export default function FileUpload({
   return (
     <div className="upload-container">
       <input
-        type="file"
-        onChange={handleFileUpload}
-        disabled={uploading}
-        multiple={multiple}
         accept="image/*,application/pdf"
         className="file-input"
+        disabled={uploading}
+        multiple={multiple}
+        type="file"
+        onChange={handleFileUpload}
       />
 
       {uploading && (

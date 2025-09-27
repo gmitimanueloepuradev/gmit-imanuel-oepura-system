@@ -34,7 +34,7 @@ const CustomLineChart = ({
       {title && (
         <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
       )}
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer height={height} width="100%">
         <LineChart
           data={data}
           margin={{
@@ -52,13 +52,13 @@ const CustomLineChart = ({
           {lines.map((line, index) => (
             <Line
               key={index}
-              type="monotone"
+              activeDot={{ r: 8 }}
               dataKey={line.dataKey}
+              dot={{ r: 6 }}
+              name={line.name}
               stroke={line.color}
               strokeWidth={3}
-              dot={{ r: 6 }}
-              activeDot={{ r: 8 }}
-              name={line.name}
+              type="monotone"
             />
           ))}
         </LineChart>

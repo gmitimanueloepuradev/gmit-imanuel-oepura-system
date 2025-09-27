@@ -49,26 +49,26 @@ export default function PekerjaanPage() {
 
   return (
     <MasterDataPage
-      title="Data Pekerjaan"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Pekerjaan" },
+      ]}
+      columns={columns}
       description="Kelola data pekerjaan"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="namaPekerjaan"
+      queryKey="pekerjaan"
+      searchFields={["namaPekerjaan"]}
       service={{
         get: () => masterService.getPekerjaan(),
         create: (data) => masterService.createPekerjaan(data),
         update: (id, data) => masterService.updatePekerjaan(id, data),
         delete: (id) => masterService.deletePekerjaan(id)
       }}
-      queryKey="pekerjaan"
-      columns={columns}
+      title="Data Pekerjaan"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="namaPekerjaan"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Pekerjaan" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["namaPekerjaan"]}
     />
   );
 }

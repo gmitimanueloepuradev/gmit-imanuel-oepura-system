@@ -123,8 +123,8 @@ const LeafletMap = ({
     <div className="relative w-full">
       <div 
         ref={mapRef} 
-        style={{ height, width: '100%' }}
         className="rounded-lg border border-gray-300 z-10"
+        style={{ height, width: '100%' }}
       />
     </div>
   );

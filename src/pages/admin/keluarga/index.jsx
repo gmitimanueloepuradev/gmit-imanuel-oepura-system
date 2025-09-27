@@ -1,9 +1,9 @@
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Edit, Eye, Trash2, Users, Plus } from "lucide-react";
+
 import ListGrid from "@/components/ui/ListGrid";
 import keluargaService from "@/services/keluargaService";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Edit, Eye, Trash2, Users, Plus } from "lucide-react";
 import { showToast } from "@/utils/showToast";
 import useConfirm from "@/hooks/useConfirm";
 
@@ -197,6 +197,25 @@ export default function KeluargaPage() {
   return (
     <>
       <ListGrid
+        breadcrumb={[
+          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Keluarga", href: "/admin/keluarga" },
+        ]}
+        columns={columns}
+        data={data?.data?.items || []}
+        description="Kelola data keluarga jemaat gereja"
+        error={error}
+        exportFilename="keluarga"
+        exportable={true}
+        headerActions={[
+          {
+            label: "Tambah Keluarga",
+            icon: Plus,
+            href: "/admin/keluarga/create",
+            variant: "primary",
+          },
+        ]}
+        isLoading={isLoading}
         rowActionType="vertical"
         rowActions={[
           {
@@ -218,39 +237,20 @@ export default function KeluargaPage() {
             variant: "danger",
           },
         ]}
-        headerActions={[
-          {
-            label: "Tambah Keluarga",
-            icon: Plus,
-            href: "/admin/keluarga/create",
-            variant: "primary",
-          },
-        ]}
-        breadcrumb={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Keluarga", href: "/admin/keluarga" },
-        ]}
-        data={data?.data?.items || []}
-        columns={columns}
-        description="Kelola data keluarga jemaat gereja"
-        title="Manajemen Keluarga"
-        isLoading={isLoading}
-        error={error}
-        searchable={true}
         searchPlaceholder="Cari berdasarkan alamat, kepala keluarga..."
-        exportable={true}
-        exportFilename="keluarga"
+        searchable={true}
+        title="Manajemen Keluarga"
       />
 
       <ConfirmDialog
+        cancelText={confirm.config.cancelText}
+        confirmText={confirm.config.confirmText}
         isOpen={confirm.isOpen}
+        message={confirm.config.message}
+        title={confirm.config.title}
+        variant={confirm.config.variant}
         onClose={confirm.hideConfirm}
         onConfirm={confirm.handleConfirm}
-        title={confirm.config.title}
-        message={confirm.config.message}
-        confirmText={confirm.config.confirmText}
-        cancelText={confirm.config.cancelText}
-        variant={confirm.config.variant}
       />
     </>
   );

@@ -179,6 +179,8 @@ export default function KotaKabupatenPage() {
         columns={columns}
         data={data?.data?.items || []}
         description={"Kelola data kota kabupaten"}
+        exportFilename="kota-kabupaten"
+        exportable={true}
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
@@ -221,8 +223,6 @@ export default function KotaKabupatenPage() {
         searchPlaceholder="Cari kota kabupaten..."
         title={"Daftar Kota / Kabupaten"}
         onAdd={() => modal.open()}
-        exportable={true}
-        exportFilename="kota-kabupaten"
       />
 
       <CreateOrEditModal

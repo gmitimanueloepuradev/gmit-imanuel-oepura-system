@@ -534,6 +534,8 @@ export default function UsersPage() {
           { label: "Users" },
         ]}
         columns={columns}
+        customFilterFunction={customFilterFunction}
+        customSearchFunction={enhancedSearch}
         data={data?.data?.items || []}
         description="Kelola data pengguna sistem"
         emptyStateProps={{
@@ -589,11 +591,8 @@ export default function UsersPage() {
         exportFilename="users"
         exportable={true}
         filters={userFilters}
-        customFilterFunction={customFilterFunction}
-        customSearchFunction={enhancedSearch}
         isLoading={isLoading}
         itemsPerPage={pageSize}
-        showPageSizeSelector={true}
         pageSizeOptions={[10, 25, 50, 100]}
         rowActionType="horizontal"
         rowActions={[
@@ -636,6 +635,7 @@ export default function UsersPage() {
         ]}
         searchPlaceholder="Cari username, email, nama jemaat, role, rayon..."
         searchable={true}
+        showPageSizeSelector={true}
         title="Manajemen Users"
         onAdd={() => setShowCreate(true)}
       />

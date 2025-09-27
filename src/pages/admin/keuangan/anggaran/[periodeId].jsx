@@ -155,14 +155,14 @@ export default function AnggaranPeriodePage() {
   return (
     <>
       <PageHeader
-        title={`Anggaran: ${periode.nama}`}
-        description={`Kelola anggaran untuk periode ${periode.nama} (${periode.tahun})`}
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Keuangan", href: "/admin/keuangan" },
           { label: "Periode", href: "/admin/data-master/keuangan/periode" },
           { label: periode.nama },
         ]}
+        description={`Kelola anggaran untuk periode ${periode.nama} (${periode.tahun})`}
+        title={`Anggaran: ${periode.nama}`}
       />
 
       <div className="max-w-7xl mx-auto p-6">
@@ -224,9 +224,9 @@ export default function AnggaranPeriodePage() {
             <div className="flex flex-wrap gap-3">
               {!hasItems && (
                 <Button 
-                  onClick={() => handlePopulate(false)}
-                  disabled={populateMutation.isPending}
                   className="bg-green-600 hover:bg-green-700"
+                  disabled={populateMutation.isPending}
+                  onClick={() => handlePopulate(false)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   {populateMutation.isPending ? "Memproses..." : "Populate dari Template"}
@@ -235,9 +235,9 @@ export default function AnggaranPeriodePage() {
               
               {hasItems && (
                 <Button 
+                  disabled={populateMutation.isPending}
                   variant="outline"
                   onClick={() => setShowPopulateDialog(true)}
-                  disabled={populateMutation.isPending}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Re-populate Template
@@ -339,14 +339,14 @@ export default function AnggaranPeriodePage() {
 
       {/* Populate Dialog */}
       <ConfirmDialog
-        open={showPopulateDialog}
-        onOpenChange={setShowPopulateDialog}
-        title="Re-populate Template Anggaran"
-        description="Tindakan ini akan menimpa semua item anggaran yang sudah ada dengan template terbaru dari item keuangan. Apakah Anda yakin?"
-        onConfirm={() => handlePopulate(true)}
         confirmText="Ya, Re-populate"
+        description="Tindakan ini akan menimpa semua item anggaran yang sudah ada dengan template terbaru dari item keuangan. Apakah Anda yakin?"
         isLoading={populateMutation.isPending}
+        open={showPopulateDialog}
+        title="Re-populate Template Anggaran"
         variant="destructive"
+        onConfirm={() => handlePopulate(true)}
+        onOpenChange={setShowPopulateDialog}
       />
     </>
   );

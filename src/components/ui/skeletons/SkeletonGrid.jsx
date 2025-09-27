@@ -1,4 +1,5 @@
 import { Card, CardContent } from "../Card";
+
 import { Skeleton } from "./Skeleton";
 
 export const GridSkeleton = ({ columns }) => (

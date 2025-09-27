@@ -147,8 +147,8 @@ export default function ItemKeuanganPage() {
             <div className="w-6 h-6 flex items-center justify-center mr-2">
               {hasChildren ? (
                 <button
-                  onClick={() => toggleNode(item.id)}
                   className="text-gray-400 hover:text-gray-600"
+                  onClick={() => toggleNode(item.id)}
                 >
                   {isExpanded ? 
                     <ChevronDown className="h-4 w-4" /> : 
@@ -163,7 +163,7 @@ export default function ItemKeuanganPage() {
             {/* Item Info */}
             <div className="flex-1">
               <div className="flex items-center">
-                <Badge variant="outline" className="mr-3 font-mono text-xs">
+                <Badge className="mr-3 font-mono text-xs" variant="outline">
                   {item.kode}
                 </Badge>
                 <span className={`font-medium ${
@@ -216,10 +216,10 @@ export default function ItemKeuanganPage() {
               </Button>
               
               <Button
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 size="sm"
                 variant="outline"
                 onClick={() => setItemToDelete(item)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
@@ -251,13 +251,13 @@ export default function ItemKeuanganPage() {
   return (
     <>
       <PageHeader
-        title="Kelola Item Keuangan"
-        description="Kelola item keuangan per periode dengan struktur hierarkis"
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Keuangan", href: "/admin/keuangan" },
           { label: "Item Keuangan" },
         ]}
+        description="Kelola item keuangan per periode dengan struktur hierarkis"
+        title="Kelola Item Keuangan"
       />
 
       <div className="max-w-7xl mx-auto p-6">
@@ -276,10 +276,10 @@ export default function ItemKeuanganPage() {
                   Periode Anggaran *
                 </label>
                 <select
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedPeriode}
                   onChange={(e) => setSelectedPeriode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
                 >
                   <option value="">Pilih Periode</option>
                   {periodeList?.map((periode) => (
@@ -295,9 +295,9 @@ export default function ItemKeuanganPage() {
                   Kategori (Opsional)
                 </label>
                 <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedKategori}
                   onChange={(e) => setSelectedKategori(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Semua Kategori</option>
                   {kategoriList?.map((kategori) => (
@@ -343,8 +343,8 @@ export default function ItemKeuanganPage() {
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => router.push(`/admin/keuangan/item/create?periodeId=${selectedPeriode}`)}
                         size="sm"
+                        onClick={() => router.push(`/admin/keuangan/item/create?periodeId=${selectedPeriode}`)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Tambah Item
@@ -393,14 +393,14 @@ export default function ItemKeuanganPage() {
 
       {/* Delete Confirmation */}
       <ConfirmDialog
-        open={!!itemToDelete}
-        onOpenChange={() => setItemToDelete(null)}
-        title="Hapus Item Keuangan"
-        description={`Apakah Anda yakin ingin menghapus item "${itemToDelete?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
-        onConfirm={() => deleteMutation.mutate(itemToDelete.id)}
         confirmText="Ya, Hapus"
+        description={`Apakah Anda yakin ingin menghapus item "${itemToDelete?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
         isLoading={deleteMutation.isPending}
+        open={!!itemToDelete}
+        title="Hapus Item Keuangan"
         variant="destructive"
+        onConfirm={() => deleteMutation.mutate(itemToDelete.id)}
+        onOpenChange={() => setItemToDelete(null)}
       />
     </>
   );

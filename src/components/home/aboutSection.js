@@ -151,11 +151,11 @@ export default function AboutSection() {
               <div className="relative overflow-hidden rounded-2xl shadow-2xl">
                 <div className="relative w-full h-80 lg:h-96">
                   <Image
+                    fill
                     alt="GMIT Imanuel Oepura"
                     className="object-cover transform hover:scale-110 transition-transform duration-700"
-                    src="/header/108d22eb.webp"
-                    fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
+                    src="/header/108d22eb.webp"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />

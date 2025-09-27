@@ -483,9 +483,9 @@ export default function EditItemKeuanganPage() {
 
               <div className="flex items-center gap-2">
                 <Button
+                  size="sm"
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => addChild(item.id, item.level)}
                 >
                   <Plus className="w-4 h-4 mr-1" />
@@ -493,9 +493,9 @@ export default function EditItemKeuanganPage() {
                 </Button>
 
                 <Button
+                  size="sm"
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => addSibling(item.id, item.level)}
                 >
                   <Plus className="w-4 h-4 mr-1" />
@@ -504,9 +504,9 @@ export default function EditItemKeuanganPage() {
 
                 {items.length > 1 && (
                   <Button
+                    size="sm"
                     type="button"
                     variant="outline"
-                    size="sm"
                     onClick={() => deleteItem(item.id)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -524,12 +524,12 @@ export default function EditItemKeuanganPage() {
                   Nama Item *
                 </label>
                 <input
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Contoh: Persembahan Perpuluhan"
                   type="text"
                   value={item.nama}
                   onChange={(e) => updateItem(item.id, "nama", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Contoh: Persembahan Perpuluhan"
-                  required
                 />
               </div>
 
@@ -539,13 +539,13 @@ export default function EditItemKeuanganPage() {
                   Deskripsi
                 </label>
                 <textarea
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Deskripsi detail item"
+                  rows="2"
                   value={item.deskripsi}
                   onChange={(e) =>
                     updateItem(item.id, "deskripsi", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  rows="2"
-                  placeholder="Deskripsi detail item"
                 />
               </div>
 
@@ -555,13 +555,13 @@ export default function EditItemKeuanganPage() {
                   Target Frekuensi
                 </label>
                 <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="12"
                   type="number"
                   value={item.targetFrekuensi}
                   onChange={(e) =>
                     updateItem(item.id, "targetFrekuensi", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="12"
                 />
               </div>
 
@@ -571,11 +571,11 @@ export default function EditItemKeuanganPage() {
                   Satuan Frekuensi
                 </label>
                 <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   value={item.satuanFrekuensi}
                   onChange={(e) =>
                     updateItem(item.id, "satuanFrekuensi", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Pilih satuan</option>
                   <option value="Kali">Kali</option>
@@ -592,13 +592,13 @@ export default function EditItemKeuanganPage() {
                   Nominal Per Satuan
                 </label>
                 <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="1000000"
                   type="number"
                   value={item.nominalSatuan}
                   onChange={(e) =>
                     updateItem(item.id, "nominalSatuan", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="1000000"
                 />
               </div>
 
@@ -608,13 +608,13 @@ export default function EditItemKeuanganPage() {
                   Total Target Anggaran
                 </label>
                 <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="12000000"
                   type="number"
                   value={item.totalTarget}
                   onChange={(e) =>
                     updateItem(item.id, "totalTarget", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="12000000"
                 />
                 {item.targetFrekuensi && item.nominalSatuan && (
                   <div className="text-xs text-gray-500 mt-1">
@@ -664,9 +664,9 @@ export default function EditItemKeuanganPage() {
         </div>
 
         <Button
-          onClick={saveItems}
-          disabled={saving || !selectedKategori || !selectedPeriode}
           className="min-w-32"
+          disabled={saving || !selectedKategori || !selectedPeriode}
+          onClick={saveItems}
         >
           <Save className="w-4 h-4 mr-2" />
           {saving ? "Menyimpan..." : "Update"}

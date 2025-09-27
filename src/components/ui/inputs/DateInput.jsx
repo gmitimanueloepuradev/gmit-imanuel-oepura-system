@@ -41,10 +41,10 @@ const DateInput = ({
     <div className={`space-y-2 ${className}`}>
       {label && (
         <label
-          htmlFor={inputId}
           className={`block text-sm font-medium text-gray-700 dark:text-gray-300 ${
             required ? "after:content-['*'] after:text-red-500 after:ml-1" : ''
           } ${labelClassName}`}
+          htmlFor={inputId}
         >
           {label}
         </label>
@@ -56,17 +56,6 @@ const DateInput = ({
         </div>
 
         <input
-          id={inputId}
-          name={name}
-          type="date"
-          value={value || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          disabled={disabled}
-          required={required}
-          placeholder={placeholder}
-          min={min}
-          max={max}
           className={`
             block w-full pl-10 pr-3 py-2 border rounded-lg shadow-sm text-sm
             focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -80,6 +69,17 @@ const DateInput = ({
             }
             ${inputClassName}
           `}
+          disabled={disabled}
+          id={inputId}
+          max={max}
+          min={min}
+          name={name}
+          placeholder={placeholder}
+          required={required}
+          type="date"
+          value={value || ''}
+          onBlur={handleBlur}
+          onChange={handleChange}
           {...props}
         />
       </div>

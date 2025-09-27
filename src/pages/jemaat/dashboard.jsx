@@ -1,7 +1,3 @@
-import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import LogoutButton from "@/components/auth/LogoutButton";
-import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
 import {
   User,
   Home,
@@ -12,6 +8,11 @@ import {
   MapPin,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+
+import { useAuth } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import LogoutButton from "@/components/auth/LogoutButton";
+import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
 import api from "@/lib/axios";
 import DailyVerse from "@/components/dashboard/DailyVerse";
 
@@ -193,10 +194,10 @@ function JemaatDashboard() {
                   Jadwal Ibadah Mendatang
                 </h3>
                 <button
+                  className="text-sm text-blue-600 hover:text-blue-500 font-medium"
                   onClick={() =>
                     (window.location.href = "/jemaat/jadwal-ibadah")
                   }
-                  className="text-sm text-blue-600 hover:text-blue-500 font-medium"
                 >
                   Lihat Semua
                 </button>

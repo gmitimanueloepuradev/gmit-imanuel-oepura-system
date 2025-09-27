@@ -1,5 +1,3 @@
-import PageHeader from "@/components/ui/PageHeader";
-import jemaatService from "@/services/jemaatService";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import React from "react";
@@ -14,6 +12,9 @@ import {
   Calendar,
   Phone,
 } from "lucide-react";
+
+import jemaatService from "@/services/jemaatService";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function JemaatDetail() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function JemaatDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -80,12 +81,12 @@ export default function JemaatDetail() {
   return (
     <>
       <PageHeader
-        title="Detail Jemaat"
-        description="Detail informasi jemaat"
         breadcrumb={[
           { label: "Jemaat", href: "/admin/jemaat" },
           { label: jemaat.nama, href: `/admin/jemaat/${id}` },
         ]}
+        description="Detail informasi jemaat"
+        title="Detail Jemaat"
       />
 
       <div className="space-y-6 p-4">
@@ -349,14 +350,14 @@ export default function JemaatDetail() {
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3">
           <button
-            onClick={() => router.push("/admin/jemaat")}
             className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            onClick={() => router.push("/admin/jemaat")}
           >
             Kembali
           </button>
           <button
-            onClick={() => router.push(`/admin/jemaat/edit/${id}`)}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            onClick={() => router.push(`/admin/jemaat/edit/${id}`)}
           >
             Edit Data
           </button>

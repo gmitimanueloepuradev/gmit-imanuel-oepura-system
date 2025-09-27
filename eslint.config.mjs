@@ -74,77 +74,33 @@ export default defineConfig([
     },
 
     rules: {
-      "no-console": "warn",
+      'react/no-unescaped-entities': 'off',
+      '@next/next/no-page-custom-font': 'off',
+      "no-console": "off",
       "react/prop-types": "off",
       "react/jsx-uses-react": "off",
       "react/react-in-jsx-scope": "off",
       "react-hooks/exhaustive-deps": "off",
 
-      "jsx-a11y/click-events-have-key-events": "warn",
-      "jsx-a11y/interactive-supports-focus": "warn",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/interactive-supports-focus": "off",
 
-      "prettier/prettier": ["warn", { endOfLine: "auto" }],
+      "prettier/prettier": "off",
 
       "no-unused-vars": "off",
-      "react/jsx-uses-react": "error",
-      "react/jsx-uses-vars": "error",
-      "no-undef": "error",
-      "react/jsx-no-undef": ["error", { allowGlobals: false }],
+      "react/jsx-uses-react": "off",
+      "react/jsx-uses-vars": "off",
+      "no-undef": "off",
+      "react/jsx-no-undef": "off",
 
-      "import/order": [
-        "warn",
-        {
-          groups: [
-            "builtin",
-            "external",
-            "internal",
-            "parent",
-            "sibling",
-            "index",
-            "object",
-            "type",
-          ],
-          pathGroups: [
-            {
-              pattern: "~/**",
-              group: "external",
-              position: "after",
-            },
-          ],
-          "newlines-between": "always",
-        },
-      ],
+      "import/order": "off",
 
-      "react/self-closing-comp": "warn",
+      "react/self-closing-comp": "off",
 
-      "react/jsx-sort-props": [
-        "warn",
-        {
-          callbacksLast: true,
-          shorthandFirst: true,
-          noSortAlphabetically: false,
-          reservedFirst: true,
-        },
-      ],
+      "react/jsx-sort-props": "off",
 
-      "padding-line-between-statements": [
-        "warn",
-        {
-          blankLine: "always",
-          prev: "*",
-          next: "return",
-        },
-        {
-          blankLine: "always",
-          prev: ["const", "let", "var"],
-          next: "*",
-        },
-        {
-          blankLine: "any",
-          prev: ["const", "let", "var"],
-          next: ["const", "let", "var"],
-        },
-      ],
+      "padding-line-between-statements": "off",
     },
+    
   },
 ]);

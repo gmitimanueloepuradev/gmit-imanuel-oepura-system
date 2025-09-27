@@ -214,43 +214,43 @@ export default function CreateMajelisPage() {
           <StepContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextInput
+                required
                 label="Nama Lengkap"
+                leftIcon={<User className="w-4 h-4" />}
                 name="namaLengkap"
                 placeholder="Masukkan nama lengkap majelis"
-                required
-                leftIcon={<User className="w-4 h-4" />}
               />
 
               <DatePicker
+                required
                 label="Tanggal Mulai Jabatan"
+                leftIcon={<Calendar className="w-4 h-4" />}
                 name="mulai"
                 placeholder="Pilih tanggal mulai"
-                required
-                leftIcon={<Calendar className="w-4 h-4" />}
               />
 
               <DatePicker
                 label="Tanggal Selesai Jabatan"
+                leftIcon={<Calendar className="w-4 h-4" />}
                 name="selesai"
                 placeholder="Pilih tanggal selesai (opsional)"
-                leftIcon={<Calendar className="w-4 h-4" />}
               />
 
               <AutoCompleteInput
+                required
+                apiEndpoint="/jenis-jabatan/options"
                 label="Jenis Jabatan"
+                leftIcon={<Crown className="w-4 h-4" />}
                 name="jenisJabatanId"
                 placeholder="Pilih jenis jabatan"
-                apiEndpoint="/jenis-jabatan/options"
-                required
-                leftIcon={<Crown className="w-4 h-4" />}
               />
 
               <AutoCompleteInput
+                apiEndpoint="/rayon/options"
                 label="Rayon"
+                leftIcon={<MapPin className="w-4 h-4" />}
                 name="idRayon"
                 placeholder="Pilih rayon (opsional)"
-                apiEndpoint="/rayon/options"
-                leftIcon={<MapPin className="w-4 h-4" />}
               />
 
             </div>
@@ -262,36 +262,36 @@ export default function CreateMajelisPage() {
           <StepContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextInput
+                required
                 label="Username"
+                leftIcon={<UserCheck className="w-4 h-4" />}
                 name="username"
                 placeholder="Masukkan username"
-                required
-                leftIcon={<UserCheck className="w-4 h-4" />}
               />
 
               <TextInput
+                required
                 label="Email"
-                name="email"
-                type="email"
-                placeholder="Masukkan email"
-                required
                 leftIcon={<Mail className="w-4 h-4" />}
+                name="email"
+                placeholder="Masukkan email"
+                type="email"
               />
 
               <TextInput
-                label="Password"
-                name="password"
-                type="password"
-                placeholder="Masukkan password"
                 required
+                label="Password"
                 leftIcon={<Lock className="w-4 h-4" />}
+                name="password"
+                placeholder="Masukkan password"
+                type="password"
               />
 
               <TextInput
                 label="No. WhatsApp"
+                leftIcon={<Phone className="w-4 h-4" />}
                 name="noWhatsapp"
                 placeholder="Masukkan nomor WhatsApp (opsional)"
-                leftIcon={<Phone className="w-4 h-4" />}
               />
             </div>
           </StepContent>
@@ -387,8 +387,8 @@ export default function CreateMajelisPage() {
 
       {/* Stepper */}
       <Stepper
-        steps={steps}
         currentStep={currentStep}
+        steps={steps}
         onStepClick={handleStepClick}
       />
 
@@ -398,15 +398,15 @@ export default function CreateMajelisPage() {
           {renderStepContent()}
 
           <StepperNavigation
-            currentStep={currentStep}
-            totalSteps={steps.length}
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            onSubmit={handleSubmit(onSubmit)}
-            isLoading={isLoading}
             canGoNext={canProceed}
+            currentStep={currentStep}
+            isLoading={isLoading}
             nextButtonText="Lanjut"
             submitButtonText="Buat Majelis & Akun"
+            totalSteps={steps.length}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+            onSubmit={handleSubmit(onSubmit)}
           />
         </div>
       </HookForm>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -19,7 +20,6 @@ import { Button } from "@/components/ui/Button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import ViewModal from "@/components/ui/ViewModal";
 
-import { useRouter } from "next/navigation";
 // Service untuk API calls
 const itemKeuanganService = {
   get: async (params) => {
@@ -219,15 +219,15 @@ export default function ItemKeuanganPage() {
           {/* Actions */}
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
               size="sm"
+              variant="outline"
               onClick={() => setViewItem(item)}
             >
               <Eye className="w-4 h-4" />
             </Button>
             <Button
-              variant="outline"
               size="sm"
+              variant="outline"
               onClick={() => setDeleteItem(item)}
             >
               <Trash2 className="w-4 h-4" />
@@ -342,9 +342,9 @@ export default function ItemKeuanganPage() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
-                type="text"
-                placeholder="Cari nama item..."
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Cari nama item..."
+                type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -419,8 +419,8 @@ export default function ItemKeuanganPage() {
               </CardTitle>
               {items.length > 0 && (
                 <Button
-                  variant="outline"
                   size="sm"
+                  variant="outline"
                   onClick={() => {
                     const kategoriId = items[0]?.kategoriId;
                     router.push(`/admin/data-master/keuangan/item/edit?periodeId=${selectedPeriode}&kategoriId=${kategoriId}`);
@@ -461,8 +461,8 @@ export default function ItemKeuanganPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
-                        variant="outline"
                         size="sm"
+                        variant="outline"
                         onClick={() => {
                           const kategoriId = periodeItems[0]?.kategoriId;
                           router.push(`/admin/data-master/keuangan/item/edit?periodeId=${periodeId}&kategoriId=${kategoriId}`);
@@ -490,19 +490,16 @@ export default function ItemKeuanganPage() {
 
       {/* Modals */}
       <ConfirmDialog
+        isLoading={deleteMutation.isPending}
         isOpen={!!deleteItem}
+        message={`Apakah Anda yakin ingin menghapus "${deleteItem?.nama}"? Data yang sudah dihapus tidak dapat dikembalikan.`}
+        title="Hapus Item Keuangan"
+        variant="danger"
         onClose={() => setDeleteItem(null)}
         onConfirm={() => deleteMutation.mutate(deleteItem.id)}
-        title="Hapus Item Keuangan"
-        message={`Apakah Anda yakin ingin menghapus "${deleteItem?.nama}"? Data yang sudah dihapus tidak dapat dikembalikan.`}
-        variant="danger"
-        isLoading={deleteMutation.isPending}
       />
 
       <ViewModal
-        isOpen={!!viewItem}
-        onClose={() => setViewItem(null)}
-        title="Detail Item Keuangan"
         data={
           viewItem
             ? viewFields.map((field) => ({
@@ -513,6 +510,9 @@ export default function ItemKeuanganPage() {
               }))
             : []
         }
+        isOpen={!!viewItem}
+        title="Detail Item Keuangan"
+        onClose={() => setViewItem(null)}
       />
 
     </div>

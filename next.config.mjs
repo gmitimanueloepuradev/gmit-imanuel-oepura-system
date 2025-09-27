@@ -1,6 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
+
+  // Capacitor configuration only
+  output: process.env.BUILD_TARGET === 'capacitor' ? 'export' : undefined,
+  trailingSlash: process.env.BUILD_TARGET === 'capacitor' ? true : false,
+  assetPrefix: process.env.BUILD_TARGET === 'capacitor' ? './' : undefined,
+  images: {
+    unoptimized: process.env.BUILD_TARGET === 'capacitor' ? true : false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's3.nevaobjects.id',
+        port: '',
+        pathname: '/files-bucket/**',
+      },
+    ],
+  },
   
   // Fix untuk messaging timeout issues
   experimental: {
@@ -33,16 +49,6 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 's3.nevaobjects.id',
-        port: '',
-        pathname: '/files-bucket/**',
-      },
-    ],
-  },
 
   // Security headers
   async headers() {

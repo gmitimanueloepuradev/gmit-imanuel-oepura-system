@@ -2,18 +2,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm, FormProvider } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { showToast } from "@/utils/showToast";
-import pengumumanService from "@/services/pengumumanService";
-import Stepper, {
-  StepContent,
-  StepperNavigation,
-} from "@/components/ui/Stepper";
-import { Card } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import PageHeader from "@/components/ui/PageHeader";
 import {
   Bell,
   FileText,
@@ -27,6 +15,19 @@ import {
   Settings,
   ArrowLeft,
 } from "lucide-react";
+
+import { showToast } from "@/utils/showToast";
+import pengumumanService from "@/services/pengumumanService";
+import Stepper, {
+  StepContent,
+  StepperNavigation,
+} from "@/components/ui/Stepper";
+import { Card } from "@/components/ui/Card";
+import PageTitle from "@/components/ui/PageTitle";
+import TextInput from "@/components/ui/inputs/TextInput";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import PageHeader from "@/components/ui/PageHeader";
 import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 import { Button } from "@/components/ui/Button";
 
@@ -54,18 +55,18 @@ const DynamicContentForm = ({ form, kategoriId, jenisId }) => {
     <Card className="p-6">
       <div className="space-y-4">
         <TextAreaInput
-          name="konten"
+          form={form}
           label="Konten Pengumuman"
+          name="konten"
           placeholder="Masukkan konten pengumuman..."
           rows={8}
-          form={form}
         />
         <TextAreaInput
-          name="kontenDinamis"
+          form={form}
           label="Konten Tambahan"
+          name="kontenDinamis"
           placeholder="Konten tambahan sesuai kategori (opsional)..."
           rows={6}
-          form={form}
         />
       </div>
     </Card>
@@ -170,9 +171,9 @@ export default function EditPengumumanPage() {
     return (
       <div className="space-y-6 p-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4" />
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
         </div>
       </div>
     );
@@ -183,14 +184,14 @@ export default function EditPengumumanPage() {
   return (
     <div className="space-y-6 p-4">
       <PageHeader
-        title={`Edit: ${pengumuman.judul || "Pengumuman"}`}
-        description="Perbarui informasi pengumuman"
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Pengumuman", href: "/admin/pengumuman" },
           { label: pengumuman.judul || "Edit", href: `/admin/pengumuman/${id}` },
           { label: "Edit" },
         ]}
+        description="Perbarui informasi pengumuman"
+        title={`Edit: ${pengumuman.judul || "Pengumuman"}`}
       />
 
       {/* Back Button */}
@@ -219,51 +220,51 @@ export default function EditPengumumanPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <TextInput
-                        name="judul"
-                        label="Judul Pengumuman"
-                        placeholder="Masukkan judul pengumuman"
-                        form={form}
                         required
+                        form={form}
+                        label="Judul Pengumuman"
+                        name="judul"
+                        placeholder="Masukkan judul pengumuman"
                       />
                     </div>
 
                     <SelectInput
-                      name="kategoriId"
+                      required
+                      form={form}
                       label="Kategori"
-                      placeholder="Pilih kategori"
+                      name="kategoriId"
                       options={kategoriOptions.map((k) => ({
                         value: k.id,
                         label: k.nama,
                       }))}
-                      form={form}
-                      required
+                      placeholder="Pilih kategori"
                     />
 
                     <SelectInput
-                      name="jenisId"
-                      label="Jenis Pengumuman"
-                      placeholder="Pilih jenis"
-                      options={jenisOptions}
-                      form={form}
                       disabled={!watchKategoriId}
+                      form={form}
+                      label="Jenis Pengumuman"
+                      name="jenisId"
+                      options={jenisOptions}
+                      placeholder="Pilih jenis"
                     />
 
                     <DatePicker
-                      name="tanggalPengumuman"
-                      label="Tanggal Pengumuman"
-                      form={form}
                       required
+                      form={form}
+                      label="Tanggal Pengumuman"
+                      name="tanggalPengumuman"
                     />
 
                     <SelectInput
-                      name="prioritas"
+                      required
+                      form={form}
                       label="Prioritas"
+                      name="prioritas"
                       options={prioritasOptions.map((p) => ({
                         value: p.value,
                         label: p.label,
                       }))}
-                      form={form}
-                      required
                     />
                   </div>
                 </div>
@@ -280,8 +281,8 @@ export default function EditPengumumanPage() {
 
                 <DynamicContentForm
                   form={form}
-                  kategoriId={watchKategoriId}
                   jenisId={watchJenisId}
+                  kategoriId={watchKategoriId}
                 />
               </div>
             </StepContent>
@@ -297,26 +298,26 @@ export default function EditPengumumanPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <SelectInput
-                      name="status"
+                      required
+                      form={form}
                       label="Status"
+                      name="status"
                       options={statusOptions.map((s) => ({
                         value: s.value,
                         label: s.label,
                       }))}
-                      form={form}
-                      required
                     />
 
                     <div className="flex items-center space-x-2">
                       <input
-                        type="checkbox"
                         id="isPinned"
+                        type="checkbox"
                         {...form.register("isPinned")}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <label
-                        htmlFor="isPinned"
                         className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                        htmlFor="isPinned"
                       >
                         <Pin className="h-4 w-4 text-red-500" />
                         Pin Pengumuman
@@ -336,9 +337,9 @@ export default function EditPengumumanPage() {
                         Untuk saat ini, kelola lampiran di halaman terpisah
                       </p>
                       <Button
+                        className="mt-4"
                         type="button"
                         variant="outline"
-                        className="mt-4"
                         onClick={() =>
                           router.push(`/admin/pengumuman/${id}/attachments`)
                         }
@@ -354,11 +355,11 @@ export default function EditPengumumanPage() {
             {/* Navigation */}
             <StepperNavigation
               currentStep={currentStep}
+              isSubmitting={updateMutation.isPending}
+              submitLabel="Perbarui Pengumuman"
               totalSteps={steps.length}
               onStepChange={setCurrentStep}
               onSubmit={form.handleSubmit(onSubmit)}
-              isSubmitting={updateMutation.isPending}
-              submitLabel="Perbarui Pengumuman"
             />
           </Stepper>
         </form>

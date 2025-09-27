@@ -51,8 +51,8 @@ export default function FormPage({
         return (
           <NumberInput
             {...commonProps}
-            min={field.min}
             max={field.max}
+            min={field.min}
             step={field.step}
           />
         );
@@ -84,13 +84,13 @@ export default function FormPage({
     <AdminLayout>
       <div className="p-6 space-y-6">
         <PageHeader
-          title={title}
-          description={description}
           breadcrumb={breadcrumb}
+          description={description}
+          title={title}
         />
 
         <Card className="p-6">
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form className="space-y-6" onSubmit={onSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {fields.map((field, index) => (
                 <div
@@ -124,12 +124,12 @@ export default function FormPage({
                 return (
                   <Button
                     key={index}
+                    className="flex items-center gap-2"
+                    disabled={action.loading || isLoading}
+                    size={action.size || "md"}
                     type={action.type || "button"}
                     variant={action.variant || "primary"}
-                    size={action.size || "md"}
-                    disabled={action.loading || isLoading}
                     onClick={action.onClick}
-                    className="flex items-center gap-2"
                   >
                     {ActionIcon && <ActionIcon className="w-4 h-4" />}
                     {action.loading ? "Memproses..." : action.label}

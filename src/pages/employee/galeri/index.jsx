@@ -1,5 +1,3 @@
-import galeriService from "@/services/galeriService";
-import { showToast } from "@/utils/showToast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Camera,
@@ -19,6 +17,9 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+
+import { showToast } from "@/utils/showToast";
+import galeriService from "@/services/galeriService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
@@ -32,7 +33,7 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
-          <nav className="flex mb-4" aria-label="Breadcrumb">
+          <nav aria-label="Breadcrumb" className="flex mb-4">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               {breadcrumb.map((item, index) => (
                 <li key={index} className="inline-flex items-center">
@@ -43,16 +44,16 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
                       viewBox="0 0 20 20"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                         clipRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        fillRule="evenodd"
                       />
                     </svg>
                   )}
                   {item.href ? (
                     <a
-                      href={item.href}
                       className="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 md:ml-2 transition-colors"
+                      href={item.href}
                     >
                       {item.label}
                     </a>
@@ -98,17 +99,17 @@ function TableSkeleton() {
       {[...Array(5)].map((_, i) => (
         <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 animate-pulse transition-colors">
           <div className="flex items-center justify-between mb-4">
-            <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-1/3" />
+            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20" />
           </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[...Array(4)].map((_, j) => (
-              <div key={j} className="aspect-square bg-gray-200 dark:bg-gray-600 rounded"></div>
+              <div key={j} className="aspect-square bg-gray-200 dark:bg-gray-600 rounded" />
             ))}
           </div>
           <div className="space-y-2">
-            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-2/3"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full" />
+            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-2/3" />
           </div>
         </div>
       ))}
@@ -157,9 +158,9 @@ function GaleriCard({ item, onView, onEdit, onDelete }) {
           {displayPhotos.map((foto, index) => (
             <div key={index} className="aspect-square relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
               <img
-                src={foto.url}
                 alt={foto.originalName || `Foto ${index + 1}`}
                 className="w-full h-full object-cover"
+                src={foto.url}
               />
               {index === 3 && remainingCount > 0 && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -222,10 +223,10 @@ function GaleriCard({ item, onView, onEdit, onDelete }) {
             Edit
           </Button>
           <Button
+            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
             size="sm"
             variant="outline"
             onClick={() => onDelete(item.id)}
-            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Hapus
@@ -320,12 +321,12 @@ export default function GaleriPage() {
     <div className="space-y-6 p-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
       {/* Page Header */}
       <PageHeader
-        title="Galeri Kegiatan"
-        description="Kelola dokumentasi foto kegiatan gereja"
         breadcrumb={[
           { label: "Employee", href: "/employee/dashboard" },
           { label: "Galeri" },
         ]}
+        description="Kelola dokumentasi foto kegiatan gereja"
+        title="Galeri Kegiatan"
         onAdd={() => router.push("/employee/galeri/create")}
       />
 
@@ -338,9 +339,9 @@ export default function GaleriPage() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
-                  type="text"
-                  placeholder="Cari nama kegiatan, tempat..."
                   className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Cari nama kegiatan, tempat..."
+                  type="text"
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -382,9 +383,9 @@ export default function GaleriPage() {
                 <GaleriCard
                   key={item.id}
                   item={item}
-                  onView={(item) => router.push(`/employee/galeri/${item.id}`)}
-                  onEdit={(item) => router.push(`/employee/galeri/${item.id}/edit`)}
                   onDelete={handleDelete}
+                  onEdit={(item) => router.push(`/employee/galeri/${item.id}/edit`)}
+                  onView={(item) => router.push(`/employee/galeri/${item.id}`)}
                 />
               ))}
             </div>
@@ -422,10 +423,10 @@ export default function GaleriPage() {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(paginationInfo.page - 1)}
                   disabled={!paginationInfo.hasPrev}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(paginationInfo.page - 1)}
                 >
                   Sebelumnya
                 </Button>
@@ -447,10 +448,10 @@ export default function GaleriPage() {
                         <span className="px-2 py-1 text-gray-500">...</span>
                       )}
                       <Button
+                        size="sm"
                         variant={
                           paginationInfo.page === page ? "default" : "outline"
                         }
-                        size="sm"
                         onClick={() => handlePageChange(page)}
                       >
                         {page}
@@ -459,10 +460,10 @@ export default function GaleriPage() {
                   ))}
 
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(paginationInfo.page + 1)}
                   disabled={!paginationInfo.hasNext}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(paginationInfo.page + 1)}
                 >
                   Selanjutnya
                 </Button>
@@ -475,14 +476,14 @@ export default function GaleriPage() {
 
     {/* Confirm Dialog */}
     <ConfirmDialog
+      cancelText={confirmDialog.config.cancelText}
+      confirmText={confirmDialog.config.confirmText}
       isOpen={confirmDialog.isOpen}
+      message={confirmDialog.config.message}
+      title={confirmDialog.config.title}
+      variant={confirmDialog.config.variant}
       onClose={confirmDialog.hideConfirm}
       onConfirm={confirmDialog.handleConfirm}
-      title={confirmDialog.config.title}
-      message={confirmDialog.config.message}
-      confirmText={confirmDialog.config.confirmText}
-      cancelText={confirmDialog.config.cancelText}
-      variant={confirmDialog.config.variant}
     />
     </>
   );

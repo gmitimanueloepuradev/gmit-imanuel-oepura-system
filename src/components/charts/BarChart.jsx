@@ -36,7 +36,7 @@ const CustomBarChart = ({
       {title && (
         <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
       )}
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer height={height} width="100%">
         <BarChart
           data={data}
           margin={{
@@ -48,11 +48,11 @@ const CustomBarChart = ({
         >
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
           <XAxis 
-            dataKey={xAxisDataKey} 
-            angle={-45}
-            textAnchor="end"
-            height={100}
+            angle={-45} 
+            dataKey={xAxisDataKey}
             fontSize={12}
+            height={100}
+            textAnchor="end"
           />
           <YAxis />
           <Tooltip content={<CustomTooltip />} />

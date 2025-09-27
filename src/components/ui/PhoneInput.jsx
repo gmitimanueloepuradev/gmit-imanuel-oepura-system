@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MessageCircle, AlertCircle } from 'lucide-react';
+
 import { formatPhoneForInput, formatPhoneToWhatsApp, validateIndonesianPhone, generateWhatsAppUrl } from '@/lib/phoneUtils';
 
 const PhoneInput = ({
@@ -104,13 +105,6 @@ const PhoneInput = ({
         </div>
 
         <input
-          type="tel"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          disabled={disabled}
-          required={required}
           className={`
             w-full pl-10 ${showWhatsAppButton && isValid && inputValue ? 'pr-12' : 'pr-3'} py-2
             border border-gray-300 dark:border-gray-600 rounded-lg
@@ -122,15 +116,22 @@ const PhoneInput = ({
             transition-colors duration-200
             ${className}
           `}
+          disabled={disabled}
+          placeholder={placeholder}
+          required={required}
+          type="tel"
+          value={inputValue}
+          onBlur={handleBlur}
+          onChange={handleInputChange}
           {...props}
         />
 
         {showWhatsAppButton && isValid && inputValue && (
           <button
-            type="button"
-            onClick={handleWhatsAppClick}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
             title="Buka di WhatsApp"
+            type="button"
+            onClick={handleWhatsAppClick}
           >
             <MessageCircle className="h-4 w-4" />
           </button>

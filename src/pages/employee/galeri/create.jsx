@@ -2,14 +2,6 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useForm, FormProvider } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { showToast } from "@/utils/showToast";
-import galeriService from "@/services/galeriService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import PageHeader from "@/components/ui/PageHeader";
-import TextInput from "@/components/ui/inputs/TextInput";
-import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
 import {
   Camera,
   Upload,
@@ -19,6 +11,15 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react";
+
+import { showToast } from "@/utils/showToast";
+import galeriService from "@/services/galeriService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import PageHeader from "@/components/ui/PageHeader";
+import TextInput from "@/components/ui/inputs/TextInput";
+import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
 
 // Photo Upload Component
 function PhotoUploadSection({ photos, setPhotos }) {
@@ -96,20 +97,20 @@ function PhotoUploadSection({ photos, setPhotos }) {
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <div className="mt-4">
               <Button
+                className="relative"
                 type="button"
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
-                className="relative"
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Pilih Foto
               </Button>
               <input
                 ref={fileInputRef}
-                type="file"
-                className="hidden"
                 multiple
                 accept="image/*"
+                className="hidden"
+                type="file"
                 onChange={handleFileSelect}
               />
               <p className="mt-2 text-sm text-gray-500">
@@ -157,14 +158,14 @@ function PhotoUploadSection({ photos, setPhotos }) {
                 <div key={index} className="relative group">
                   <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100">
                     <img
-                      src={photo.previewUrl || photo.url}
                       alt={photo.originalName}
                       className="w-full h-full object-cover"
+                      src={photo.previewUrl || photo.url}
                     />
                     <button
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       type="button"
                       onClick={() => removePhoto(index)}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -292,17 +293,17 @@ export default function CreateGaleri() {
   return (
     <div className="space-y-6 p-4">
       <PageHeader
-        title="Buat Galeri Baru"
-        description="Dokumentasikan kegiatan gereja dalam galeri foto"
         breadcrumb={[
           { label: "Employee", href: "/employee/dashboard" },
           { label: "Galeri", href: "/employee/galeri" },
           { label: "Buat Baru" },
         ]}
+        description="Dokumentasikan kegiatan gereja dalam galeri foto"
+        title="Buat Galeri Baru"
       />
 
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
           {/* Form Informasi Kegiatan */}
           <Card>
             <CardHeader>
@@ -312,10 +313,10 @@ export default function CreateGaleri() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="lg:col-span-2">
                   <TextInput
-                    name="namaKegiatan"
-                    label="Nama Kegiatan"
-                    placeholder="Masukkan nama kegiatan..."
                     required
+                    label="Nama Kegiatan"
+                    name="namaKegiatan"
+                    placeholder="Masukkan nama kegiatan..."
                     validation={{ 
                       required: "Nama kegiatan wajib diisi",
                       maxLength: { value: 255, message: "Nama kegiatan maksimal 255 karakter" }
@@ -324,10 +325,10 @@ export default function CreateGaleri() {
                 </div>
 
                 <TextInput
-                  name="tempat"
-                  label="Tempat Kegiatan"
-                  placeholder="Masukkan lokasi/tempat kegiatan..."
                   required
+                  label="Tempat Kegiatan"
+                  name="tempat"
+                  placeholder="Masukkan lokasi/tempat kegiatan..."
                   validation={{ 
                     required: "Tempat kegiatan wajib diisi",
                     maxLength: { value: 255, message: "Tempat maksimal 255 karakter" }
@@ -335,16 +336,16 @@ export default function CreateGaleri() {
                 />
 
                 <DatePicker
-                  name="tanggalKegiatan"
-                  label="Tanggal Kegiatan"
                   required
+                  label="Tanggal Kegiatan"
+                  name="tanggalKegiatan"
                   validation={{ required: "Tanggal kegiatan wajib diisi" }}
                 />
 
                 <div className="lg:col-span-2">
                   <TextAreaInput
-                    name="deskripsi"
                     label="Deskripsi"
+                    name="deskripsi"
                     placeholder="Tuliskan deskripsi kegiatan... (opsional)"
                     rows={4}
                   />
@@ -367,12 +368,12 @@ export default function CreateGaleri() {
             <CardContent>
               <div className="flex items-center space-x-3">
                 <input
-                  type="checkbox"
                   id="isPublished"
+                  type="checkbox"
                   {...form.register("isPublished")}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="isPublished" className="text-sm font-medium text-gray-900">
+                <label className="text-sm font-medium text-gray-900" htmlFor="isPublished">
                   Publikasikan galeri (akan tampil di website publik)
                 </label>
               </div>
@@ -385,16 +386,16 @@ export default function CreateGaleri() {
           {/* Submit Actions */}
           <div className="flex justify-end gap-4">
             <Button
+              disabled={isSubmitting}
               type="button"
               variant="outline"
               onClick={() => router.back()}
-              disabled={isSubmitting}
             >
               Batal
             </Button>
             <Button
-              type="submit"
               disabled={isSubmitting}
+              type="submit"
             >
               {isSubmitting ? (
                 <>

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+
 import { Button } from "@/components/ui/Button";
 
 export default function PageHeader({
@@ -15,7 +16,7 @@ export default function PageHeader({
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
-          <nav className="flex mb-4" aria-label="Breadcrumb">
+          <nav aria-label="Breadcrumb" className="flex mb-4">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               {breadcrumb.map((item, index) => (
                 <li key={index} className="inline-flex items-center">
@@ -26,16 +27,16 @@ export default function PageHeader({
                       viewBox="0 0 20 20"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                         clipRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        fillRule="evenodd"
                       />
                     </svg>
                   )}
                   {item.href ? (
                     <a
-                      href={item.href}
                       className="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 md:ml-2 transition-colors"
+                      href={item.href}
                     >
                       {item.label}
                     </a>
@@ -67,9 +68,9 @@ export default function PageHeader({
               {actions.map((action, index) => (
                 <Button
                   key={index}
-                  variant={action.variant || "default"}
-                  size={action.size || "default"}
                   className={action.className}
+                  size={action.size || "default"}
+                  variant={action.variant || "default"}
                   onClick={action.onClick}
                 >
                   {action.icon && <action.icon className="w-4 h-4 mr-2" />}

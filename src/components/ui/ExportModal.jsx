@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Download, CheckSquare, Square, FileText, FileSpreadsheet } from 'lucide-react';
+
 import { Button } from './Button';
+
 import { exportData, getAvailableFormats } from '@/utils/exportUtils';
 
 export default function ExportModal({
@@ -99,8 +101,8 @@ export default function ExportModal({
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 transition-colors duration-200">Export Data</h2>
           </div>
           <button
-            onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+            onClick={onClose}
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,12 +119,12 @@ export default function ExportModal({
               {formats.map((format) => (
                 <button
                   key={format.value}
-                  onClick={() => setSelectedFormat(format.value)}
                   className={`p-3 border rounded-lg text-left transition-colors duration-200 ${
                     selectedFormat === format.value
                       ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                       : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-700'
                   }`}
+                  onClick={() => setSelectedFormat(format.value)}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{format.icon}</span>
@@ -138,8 +140,8 @@ export default function ExportModal({
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <button
-                  onClick={() => setIncludeTitle(!includeTitle)}
                   className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200"
+                  onClick={() => setIncludeTitle(!includeTitle)}
                 >
                   {includeTitle ? (
                     <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -151,11 +153,11 @@ export default function ExportModal({
               </div>
               {includeTitle && (
                 <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200"
+                  placeholder="Masukkan judul dokumen"
                   type="text"
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200"
-                  placeholder="Masukkan judul dokumen"
                 />
               )}
             </div>
@@ -168,8 +170,8 @@ export default function ExportModal({
                 Pilih Kolom ({selectedColumns.length}/{columnsToUse.length})
               </label>
               <button
-                onClick={toggleAllColumns}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                onClick={toggleAllColumns}
               >
                 {isAllSelected ? 'Batalkan Semua' : 'Pilih Semua'}
               </button>
@@ -183,8 +185,8 @@ export default function ExportModal({
                     className="flex items-center gap-3 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition-colors duration-200"
                   >
                     <button
-                      onClick={() => toggleColumn(column.key)}
                       className="flex items-center"
+                      onClick={() => toggleColumn(column.key)}
                     >
                       {selectedColumns.includes(column.key) ? (
                         <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -224,17 +226,17 @@ export default function ExportModal({
         {/* Footer */}
         <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
           <Button
+            disabled={isExporting}
             variant="outline"
             onClick={onClose}
-            disabled={isExporting}
           >
             Batal
           </Button>
           <Button
-            onClick={handleExport}
+            disabled={selectedColumns.length === 0}
             isLoading={isExporting}
             loadingText="Mengekspor..."
-            disabled={selectedColumns.length === 0}
+            onClick={handleExport}
           >
             <Download className="w-4 h-4 mr-2" />
             Export Data

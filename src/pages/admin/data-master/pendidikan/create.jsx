@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import masterService from "@/services/masterService";
-
 import CardWrapper from "@/components/common/CardWrapper";
 import CreateOrEditButton from "@/components/common/CreateOrEditButton";
 import HookForm from "@/components/form/HookForm";
@@ -57,18 +56,18 @@ export default function CreatePendidikanPage() {
   return (
     <>
       <PageHeader
-        title={"Tambah Data Pendidikan "}
         breadcrumb={[
           { label: "Dashboard", href: "/admin/dashboard" },
           { label: "Data Pendidikan", href: "/admin/data-master/pendidikan" },
           { label: "Tambah Pendidikan" },
         ]}
+        title={"Tambah Data Pendidikan "}
       />
       <CardWrapper>
         <HookForm methods={methods} onSubmit={onSubmit}>
           <TextInput
-            name="jenjang"
             label="Jenjang Pendidikan"
+            name="jenjang"
             placeholder="Contoh: SMA"
           />
           <CreateOrEditButton label="Simpan" />

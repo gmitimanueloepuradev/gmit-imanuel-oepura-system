@@ -1,7 +1,4 @@
-import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
 import {
   ArrowLeft,
   Calendar,
@@ -16,8 +13,13 @@ import {
   Target,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import PageTitle from "@/components/ui/PageTitle";
 import { useState } from "react";
+
+import { useAuth } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import api from "@/lib/axios";
+import PageTitle from "@/components/ui/PageTitle";
+
 
 export default function JemaatJadwalIbadahPage() {
   const { user } = useAuth();
@@ -55,7 +57,7 @@ export default function JemaatJadwalIbadahPage() {
       <ProtectedRoute allowedRoles="JEMAAT">
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-300 border-t-slate-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-300 border-t-slate-600 mx-auto" />
             <p className="mt-4 text-slate-600 font-medium">
               Memuat jadwal ibadah...
             </p>
@@ -126,8 +128,8 @@ export default function JemaatJadwalIbadahPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center py-6">
               <button
-                onClick={() => router.back()}
                 className="mr-4 p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200"
+                onClick={() => router.back()}
               >
                 <ArrowLeft className="h-5 w-5 text-slate-600" />
               </button>
@@ -165,9 +167,9 @@ export default function JemaatJadwalIbadahPage() {
                     Pilih Bulan
                   </label>
                   <select
+                    className="block w-full rounded-lg border border-gray-300 shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 py-2 px-3 text-sm transition-colors duration-200"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                    className="block w-full rounded-lg border border-gray-300 shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 py-2 px-3 text-sm transition-colors duration-200"
                   >
                     {monthNames.map((month, index) => (
                       <option key={index} value={index}>
@@ -181,9 +183,9 @@ export default function JemaatJadwalIbadahPage() {
                     Pilih Tahun
                   </label>
                   <select
+                    className="block w-full rounded-lg border border-gray-300 shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 py-2 px-3 text-sm transition-colors duration-200"
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    className="block w-full rounded-lg border border-gray-300 shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 py-2 px-3 text-sm transition-colors duration-200"
                   >
                     {years.map((year) => (
                       <option key={year} value={year}>
@@ -321,13 +323,13 @@ export default function JemaatJadwalIbadahPage() {
 
                             {/* Google Maps Button */}
                             <button
+                              className="ml-4 flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
                               onClick={() =>
                                 openGoogleMaps(
                                   jadwal.googleMapsLink,
                                   jadwal.alamat
                                 )
                               }
-                              className="ml-4 flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
                             >
                               <Navigation className="h-4 w-4 mr-2" />
                               Buka Maps

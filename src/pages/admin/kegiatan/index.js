@@ -8,6 +8,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
+
 import PageHeader from "@/components/ui/PageHeader";
 import ListGrid from "@/components/ui/ListGrid";
 import { Badge } from "@/components/ui/Badge";
@@ -112,7 +113,7 @@ export default function EventsManagement() {
           monthly: "Bulanan",
         };
         return (
-          <Badge variant="outline" className="text-xs">
+          <Badge className="text-xs" variant="outline">
             {labels[value] || value}
           </Badge>
         );
@@ -224,10 +225,6 @@ export default function EventsManagement() {
   return (
     <>
       <PageHeader
-        title="Manajemen Acara"
-        description="Kelola jadwal dan acara gereja GMIT Imanuel Oepura"
-        breadcrumb={[{ label: "Admin", href: "/adm" }, { label: "Acara" }]}
-        stats={headerStats}
         actions={[
           {
             label: "Tambah Acara",
@@ -235,21 +232,25 @@ export default function EventsManagement() {
             onClick: handleAdd,
           },
         ]}
+        breadcrumb={[{ label: "Admin", href: "/adm" }, { label: "Acara" }]}
+        description="Kelola jadwal dan acara gereja GMIT Imanuel Oepura"
+        stats={headerStats}
+        title="Manajemen Acara"
       />
 
       <div className="max-w-7xl mx-auto p-6">
         <ListGrid
-          title="Daftar Acara"
-          data={events}
+          actions={rowActions}
           columns={columns}
+          data={events}
           filters={filters}
           searchPlaceholder="Cari nama acara, lokasi, atau deskripsi..."
+          title="Daftar Acara"
           onAdd={handleAdd}
-          onView={handleView}
-          onEdit={handleEdit}
           onDelete={handleDelete}
+          onEdit={handleEdit}
           onExport={handleExport}
-          actions={rowActions}
+          onView={handleView}
         />
       </div>
     </>

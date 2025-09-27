@@ -1,8 +1,10 @@
 import React from "react";
-import LoadingSpinner from "../ui/loading/LoadingSpinner";
-import useModalForm from "@/hooks/useModalForm";
-import CreateOrEditModal from "../common/CreateOrEditModal";
 import { useRouter } from "next/navigation";
+
+import LoadingSpinner from "../ui/loading/LoadingSpinner";
+import CreateOrEditModal from "../common/CreateOrEditModal";
+
+import useModalForm from "@/hooks/useModalForm";
 const KotaKabupatenDrawerContent = ({ data, isLoading, provinsiName }) => {
   const modal = useModalForm();
   const router = useRouter();
@@ -67,12 +69,12 @@ const KotaKabupatenDrawerContent = ({ data, isLoading, provinsiName }) => {
 
       <footer>
         <button
+          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           onClick={() =>
             router.push(
               "/admin/data-master/wilayah-administratif/kota-kabupaten"
             )
           }
-          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Lihat Semua Kota/Kabupaten
         </button>

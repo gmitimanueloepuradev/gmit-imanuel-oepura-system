@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
 import publicStatisticsService from "../../../services/publicStatisticsService";
+
 import StatPieChart from "./statPieChart";
 
 export default function ChurchStatisticsHorizontal() {
@@ -40,7 +42,7 @@ export default function ChurchStatisticsHorizontal() {
     return (
       <div className="block md:hidden w-full bg-slate-800 dark:bg-gray-900 p-4 py-6 overflow-hidden transition-colors duration-300">
         <div className="flex flex-col h-80 items-center justify-center">
-          <div className="loading loading-spinner loading-lg text-blue-400"></div>
+          <div className="loading loading-spinner loading-lg text-blue-400" />
           <p className="mt-4 text-sm text-gray-300 dark:text-gray-200">Memuat statistik...</p>
         </div>
       </div>
@@ -60,10 +62,10 @@ export default function ChurchStatisticsHorizontal() {
               viewBox="0 0 24 24"
             >
               <path
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
             <p className="text-sm text-gray-300 dark:text-gray-200">Gagal memuat statistik gereja</p>
@@ -105,9 +107,9 @@ export default function ChurchStatisticsHorizontal() {
                       className="w-full max-w-xs h-full"
                     >
                       <StatPieChart
-                        title={chart.title}
                         data={chart.data}
                         size="small"
+                        title={chart.title}
                       />
                     </div>
                   ))}
@@ -123,11 +125,11 @@ export default function ChurchStatisticsHorizontal() {
             {Array.from({ length: totalSlides }, (_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
                 className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
                   index === currentIndex ? "bg-primary" : "bg-gray-400 dark:bg-gray-500"
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                onClick={() => setCurrentIndex(index)}
               />
             ))}
           </div>

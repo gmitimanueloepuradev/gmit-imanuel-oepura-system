@@ -64,8 +64,8 @@ const AttachmentItem = ({ attachment }) => {
         </div>
       </div>
       <button
-        onClick={() => downloadAttachment(attachment)}
         className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        onClick={() => downloadAttachment(attachment)}
       >
         <Download className="w-4 h-4" />
         <span>Unduh</span>

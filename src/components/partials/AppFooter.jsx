@@ -1,5 +1,6 @@
-import { getRoleConfig, churchContact } from "@/config/navigationItem";
 import { Heart, Mail, MapPin, Phone } from "lucide-react";
+
+import { getRoleConfig, churchContact } from "@/config/navigationItem";
 
 export default function AppFooter({ role = "admin" }) {
   const config = getRoleConfig(role);

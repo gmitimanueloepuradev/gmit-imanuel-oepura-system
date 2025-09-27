@@ -1,13 +1,14 @@
 "use client";
 
+import { CalendarDays, Clock } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
 import {
   formatDate,
   formatTime,
   getGreeting,
   getIndonesianTimezone,
 } from "@/utils/common";
-import { CalendarDays, Clock } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
 
 export default function HeaderDateTimeWidget({ locale = "id-ID" }) {
   const [now, setNow] = useState(new Date());

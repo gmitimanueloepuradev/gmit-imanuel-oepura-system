@@ -49,26 +49,26 @@ export default function JaminanKesehatanPage() {
 
   return (
     <MasterDataPage
-      title="Data Jaminan Kesehatan"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Jaminan Kesehatan" },
+      ]}
+      columns={columns}
       description="Kelola data jaminan kesehatan"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="jenisJaminan"
+      queryKey="jaminan-kesehatan"
+      searchFields={["jenisJaminan"]}
       service={{
         get: () => masterService.getJaminanKesehatan(),
         create: (data) => masterService.createJaminanKesehatan(data),
         update: (id, data) => masterService.updateJaminanKesehatan(id, data),
         delete: (id) => masterService.deleteJaminanKesehatan(id)
       }}
-      queryKey="jaminan-kesehatan"
-      columns={columns}
+      title="Data Jaminan Kesehatan"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="jenisJaminan"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Jaminan Kesehatan" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["jenisJaminan"]}
     />
   );
 }

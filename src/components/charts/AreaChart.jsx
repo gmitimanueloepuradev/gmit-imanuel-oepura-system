@@ -34,7 +34,7 @@ const CustomAreaChart = ({
       {title && (
         <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
       )}
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer height={height} width="100%">
         <AreaChart
           data={data}
           margin={{
@@ -52,13 +52,13 @@ const CustomAreaChart = ({
           {areas.map((area, index) => (
             <Area
               key={index}
-              type="monotone"
               dataKey={area.dataKey}
-              stackId="1"
-              stroke={area.color}
               fill={area.color}
               fillOpacity={0.6}
               name={area.name}
+              stackId="1"
+              stroke={area.color}
+              type="monotone"
             />
           ))}
         </AreaChart>

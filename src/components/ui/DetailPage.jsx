@@ -26,10 +26,10 @@ export default function DetailPage({
     <AdminLayout>
       <div className="p-6 space-y-6">
         <PageHeader
-          title={title}
-          description={description}
-          breadcrumb={breadcrumb}
           actions={actions}
+          breadcrumb={breadcrumb}
+          description={description}
+          title={title}
         />
 
         <div className="space-y-6">

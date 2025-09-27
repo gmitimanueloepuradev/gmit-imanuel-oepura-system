@@ -510,11 +510,11 @@ export default function CreateItemKeuanganPage() {
               {/* Nama Item */}
               <div className="md:col-span-2">
                 <TextInput
+                  required
                   label="Nama Item"
                   placeholder="Contoh: Persembahan Perpuluhan"
                   value={item.nama}
                   onChange={(value) => updateItem(item.id, "nama", value)}
-                  required
                 />
               </div>
 
@@ -543,9 +543,6 @@ export default function CreateItemKeuanganPage() {
               <div>
                 <SelectInput
                   label="Satuan Frekuensi"
-                  placeholder="Pilih satuan"
-                  value={item.satuanFrekuensi}
-                  onChange={(value) => updateItem(item.id, "satuanFrekuensi", value)}
                   options={[
                     { value: "Kali", label: "Kali" },
                     { value: "Bulan", label: "Per Bulan" },
@@ -553,6 +550,9 @@ export default function CreateItemKeuanganPage() {
                     { value: "Minggu", label: "Per Minggu" },
                     { value: "Hari", label: "Per Hari" }
                   ]}
+                  placeholder="Pilih satuan"
+                  value={item.satuanFrekuensi}
+                  onChange={(value) => updateItem(item.id, "satuanFrekuensi", value)}
                 />
               </div>
 
@@ -635,13 +635,13 @@ export default function CreateItemKeuanganPage() {
           </CardHeader>
           <CardContent>
             <SelectInput
-              placeholder="Pilih kategori keuangan"
-              value={selectedKategori}
-              onChange={(value) => setSelectedKategori(value)}
               options={kategoriOptions?.data?.map((cat) => ({
                 value: cat.id,
                 label: `${cat.kode} - ${cat.nama}`
               })) || []}
+              placeholder="Pilih kategori keuangan"
+              value={selectedKategori}
+              onChange={(value) => setSelectedKategori(value)}
             />
           </CardContent>
         </Card>
@@ -652,13 +652,13 @@ export default function CreateItemKeuanganPage() {
           </CardHeader>
           <CardContent>
             <SelectInput
-              placeholder="Pilih periode anggaran"
-              value={selectedPeriode}
-              onChange={(value) => setSelectedPeriode(value)}
               options={periodeOptions?.data?.map((periode) => ({
                 value: periode.value,
                 label: periode.label
               })) || []}
+              placeholder="Pilih periode anggaran"
+              value={selectedPeriode}
+              onChange={(value) => setSelectedPeriode(value)}
             />
           </CardContent>
         </Card>

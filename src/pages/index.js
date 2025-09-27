@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import AboutSection from "@/components/home/aboutSection";
 import DailyVerse from "@/components/home/cta/dailyVerse";
 import JoinUs from "@/components/home/cta/joinUs";
@@ -7,7 +9,6 @@ import ScheduleRow from "@/components/home/schedule/scheduleRow";
 import ChurchStatistics from "@/components/home/statistics/churchStatistics";
 import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
 import PageTitle from "@/components/ui/PageTitle";
-import Image from "next/image";
 
 export default function Home() {
   return (
@@ -55,11 +56,11 @@ export default function Home() {
 
           <div className="relative min-h-fit">
             <Image
+              fill
               alt="Home Head"
               className="object-cover"
-              src="/header/f92411b3.webp"
-              fill
               sizes="100vw"
+              src="/header/f92411b3.webp"
             />
             <div className="relative z-10 flex flex-col w-full p-4">
               <ScheduleRow
@@ -124,11 +125,11 @@ export default function Home() {
             {/* Schedule */}
             <div className="relative min-h-fit">
               <Image
+                fill
                 alt="Home Head"
                 className="object-cover brightness-75"
-                src="/header/5dd0a95e.webp"
-                fill
                 sizes="100vw"
+                src="/header/5dd0a95e.webp"
               />
               <div className="relative z-10 flex flex-col w-full p-8">
                 <ScheduleRow

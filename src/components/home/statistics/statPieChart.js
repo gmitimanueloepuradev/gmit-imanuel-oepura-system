@@ -10,12 +10,12 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
   return (
     <text
+      dominantBaseline="central"
+      fill="white"
+      fontSize="12"
+      textAnchor={x > cx ? "start" : "end"}
       x={x}
       y={y}
-      fill="white"
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-      fontSize="12"
     >
       {`${((percent ?? 1) * 100).toFixed(0)}%`}
     </text>
@@ -66,19 +66,19 @@ export default function StatPieChart({
       <div className="flex flex-col items-center">
         <div style={{ width: sizing.outerRadius * 2 + 20, height: sizing.outerRadius * 2 + 20 }}>
           <ResponsiveContainer
-            width="100%"
             height="100%"
+            width="100%"
           >
             <PieChart>
               <Pie
-                data={data}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={sizing.outerRadius}
-                fill="#8884d8"
+                data={data}
                 dataKey="value"
+                fill="#8884d8"
+                label={renderCustomizedLabel}
+                labelLine={false}
+                outerRadius={sizing.outerRadius}
               >
                 {data.map((entry, index) => (
                   <Cell
@@ -100,7 +100,7 @@ export default function StatPieChart({
               <div
                 className="w-2.5 h-2.5 mr-1.5"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
-              ></div>
+               />
               <span className="text-white dark:text-gray-200" style={{ fontSize: sizing.fontSize }}>{entry.name}</span>
             </div>
           ))}

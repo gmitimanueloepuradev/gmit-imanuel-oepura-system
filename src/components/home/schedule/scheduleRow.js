@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+
 import publicJadwalService from "../../../services/publicJadwalService";
+
 import ScheduleCard from "./scheduleCard";
 
 export default function ScheduleRow({ jenisIbadah = null, kategori = null, title = "Schedule", limit = 6 }) {
@@ -74,7 +76,7 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
       <div className="bg-black/20 py-2 overflow-hidden">
         <div className="divider text-3xl font-bold text-white">{title}</div>
         <div className="flex items-center justify-center h-80">
-          <div className="loading loading-spinner loading-lg text-white"></div>
+          <div className="loading loading-spinner loading-lg text-white" />
           <p className="ml-4 text-white">Memuat jadwal...</p>
         </div>
       </div>
@@ -95,10 +97,10 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
               viewBox="0 0 24 24"
             >
               <path
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
             <p className="text-sm">{error}</p>
@@ -143,15 +145,15 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
               `}
             >
               <ScheduleCard
-                title={schedule.title}
                 date={schedule.date}
-                time={schedule.time}
-                location={schedule.location}
-                speaker={schedule.speaker}
-                tema={schedule.tema}
                 firman={schedule.firman}
                 jenisIbadah={schedule.jenisIbadah}
+                location={schedule.location}
                 rayon={schedule.rayon}
+                speaker={schedule.speaker}
+                tema={schedule.tema}
+                time={schedule.time}
+                title={schedule.title}
               />
             </div>
           ))}
@@ -160,14 +162,14 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
         {/* Navigation Buttons */}
         <div className="flex justify-center mt-2 gap-4">
           <button
-            onClick={prevSlide}
             className="w-12 h-12 rounded-full border border-gray-300 bg-white transition-colors duration-500 hover:bg-success inline-flex items-center justify-center shadow-lg"
+            onClick={prevSlide}
           >
             <ChevronLeft className="w-5 h-5 text-black" />
           </button>
           <button
-            onClick={nextSlide}
             className="w-12 h-12 rounded-full border border-gray-300 bg-white transition-colors duration-500 hover:bg-success inline-flex items-center justify-center shadow-lg"
+            onClick={nextSlide}
           >
             <ChevronRight className="w-5 h-5 text-black" />
           </button>

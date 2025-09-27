@@ -94,9 +94,9 @@ export default function InstallPrompt() {
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <img
-                src="/android-chrome-192x192.png"
                 alt="GMIT JIO"
                 className="w-8 h-8 rounded-lg"
+                src="/android-chrome-192x192.png"
               />
             </div>
             <div className="flex-1">
@@ -109,9 +109,9 @@ export default function InstallPrompt() {
             </div>
           </div>
           <button
-            onClick={handleDismiss}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
             aria-label="Tutup"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
+            onClick={handleDismiss}
           >
             <X size={18} />
           </button>
@@ -125,21 +125,21 @@ export default function InstallPrompt() {
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2">
-                <Share size={16} className="text-blue-600" />
+                <Share className="text-blue-600" size={16} />
                 <span className="text-gray-600 dark:text-gray-300">
                   1. Tap tombol Share
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <Plus size={16} className="text-blue-600" />
+                <Plus className="text-blue-600" size={16} />
                 <span className="text-gray-600 dark:text-gray-300">
                   2. Pilih "Add to Home Screen"
                 </span>
               </div>
             </div>
             <button
-              onClick={handleDismiss}
               className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              onClick={handleDismiss}
             >
               Mengerti
             </button>
@@ -152,15 +152,15 @@ export default function InstallPrompt() {
             </p>
             <div className="flex space-x-2">
               <button
-                onClick={handleInstallClick}
                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                onClick={handleInstallClick}
               >
                 <Download size={16} />
                 <span>Install</span>
               </button>
               <button
-                onClick={handleDismiss}
                 className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                onClick={handleDismiss}
               >
                 Nanti
               </button>

@@ -7,9 +7,9 @@ export default function CreateOrEditButton({
 }) {
   return (
     <Button
-      type="submit"
       isLoading={isLoading}
       loadingText="Menyimpan..."
+      type="submit"
       {...props}
     >
       {label}

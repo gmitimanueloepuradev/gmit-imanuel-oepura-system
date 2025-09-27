@@ -47,23 +47,23 @@ export default function GalleryImage({ galleryItem }) {
       {/* Image Container */}
       <div className="relative h-64 md:h-80 lg:h-96">
         <img 
-          src={fotos[currentImageIndex].url} 
           alt={fotos[currentImageIndex].originalName || 'gallery image'} 
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full" 
+          src={fotos[currentImageIndex].url}
         />
         
         {/* Navigation Arrows */}
         {fotos.length > 1 && (
           <>
             <button
-              onClick={prevImage}
               className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              onClick={prevImage}
             >
               <ChevronLeft size={20} />
             </button>
             <button
-              onClick={nextImage}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              onClick={nextImage}
             >
               <ChevronRight size={20} />
             </button>
@@ -84,10 +84,10 @@ export default function GalleryImage({ galleryItem }) {
           {fotos.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToImage(index)}
               className={`w-2 h-2 rounded-full transition-colors ${
                 index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'
               }`}
+              onClick={() => goToImage(index)}
             />
           ))}
         </div>

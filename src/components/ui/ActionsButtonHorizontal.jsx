@@ -1,6 +1,8 @@
 import React from "react";
-import { Button } from "@/components/ui/Button";
+
 import ActionsButtonVertical from "./ActionsButtonVertical";
+
+import { Button } from "@/components/ui/Button";
 
 export default function ActionsButtonHorizontal({
   actions = [],
@@ -21,10 +23,6 @@ export default function ActionsButtonHorizontal({
       {visibleActions.map((action, index) => (
         <Button
           key={index}
-          variant={action.variant || "outline"}
-          size={size}
-          onClick={() => action.onClick(item)}
-          disabled={action.disabled}
           className={`
             flex items-center
             ${action.className || ""}
@@ -35,7 +33,11 @@ export default function ActionsButtonHorizontal({
             }
             ${action.hideLabel ? "p-2" : ""}
           `}
+          disabled={action.disabled}
+          size={size}
           title={action.tooltip || action.label}
+          variant={action.variant || "outline"}
+          onClick={() => action.onClick(item)}
         >
           {action.icon && (
             <action.icon

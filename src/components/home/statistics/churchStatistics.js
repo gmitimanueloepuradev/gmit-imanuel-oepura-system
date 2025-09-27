@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
 import publicStatisticsService from "../../../services/publicStatisticsService";
+
 import StatPieChart from "./statPieChart";
 
 export default function ChurchStatistics() {
@@ -44,10 +46,10 @@ export default function ChurchStatistics() {
       }`}>
         {/* Collapse/Expand Toggle Button */}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
           className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
             isCollapsed ? 'right-2' : 'right-4'
           }`}
+          onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <svg
             className={`w-4 h-4 transition-transform duration-300 ${
@@ -58,10 +60,10 @@ export default function ChurchStatistics() {
             viewBox="0 0 24 24"
           >
             <path
+              d="M9 5l7 7-7 7"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 5l7 7-7 7"
             />
           </svg>
         </button>
@@ -71,7 +73,7 @@ export default function ChurchStatistics() {
         }`}>
           <div className="p-4 lg:p-6 lg:py-8 h-full">
             <div className="flex flex-col h-full w-full items-center justify-center min-h-[300px] lg:min-h-full">
-              <div className="loading loading-spinner loading-lg text-blue-400"></div>
+              <div className="loading loading-spinner loading-lg text-blue-400" />
               <p className="mt-4 text-sm text-gray-300">Memuat statistik...</p>
             </div>
           </div>
@@ -88,10 +90,10 @@ export default function ChurchStatistics() {
       }`}>
         {/* Collapse/Expand Toggle Button */}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
           className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
             isCollapsed ? 'right-2' : 'right-4'
           }`}
+          onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <svg
             className={`w-4 h-4 transition-transform duration-300 ${
@@ -102,10 +104,10 @@ export default function ChurchStatistics() {
             viewBox="0 0 24 24"
           >
             <path
+              d="M9 5l7 7-7 7"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 5l7 7-7 7"
             />
           </svg>
         </button>
@@ -123,10 +125,10 @@ export default function ChurchStatistics() {
                   viewBox="0 0 24 24"
                 >
                   <path
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
                   />
                 </svg>
                 <p className="text-sm text-gray-300">Gagal memuat statistik gereja</p>
@@ -151,11 +153,11 @@ export default function ChurchStatistics() {
     >
       {/* Collapse/Expand Toggle Button */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        aria-label={isCollapsed ? "Expand statistics" : "Collapse statistics"}
         className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
           isCollapsed ? 'right-2' : 'right-4'
         }`}
-        aria-label={isCollapsed ? "Expand statistics" : "Collapse statistics"}
+        onClick={() => setIsCollapsed(!isCollapsed)}
       >
         <svg
           className={`w-4 h-4 transition-transform duration-300 ${
@@ -166,10 +168,10 @@ export default function ChurchStatistics() {
           viewBox="0 0 24 24"
         >
           <path
+            d="M9 5l7 7-7 7"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 5l7 7-7 7"
           />
         </svg>
       </button>
@@ -204,9 +206,9 @@ export default function ChurchStatistics() {
                           className="flex-1 min-h-0"
                         >
                           <StatPieChart
-                            title={chart.title}
                             data={chart.data}
                             size="small"
+                            title={chart.title}
                           />
                         </div>
                       ))}
@@ -222,11 +224,11 @@ export default function ChurchStatistics() {
                 {Array.from({ length: totalSlides }, (_, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentIndex(index)}
+                    aria-label={`Go to slide ${index + 1}`}
                     className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
                       index === currentIndex ? "bg-primary" : "bg-gray-400"
                     }`}
-                    aria-label={`Go to slide ${index + 1}`}
+                    onClick={() => setCurrentIndex(index)}
                   />
                 ))}
               </div>

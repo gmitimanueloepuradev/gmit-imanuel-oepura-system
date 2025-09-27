@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 
 import jemaatService from "@/services/jemaatService";
 import masterService from "@/services/masterService";
@@ -13,7 +14,6 @@ import Stepper, {
 import { Card } from "@/components/ui/Card";
 import DatePicker from "@/components/ui/inputs/DatePicker";
 import PageHeader from "@/components/ui/PageHeader";
-import { ArrowLeft } from "lucide-react";
 
 const steps = [
   {
@@ -440,17 +440,17 @@ export default function EditJemaat() {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <PageHeader
-          title="Edit Jemaat"
           breadcrumb={[
             { label: "Dashboard", href: "/admin/dashboard" },
             { label: "Jemaat", href: "/admin/jemaat" },
             { label: "Edit Jemaat" },
           ]}
           description="Perbarui data jemaat"
+          title="Edit Jemaat"
         />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4" />
             <p className="text-gray-600">Memuat data jemaat...</p>
           </div>
         </div>
@@ -462,20 +462,20 @@ export default function EditJemaat() {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <PageHeader
-          title="Edit Jemaat"
           breadcrumb={[
             { label: "Dashboard", href: "/admin/dashboard" },
             { label: "Jemaat", href: "/admin/jemaat" },
             { label: "Edit Jemaat" },
           ]}
           description="Perbarui data jemaat"
+          title="Edit Jemaat"
         />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <p className="text-red-600 mb-4">Data jemaat tidak ditemukan</p>
             <button
-              onClick={() => router.push("/admin/jemaat")}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              onClick={() => router.push("/admin/jemaat")}
             >
               Kembali ke Daftar Jemaat
             </button>
@@ -488,13 +488,6 @@ export default function EditJemaat() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
-        title="Edit Jemaat"
-        breadcrumb={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Jemaat", href: "/admin/jemaat" },
-          { label: "Edit Jemaat" },
-        ]}
-        description="Perbarui data jemaat dengan mengikuti langkah-langkah berikut"
         actions={[
           {
             label: "Kembali",
@@ -503,6 +496,13 @@ export default function EditJemaat() {
             onClick: () => router.push("/admin/jemaat"),
           },
         ]}
+        breadcrumb={[
+          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Jemaat", href: "/admin/jemaat" },
+          { label: "Edit Jemaat" },
+        ]}
+        description="Perbarui data jemaat dengan mengikuti langkah-langkah berikut"
+        title="Edit Jemaat"
       />
 
       <Card className="p-6 mt-4">
@@ -544,10 +544,10 @@ export default function EditJemaat() {
                 <div>
                   <DatePicker
                     label="Tanggal Lahir"
+                    placeholder="Pilih tanggal lahir"
                     required={true}
                     value={form.watch("tanggalLahir")}
                     onChange={(value) => form.setValue("tanggalLahir", value)}
-                    placeholder="Pilih tanggal lahir"
                   />
                 </div>
 

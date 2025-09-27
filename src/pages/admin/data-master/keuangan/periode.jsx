@@ -169,7 +169,7 @@ export default function PeriodeAnggaranPage() {
       label: "Nama Periode",
       type: "text",
       required: true,
-      placeholder: "Contoh: Anggaran 2025, Q1 2025",
+      placeholder: "Contoh: Anggaran 2025",
       validation: {
         maxLength: {
           value: 100,

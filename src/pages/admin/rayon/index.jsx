@@ -59,15 +59,18 @@ export default function RayonPage() {
 
   return (
     <MasterDataPage
+      allowBulkDelete={true}
       breadcrumb={[
         { label: "Admin", href: "/admin/dashboard" },
         { label: "Rayon" },
       ]}
       columns={columns}
       description="Kelola data rayon untuk pembagian wilayah jemaat"
+      exportable={true}
       formFields={formFields}
       itemNameField="namaRayon"
       queryKey="rayon"
+      searchFields={["namaRayon", "deskripsi"]}
       service={{
         get: () => masterService.getRayon(),
         create: (data) => masterService.createRayon(data),
@@ -76,9 +79,6 @@ export default function RayonPage() {
       }}
       title="Kelola Rayon"
       viewFields={viewFields}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["namaRayon", "deskripsi"]}
     />
   );
 }

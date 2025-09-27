@@ -49,26 +49,26 @@ export default function PendidikanPage() {
 
   return (
     <MasterDataPage
-      title="Data Pendidikan"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Pendidikan" },
+      ]}
+      columns={columns}
       description="Kelola data pendidikan"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="jenjang"
+      queryKey="pendidikan"
+      searchFields={["jenjang"]}
       service={{
         get: () => masterService.getPendidikan(),
         create: (data) => masterService.createPendidikan(data),
         update: (id, data) => masterService.updatePendidikan(id, data),
         delete: (id) => masterService.deletePendidikan(id)
       }}
-      queryKey="pendidikan"
-      columns={columns}
+      title="Data Pendidikan"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="jenjang"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Pendidikan" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["jenjang"]}
     />
   );
 }

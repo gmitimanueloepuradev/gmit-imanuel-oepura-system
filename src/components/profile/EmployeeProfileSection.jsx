@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Edit2, Save, X, Briefcase, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import TextInput from "@/components/ui/inputs/TextInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import TextInput from "@/components/ui/inputs/TextInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 import { showToast } from "@/utils/showToast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -94,8 +95,8 @@ export default function EmployeeProfileSection({ user }) {
         </CardTitle>
         {!isEditing ? (
           <Button 
-            variant="outline" 
-            size="sm"
+            size="sm" 
+            variant="outline"
             onClick={() => setIsEditing(true)}
           >
             <Edit2 className="h-4 w-4 mr-2" />
@@ -104,17 +105,17 @@ export default function EmployeeProfileSection({ user }) {
         ) : (
           <div className="flex gap-2">
             <Button 
-              variant="outline" 
-              size="sm"
+              size="sm" 
+              variant="outline"
               onClick={handleCancel}
             >
               <X className="h-4 w-4 mr-2" />
               Batal
             </Button>
             <Button 
+              disabled={updateMutation.isLoading}
               size="sm"
               onClick={methods.handleSubmit(onSubmit)}
-              disabled={updateMutation.isLoading}
             >
               <Save className="h-4 w-4 mr-2" />
               {updateMutation.isLoading ? "Menyimpan..." : "Simpan"}
@@ -167,37 +168,37 @@ export default function EmployeeProfileSection({ user }) {
           </div>
         ) : (
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={methods.handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
-                  name="namaLengkap"
-                  label="Nama Lengkap"
-                  placeholder="Masukkan nama lengkap"
                   required
+                  label="Nama Lengkap"
+                  name="namaLengkap"
+                  placeholder="Masukkan nama lengkap"
                 />
                 
                 <TextInput
-                  name="posisi"
                   label="Posisi"
+                  name="posisi"
                   placeholder="Masukkan posisi"
                 />
                 
                 <DatePicker
-                  name="tanggalMasuk"
                   label="Tanggal Bergabung"
+                  name="tanggalMasuk"
                   placeholder="Pilih tanggal bergabung"
                 />
                 
                 <TextInput
-                  name="departemen"
                   label="Departemen"
+                  name="departemen"
                   placeholder="Masukkan departemen"
                 />
                 
                 <div className="md:col-span-2">
                   <TextAreaInput
-                    name="deskripsiTugas"
                     label="Deskripsi Tugas"
+                    name="deskripsiTugas"
                     placeholder="Masukkan deskripsi tugas"
                     rows={3}
                   />

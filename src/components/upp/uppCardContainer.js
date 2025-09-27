@@ -1,5 +1,6 @@
-import usePengumuman from "@/hooks/usePengumuman";
 import UppCard from "./uppCard";
+
+import usePengumuman from "@/hooks/usePengumuman";
 
 export default function UppCardContainer({ jenisId = null, kategoriId = null, limit = 6 }) {
   // Fetch pengumuman data with filters
@@ -16,7 +17,7 @@ export default function UppCardContainer({ jenisId = null, kategoriId = null, li
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center gap-4">
-          <span className="loading loading-spinner loading-lg"></span>
+          <span className="loading loading-spinner loading-lg" />
           <p className="text-gray-600">Loading announcements...</p>
         </div>
       </div>

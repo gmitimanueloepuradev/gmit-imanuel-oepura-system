@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+
 import { verifyToken } from './jwt';
 
 // Middleware untuk endpoint public - tidak perlu autentikasi

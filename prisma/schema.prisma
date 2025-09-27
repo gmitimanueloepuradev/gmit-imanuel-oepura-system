@@ -264,7 +264,7 @@ model Jemaat {
   atestasis                     Atestasi[]
   User                          User?
   Majelis                       Majelis[]
-  
+
   // Keuangan relations
   // transaksiPenerimaan TransaksiPenerimaan[]
 
@@ -591,7 +591,7 @@ model KategoriKeuangan {
   nama     String  @db.VarChar(100) // "PENERIMAAN" atau "PENGELUARAN"
   kode     String  @unique @db.VarChar(10) // "A" untuk Penerimaan, "B" untuk Pengeluaran
   isActive Boolean @default(true) @map("is_active")
-  
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -602,43 +602,45 @@ model KategoriKeuangan {
 }
 
 // Model untuk item keuangan (struktur hierarkis dinamis)
+//Model ini utk Perancangan KEUANGAN (anggaran target) bukan actual transaksi
 model ItemKeuangan {
-  id                String  @id @default(dbgenerated("concat('item_', gen_random_uuid())")) @db.VarChar(80)
-  kategoriId        String  @map("kategori_id") @db.VarChar(80)
-  periodeId         String  @map("periode_id") @db.VarChar(80)  // TAMBAH: Relasi ke periode
-  parentId          String? @map("parent_id") @db.VarChar(80) // Untuk hierarki
-  
-  kode              String  @db.VarChar(20)     // "A", "A.1", "A.1.1", "A.1.1.1"
-  nama              String  @db.VarChar(255)    // Nama item
-  deskripsi         String? @db.Text
-  
-  level             Int     @default(1)         // Level hierarki (1, 2, 3, 4, dst)
-  urutan            Int     @default(0)         // Urutan dalam level yang sama
-  
-  // Target/anggaran fields (tambahan untuk perencanaan anggaran)
-  targetFrekuensi   Int?    @map("target_frekuensi")          // Target frekuensi (misal: 12 kali)
-  satuanFrekuensi   String? @map("satuan_frekuensi") @db.VarChar(20) // Satuan (Per Bulan, Per Tahun, dll)
-  nominalSatuan     Decimal? @map("nominal_satuan") @db.Decimal(15,2) // Nominal per satuan
-  totalTarget       Decimal? @map("total_target") @db.Decimal(15,2)   // Total target anggaran (auto calculated)
-  
-  // Data actual transaksi (bukan target/anggaran)
-  nominalActual     Decimal @default(0) @map("nominal_actual") @db.Decimal(15,2)  // Total actual penerimaan/pengeluaran
-  jumlahTransaksi   Int     @default(0) @map("jumlah_transaksi")                  // Jumlah transaksi yang terjadi
-  
-  keterangan        String? @db.Text
+  id         String  @id @default(dbgenerated("concat('item_', gen_random_uuid())")) @db.VarChar(80)
+  kategoriId String  @map("kategori_id") @db.VarChar(80)
+  periodeId  String  @map("periode_id") @db.VarChar(80) // TAMBAH: Relasi ke periode
+  parentId   String? @map("parent_id") @db.VarChar(80) // Untuk hierarki
 
-  isActive          Boolean @default(true) @map("is_active")
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  kode      String  @db.VarChar(20) // "A", "A.1", "A.1.1", "A.1.1.1"
+  nama      String  @db.VarChar(255) // Nama item
+  deskripsi String? @db.Text
+
+  level  Int @default(1) // Level hierarki (1, 2, 3, 4, dst)
+  urutan Int @default(0) // Urutan dalam level yang sama
+
+  // Target/anggaran fields (tambahan untuk perencanaan anggaran)
+  targetFrekuensi Int?     @map("target_frekuensi") // Target frekuensi (misal: 12 kali)
+  satuanFrekuensi String?  @map("satuan_frekuensi") @db.VarChar(20) // Satuan (Per Bulan, Per Tahun, dll)
+  nominalSatuan   Decimal? @map("nominal_satuan") @db.Decimal(15, 2) // Nominal per satuan
+  totalTarget     Decimal? @map("total_target") @db.Decimal(15, 2) // Total target anggaran (auto calculated)
+
+  // Data actual transaksi (bukan target/anggaran)
+  nominalActual   Decimal @default(0) @map("nominal_actual") @db.Decimal(15, 2) // Total actual penerimaan/pengeluaran
+  jumlahTransaksi Int     @default(0) @map("jumlah_transaksi") // Jumlah transaksi yang terjadi
+
+  keterangan String? @db.Text
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  kategori          KategoriKeuangan @relation(fields: [kategoriId], references: [id])
-  periode           PeriodeAnggaran  @relation(fields: [periodeId], references: [id])
-  parent            ItemKeuangan?    @relation("HierarkiItem", fields: [parentId], references: [id])
-  children          ItemKeuangan[]   @relation("HierarkiItem")
-  
+  kategori KategoriKeuangan @relation(fields: [kategoriId], references: [id])
+  periode  PeriodeAnggaran  @relation(fields: [periodeId], references: [id])
+  parent   ItemKeuangan?    @relation("HierarkiItem", fields: [parentId], references: [id])
+  children ItemKeuangan[]   @relation("HierarkiItem")
+
   // rekapKeuangan     RekapKeuangan[]
+  // RealisasiItemKeuangan RealisasiItemKeuangan[]
 
   @@unique([kategoriId, periodeId, kode], name: "unique_kode_per_kategori_periode")
   @@index([kategoriId], name: "idx_item_kategori")
@@ -648,23 +650,40 @@ model ItemKeuangan {
   @@map("item_keuangan")
 }
 
+// Model untuk realisasi item keuangan (catatan transaksi aktual per item)
+// model RealisasiItemKeuangan {
+//   id               String   @id @default(dbgenerated("concat('rek_', gen_random_uuid())")) @db.VarChar(80)
+//   itemKeuanganId   String   @map("item_keuangan_id") @db.VarChar(80)
+//   // tanggalTransaksi DateTime @map("tanggal_transaksi") @db.Date
+//   nominal          Decimal  @map("nominal") @db.Decimal(15, 2)
+//   keterangan       String?  @db.Text
+
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   // Relations
+//   itemKeuangan ItemKeuangan @relation(fields: [itemKeuanganId], references: [id])
+
+//   @@map("realisasi_item_keuangan")
+// }
+
 // Model untuk periode anggaran
 model PeriodeAnggaran {
-  id          String    @id @default(dbgenerated("concat('per_', gen_random_uuid())")) @db.VarChar(80)
-  nama        String    @db.VarChar(100)     // "Anggaran 2025", "Q1 2025"
-  tahun       Int
+  id           String   @id @default(dbgenerated("concat('per_', gen_random_uuid())")) @db.VarChar(80)
+  nama         String   @db.VarChar(100) // "Anggaran 2025", "Q1 2025"
+  tahun        Int
   tanggalMulai DateTime @map("tanggal_mulai") @db.Date
   tanggalAkhir DateTime @map("tanggal_akhir") @db.Date
-  
-  status      StatusPeriode @default(DRAFT)
-  keterangan  String?   @db.Text
-  
-  isActive    Boolean   @default(true) @map("is_active")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  status     StatusPeriode @default(DRAFT)
+  keterangan String?       @db.Text
+
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  itemKeuangan  ItemKeuangan[]
+  itemKeuangan ItemKeuangan[]
   // rekapKeuangan RekapKeuangan[]
 
   @@map("periode_anggaran")
@@ -675,7 +694,6 @@ enum StatusPeriode {
   ACTIVE
   CLOSED
 }
-
 
 enum StatusTransaksi {
   DRAFT
@@ -689,17 +707,17 @@ enum StatusTransaksi {
 //   id              String @id @default(dbgenerated("concat('rek_', gen_random_uuid())")) @db.VarChar(80)
 //   periodeId       String @map("periode_id") @db.VarChar(80)
 //   itemKeuanganId  String @map("item_keuangan_id") @db.VarChar(80)
-  
+
 //   tahun           Int
 //   bulan           Int?    // Null jika rekap tahunan
-  
+
 //   targetAnggaran  Decimal? @map("target_anggaran") @db.Decimal(15,2)
 //   realisasiNominal Decimal @map("realisasi_nominal") @db.Decimal(15,2)
 //   jumlahTransaksi Int    @map("jumlah_transaksi")
-  
+
 //   persentaseRealisasi Float? @map("persentase_realisasi")
 //   selisih         Decimal? @db.Decimal(15,2) // Realisasi - Target
-  
+
 //   createdAt       DateTime @default(now()) @map("created_at")
 //   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -709,4 +727,13 @@ enum StatusTransaksi {
 
 //   @@unique([periodeId, itemKeuanganId, tahun, bulan], name: "unique_rekap")
 //   @@map("rekap_keuangan")
+// }
+
+//generally useful for storing document metadata
+// model Documents{
+//   id        String   @id @default(dbgenerated("concat('doc_', gen_random_uuid())")) @db.VarChar(80)
+//   title     String   @db.VarChar(255)
+//   content   String   @db.Text
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
 // }

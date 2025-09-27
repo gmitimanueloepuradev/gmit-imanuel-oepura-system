@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, X, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+
 import masterService from '@/services/masterService';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -355,9 +356,9 @@ const JemaatFilters = ({ onFiltersChange, initialFilters = {} }) => {
       case 'number':
         return (
           <input
-            type="number"
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors duration-200"
             placeholder={filter.placeholder}
+            type="number"
             value={filters[filter.key] || ''}
             onChange={(e) => handleFilterChange(filter.key, e.target.value)}
           />
@@ -365,9 +366,9 @@ const JemaatFilters = ({ onFiltersChange, initialFilters = {} }) => {
       default:
         return (
           <input
-            type="text"
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors duration-200"
             placeholder={filter.placeholder}
+            type="text"
             value={filters[filter.key] || ''}
             onChange={(e) => handleFilterChange(filter.key, e.target.value)}
           />
@@ -394,20 +395,20 @@ const JemaatFilters = ({ onFiltersChange, initialFilters = {} }) => {
           <div className="flex items-center gap-2">
             {activeFiltersCount > 0 && (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllFilters}
                 className="text-xs"
+                size="sm"
+                variant="outline"
+                onClick={clearAllFilters}
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Reset
               </Button>
             )}
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
               className="text-xs"
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
                 <>

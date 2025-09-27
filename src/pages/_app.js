@@ -26,7 +26,6 @@ export default function App({ Component, pageProps, router }) {
   const isMajelisPage = pathname.startsWith("/majelis");
   const isEmployeePage = pathname.startsWith("/employee");
   const isOnboardingPage = pathname === "/onboarding";
-
   // If the component has a custom layout, use it
   if (Component.getLayout) {
     return (

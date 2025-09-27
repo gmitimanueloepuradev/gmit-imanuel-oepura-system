@@ -120,7 +120,7 @@ export default function KategoriKeuanganPage() {
     {
       key: "isActive",
       label: "Status Aktif",
-      type: "switch",
+      type: "boolean",
       defaultValue: true,
       description: "Kategori aktif dapat digunakan untuk membuat item keuangan",
     },

@@ -4,6 +4,15 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
+import {
+  User,
+  Clock,
+  CheckCircle,
+  X,
+  AlertTriangle,
+  LogOut
+} from "lucide-react";
+
 import { showToast } from "@/utils/showToast";
 import { useAuth } from "@/contexts/AuthContext";
 import authService from "@/services/authService";
@@ -14,14 +23,6 @@ import TextInput from "@/components/ui/inputs/TextInput";
 import SelectInput from "@/components/ui/inputs/SelectInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
-import {
-  User,
-  Clock,
-  CheckCircle,
-  X,
-  AlertTriangle,
-  LogOut
-} from "lucide-react";
 
 const validationSchema = z.object({
   nama: z.string().min(1, "Nama lengkap harus diisi"),
@@ -192,10 +193,10 @@ export default function OnboardingDialog({ user, onComplete }) {
               </div>
             </div>
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowLogoutDialog(true)}
               className="flex items-center text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/30"
+              size="sm"
+              variant="outline"
+              onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -214,93 +215,93 @@ export default function OnboardingDialog({ user, onComplete }) {
             </CardHeader>
             <CardContent>
               <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <TextInput
-                        name="nama"
-                        label="Nama Lengkap"
-                        placeholder="Masukkan nama lengkap"
                         required
+                        label="Nama Lengkap"
+                        name="nama"
+                        placeholder="Masukkan nama lengkap"
                       />
                     </div>
 
                     <SelectInput
-                      name="jenisKelamin"
+                      required
                       label="Jenis Kelamin"
+                      name="jenisKelamin"
                       options={jenisKelaminOptions}
                       placeholder="Pilih jenis kelamin"
-                      required
                     />
 
                     <DatePicker
-                      name="tanggalLahir"
+                      required
                       label="Tanggal Lahir"
+                      name="tanggalLahir"
                       placeholder="Pilih tanggal lahir"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idStatusDalamKeluarga"
-                      label="Status dalam Keluarga"
+                      required
                       apiEndpoint="/status-dalam-keluarga/options"
+                      label="Status dalam Keluarga"
+                      name="idStatusDalamKeluarga"
                       placeholder="Pilih status dalam keluarga"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idSuku"
-                      label="Suku"
+                      required
                       apiEndpoint="/suku/options"
+                      label="Suku"
+                      name="idSuku"
                       placeholder="Pilih suku"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPendidikan"
-                      label="Pendidikan"
+                      required
                       apiEndpoint="/pendidikan/options"
+                      label="Pendidikan"
+                      name="idPendidikan"
                       placeholder="Pilih pendidikan terakhir"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPekerjaan"
-                      label="Pekerjaan"
+                      required
                       apiEndpoint="/pekerjaan/options"
+                      label="Pekerjaan"
+                      name="idPekerjaan"
                       placeholder="Pilih pekerjaan"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idPendapatan"
-                      label="Kategori Pendapatan"
+                      required
                       apiEndpoint="/pendapatan/options"
+                      label="Kategori Pendapatan"
+                      name="idPendapatan"
                       placeholder="Pilih kategori pendapatan"
-                      required
                     />
 
                     <AutoCompleteInput
-                      name="idJaminanKesehatan"
-                      label="Jaminan Kesehatan"
-                      apiEndpoint="/jaminan-kesehatan/options"
-                      placeholder="Pilih jaminan kesehatan"
                       required
+                      apiEndpoint="/jaminan-kesehatan/options"
+                      label="Jaminan Kesehatan"
+                      name="idJaminanKesehatan"
+                      placeholder="Pilih jaminan kesehatan"
                     />
 
                     <div className="md:col-span-2">
                       <AutoCompleteInput
-                        name="idKeluarga"
-                        label="Kepala Keluarga"
-                        apiEndpoint="/keluarga/options"
-                        placeholder="Pilih kepala keluarga Anda"
                         required
+                        apiEndpoint="/keluarga/options"
+                        label="Kepala Keluarga"
+                        name="idKeluarga"
+                        placeholder="Pilih kepala keluarga Anda"
                       />
                     </div>
 
                     <SelectInput
-                      name="golonganDarah"
                       label="Golongan Darah"
+                      name="golonganDarah"
                       options={golonganDarahOptions}
                       placeholder="Pilih golongan darah (opsional)"
                     />
@@ -309,9 +310,9 @@ export default function OnboardingDialog({ user, onComplete }) {
                   {/* Submit Button */}
                   <div className="flex justify-end gap-4 pt-6 border-t">
                     <Button
-                      type="submit"
-                      disabled={!isValid || onboardingMutation.isLoading}
                       className="min-w-[120px]"
+                      disabled={!isValid || onboardingMutation.isLoading}
+                      type="submit"
                     >
                       {onboardingMutation.isLoading ? (
                         <Clock className="h-4 w-4 mr-2 animate-spin" />
@@ -330,8 +331,8 @@ export default function OnboardingDialog({ user, onComplete }) {
 
       {/* Logout Confirmation Dialog */}
       <ConfirmDialog
-        confirmText="Ya, Logout"
         cancelText="Batal"
+        confirmText="Ya, Logout"
         isOpen={showLogoutDialog}
         message="Apakah Anda yakin ingin logout? Data yang sedang diisi akan hilang dan Anda harus login ulang untuk melengkapi profil."
         title="Konfirmasi Logout"

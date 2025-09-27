@@ -100,7 +100,7 @@ export default function EditKeluargaPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -123,8 +123,8 @@ export default function EditKeluargaPage() {
       {/* Header */}
       <div className="flex items-center mb-6">
         <button
-          onClick={() => router.push(`/admin/keluarga/${id}`)}
           className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+          onClick={() => router.push(`/admin/keluarga/${id}`)}
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
           Kembali
@@ -149,67 +149,67 @@ export default function EditKeluargaPage() {
         <HookForm methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TextInput
+              required
               label="No. Bangunan"
               name="noBagungan"
               placeholder="Masukkan no. bangunan"
-              required
             />
 
             <SelectInput
+              required
               label="Rayon"
               name="idRayon"
-              placeholder="Pilih rayon"
-              required
               options={rayonData?.data?.items?.map((item) => ({
                 value: item.id,
                 label: item.namaRayon,
               })) || []}
+              placeholder="Pilih rayon"
             />
 
             <SelectInput
               label="Status Keluarga"
               name="idStatusKeluarga"
-              placeholder="Pilih status keluarga (opsional)"
               options={statusKeluargaData?.data?.items?.map((item) => ({
                 value: item.id,
                 label: item.status,
               })) || []}
+              placeholder="Pilih status keluarga (opsional)"
             />
 
             <SelectInput
               label="Status Kepemilikan Rumah"
               name="idStatusKepemilikanRumah"
-              placeholder="Pilih status kepemilikan rumah (opsional)"
               options={statusKepemilikanRumahData?.data?.items?.map((item) => ({
                 value: item.id,
                 label: item.status,
               })) || []}
+              placeholder="Pilih status kepemilikan rumah (opsional)"
             />
 
             <SelectInput
               label="Keadaan Rumah"
               name="idKeadaanRumah"
-              placeholder="Pilih keadaan rumah (opsional)"
               options={keadaanRumahData?.data?.items?.map((item) => ({
                 value: item.id,
                 label: item.keadaan,
               })) || []}
+              placeholder="Pilih keadaan rumah (opsional)"
             />
           </div>
 
           {/* Submit Button */}
           <div className="flex justify-end mt-6 pt-6 border-t border-gray-200">
             <button
+              className="mr-3 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               type="button"
               onClick={() => router.push(`/admin/keluarga/${id}`)}
-              className="mr-3 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
             >
               Batal
             </button>
             <button
-              type="submit"
-              disabled={updateMutation.isPending}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              disabled={updateMutation.isPending}
+              type="submit"
             >
               {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
             </button>

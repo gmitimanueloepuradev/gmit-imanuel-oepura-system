@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Edit2, Save, X, User, Mail, Phone, Key } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import TextInput from "@/components/ui/inputs/TextInput";
-import PhoneInput from "@/components/ui/PhoneInput";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+
+import PhoneInput from "@/components/ui/PhoneInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { showToast } from "@/utils/showToast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -67,6 +68,8 @@ export default function UserProfileSection({ user }) {
       confirmPassword: ""
     }
   });
+
+  const { register, formState: { errors } } = methods;
 
   const updateMutation = useMutation({
     mutationFn: async (data) => {
@@ -136,8 +139,8 @@ export default function UserProfileSection({ user }) {
         </CardTitle>
         {!isEditing ? (
           <Button 
-            variant="outline" 
-            size="sm"
+            size="sm" 
+            variant="outline"
             onClick={() => setIsEditing(true)}
           >
             <Edit2 className="h-4 w-4 mr-2" />
@@ -146,17 +149,17 @@ export default function UserProfileSection({ user }) {
         ) : (
           <div className="flex gap-2">
             <Button 
-              variant="outline" 
-              size="sm"
+              size="sm" 
+              variant="outline"
               onClick={handleCancel}
             >
               <X className="h-4 w-4 mr-2" />
               Batal
             </Button>
             <Button 
+              disabled={updateMutation.isLoading}
               size="sm"
               onClick={methods.handleSubmit(onSubmit)}
-              disabled={updateMutation.isLoading}
             >
               <Save className="h-4 w-4 mr-2" />
               {updateMutation.isLoading ? "Menyimpan..." : "Simpan"}
@@ -219,21 +222,21 @@ export default function UserProfileSection({ user }) {
           </div>
         ) : (
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={methods.handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
-                  name="username"
-                  label="Username"
-                  placeholder="Masukkan username"
                   required
+                  label="Username"
+                  name="username"
+                  placeholder="Masukkan username"
                 />
                 
                 <TextInput
-                  name="email"
-                  label="Email"
-                  type="email"
-                  placeholder="Masukkan email"
                   required
+                  label="Email"
+                  name="email"
+                  placeholder="Masukkan email"
+                  type="email"
                 />
                 
                 <div className="md:col-span-2">
@@ -242,8 +245,8 @@ export default function UserProfileSection({ user }) {
                   </label>
                   <PhoneInput
                     {...register("noWhatsapp")}
-                    placeholder="Masukkan nomor WhatsApp"
                     error={errors.noWhatsapp?.message}
+                    placeholder="Masukkan nomor WhatsApp"
                   />
                 </div>
               </div>
@@ -252,9 +255,9 @@ export default function UserProfileSection({ user }) {
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-sm font-medium text-gray-900">Ubah Password</h4>
                   <Button
+                    size="sm"
                     type="button"
                     variant="outline"
-                    size="sm"
                     onClick={() => setIsChangingPassword(!isChangingPassword)}
                   >
                     <Key className="h-4 w-4 mr-2" />
@@ -265,27 +268,27 @@ export default function UserProfileSection({ user }) {
                 {isChangingPassword && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <TextInput
-                      name="currentPassword"
                       label="Password Lama"
-                      type="password"
+                      name="currentPassword"
                       placeholder="Masukkan password lama"
                       required={isChangingPassword}
+                      type="password"
                     />
                     
                     <TextInput
-                      name="newPassword"
                       label="Password Baru"
-                      type="password"
+                      name="newPassword"
                       placeholder="Masukkan password baru"
                       required={isChangingPassword}
+                      type="password"
                     />
                     
                     <TextInput
-                      name="confirmPassword"
                       label="Konfirmasi Password"
-                      type="password"
+                      name="confirmPassword"
                       placeholder="Konfirmasi password baru"
                       required={isChangingPassword}
+                      type="password"
                     />
                   </div>
                 )}

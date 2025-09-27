@@ -9,7 +9,7 @@ const LeafletMap = dynamic(() => import("../LeafletMap"), {
   loading: () => (
     <div className="h-80 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
         <p className="mt-2 text-sm text-gray-600">Memuat peta...</p>
       </div>
     </div>
@@ -154,10 +154,10 @@ export default function LocationMapPicker({
 
         <LeafletMap
           center={mapCenter}
-          zoom={zoom}
-          selectedPosition={selectedPosition}
-          onMapClick={handleMapClick}
           height="400px"
+          selectedPosition={selectedPosition}
+          zoom={zoom}
+          onMapClick={handleMapClick}
         />
       </div>
 
@@ -168,8 +168,8 @@ export default function LocationMapPicker({
             📍 Latitude
           </label>
           <input
-            type="number"
             step="any"
+            type="number"
             {...latField}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
             placeholder="Klik di peta untuk auto-fill"
@@ -181,8 +181,8 @@ export default function LocationMapPicker({
             📍 Longitude
           </label>
           <input
-            type="number"
             step="any"
+            type="number"
             {...lngField}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
             placeholder="Klik di peta untuk auto-fill"
@@ -211,9 +211,9 @@ export default function LocationMapPicker({
           </label>
           <textarea
             {...alamatField}
-            rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Akan terisi otomatis dari reverse geocoding saat klik peta"
+            rows={3}
           />
         </div>
 
@@ -231,10 +231,10 @@ export default function LocationMapPicker({
             />
             {currentGmapLink && (
               <a
-                href={currentGmapLink}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1 transition-colors"
+                href={currentGmapLink}
+                rel="noopener noreferrer"
+                target="_blank"
                 title="Buka di Google Maps"
               >
                 <ExternalLink className="h-4 w-4" />
@@ -247,17 +247,17 @@ export default function LocationMapPicker({
       {/* Action buttons */}
       <div className="flex gap-3 pt-2">
         <button
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-2 transition-colors shadow-sm"
           type="button"
           onClick={handleGetCurrentLocation}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-2 transition-colors shadow-sm"
         >
           <Navigation className="h-4 w-4" />
           Gunakan Lokasi Saya
         </button>
         <button
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2 transition-colors shadow-sm"
           type="button"
           onClick={generateGoogleMapsLink}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2 transition-colors shadow-sm"
         >
           <Map className="h-4 w-4" />
           Generate Link Maps

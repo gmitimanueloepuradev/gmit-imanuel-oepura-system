@@ -301,8 +301,8 @@ export default function CreateAtestasiPage() {
 
       {/* Create Jemaat Confirmation Dialog */}
       <ConfirmDialog
-        confirmText="Ya, Buat Data Jemaat"
         cancelText="Tidak, Nanti Saja"
+        confirmText="Ya, Buat Data Jemaat"
         isOpen={showCreateJemaatDialog}
         message="Atestasi masuk berhasil dibuat! Apakah Anda ingin langsung membuat data jemaat untuk orang ini?"
         title="Buat Data Jemaat"

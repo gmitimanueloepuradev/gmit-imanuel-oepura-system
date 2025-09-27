@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { ArrowLeft } from "lucide-react";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
@@ -21,7 +22,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import jemaatService from "@/services/jemaatService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
-import { ArrowLeft } from "lucide-react";
 
 const steps = [
   {
@@ -331,7 +331,7 @@ export default function MajelisCreateJemaat() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Anda belum memiliki akses ke rayon manapun. Silakan hubungi administrator.
               </p>
-              <Button onClick={() => router.push('/majelis')} variant="outline">
+              <Button variant="outline" onClick={() => router.push('/majelis')}>
                 Kembali ke Dashboard
               </Button>
             </CardContent>
@@ -524,8 +524,8 @@ export default function MajelisCreateJemaat() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Tambah Jemaat Baru"
         description={`Tambah jemaat baru untuk ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
+        title="Tambah Jemaat Baru"
       />
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -534,9 +534,9 @@ export default function MajelisCreateJemaat() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <Button
+                className="flex items-center space-x-2"
                 variant="outline"
                 onClick={() => router.push('/majelis/jemaat')}
-                className="flex items-center space-x-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Kembali</span>
@@ -729,10 +729,10 @@ export default function MajelisCreateJemaat() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <TextInput
+                          required
                           label="Email"
                           name="email"
                           placeholder="contoh@email.com"
-                          required
                           type="email"
                         />
                       </div>
@@ -751,20 +751,20 @@ export default function MajelisCreateJemaat() {
 
                       <div>
                         <TextInput
+                          required
                           label="Password"
                           name="password"
                           placeholder="Minimal 8 karakter"
-                          required
                           type="password"
                         />
                       </div>
 
                       <div>
                         <TextInput
+                          required
                           label="Konfirmasi Password"
                           name="confirmPassword"
                           placeholder="Ulangi password"
-                          required
                           type="password"
                         />
                       </div>

@@ -17,6 +17,7 @@ import {
   UserCheck,
   Target,
 } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -74,7 +75,7 @@ export default function AnalyticsPageAdmin() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
           <p className="text-gray-600 dark:text-gray-400">Memuat analitik...</p>
         </div>
       </div>
@@ -136,13 +137,13 @@ export default function AnalyticsPageAdmin() {
   return (
     <>
       <PageHeader
-        title="Analitik & Statistik"
-        description="Analisis komprehensif data gereja dan tren keanggotaan"
         breadcrumb={[
           { label: "Admin", href: "/admin" },
           { label: "Analitik" },
         ]}
+        description="Analisis komprehensif data gereja dan tren keanggotaan"
         stats={headerStats}
+        title="Analitik & Statistik"
       />
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -151,22 +152,22 @@ export default function AnalyticsPageAdmin() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">📊 Visualisasi Data Komprehensif</h2>
           <div className="flex gap-2">
             <Button
-              variant={selectedPeriod === 'month' ? 'default' : 'outline'}
               size="sm"
+              variant={selectedPeriod === 'month' ? 'default' : 'outline'}
               onClick={() => setSelectedPeriod('month')}
             >
               Bulan Ini
             </Button>
             <Button
-              variant={selectedPeriod === 'year' ? 'default' : 'outline'}
               size="sm"
+              variant={selectedPeriod === 'year' ? 'default' : 'outline'}
               onClick={() => setSelectedPeriod('year')}
             >
               Tahun Ini
             </Button>
             <Button
-              variant={selectedPeriod === 'all' ? 'default' : 'outline'}
               size="sm"
+              variant={selectedPeriod === 'all' ? 'default' : 'outline'}
               onClick={() => setSelectedPeriod('all')}
             >
               Semua Data
@@ -241,13 +242,13 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent>
               <CustomBarChart
+                barColor="#3B82F6"
                 data={[
                   { name: 'Baptis', value: analytics.sacraments.baptisTotal || 0, percentage: 0 },
                   { name: 'Sidi', value: analytics.sacraments.sidiTotal || 0, percentage: 0 },
                   { name: 'Pernikahan', value: analytics.sacraments.pernikahanTotal || 0, percentage: 0 }
                 ]}
                 height={300}
-                barColor="#3B82F6"
                 showGrid={true}
               />
             </CardContent>
@@ -293,13 +294,13 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent>
               <CustomBarChart
+                barColor="#10B981"
                 data={(analytics.distributions.rayonStats || []).map(rayon => ({
                   name: rayon.name,
                   value: rayon.members,
                   percentage: rayon.percentage
                 }))}
                 height={400}
-                barColor="#10B981"
                 showGrid={true}
               />
             </CardContent>
@@ -318,13 +319,13 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent>
               <CustomBarChart
+                barColor="#8B5CF6"
                 data={(analytics.distributions.educationStats || []).map(education => ({
                   name: education.level,
                   value: education.count,
                   percentage: education.percentage
                 }))}
                 height={400}
-                barColor="#8B5CF6"
                 showGrid={true}
               />
             </CardContent>
@@ -346,13 +347,13 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent>
               <CustomBarChart
+                barColor="#F59E0B"
                 data={(analytics.distributions.jobStats || []).slice(0, 10).map(job => ({
                   name: job.job,
                   value: job.count,
                   percentage: job.percentage
                 }))}
                 height={400}
-                barColor="#F59E0B"
                 showGrid={true}
               />
             </CardContent>
@@ -371,17 +372,17 @@ export default function AnalyticsPageAdmin() {
             </CardHeader>
             <CardContent>
               <CustomAreaChart
-                data={[
-                  { name: 'Anak', children: analytics.demographics.childrenCount || 0, youth: 0, adult: 0, elderly: 0 },
-                  { name: 'Remaja', children: 0, youth: analytics.demographics.youthCount || 0, adult: 0, elderly: 0 },
-                  { name: 'Dewasa', children: 0, youth: 0, adult: analytics.demographics.adultCount || 0, elderly: 0 },
-                  { name: 'Lansia', children: 0, youth: 0, adult: 0, elderly: analytics.demographics.elderlyCount || 0 }
-                ]}
                 areas={[
                   { dataKey: 'children', color: '#3B82F6', name: 'Anak (0-12)' },
                   { dataKey: 'youth', color: '#10B981', name: 'Remaja (13-25)' },
                   { dataKey: 'adult', color: '#F59E0B', name: 'Dewasa (26-59)' },
                   { dataKey: 'elderly', color: '#8B5CF6', name: 'Lansia (60+)' }
+                ]}
+                data={[
+                  { name: 'Anak', children: analytics.demographics.childrenCount || 0, youth: 0, adult: 0, elderly: 0 },
+                  { name: 'Remaja', children: 0, youth: analytics.demographics.youthCount || 0, adult: 0, elderly: 0 },
+                  { name: 'Dewasa', children: 0, youth: 0, adult: analytics.demographics.adultCount || 0, elderly: 0 },
+                  { name: 'Lansia', children: 0, youth: 0, adult: 0, elderly: analytics.demographics.elderlyCount || 0 }
                 ]}
                 height={400}
                 showLegend={true}

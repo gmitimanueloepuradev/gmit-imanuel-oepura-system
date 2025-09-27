@@ -161,6 +161,8 @@ export default function ProvinsiPage() {
         columns={columns}
         data={data?.data.items || []}
         description={"Kelola data provinsi"}
+        exportFilename="provinsi"
+        exportable={true}
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
@@ -202,8 +204,6 @@ export default function ProvinsiPage() {
         searchPlaceholder="Cari provinsi..."
         title={"Daftar Provinsi"}
         onAdd={() => modal.open()}
-        exportable={true}
-        exportFilename="provinsi"
       />
 
       {/* Provinsi Modal */}

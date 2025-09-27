@@ -16,6 +16,7 @@ import {
   Image as ImageIcon,
   AlertCircle,
 } from "lucide-react";
+
 import pengumumanService from "@/services/pengumumanService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -118,9 +119,9 @@ export default function PengumumanDetailPage() {
     return (
       <div className="space-y-6 p-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4" />
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
         </div>
       </div>
     );
@@ -130,12 +131,12 @@ export default function PengumumanDetailPage() {
     return (
       <div className="space-y-6 p-4">
         <PageHeader
-          title="Detail Pengumuman"
           breadcrumb={[
             { label: "Admin", href: "/admin/dashboard" },
             { label: "Pengumuman", href: "/admin/pengumuman" },
             { label: "Detail" },
           ]}
+          title="Detail Pengumuman"
         />
         <Card>
           <CardContent className="p-8 text-center">
@@ -162,12 +163,6 @@ export default function PengumumanDetailPage() {
   return (
     <div className="space-y-6 p-4">
       <PageHeader
-        title="Detail Pengumuman"
-        breadcrumb={[
-          { label: "Admin", href: "/admin/dashboard" },
-          { label: "Pengumuman", href: "/admin/pengumuman" },
-          { label: "Detail" },
-        ]}
         actions={[
           {
             label: "Edit",
@@ -183,6 +178,12 @@ export default function PengumumanDetailPage() {
             className: "text-red-600 hover:text-red-700",
           },
         ]}
+        breadcrumb={[
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Pengumuman", href: "/admin/pengumuman" },
+          { label: "Detail" },
+        ]}
+        title="Detail Pengumuman"
       />
 
       {/* Back Button */}
@@ -379,18 +380,18 @@ export default function PengumumanDetailPage() {
                   Edit Pengumuman
                 </Button>
                 <Button
-                  variant="outline"
                   className="w-full"
+                  variant="outline"
                   onClick={() => router.push(`/admin/pengumuman/${id}/attachments`)}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Kelola Lampiran
                 </Button>
                 <Button
-                  variant="outline"
                   className="w-full text-red-600 hover:text-red-700"
-                  onClick={handleDelete}
                   disabled={deleteMutation.isPending}
+                  variant="outline"
+                  onClick={handleDelete}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   {deleteMutation.isPending ? "Menghapus..." : "Hapus"}

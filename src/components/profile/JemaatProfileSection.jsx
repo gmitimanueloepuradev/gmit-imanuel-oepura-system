@@ -12,17 +12,18 @@ import {
   DollarSign,
   Shield,
 } from "lucide-react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import TextInput from "@/components/ui/inputs/TextInput";
 import SelectInput from "@/components/ui/inputs/SelectInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
-import { useForm, FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { showToast } from "@/utils/showToast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -129,8 +130,8 @@ export default function JemaatProfileSection({ user }) {
         </CardTitle>
         {!isEditing ? (
           <Button
-            variant="outline"
             size="sm"
+            variant="outline"
             onClick={() => setIsEditing(true)}
           >
             <Edit2 className="h-4 w-4 mr-2" />
@@ -138,14 +139,14 @@ export default function JemaatProfileSection({ user }) {
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleCancel}>
+            <Button size="sm" variant="outline" onClick={handleCancel}>
               <X className="h-4 w-4 mr-2" />
               Batal
             </Button>
             <Button
+              disabled={updateMutation.isLoading}
               size="sm"
               onClick={methods.handleSubmit(onSubmit)}
-              disabled={updateMutation.isLoading}
             >
               <Save className="h-4 w-4 mr-2" />
               {updateMutation.isLoading ? "Menyimpan..." : "Simpan"}
@@ -246,83 +247,83 @@ export default function JemaatProfileSection({ user }) {
         ) : (
           <FormProvider {...methods}>
             <form
-              onSubmit={methods.handleSubmit(onSubmit)}
               className="space-y-4"
+              onSubmit={methods.handleSubmit(onSubmit)}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
-                  name="nama"
-                  label="Nama Lengkap"
-                  placeholder="Masukkan nama lengkap"
                   required
+                  label="Nama Lengkap"
+                  name="nama"
+                  placeholder="Masukkan nama lengkap"
                 />
 
                 <SelectInput
-                  name="jenisKelamin"
+                  required
                   label="Jenis Kelamin"
+                  name="jenisKelamin"
                   options={jenisKelaminOptions}
                   placeholder="Pilih jenis kelamin"
-                  required
                 />
 
                 <DatePicker
-                  name="tanggalLahir"
+                  required
                   label="Tanggal Lahir"
+                  name="tanggalLahir"
                   placeholder="Pilih tanggal lahir"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idStatusDalamKeluarga"
-                  label="Status dalam Keluarga"
+                  required
                   apiEndpoint="/status-dalam-keluarga/options"
+                  label="Status dalam Keluarga"
+                  name="idStatusDalamKeluarga"
                   placeholder="Pilih status dalam keluarga"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idSuku"
-                  label="Suku"
+                  required
                   apiEndpoint="/suku/options"
+                  label="Suku"
+                  name="idSuku"
                   placeholder="Pilih suku"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPendidikan"
-                  label="Pendidikan"
+                  required
                   apiEndpoint="/pendidikan/options"
+                  label="Pendidikan"
+                  name="idPendidikan"
                   placeholder="Pilih pendidikan"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPekerjaan"
-                  label="Pekerjaan"
+                  required
                   apiEndpoint="/pekerjaan/options"
+                  label="Pekerjaan"
+                  name="idPekerjaan"
                   placeholder="Pilih pekerjaan"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPendapatan"
-                  label="Pendapatan"
+                  required
                   apiEndpoint="/pendapatan/options"
+                  label="Pendapatan"
+                  name="idPendapatan"
                   placeholder="Pilih kategori pendapatan"
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idJaminanKesehatan"
-                  label="Jaminan Kesehatan"
-                  apiEndpoint="/jaminan-kesehatan/options"
-                  placeholder="Pilih jaminan kesehatan"
                   required
+                  apiEndpoint="/jaminan-kesehatan/options"
+                  label="Jaminan Kesehatan"
+                  name="idJaminanKesehatan"
+                  placeholder="Pilih jaminan kesehatan"
                 />
 
                 <SelectInput
-                  name="golonganDarah"
                   label="Golongan Darah"
+                  name="golonganDarah"
                   options={golonganDarahOptions}
                   placeholder="Pilih golongan darah"
                 />

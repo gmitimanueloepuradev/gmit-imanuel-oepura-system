@@ -1,7 +1,3 @@
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
-import keluargaService from "@/services/keluargaService";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -20,6 +16,11 @@ import {
 import { useRouter } from "next/router";
 import React from "react";
 
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import PageTitle from "@/components/ui/PageTitle";
+import keluargaService from "@/services/keluargaService";
+
 // Page Header Component
 function PageHeader({ title, description, breadcrumb, onBack }) {
   return (
@@ -27,7 +28,7 @@ function PageHeader({ title, description, breadcrumb, onBack }) {
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
-          <nav className="flex mb-4" aria-label="Breadcrumb">
+          <nav aria-label="Breadcrumb" className="flex mb-4">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               {breadcrumb.map((item, index) => (
                 <li key={index} className="inline-flex items-center">
@@ -38,16 +39,16 @@ function PageHeader({ title, description, breadcrumb, onBack }) {
                       viewBox="0 0 20 20"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                         clipRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        fillRule="evenodd"
                       />
                     </svg>
                   )}
                   {item.href ? (
                     <a
-                      href={item.href}
                       className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                      href={item.href}
                     >
                       {item.label}
                     </a>
@@ -68,10 +69,10 @@ function PageHeader({ title, description, breadcrumb, onBack }) {
             <div className="flex items-center">
               {onBack && (
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onBack}
                   className="mr-3"
+                  size="sm"
+                  variant="ghost"
+                  onClick={onBack}
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -100,12 +101,12 @@ function DetailSkeleton() {
         <Card key={i}>
           <CardContent className="p-6">
             <div className="animate-pulse">
-              <div className="h-6 bg-gray-300 rounded w-48 mb-4"></div>
+              <div className="h-6 bg-gray-300 rounded w-48 mb-4" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, j) => (
                   <div key={j}>
-                    <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
-                    <div className="h-5 bg-gray-300 rounded w-full"></div>
+                    <div className="h-4 bg-gray-300 rounded w-24 mb-2" />
+                    <div className="h-5 bg-gray-300 rounded w-full" />
                   </div>
                 ))}
               </div>
@@ -355,20 +356,20 @@ export default function KeluargaDetailPage() {
   return (
     <>
       <PageTitle
-        title={keluarga ? `Detail Keluarga Bangunan ${keluarga.noBagungan}` : "Detail Keluarga"}
         description="Detail informasi keluarga dan anggota - GMIT Imanuel Oepura"
+        title={keluarga ? `Detail Keluarga Bangunan ${keluarga.noBagungan}` : "Detail Keluarga"}
       />
 
       <div className="space-y-6 p-4">
         {/* Page Header */}
         <PageHeader
-          title={keluarga ? `Keluarga Bangunan ${keluarga.noBagungan}` : "Detail Keluarga"}
-          description={keluarga ? `${keluarga.rayon?.namaRayon || "Rayon"} - ${jemaats.length} anggota keluarga` : ""}
           breadcrumb={[
             { label: "Majelis", href: "/majelis/dashboard" },
             { label: "Data Keluarga", href: "/majelis/keluarga" },
             { label: "Detail Keluarga" },
           ]}
+          description={keluarga ? `${keluarga.rayon?.namaRayon || "Rayon"} - ${jemaats.length} anggota keluarga` : ""}
+          title={keluarga ? `Keluarga Bangunan ${keluarga.noBagungan}` : "Detail Keluarga"}
           onBack={handleBack}
         />
 

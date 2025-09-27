@@ -88,13 +88,13 @@ export default function AnggaranIndexPage() {
   return (
     <>
       <PageHeader
-        title="Kelola Anggaran"
-        description="Pilih periode untuk mengatur anggaran keuangan gereja"
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Keuangan", href: "/admin/keuangan" },
           { label: "Kelola Anggaran" },
         ]}
+        description="Pilih periode untuk mengatur anggaran keuangan gereja"
+        title="Kelola Anggaran"
       />
 
       <div className="max-w-7xl mx-auto p-6">
@@ -107,11 +107,11 @@ export default function AnggaranIndexPage() {
                 Filter Periode
               </CardTitle>
               <Button
+                size="sm"
+                variant="outline"
                 onClick={() =>
                   router.push("/admin/data-master/keuangan/periode")
                 }
-                variant="outline"
-                size="sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Tambah Periode
@@ -125,9 +125,9 @@ export default function AnggaranIndexPage() {
                   Tahun
                 </label>
                 <select
+                  className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {yearOptions.map((year) => (
                     <option key={year} value={year}>
@@ -233,11 +233,11 @@ export default function AnggaranIndexPage() {
 
                     <div className="flex space-x-2 pt-2">
                       <Button
+                        className="flex-1"
+                        size="sm"
                         onClick={() =>
                           router.push(`/admin/keuangan/anggaran/${periode.id}`)
                         }
-                        size="sm"
-                        className="flex-1"
                       >
                         <DollarSign className="h-4 w-4 mr-1" />
                         Kelola Anggaran

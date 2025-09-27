@@ -207,8 +207,8 @@ function MajelisJemaatPage() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Data Jemaat"
         description={`Kelola data jemaat untuk ${user.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
+        title="Data Jemaat"
       />
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -217,9 +217,9 @@ function MajelisJemaatPage() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <Button
+                className="flex items-center space-x-2"
                 variant="outline"
                 onClick={handleBack}
-                className="flex items-center space-x-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Dashboard</span>
@@ -236,16 +236,16 @@ function MajelisJemaatPage() {
 
             <div className="flex items-center space-x-3">
               <Button
+                className="flex items-center space-x-2"
                 variant="outline"
                 onClick={() => setShowExportModal(true)}
-                className="flex items-center space-x-2"
               >
                 <Download className="h-4 w-4" />
                 <span>Export</span>
               </Button>
               <Button
-                onClick={handleCreate}
                 className="flex items-center space-x-2"
+                onClick={handleCreate}
               >
                 <UserPlus className="h-4 w-4" />
                 <span>Tambah Jemaat</span>
@@ -294,7 +294,7 @@ function MajelisJemaatPage() {
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                      <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded-lg" />
                     </div>
                   ))}
                 </div>
@@ -314,8 +314,8 @@ function MajelisJemaatPage() {
                     }
                   </p>
                   <Button
-                    onClick={handleCreate}
                     className="mt-4"
+                    onClick={handleCreate}
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
                     Tambah Jemaat Pertama
@@ -384,24 +384,24 @@ function MajelisJemaatPage() {
                           <td className="py-3 px-4">
                             <div className="flex items-center space-x-2">
                               <Button
-                                variant="outline"
                                 size="sm"
+                                variant="outline"
                                 onClick={() => handleView(jemaat.id)}
                               >
                                 <Eye className="h-3 w-3" />
                               </Button>
                               <Button
-                                variant="outline"
                                 size="sm"
+                                variant="outline"
                                 onClick={() => handleEdit(jemaat.id)}
                               >
                                 <Edit className="h-3 w-3" />
                               </Button>
                               <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDelete(jemaat)}
                                 className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDelete(jemaat)}
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
@@ -441,9 +441,9 @@ function MajelisJemaatPage() {
                       <option value={100}>100 per halaman</option>
                     </select>
                     <Button
-                      variant="outline"
-                      size="sm"
                       disabled={currentPage <= 1}
+                      size="sm"
+                      variant="outline"
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     >
                       ← Sebelumnya
@@ -454,9 +454,9 @@ function MajelisJemaatPage() {
                       <span className="font-medium">{pagination.totalPages}</span>
                     </span>
                     <Button
-                      variant="outline"
-                      size="sm"
                       disabled={currentPage >= pagination.totalPages}
+                      size="sm"
+                      variant="outline"
                       onClick={() =>
                         setCurrentPage(
                           Math.min(pagination.totalPages, currentPage + 1)

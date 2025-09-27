@@ -105,7 +105,12 @@ async function handlePatch(req, res) {
         // Create data object with only valid jemaat fields
         const jemaatUpdateData = {
           ...(nama !== undefined && { nama }),
-          ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin === true || jenisKelamin === 'true' || jenisKelamin === 1 }),
+          ...(jenisKelamin !== undefined && {
+            jenisKelamin:
+              jenisKelamin === true ||
+              jenisKelamin === "true" ||
+              jenisKelamin === 1,
+          }),
           ...(tanggalLahir !== undefined && { tanggalLahir }),
           ...(golonganDarah !== undefined && { golonganDarah }),
           ...(idStatusDalamKeluarga !== undefined && { idStatusDalamKeluarga }),
@@ -224,7 +229,12 @@ async function handlePatch(req, res) {
       // Create data object with only valid fields
       const jemaatData = {
         ...(nama !== undefined && { nama }),
-        ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin === true || jenisKelamin === 'true' || jenisKelamin === 1 }),
+        ...(jenisKelamin !== undefined && {
+          jenisKelamin:
+            jenisKelamin === true ||
+            jenisKelamin === "true" ||
+            jenisKelamin === 1,
+        }),
         ...(tanggalLahir !== undefined && { tanggalLahir }),
         ...(golonganDarah !== undefined && { golonganDarah }),
         ...(idKeluarga !== undefined && { idKeluarga }),

@@ -49,26 +49,26 @@ export default function StatusDalamKeluargaPage() {
 
   return (
     <MasterDataPage
-      title="Data Status Dalam Keluarga"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Status Dalam Keluarga" },
+      ]}
+      columns={columns}
       description="Kelola data status dalam keluarga"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="status"
+      queryKey="status-dalam-keluarga"
+      searchFields={["status"]}
       service={{
         get: () => masterService.getStatusDalamKeluarga(),
         create: (data) => masterService.createStatusDalamKeluarga(data),
         update: (id, data) => masterService.updateStatusDalamKeluarga(id, data),
         delete: (id) => masterService.deleteStatusDalamKeluarga(id),
       }}
-      queryKey="status-dalam-keluarga"
-      columns={columns}
+      title="Data Status Dalam Keluarga"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="status"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Status Dalam Keluarga" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["status"]}
     />
   );
 }

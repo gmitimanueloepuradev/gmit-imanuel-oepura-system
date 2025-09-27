@@ -16,7 +16,7 @@ export const apiResponse = (
 
 // Standard Error Response Handler
 export const handleApiError = (res, error, message = "Server error") => {
-  // eslint-disable-next-line no-console
+   
   console.error(`API Error: ${message}`, error);
 
   return res.status(500).json(apiResponse(false, null, message, error.message));

@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
+
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/Carousel";
 import UppCard from "@/components/upp/uppCard";
 import pengumumanService from "@/services/pengumumanService";
-import { useEffect, useState } from "react";
 
 export default function NewsRow() {
   const [newsData, setNewsData] = useState([]);

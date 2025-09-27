@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "./Button";
 import { MoreVertical } from "lucide-react";
+
+import { Button } from "./Button";
 
 /**
  * Reusable ButtonActions Component
@@ -170,7 +171,6 @@ export default function ButtonActions({
                     return (
                       <a
                         key={index}
-                        href={href}
                         className={`
                           group flex items-center w-full px-4 py-2 text-sm transition-colors
                           ${
@@ -183,6 +183,7 @@ export default function ButtonActions({
                                   : "text-gray-700 hover:bg-gray-100"
                           }
                         `}
+                        href={href}
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         {action.icon && (

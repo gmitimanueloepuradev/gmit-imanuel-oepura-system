@@ -288,10 +288,10 @@ export default function AppNavbar({
             <div className="flex items-center gap-2">
               {/* View Public Website Button */}
               <Link
-                href="/"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
+                href="/"
+                rel="noopener noreferrer"
+                target="_blank"
                 title="Lihat Website Public"
               >
                 <Globe className="w-5 h-5" />
@@ -382,7 +382,7 @@ export default function AppNavbar({
         lg:translate-x-0
       `}
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800 custom-scrollbar transition-colors duration-300">
+        <div className="h-full px-3 overflow-y-auto bg-white dark:bg-gray-800 custom-scrollbar transition-colors duration-300 flex flex-col">
           {/* Sidebar Header */}
           <div
             className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-4 border-b border-gray-200 dark:border-gray-700 lg:border-none transition-colors duration-300`}
@@ -437,14 +437,14 @@ export default function AppNavbar({
           </div>
 
           {/* Navigation Menu */}
-          <nav className="mt-1">
+          <nav className="mt-1 flex-1">
             <ul className="space-y-2">
               {config.navigation.map((item) => renderMenuItem(item))}
             </ul>
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
+          <div className="mt-auto p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
             {isCollapsed ? (
               <Tooltip
                 content={`${currentUser.name} - ${currentUser.organization}`}

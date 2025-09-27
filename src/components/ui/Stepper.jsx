@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+
 import { Button } from "./Button";
 
 export default function Stepper({ steps, currentStep, onStepClick }) {
@@ -85,10 +86,10 @@ export function StepperNavigation({
   return (
     <div className="flex justify-between items-center pt-6 border-t">
       <Button
+        disabled={isFirstStep || isLoading}
         type="button"
         variant="outline"
         onClick={onPrevious}
-        disabled={isFirstStep || isLoading}
       >
         Sebelumnya
       </Button>
@@ -99,19 +100,19 @@ export function StepperNavigation({
 
       {isLastStep ? (
         <Button
-          type="button"
-          onClick={onSubmit}
           disabled={!canGoNext}
           isLoading={isLoading}
           loadingText="Menyimpan..."
+          type="button"
+          onClick={onSubmit}
         >
           {submitButtonText}
         </Button>
       ) : (
         <Button
+          disabled={!canGoNext || isLoading}
           type="button"
           onClick={onNext}
-          disabled={!canGoNext || isLoading}
         >
           {nextButtonText}
         </Button>

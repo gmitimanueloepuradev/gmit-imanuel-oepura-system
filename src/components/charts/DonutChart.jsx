@@ -41,13 +41,13 @@ const DonutChart = ({
 
     return (
       <text 
-        x={x} 
-        y={y} 
+        dominantBaseline="central" 
         fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="11"
-        fontWeight="bold"
+        fontSize="11" 
+        fontWeight="bold" 
+        textAnchor={x > cx ? 'start' : 'end'}
+        x={x}
+        y={y}
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -59,18 +59,18 @@ const DonutChart = ({
       {title && (
         <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
       )}
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer height={height} width="100%">
         <PieChart>
           <Pie
-            data={data}
             cx="50%"
             cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={outerRadius}
-            innerRadius={innerRadius}
-            fill="#8884d8"
+            data={data}
             dataKey="value"
+            fill="#8884d8"
+            innerRadius={innerRadius}
+            label={renderCustomizedLabel}
+            labelLine={false}
+            outerRadius={outerRadius}
             paddingAngle={2}
           >
             {data.map((entry, index) => (
@@ -97,7 +97,7 @@ const DonutChart = ({
             <div 
               className="w-3 h-3 rounded-full mr-2" 
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
-            ></div>
+             />
             <span className="truncate">{entry.name}: {entry.value}</span>
           </div>
         ))}

@@ -167,14 +167,21 @@ export default function KecamatanPage() {
   return (
     <>
       <ListGrid
-        data={data?.data?.items || []}
+        breadcrumb={[
+          {
+            label: "Wilayah Administratif",
+            href: "/admin/data-master/wilayah-administratif",
+          },
+          {
+            label: "Kecamatan",
+          },
+        ]}
         columns={columns}
-        isLoading={isLoading}
-        title={"Daftar Kecamatan"}
-        exportable={true}
-        exportFilename="kecamatan"
-        searchPlaceholder="Cari kecamatan..."
+        data={data?.data?.items || []}
         description={"Kelola data kecamatan"}
+        exportFilename="kecamatan"
+        exportable={true}
+        isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
           {
@@ -213,15 +220,8 @@ export default function KecamatanPage() {
             tooltip: "Lihat kelurahan/desa yang ada",
           },
         ]}
-        breadcrumb={[
-          {
-            label: "Wilayah Administratif",
-            href: "/admin/data-master/wilayah-administratif",
-          },
-          {
-            label: "Kecamatan",
-          },
-        ]}
+        searchPlaceholder="Cari kecamatan..."
+        title={"Daftar Kecamatan"}
         onAdd={() => modal.open()}
       />
 
@@ -229,8 +229,8 @@ export default function KecamatanPage() {
         defaultValues={{ nama: "", idKotaKab: "" }}
         editData={modal.editData}
         fields={fieldsWithOptions}
-        isOpen={modal.isOpen}
         isLoading={kecamatanCreateMutation.isPending || kecamatanUpdateMutation.isPending}
+        isOpen={modal.isOpen}
         schema={kecamatanSchema}
         title="Kecamatan"
         onClose={modal.close}
@@ -245,8 +245,8 @@ export default function KecamatanPage() {
         }}
         editData={null}
         fields={kelurahanDesaFields}
-        isOpen={kelurahanDesaModal.isOpen}
         isLoading={kelurahanDesaCreateMutation.isPending}
+        isOpen={kelurahanDesaModal.isOpen}
         schema={kelurahanDesaSchema}
         title={`Tambah Kelurahan/Desa untuk ${kelurahanDesaModal.editData?.nama || ""}`}
         onClose={kelurahanDesaModal.close}
@@ -255,10 +255,10 @@ export default function KecamatanPage() {
 
       <Drawer
         isOpen={drawer.isOpen}
-        onClose={drawer.close}
+        position="right"
         title={`Kelurahan/Desa - ${drawer.data?.nama || ""}`}
         width="w-96"
-        position="right"
+        onClose={drawer.close}
       >
         <div className="space-y-4">
           {isLoadingKelurahanDesa ? (
@@ -283,20 +283,20 @@ export default function KecamatanPage() {
       </Drawer>
 
       <ConfirmDialog
+        cancelText={confirm.config.cancelText}
+        confirmText={confirm.config.confirmText}
         isOpen={confirm.isOpen}
+        message={confirm.config.message}
+        title={confirm.config.title}
+        variant={confirm.config.variant}
         onClose={confirm.hideConfirm}
         onConfirm={confirm.handleConfirm}
-        title={confirm.config.title}
-        message={confirm.config.message}
-        confirmText={confirm.config.confirmText}
-        cancelText={confirm.config.cancelText}
-        variant={confirm.config.variant}
       />
 
       {/* View Modal */}
       {isViewModalOpen && viewData && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity"></div>
+          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity" />
 
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
@@ -335,8 +335,8 @@ export default function KecamatanPage() {
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
-                  type="button"
                   className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
+                  type="button"
                   onClick={() => setIsViewModalOpen(false)}
                 >
                   Tutup

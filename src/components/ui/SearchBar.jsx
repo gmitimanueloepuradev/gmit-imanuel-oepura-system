@@ -44,12 +44,12 @@ export default function SearchBar({
     <div className={`flex items-center gap-2 w-full ${className}`}>
       {filters.length > 0 && (
         <div className="dropdown">
-          <label tabIndex={0} className="btn btn-outline btn-square">
+          <label className="btn btn-outline btn-square" tabIndex={0}>
             <Filter className="w-5 h-5" />
           </label>
           <ul
-            tabIndex={0}
             className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            tabIndex={0}
           >
             {filters.map((f) => (
               <li key={f.key}>
@@ -68,15 +68,15 @@ export default function SearchBar({
 
       <div className="flex-1 relative">
         <input
-          type="text"
+          className="input input-bordered w-full pl-10 pr-10"
           placeholder={placeholder}
+          type="text"
           value={searchValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
             if (e.key === "Escape") handleClear();
           }}
-          className="input input-bordered w-full pl-10 pr-10"
         />
         <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
 

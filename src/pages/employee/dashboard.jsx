@@ -232,8 +232,8 @@ function EmployeeDashboard() {
                     return (
                       <button
                         key={item.href}
-                        onClick={() => router.push(item.href)}
                         className="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        onClick={() => router.push(item.href)}
                       >
                         <IconComponent className="h-6 w-6 text-orange-600 dark:text-orange-400 mr-3" />
                         <div className="text-left">

@@ -30,8 +30,8 @@ export default function TagInput({
       <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent bg-white min-h-[42px]">
         {value.map((tag, index) => (
           <span
-            className="inline-flex items-center px-2 py-1 text-sm bg-blue-100 text-blue-800 rounded-md"
             key={index}
+            className="inline-flex items-center px-2 py-1 text-sm bg-blue-100 text-blue-800 rounded-md"
           >
             {tag}
             <button

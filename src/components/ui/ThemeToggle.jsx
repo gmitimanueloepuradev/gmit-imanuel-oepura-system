@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sun, Moon } from 'lucide-react';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ThemeToggle({ className = '' }) {
@@ -13,7 +14,7 @@ export default function ThemeToggle({ className = '' }) {
 
   return (
     <button
-      onClick={toggleTheme}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       className={`
         relative inline-flex items-center justify-center w-10 h-10
         rounded-lg transition-all duration-300 ease-in-out
@@ -26,7 +27,7 @@ export default function ThemeToggle({ className = '' }) {
         ${className}
       `}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      onClick={toggleTheme}
     >
       <div className="relative w-5 h-5">
         <Sun

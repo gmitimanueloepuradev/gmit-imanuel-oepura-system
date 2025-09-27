@@ -273,9 +273,9 @@ export default function LaporanPage() {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => handleExport('pdf')}
-                  disabled={isExporting}
                   className="w-full flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  disabled={isExporting}
+                  onClick={() => handleExport('pdf')}
                 >
                   <FileText className="w-5 h-5 mr-3 text-red-600" />
                   <div className="text-left">
@@ -285,9 +285,9 @@ export default function LaporanPage() {
                 </button>
 
                 <button
-                  onClick={() => handleExport('csv')}
-                  disabled={isExporting}
                   className="w-full flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  disabled={isExporting}
+                  onClick={() => handleExport('csv')}
                 >
                   <Table className="w-5 h-5 mr-3 text-green-600" />
                   <div className="text-left">
@@ -304,16 +304,16 @@ export default function LaporanPage() {
               </label>
               <div className="space-y-2">
                 <button
-                  onClick={() => handleExport('csv', activeTab)}
-                  disabled={isExporting}
                   className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  disabled={isExporting}
+                  onClick={() => handleExport('csv', activeTab)}
                 >
                   Tab Saat Ini ({activeTab === 'overview' ? 'Ringkasan' : activeTab === 'growth' ? 'Pertumbuhan' : 'Demografi'})
                 </button>
                 <button
-                  onClick={() => handleExport('csv', 'all')}
-                  disabled={isExporting}
                   className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  disabled={isExporting}
+                  onClick={() => handleExport('csv', 'all')}
                 >
                   Semua Data Lengkap
                 </button>
@@ -323,9 +323,9 @@ export default function LaporanPage() {
 
           <div className="flex justify-end space-x-3 mt-6">
             <button
-              onClick={() => setShowExportModal(false)}
-              disabled={isExporting}
               className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+              disabled={isExporting}
+              onClick={() => setShowExportModal(false)}
             >
               Batal
             </button>
@@ -351,18 +351,18 @@ export default function LaporanPage() {
             </div>
             <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
               <button
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-50 dark:hover:bg-gray-600 h-9 px-4 py-2"
                 onClick={() => {
                   refetchOverview();
                 }}
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-50 dark:hover:bg-gray-600 h-9 px-4 py-2"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Perbarui
               </button>
               <button
-                onClick={() => setShowExportModal(true)}
-                disabled={isExporting}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-50 dark:hover:bg-gray-600 h-9 px-4 py-2"
+                disabled={isExporting}
+                onClick={() => setShowExportModal(true)}
               >
                 {isExporting ? (
                   <>
@@ -387,12 +387,12 @@ export default function LaporanPage() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                       activeTab === tab.id
                         ? "border-blue-500 text-blue-600 dark:text-blue-400"
                         : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500"
                     }`}
+                    onClick={() => setActiveTab(tab.id)}
                   >
                     <Icon className="w-4 h-4 mr-2" />
                     {tab.label}
@@ -413,8 +413,8 @@ export default function LaporanPage() {
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                     <div className="animate-pulse">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
-                      <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
+                      <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded" />
                     </div>
                   </div>
                 ))}
@@ -424,32 +424,32 @@ export default function LaporanPage() {
                 {/* Main Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <StatCard
+                    color="bg-blue-500"
+                    icon={Users}
+                    subtitle="Anggota terdaftar"
                     title="Total Jemaat"
                     value={overviewData?.totalMembers?.toLocaleString() || "0"}
-                    subtitle="Anggota terdaftar"
-                    icon={Users}
-                    color="bg-blue-500"
                   />
                   <StatCard
+                    color="bg-green-500"
+                    icon={Building2}
+                    subtitle="Kepala keluarga"
                     title="Total Keluarga"
                     value={overviewData?.totalFamilies?.toLocaleString() || "0"}
-                    subtitle="Kepala keluarga"
-                    icon={Building2}
-                    color="bg-green-500"
                   />
                   <StatCard
+                    color="bg-purple-500"
+                    icon={Users}
+                    subtitle={`${Math.round(((overviewData?.membersByGender?.male || 0) / (overviewData?.totalMembers || 1)) * 100)}% dari total`}
                     title="Laki-laki"
                     value={overviewData?.membersByGender?.male?.toLocaleString() || "0"}
-                    subtitle={`${Math.round(((overviewData?.membersByGender?.male || 0) / (overviewData?.totalMembers || 1)) * 100)}% dari total`}
-                    icon={Users}
-                    color="bg-purple-500"
                   />
                   <StatCard
+                    color="bg-pink-500"
+                    icon={Users}
+                    subtitle={`${Math.round(((overviewData?.membersByGender?.female || 0) / (overviewData?.totalMembers || 1)) * 100)}% dari total`}
                     title="Perempuan"
                     value={overviewData?.membersByGender?.female?.toLocaleString() || "0"}
-                    subtitle={`${Math.round(((overviewData?.membersByGender?.female || 0) / (overviewData?.totalMembers || 1)) * 100)}% dari total`}
-                    icon={Users}
-                    color="bg-pink-500"
                   />
                 </div>
 
@@ -573,9 +573,9 @@ export default function LaporanPage() {
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Periode:</label>
                   <select
+                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
-                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   >
                     <option value="monthly">Bulanan</option>
                     <option value="yearly">Tahunan</option>
@@ -584,9 +584,9 @@ export default function LaporanPage() {
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tahun:</label>
                   <select
+                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   >
                     {years.map(year => (
                       <option key={year} value={year}>{year}</option>
@@ -599,8 +599,8 @@ export default function LaporanPage() {
             {growthLoading ? (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-4 w-1/3"></div>
-                  <div className="h-64 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-4 w-1/3" />
+                  <div className="h-64 bg-gray-200 dark:bg-gray-600 rounded" />
                 </div>
               </div>
             ) : (
@@ -608,27 +608,27 @@ export default function LaporanPage() {
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <StatCard
+                    color="bg-green-500"
+                    icon={Users}
+                    subtitle={`Periode ${selectedPeriod === 'monthly' ? 'tahun' : '5 tahun'} terakhir`}
                     title="Anggota Baru"
                     value={growthData?.summary?.totalNewMembers?.toString() || "0"}
-                    subtitle={`Periode ${selectedPeriod === 'monthly' ? 'tahun' : '5 tahun'} terakhir`}
-                    icon={Users}
-                    color="bg-green-500"
                   />
                   <StatCard
+                    color="bg-blue-500"
+                    icon={TrendingUp}
+                    subtitle={`Per ${selectedPeriod === 'monthly' ? 'bulan' : 'tahun'}`}
                     title="Rata-rata Pertumbuhan"
                     value={growthData?.summary?.averageGrowth?.toString() || "0"}
-                    subtitle={`Per ${selectedPeriod === 'monthly' ? 'bulan' : 'tahun'}`}
-                    icon={TrendingUp}
-                    color="bg-blue-500"
                   />
                   <StatCard
+                    color="bg-purple-500"
+                    icon={Calendar}
+                    subtitle="Baptis, Sidi, Pernikahan"
                     title="Total Sakramen"
                     value={((growthData?.summary?.totalSacraments?.baptis || 0) + 
                             (growthData?.summary?.totalSacraments?.sidi || 0) + 
                             (growthData?.summary?.totalSacraments?.pernikahan || 0)).toString()}
-                    subtitle="Baptis, Sidi, Pernikahan"
-                    icon={Calendar}
-                    color="bg-purple-500"
                   />
                 </div>
 
@@ -690,8 +690,8 @@ export default function LaporanPage() {
             {demographicsLoading ? (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-4 w-1/3"></div>
-                  <div className="h-64 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-4 w-1/3" />
+                  <div className="h-64 bg-gray-200 dark:bg-gray-600 rounded" />
                 </div>
               </div>
             ) : (
@@ -699,25 +699,25 @@ export default function LaporanPage() {
                 {/* Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <StatCard
+                    color="bg-blue-500"
+                    icon={Users}
+                    subtitle="Jemaat terdaftar"
                     title="Total Anggota"
                     value={demographicsData?.summary?.totalMembers?.toLocaleString() || "0"}
-                    subtitle="Jemaat terdaftar"
-                    icon={Users}
-                    color="bg-blue-500"
                   />
                   <StatCard
+                    color="bg-green-500"
+                    icon={Building2}
+                    subtitle="Kepala keluarga"
                     title="Total Keluarga"
                     value={demographicsData?.summary?.totalFamilies?.toLocaleString() || "0"}
-                    subtitle="Kepala keluarga"
-                    icon={Building2}
-                    color="bg-green-500"
                   />
                   <StatCard
+                    color="bg-purple-500"
+                    icon={Calendar}
+                    subtitle="Seluruh jemaat"
                     title="Rata-rata Umur"
                     value={`${demographicsData?.summary?.averageAge || 0} tahun`}
-                    subtitle="Seluruh jemaat"
-                    icon={Calendar}
-                    color="bg-purple-500"
                   />
                 </div>
 

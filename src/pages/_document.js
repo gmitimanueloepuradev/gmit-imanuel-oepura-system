@@ -63,14 +63,14 @@ export default function Document() {
         <link href="/favicon.ico" rel="shortcut icon" />
 
         {/* Preload critical resources for better LCP */}
-        <link rel="preload" href="/header/f92411b3.webp" as="image" type="image/webp" />
-        <link rel="preload" href="/logo-GMIT.png" as="image" type="image/png" />
+        <link as="image" href="/header/f92411b3.webp" rel="preload" type="image/webp" />
+        <link as="image" href="/logo-GMIT.png" rel="preload" type="image/png" />
 
         {/* DNS prefetch for external domains */}
-        <link rel="dns-prefetch" href="//beta.ourmanna.com" />
+        <link href="//beta.ourmanna.com" rel="dns-prefetch" />
 
         {/* Preconnect to external origins */}
-        <link rel="preconnect" href="https://beta.ourmanna.com" />
+        <link href="https://beta.ourmanna.com" rel="preconnect" />
 
         <meta content="summary" name="twitter:card" />
         <meta content="https://www.gmitjio-oepura.org" name="twitter:url" />

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Church } from "lucide-react";
+
 import jenisIbadahService from "@/services/jenisIbadahService";
 import { showToast } from "@/utils/showToast";
 import FormPage from "@/components/ui/FormPage";
-import { ArrowLeft, Save, Church } from "lucide-react";
 
 export default function EditJenisIbadah() {
   const router = useRouter();
@@ -97,7 +98,7 @@ export default function EditJenisIbadah() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-4 text-gray-600">Memuat data jenis ibadah...</p>
         </div>
       </div>
@@ -106,20 +107,20 @@ export default function EditJenisIbadah() {
 
   return (
     <FormPage
-      title="Edit Jenis Ibadah"
-      description="Update informasi jenis ibadah"
+      actions={actions}
       breadcrumb={[
         { label: "Dashboard", href: "/admin/dashboard" },
         { label: "Jenis Ibadah", href: "/admin/jenis-ibadah" },
         { label: jenisIbadahData?.data?.namaIbadah || "Jenis Ibadah", href: `/admin/jenis-ibadah/${id}` },
         { label: "Edit" },
       ]}
+      description="Update informasi jenis ibadah"
       fields={fields}
       formData={formData}
+      isLoading={updateMutation.isLoading}
+      title="Edit Jenis Ibadah"
       onInputChange={handleInputChange}
       onSubmit={handleSubmit}
-      actions={actions}
-      isLoading={updateMutation.isLoading}
     />
   );
 }

@@ -34,7 +34,7 @@ export default function SelectInput({
     return (
       <div>
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor={inputId}>
             {label} {required && <span className="text-red-500">*</span>}
           </label>
         )}
@@ -47,9 +47,17 @@ export default function SelectInput({
           }`}
           {...props}
         >
-          {placeholder && <option value="">{placeholder}</option>}
+          {placeholder && (
+            <option className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" value="">
+              {placeholder}
+            </option>
+          )}
           {options?.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option
+              key={option.value}
+              className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              value={option.value}
+            >
               {option.label}
             </option>
           ))}
@@ -66,24 +74,32 @@ export default function SelectInput({
   return (
     <div>
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor={inputId}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
       <select
+        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors ${
+          externalError ? "border-red-500 focus:ring-red-500" : ""
+        }`}
         id={inputId}
         name={name}
         value={value || ""}
         onChange={(e) => onChange?.(e.target.value)}
-        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors ${
-          externalError ? "border-red-500 focus:ring-red-500" : ""
-        }`}
         {...props}
       >
-        {placeholder && <option value="">{placeholder}</option>}
+        {placeholder && (
+          <option className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" value="">
+            {placeholder}
+          </option>
+        )}
         {options?.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option
+            key={option.value}
+            className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            value={option.value}
+          >
             {option.label}
           </option>
         ))}

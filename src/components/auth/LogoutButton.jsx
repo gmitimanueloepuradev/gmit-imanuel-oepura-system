@@ -1,4 +1,5 @@
 import { LogOut } from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 
 const LogoutButton = ({ className = "", variant = "primary" }) => {
@@ -22,13 +23,13 @@ const LogoutButton = ({ className = "", variant = "primary" }) => {
 
   return (
     <button
-      onClick={handleLogout}
-      disabled={loading}
       className={`${baseClasses} ${variantClasses} ${className}`}
+      disabled={loading}
+      onClick={handleLogout}
     >
       {loading ? (
         <>
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
           Keluar...
         </>
       ) : (

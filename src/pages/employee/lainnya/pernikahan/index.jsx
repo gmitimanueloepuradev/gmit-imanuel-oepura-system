@@ -161,8 +161,6 @@ export default function PernikahanManagement() {
   return (
     <>
       <ListGrid
-        rowActionType="horizontal"
-        rowActions={rowActions}
         breadcrumb={[
           { label: "Dashboard", href: "/employee/dashboard" },
           { label: "Lainnya", href: "/employee/lainnya" },
@@ -198,6 +196,8 @@ export default function PernikahanManagement() {
           total: pernikahanData?.data?.pagination?.total || 0,
           totalPages: pernikahanData?.data?.pagination?.totalPages || 0,
         }}
+        rowActionType="horizontal"
+        rowActions={rowActions}
         searchPlaceholder="Cari berdasarkan klasis atau nama jemaat..."
         searchable={true}
         title="Data Pernikahan"

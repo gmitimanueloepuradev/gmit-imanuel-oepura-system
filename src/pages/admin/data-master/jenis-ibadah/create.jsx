@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useMutation } from "@tanstack/react-query";
+import { ArrowLeft, Save, Church } from "lucide-react";
+
 import jenisIbadahService from "@/services/jenisIbadahService";
 import { showToast } from "@/utils/showToast";
 import FormPage from "@/components/ui/FormPage";
-import { ArrowLeft, Save, Church } from "lucide-react";
 
 export default function CreateJenisIbadah() {
   const router = useRouter();
@@ -73,19 +74,19 @@ export default function CreateJenisIbadah() {
 
   return (
     <FormPage
-      title="Tambah Jenis Ibadah"
-      description="Buat jenis ibadah baru untuk sistem penjadwalan"
+      actions={actions}
       breadcrumb={[
         { label: "Dashboard", href: "/admin/dashboard" },
         { label: "Jenis Ibadah", href: "/admin/jenis-ibadah" },
         { label: "Tambah Jenis Ibadah" },
       ]}
+      description="Buat jenis ibadah baru untuk sistem penjadwalan"
       fields={fields}
       formData={formData}
+      isLoading={createMutation.isLoading}
+      title="Tambah Jenis Ibadah"
       onInputChange={handleInputChange}
       onSubmit={handleSubmit}
-      actions={actions}
-      isLoading={createMutation.isLoading}
     />
   );
 }

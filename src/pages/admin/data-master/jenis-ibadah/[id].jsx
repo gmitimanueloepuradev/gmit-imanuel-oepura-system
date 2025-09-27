@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Edit, Church, Calendar, Hash } from "lucide-react";
+
 import jenisIbadahService from "@/services/jenisIbadahService";
 import DetailPage from "@/components/ui/DetailPage";
-import { ArrowLeft, Edit, Church, Calendar, Hash } from "lucide-react";
 
 export default function JenisIbadahDetail() {
   const router = useRouter();
@@ -72,8 +73,8 @@ export default function JenisIbadahDetail() {
         <div className="text-center">
           <p className="text-red-600">Gagal memuat data jenis ibadah</p>
           <button 
-            onClick={() => router.back()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
+            onClick={() => router.back()}
           >
             Kembali
           </button>
@@ -84,16 +85,16 @@ export default function JenisIbadahDetail() {
 
   return (
     <DetailPage
-      title={`Detail Jenis Ibadah - ${jenisIbadah?.namaIbadah || 'Loading...'}`}
-      description="Informasi lengkap jenis ibadah"
+      actions={actions}
       breadcrumb={[
         { label: "Dashboard", href: "/admin/dashboard" },
         { label: "Jenis Ibadah", href: "/admin/jenis-ibadah" },
         { label: jenisIbadah?.namaIbadah || "Detail" },
       ]}
-      sections={sections}
-      actions={actions}
+      description="Informasi lengkap jenis ibadah"
       isLoading={isLoading}
+      sections={sections}
+      title={`Detail Jenis Ibadah - ${jenisIbadah?.namaIbadah || 'Loading...'}`}
     />
   );
 }

@@ -1,7 +1,8 @@
+import React from "react";
+
 import ProfileGrid from "@/components/profile/ProfileGrid";
 import PageHeader from "@/components/ui/PageHeader";
 import { useUser } from "@/hooks/useUser";
-import React from "react";
 
 export default function ProfilePage() {
   const { user: authUser } = useUser();

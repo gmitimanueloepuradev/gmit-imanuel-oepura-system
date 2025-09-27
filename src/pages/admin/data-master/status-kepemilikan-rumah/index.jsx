@@ -49,26 +49,26 @@ export default function StatusKepemilikanRumahPage() {
 
   return (
     <MasterDataPage
-      title="Data Status Kepemilikan Rumah"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Status Kepemilikan Rumah" },
+      ]}
+      columns={columns}
       description="Kelola data status kepemilikan rumah"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="status"
+      queryKey="status-kepemilikan-rumah"
+      searchFields={["status"]}
       service={{
         get: () => masterService.getStatusKepemilikanRumah(),
         create: (data) => masterService.createStatusKepemilikanRumah(data),
         update: (id, data) => masterService.updateStatusKepemilikanRumah(id, data),
         delete: (id) => masterService.deleteStatusKepemilikanRumah(id)
       }}
-      queryKey="status-kepemilikan-rumah"
-      columns={columns}
+      title="Data Status Kepemilikan Rumah"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="status"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Status Kepemilikan Rumah" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["status"]}
     />
   );
 }

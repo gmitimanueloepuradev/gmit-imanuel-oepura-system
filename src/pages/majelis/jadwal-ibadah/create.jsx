@@ -3,6 +3,16 @@ import { useRouter } from "next/router";
 import { useForm, FormProvider } from "react-hook-form";
 import "leaflet/dist/leaflet.css";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  FileText,
+  Book,
+  Target,
+} from "lucide-react";
+
 import { showToast } from "@/utils/showToast";
 import jadwalIbadahService from "@/services/jadwalIbadahService";
 import Stepper, {
@@ -18,15 +28,6 @@ import DatePicker from "@/components/ui/inputs/DatePicker";
 import TimeInput from "@/components/ui/inputs/TimeInput";
 import LocationMapPicker from "@/components/ui/inputs/LocationMapPicker";
 import PageHeader from "@/components/ui/PageHeader";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  FileText,
-  Book,
-  Target,
-} from "lucide-react";
 import NumberInput from "@/components/ui/inputs/NumberInput";
 import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 
@@ -213,7 +214,7 @@ export default function CreateJadwalIbadah() {
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-4 text-gray-600">Memuat data options...</p>
         </div>
       </div>
@@ -228,8 +229,8 @@ export default function CreateJadwalIbadah() {
             Error loading options: {optionsError.message}
           </p>
           <button
-            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => window.location.reload()}
           >
             Reload Page
           </button>
@@ -245,29 +246,29 @@ export default function CreateJadwalIbadah() {
           <StepContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <AutoCompleteInput
-                name="idJenisIbadah"
+                required
                 label="Jenis Ibadah *"
-                placeholder="Pilih atau cari jenis ibadah..."
+                name="idJenisIbadah"
                 options={options.jenisIbadah || []}
-                required
+                placeholder="Pilih atau cari jenis ibadah..."
               />
               <AutoCompleteInput
-                name="idKategori"
+                required
                 label="Kategori Jadwal *"
-                placeholder="Pilih atau cari kategori..."
+                name="idKategori"
                 options={options.kategoriJadwal || []}
-                required
+                placeholder="Pilih atau cari kategori..."
               />
               <AutoCompleteInput
-                name="idPemimpin"
-                label="Pemimpin Ibadah *"
-                placeholder="Pilih atau cari pemimpin..."
-                options={options.pemimpin || []}
                 required
+                label="Pemimpin Ibadah *"
+                name="idPemimpin"
+                options={options.pemimpin || []}
+                placeholder="Pilih atau cari pemimpin..."
               />
               <TextInput
-                name="judul"
                 label="Judul Ibadah *"
+                name="judul"
                 placeholder="Masukkan judul ibadah"
               />
             </div>
@@ -281,47 +282,47 @@ export default function CreateJadwalIbadah() {
               {/* Date and Time */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <DatePicker
-                  name="tanggal"
+                  required
                   label="Tanggal Ibadah *"
                   leftIcon={<Calendar className="h-4 w-4" />}
-                  required
+                  name="tanggal"
                 />
                 <TimeInput
-                  name="waktuMulai"
                   label="Waktu Mulai"
                   leftIcon={<Clock className="h-4 w-4" />}
+                  name="waktuMulai"
                 />
                 <TimeInput
-                  name="waktuSelesai"
                   label="Waktu Selesai"
                   leftIcon={<Clock className="h-4 w-4" />}
+                  name="waktuSelesai"
                 />
               </div>
 
               {/* Location Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AutoCompleteInput
-                  name="idKeluarga"
                   label="Keluarga (Ibadah Keluarga)"
-                  placeholder="Pilih keluarga untuk ibadah keluarga..."
+                  name="idKeluarga"
                   options={options.keluarga || []}
+                  placeholder="Pilih keluarga untuk ibadah keluarga..."
                 />
                 <AutoCompleteInput
-                  name="idRayon"
                   label="Rayon (Ibadah Rayon)"
-                  placeholder="Pilih rayon untuk ibadah rayon..."
+                  name="idRayon"
                   options={options.rayon || []}
+                  placeholder="Pilih rayon untuk ibadah rayon..."
                 />
               </div>
 
               {/* Map Location Picker */}
               <LocationMapPicker
+                alamatName="alamat"
+                googleMapsLinkName="googleMapsLink"
                 label="Pilih Lokasi di Peta"
                 latitudeName="latitude"
-                longitudeName="longitude"
-                googleMapsLinkName="googleMapsLink"
-                alamatName="alamat"
                 lokasiName="lokasi"
+                longitudeName="longitude"
               />
             </div>
           </StepContent>
@@ -332,22 +333,22 @@ export default function CreateJadwalIbadah() {
           <StepContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextInput
-                name="tema"
                 label="Tema Ibadah"
+                name="tema"
                 placeholder="Masukkan tema ibadah"
               />
               <TextInput
-                name="firman"
                 label="Firman (Ayat)"
+                name="firman"
                 placeholder="Contoh: Yohanes 3:16"
               />
 
               <TextAreaInput
-                name="keterangan"
+                className="md:col-span-2"
                 label="Keterangan"
+                name="keterangan"
                 placeholder="Masukkan keterangan tambahan"
                 rows={6}
-                className="md:col-span-2"
               />
               {/* <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -371,9 +372,9 @@ export default function CreateJadwalIbadah() {
               {/* Target Peserta */}
               <div className="max-w-md">
                 <NumberInput
-                  name={"targetPeserta"}
                   label={"Target Peserta"}
                   min={0}
+                  name={"targetPeserta"}
                   placeholder="Contoh: 50"
                 />
 
@@ -455,13 +456,13 @@ export default function CreateJadwalIbadah() {
   return (
     <>
       <PageTitle 
-        title="Tambah Jadwal Ibadah" 
         description="Buat jadwal ibadah baru untuk rayon Anda" 
+        title="Tambah Jadwal Ibadah" 
       />
       <div className="space-y-6 p-4">
         <PageHeader
-          title="Tambah Jadwal Ibadah"
           subtitle="Buat jadwal ibadah baru untuk rayon Anda"
+          title="Tambah Jadwal Ibadah"
           onBack={() => router.back()}
         />
 
@@ -469,23 +470,23 @@ export default function CreateJadwalIbadah() {
         <FormProvider {...form}>
           <form onSubmit={handleSubmit}>
             <Stepper
-              steps={steps}
               currentStep={currentStep}
+              steps={steps}
               onStepClick={handleStepClick}
             />
 
             {renderStepContent()}
 
             <StepperNavigation
-              currentStep={currentStep}
-              totalSteps={steps.length}
-              onPrevious={handlePrevious}
-              onNext={handleNext}
-              onSubmit={handleSubmit}
-              isLoading={createMutation.isLoading}
               canGoNext={true}
+              currentStep={currentStep}
+              isLoading={createMutation.isLoading}
               nextButtonText="Lanjut"
               submitButtonText="Simpan Jadwal"
+              totalSteps={steps.length}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              onSubmit={handleSubmit}
             />
           </form>
         </FormProvider>

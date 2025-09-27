@@ -182,8 +182,8 @@ function MajelisCreateKeluarga() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Tambah Keluarga Baru"
         description="Menambahkan data keluarga baru untuk rayon yang Anda kelola"
+        title="Tambah Keluarga Baru"
       />
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -192,9 +192,9 @@ function MajelisCreateKeluarga() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <Button
+                className="flex items-center space-x-2"
                 variant="outline"
                 onClick={handleBack}
-                className="flex items-center space-x-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Kembali</span>
@@ -220,16 +220,16 @@ function MajelisCreateKeluarga() {
             </CardHeader>
             <CardContent>
               <FormProvider {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                   {/* Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextInput
                       {...register("noBagungan")}
-                      label="No. Bangunan"
-                      type="number"
-                      placeholder="Contoh: 123"
                       required
                       error={errors.noBagungan?.message}
+                      label="No. Bangunan"
+                      placeholder="Contoh: 123"
+                      type="number"
                     />
                   </div>
 
@@ -242,40 +242,40 @@ function MajelisCreateKeluarga() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       <TextInput
                         {...register("rt")}
-                        label="RT"
-                        type="number"
-                        placeholder="Contoh: 001"
                         required
                         error={errors.rt?.message}
+                        label="RT"
+                        placeholder="Contoh: 001"
+                        type="number"
                       />
                       <TextInput
                         {...register("rw")}
-                        label="RW"
-                        type="number"
-                        placeholder="Contoh: 001"
                         required
                         error={errors.rw?.message}
+                        label="RW"
+                        placeholder="Contoh: 001"
+                        type="number"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <TextInput
                         {...register("jalan")}
-                        label="Alamat Jalan"
-                        placeholder="Contoh: Jl. Merdeka No. 123"
                         required
                         error={errors.jalan?.message}
+                        label="Alamat Jalan"
+                        placeholder="Contoh: Jl. Merdeka No. 123"
                       />
 
                       <SelectInput
                         {...register("idKelurahan")}
+                        required
+                        error={errors.idKelurahan?.message}
                         label="Kelurahan"
                         options={[
                           { value: "", label: "Pilih Kelurahan" },
                           ...kelurahanOptions
                         ]}
-                        required
-                        error={errors.idKelurahan?.message}
                       />
                     </div>
                   </div>
@@ -289,32 +289,32 @@ function MajelisCreateKeluarga() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <SelectInput
                         {...register("idStatusKeluarga")}
+                        error={errors.idStatusKeluarga?.message}
                         label="Status Keluarga"
                         options={[
                           { value: "", label: "Pilih Status Keluarga" },
                           ...statusKeluargaOptions
                         ]}
-                        error={errors.idStatusKeluarga?.message}
                       />
 
                       <SelectInput
                         {...register("idStatusKepemilikanRumah")}
+                        error={errors.idStatusKepemilikanRumah?.message}
                         label="Status Kepemilikan Rumah"
                         options={[
                           { value: "", label: "Pilih Status Kepemilikan" },
                           ...statusKepemilikanRumahOptions
                         ]}
-                        error={errors.idStatusKepemilikanRumah?.message}
                       />
 
                       <SelectInput
                         {...register("idKeadaanRumah")}
+                        error={errors.idKeadaanRumah?.message}
                         label="Keadaan Rumah"
                         options={[
                           { value: "", label: "Pilih Keadaan Rumah" },
                           ...keadaanRumahOptions
                         ]}
-                        error={errors.idKeadaanRumah?.message}
                       />
                     </div>
                   </div>
@@ -322,17 +322,17 @@ function MajelisCreateKeluarga() {
                   {/* Submit Buttons */}
                   <div className="flex justify-end space-x-4 pt-6 border-t">
                     <Button
+                      disabled={isSubmitting}
                       type="button"
                       variant="outline"
                       onClick={handleBack}
-                      disabled={isSubmitting}
                     >
                       Batal
                     </Button>
                     <Button
-                      type="submit"
-                      disabled={isSubmitting}
                       className="flex items-center space-x-2"
+                      disabled={isSubmitting}
+                      type="submit"
                     >
                       <Save className="h-4 w-4" />
                       <span>

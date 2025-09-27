@@ -314,7 +314,7 @@ function MajelisCreateJemaatInKeluarga() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardContent className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
               <p>Memuat data keluarga...</p>
             </CardContent>
           </Card>
@@ -326,8 +326,8 @@ function MajelisCreateJemaatInKeluarga() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Tambah Kepala Keluarga"
         description="Menambahkan kepala keluarga untuk keluarga yang baru dibuat"
+        title="Tambah Kepala Keluarga"
       />
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -336,9 +336,9 @@ function MajelisCreateJemaatInKeluarga() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <Button
+                className="flex items-center space-x-2"
                 variant="outline"
                 onClick={handleBack}
-                className="flex items-center space-x-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Kembali</span>
@@ -392,15 +392,15 @@ function MajelisCreateJemaatInKeluarga() {
             </CardHeader>
             <CardContent>
               <FormProvider {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                   {/* Basic Personal Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <TextInput
                       {...register("nama")}
-                      label="Nama Lengkap"
-                      placeholder="Contoh: John Doe"
                       required
                       error={errors.nama?.message}
+                      label="Nama Lengkap"
+                      placeholder="Contoh: John Doe"
                     />
 
                     <AutoCompleteInput
@@ -430,10 +430,10 @@ function MajelisCreateJemaatInKeluarga() {
 
                     <TextInput
                       {...register("tempatLahir")}
-                      label="Tempat Lahir"
-                      placeholder="Contoh: Jakarta"
                       required
                       error={errors.tempatLahir?.message}
+                      label="Tempat Lahir"
+                      placeholder="Contoh: Jakarta"
                     />
 
                     <AutoCompleteInput
@@ -580,37 +580,37 @@ function MajelisCreateJemaatInKeluarga() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <TextInput
                         {...register("email")}
-                        label="Email"
-                        type="email"
-                        placeholder="contoh@email.com"
                         required
                         error={errors.email?.message}
+                        label="Email"
+                        placeholder="contoh@email.com"
+                        type="email"
                       />
 
                       <PhoneInput
                         {...register("nomorTelepon")}
-                        label="Nomor WhatsApp"
                         required
                         error={errors.nomorTelepon?.message}
+                        label="Nomor WhatsApp"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <TextInput
                         {...register("username")}
-                        label="Username"
-                        placeholder="Contoh: john123"
                         required
                         error={errors.username?.message}
+                        label="Username"
+                        placeholder="Contoh: john123"
                       />
 
                       <TextInput
                         {...register("password")}
-                        label="Password"
-                        type="password"
-                        placeholder="Minimal 6 karakter"
                         required
                         error={errors.password?.message}
+                        label="Password"
+                        placeholder="Minimal 6 karakter"
+                        type="password"
                       />
                     </div>
                   </div>
@@ -618,28 +618,28 @@ function MajelisCreateJemaatInKeluarga() {
                   {/* Submit Buttons */}
                   <div className="flex justify-between pt-6 border-t">
                     <Button
+                      className="text-gray-600"
+                      disabled={isSubmitting}
                       type="button"
                       variant="outline"
                       onClick={handleSkip}
-                      disabled={isSubmitting}
-                      className="text-gray-600"
                     >
                       Lewati (Tambah Nanti)
                     </Button>
 
                     <div className="flex space-x-4">
                       <Button
+                        disabled={isSubmitting}
                         type="button"
                         variant="outline"
                         onClick={handleBack}
-                        disabled={isSubmitting}
                       >
                         Batal
                       </Button>
                       <Button
-                        type="submit"
-                        disabled={isSubmitting}
                         className="flex items-center space-x-2"
+                        disabled={isSubmitting}
+                        type="submit"
                       >
                         <Save className="h-4 w-4" />
                         <span>

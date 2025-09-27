@@ -47,13 +47,13 @@ export default function TimeInput({
             id={inputId}
             type="time"
             {...field}
-            style={{
-              colorScheme: "light", // Ensures consistent styling across browsers
-            }}
-            placeholder={placeholder}
             className={`w-full ${leftIcon ? "pl-10" : "pl-3"} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               error ? "border-red-500 focus:ring-red-500" : ""
             }`}
+            placeholder={placeholder}
+            style={{
+              colorScheme: "light", // Ensures consistent styling across browsers
+            }}
             {...props}
           />
         </div>
@@ -82,18 +82,18 @@ export default function TimeInput({
           </div>
         )}
         <input
-          id={inputId}
-          type="time"
-          name={name}
-          value={value || ""}
-          onChange={(e) => onChange?.(e.target.value)}
-          style={{
-            colorScheme: "light", // Ensures consistent styling across browsers
-          }}
-          placeholder={placeholder}
           className={`w-full ${leftIcon ? "pl-10" : "pl-3"} pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             externalError ? "border-red-500 focus:ring-red-500" : ""
           }`}
+          id={inputId}
+          name={name}
+          placeholder={placeholder}
+          style={{
+            colorScheme: "light", // Ensures consistent styling across browsers
+          }}
+          type="time"
+          value={value || ""}
+          onChange={(e) => onChange?.(e.target.value)}
           {...props}
         />
       </div>

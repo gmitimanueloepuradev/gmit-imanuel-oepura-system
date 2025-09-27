@@ -49,26 +49,26 @@ export default function SukuPage() {
 
   return (
     <MasterDataPage
-      title="Data Suku"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Suku" },
+      ]}
+      columns={columns}
       description="Kelola data suku"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="namaSuku"
+      queryKey="suku"
+      searchFields={["namaSuku"]}
       service={{
         get: () => masterService.getSuku(),
         create: (data) => masterService.createSuku(data),
         update: (id, data) => masterService.updateSuku(id, data),
         delete: (id) => masterService.deleteSuku(id),
       }}
-      queryKey="suku"
-      columns={columns}
+      title="Data Suku"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="namaSuku"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Suku" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["namaSuku"]}
     />
   );
 }

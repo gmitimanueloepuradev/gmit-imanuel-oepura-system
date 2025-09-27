@@ -66,11 +66,11 @@ export default function DailyVerse() {
         <div className="bg-gradient-to-br rounded-2xl p-2 w-full h-full flex items-center justify-center overflow-hidden">
           <div className="relative w-full h-full">
             <Image
+              fill
               alt="Alkitab Kudus"
               className="object-cover rounded-xl shadow-lg"
-              src="/bible-image.webp"
-              fill
               sizes="(min-width: 768px) 288px, 100vw"
+              src="/bible-image.webp"
             />
           </div>
         </div>

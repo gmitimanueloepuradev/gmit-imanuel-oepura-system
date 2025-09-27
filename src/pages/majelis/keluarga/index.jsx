@@ -1,10 +1,3 @@
-import { Button } from "@/components/ui/Button";
-import ButtonActions from "@/components/ui/ButtonActions";
-import { Card, CardContent } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import keluargaService from "@/services/keluargaService";
-import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
@@ -19,6 +12,14 @@ import {
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
+import { Button } from "@/components/ui/Button";
+import ButtonActions from "@/components/ui/ButtonActions";
+import { Card, CardContent } from "@/components/ui/Card";
+import PageTitle from "@/components/ui/PageTitle";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import keluargaService from "@/services/keluargaService";
+import { useAuth } from "@/contexts/AuthContext";
+
 // Page Header Component
 function PageHeader({ title, description, breadcrumb, onAdd }) {
   return (
@@ -26,7 +27,7 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
-          <nav className="flex mb-4" aria-label="Breadcrumb">
+          <nav aria-label="Breadcrumb" className="flex mb-4">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               {breadcrumb.map((item, index) => (
                 <li key={index} className="inline-flex items-center">
@@ -37,16 +38,16 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
                       viewBox="0 0 20 20"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                         clipRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        fillRule="evenodd"
                       />
                     </svg>
                   )}
                   {item.href ? (
                     <a
-                      href={item.href}
                       className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                      href={item.href}
                     >
                       {item.label}
                     </a>
@@ -94,24 +95,24 @@ function TableSkeleton() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center mb-3">
-                <div className="h-5 w-5 bg-gray-300 rounded mr-2"></div>
-                <div className="h-5 bg-gray-300 rounded w-32"></div>
+                <div className="h-5 w-5 bg-gray-300 rounded mr-2" />
+                <div className="h-5 bg-gray-300 rounded w-32" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
-                  <div className="h-6 bg-gray-300 rounded w-full"></div>
+                  <div className="h-4 bg-gray-300 rounded w-24 mb-1" />
+                  <div className="h-6 bg-gray-300 rounded w-full" />
                 </div>
                 <div>
-                  <div className="h-4 bg-gray-300 rounded w-20 mb-1"></div>
-                  <div className="h-6 bg-gray-300 rounded w-16"></div>
+                  <div className="h-4 bg-gray-300 rounded w-20 mb-1" />
+                  <div className="h-6 bg-gray-300 rounded w-16" />
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
-              <div className="h-8 w-8 bg-gray-300 rounded"></div>
-              <div className="h-8 w-8 bg-gray-300 rounded"></div>
-              <div className="h-8 w-8 bg-gray-300 rounded"></div>
+              <div className="h-8 w-8 bg-gray-300 rounded" />
+              <div className="h-8 w-8 bg-gray-300 rounded" />
+              <div className="h-8 w-8 bg-gray-300 rounded" />
             </div>
           </div>
         </div>
@@ -177,19 +178,19 @@ export default function MajelisKeluargaPage() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        title="Data Keluarga"
         description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'} - GMIT Imanuel Oepura`}
+        title="Data Keluarga"
       />
 
       <div className="space-y-6 p-4">
         {/* Page Header */}
         <PageHeader
-          title="Data Keluarga"
-          description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
           breadcrumb={[
             { label: "Majelis", href: "/majelis" },
             { label: "Data Keluarga" },
           ]}
+          description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
+          title="Data Keluarga"
           onAdd={() => router.push("/majelis/keluarga/create")}
         />
 
@@ -202,9 +203,9 @@ export default function MajelisKeluargaPage() {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <input
-                    type="text"
-                    placeholder="Cari kepala keluarga atau alamat..."
                     className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Cari kepala keluarga atau alamat..."
+                    type="text"
                     value={searchTerm}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
@@ -302,8 +303,8 @@ export default function MajelisKeluargaPage() {
                       <ButtonActions
                         actions={actions}
                         item={item}
-                        type="horizontal"
                         maxVisible={3}
+                        type="horizontal"
                       />
                     </div>
                   </div>
@@ -341,10 +342,10 @@ export default function MajelisKeluargaPage() {
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(paginationInfo.page - 1)}
                     disabled={!paginationInfo.hasPrev}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePageChange(paginationInfo.page - 1)}
                   >
                     Sebelumnya
                   </Button>
@@ -366,10 +367,10 @@ export default function MajelisKeluargaPage() {
                           <span className="px-2 py-1 text-gray-500">...</span>
                         )}
                         <Button
+                          size="sm"
                           variant={
                             paginationInfo.page === page ? "default" : "outline"
                           }
-                          size="sm"
                           onClick={() => handlePageChange(page)}
                         >
                           {page}
@@ -378,10 +379,10 @@ export default function MajelisKeluargaPage() {
                     ))}
 
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(paginationInfo.page + 1)}
                     disabled={!paginationInfo.hasNext}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePageChange(paginationInfo.page + 1)}
                   >
                     Selanjutnya
                   </Button>

@@ -14,13 +14,13 @@ const CustomPieChart = ({ data, title, height = 300, showLegend = true, showLabe
 
     return (
       <text 
-        x={x} 
-        y={y} 
+        dominantBaseline="central" 
         fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="bold"
+        fontSize="12" 
+        fontWeight="bold" 
+        textAnchor={x > cx ? 'start' : 'end'}
+        x={x}
+        y={y}
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -50,17 +50,17 @@ const CustomPieChart = ({ data, title, height = 300, showLegend = true, showLabe
       {title && (
         <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
       )}
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer height={height} width="100%">
         <PieChart>
           <Pie
-            data={data}
             cx="50%"
             cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={80}
-            fill="#8884d8"
+            data={data}
             dataKey="value"
+            fill="#8884d8"
+            label={renderCustomizedLabel}
+            labelLine={false}
+            outerRadius={80}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

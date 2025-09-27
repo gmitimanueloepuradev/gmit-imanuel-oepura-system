@@ -77,26 +77,26 @@ export default function PendapatanPage() {
 
   return (
     <MasterDataPage
-      title="Data Pendapatan"
+      allowBulkDelete={true}
+      breadcrumb={[
+        { label: "Admin", href: "/admin/dashboard" },
+        { label: "Pendapatan" },
+      ]}
+      columns={columns}
       description="Kelola data pendapatan"
+      exportable={true}
+      formFields={formFields}
+      itemNameField="label"
+      queryKey="pendapatan"
+      searchFields={["rentangPendapatan"]}
       service={{
         get: () => masterService.getPendapatan(),
         create: (data) => masterService.createPendapatan(data),
         update: (id, data) => masterService.updatePendapatan(id, data),
         delete: (id) => masterService.deletePendapatan(id)
       }}
-      queryKey="pendapatan"
-      columns={columns}
+      title="Data Pendapatan"
       viewFields={viewFields}
-      formFields={formFields}
-      itemNameField="label"
-      breadcrumb={[
-        { label: "Admin", href: "/admin/dashboard" },
-        { label: "Pendapatan" },
-      ]}
-      exportable={true}
-      allowBulkDelete={true}
-      searchFields={["rentangPendapatan"]}
     />
   );
 }

@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import pengumumanService from "@/services/pengumumanService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import PageHeader from "@/components/ui/PageHeader";
 import {
   ArrowLeft,
   Download,
@@ -16,6 +12,11 @@ import {
   Paperclip,
 } from "lucide-react";
 
+import pengumumanService from "@/services/pengumumanService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import PageHeader from "@/components/ui/PageHeader";
+
 // Loading Skeleton
 function AttachmentsSkeleton() {
   return (
@@ -24,12 +25,12 @@ function AttachmentsSkeleton() {
         <div key={i} className="animate-pulse">
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <div className="h-5 w-5 bg-gray-300 rounded"></div>
-              <div className="h-8 w-16 bg-gray-300 rounded"></div>
+              <div className="h-5 w-5 bg-gray-300 rounded" />
+              <div className="h-8 w-16 bg-gray-300 rounded" />
             </div>
             <div className="space-y-2">
-              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-3/4" />
+              <div className="h-3 bg-gray-300 rounded w-1/2" />
             </div>
           </div>
         </div>
@@ -51,8 +52,8 @@ function FilePreviewModal({ file, isOpen, onClose }) {
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold">{file.fileName}</h3>
           <button
-            onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg"
+            onClick={onClose}
           >
             <X className="h-5 w-5" />
           </button>
@@ -62,9 +63,9 @@ function FilePreviewModal({ file, isOpen, onClose }) {
           {isImage ? (
             <div className="max-h-96 overflow-hidden flex justify-center">
               <img
-                src={fileUrl}
                 alt={file.fileName}
                 className="max-w-full h-auto rounded-lg"
+                src={fileUrl}
                 style={{ maxHeight: '24rem' }}
               />
             </div>
@@ -75,8 +76,8 @@ function FilePreviewModal({ file, isOpen, onClose }) {
                 Preview tidak tersedia untuk file PDF
               </p>
               <Button
-                onClick={() => pengumumanService.downloadFile(file)}
                 className="inline-flex items-center gap-2"
+                onClick={() => pengumumanService.downloadFile(file)}
               >
                 <Download className="h-4 w-4" />
                 Download File
@@ -130,19 +131,19 @@ function FileCard({ file, onPreview, onDownload }) {
         <div className="flex gap-2">
           {isImage && (
             <Button
+              className="p-2"
               size="sm"
               variant="outline"
               onClick={() => onPreview(file)}
-              className="p-2"
             >
               <Eye className="h-4 w-4" />
             </Button>
           )}
           <Button
+            className="p-2"
             size="sm"
             variant="outline"
             onClick={() => onDownload(file)}
-            className="p-2"
           >
             <Download className="h-4 w-4" />
           </Button>
@@ -196,12 +197,12 @@ export default function AttachmentsPage() {
     return (
       <div className="space-y-6 p-4">
         <PageHeader
-          title="Lampiran Pengumuman"
           breadcrumb={[
             { label: "Admin", href: "/admin/dashboard" },
             { label: "Pengumuman", href: "/admin/pengumuman" },
             { label: "Lampiran" },
           ]}
+          title="Lampiran Pengumuman"
         />
         
         <Card>
@@ -233,13 +234,13 @@ export default function AttachmentsPage() {
   return (
     <div className="space-y-6 p-4">
       <PageHeader
-        title={`Lampiran: ${pengumuman.judul || 'Loading...'}`}
-        description={`${totalAttachments} file lampiran`}
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Pengumuman", href: "/admin/pengumuman" },
           { label: "Lampiran" },
         ]}
+        description={`${totalAttachments} file lampiran`}
+        title={`Lampiran: ${pengumuman.judul || 'Loading...'}`}
       />
 
       {/* Back Button */}
@@ -291,8 +292,8 @@ export default function AttachmentsPage() {
                   <FileCard
                     key={index}
                     file={file}
-                    onPreview={handlePreview}
                     onDownload={handleDownload}
+                    onPreview={handlePreview}
                   />
                 ))}
               </div>
@@ -301,12 +302,12 @@ export default function AttachmentsPage() {
               {attachments.length > 1 && (
                 <div className="mt-6 pt-4 border-t">
                   <Button
+                    className="inline-flex items-center gap-2"
                     onClick={() => {
                       attachments.forEach(file => {
                         setTimeout(() => pengumumanService.downloadFile(file), 100);
                       });
                     }}
-                    className="inline-flex items-center gap-2"
                   >
                     <Download className="h-4 w-4" />
                     Download Semua ({attachments.length} file)

@@ -1,8 +1,10 @@
 "use client";
+import { Building2, Building, MapPin, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
 import { Text } from "@/components/ui/Text";
-import { Building2, Building, MapPin, Home } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
-import { useRouter } from "next/navigation";
+
 
 export default function WilayahAdministratifPage() {
   const router = useRouter();
@@ -59,7 +61,7 @@ export default function WilayahAdministratifPage() {
             Pilih tingkat wilayah administratif yang ingin Anda kelola untuk
             sistem anda.
           </p>
-          <div className="w-24 h-px bg-gray-300 mx-auto mt-6"></div>
+          <div className="w-24 h-px bg-gray-300 mx-auto mt-6" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -82,8 +84,8 @@ export default function WilayahAdministratifPage() {
                 </CardHeader>
                 <CardFooter className="justify-center">
                   <Button
-                    size="sm"
                     className="bg-gray-600 text-white hover:bg-gray-700"
+                    size="sm"
                   >
                     Buka
                   </Button>

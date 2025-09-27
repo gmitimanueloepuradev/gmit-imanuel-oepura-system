@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Download, X, Smartphone } from "lucide-react";
+
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 export default function PWAInstallBanner() {
@@ -67,9 +68,9 @@ export default function PWAInstallBanner() {
             </div>
           </div>
           <button
-            onClick={handleDismiss}
-            className="text-blue-200 hover:text-white p-1 ml-2 flex-shrink-0"
             aria-label="Tutup"
+            className="text-blue-200 hover:text-white p-1 ml-2 flex-shrink-0"
+            onClick={handleDismiss}
           >
             <X size={16} />
           </button>
@@ -77,15 +78,15 @@ export default function PWAInstallBanner() {
 
         <div className="flex space-x-2 mt-3">
           <button
-            onClick={handleInstall}
             className="bg-white text-blue-600 px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-50 transition-colors flex items-center space-x-1 flex-1"
+            onClick={handleInstall}
           >
             <Download size={14} />
             <span>{isIOS ? "Lihat Cara" : "Install"}</span>
           </button>
           <button
-            onClick={handleDismiss}
             className="bg-blue-500 bg-opacity-50 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-opacity-70 transition-colors"
+            onClick={handleDismiss}
           >
             Nanti
           </button>

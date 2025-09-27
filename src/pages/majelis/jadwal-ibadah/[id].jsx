@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { showToast } from "@/utils/showToast";
-import jadwalIbadahService from "@/services/jadwalIbadahService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import PageHeader from "@/components/ui/PageHeader";
-import PageTitle from "@/components/ui/PageTitle";
 import {
   Calendar,
   Clock,
@@ -22,6 +15,14 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+
+import { showToast } from "@/utils/showToast";
+import jadwalIbadahService from "@/services/jadwalIbadahService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function DetailJadwalIbadah() {
   const router = useRouter();
@@ -94,7 +95,7 @@ export default function DetailJadwalIbadah() {
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-4 text-gray-600">Memuat detail jadwal...</p>
         </div>
       </div>
@@ -136,14 +137,14 @@ export default function DetailJadwalIbadah() {
   return (
     <>
       <PageTitle 
-        title={`Detail: ${jadwal.judul}`} 
         description="Informasi lengkap jadwal ibadah" 
+        title={`Detail: ${jadwal.judul}`} 
       />
       
       <div className="space-y-6 p-4">
         <PageHeader
-          title="Detail Jadwal Ibadah"
           subtitle="Informasi lengkap jadwal ibadah"
+          title="Detail Jadwal Ibadah"
           onBack={() => router.back()}
         />
 
@@ -170,10 +171,10 @@ export default function DetailJadwalIbadah() {
               Edit
             </Button>
             <Button
+              className="text-red-600 border-red-300 hover:bg-red-50"
+              disabled={deleteMutation.isLoading}
               variant="outline"
               onClick={handleDelete}
-              disabled={deleteMutation.isLoading}
-              className="text-red-600 border-red-300 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Hapus
@@ -285,8 +286,8 @@ export default function DetailJadwalIbadah() {
                 {jadwal.googleMapsLink && (
                   <div>
                     <Button
-                      variant="outline"
                       size="sm"
+                      variant="outline"
                       onClick={() => window.open(jadwal.googleMapsLink, '_blank')}
                     >
                       <MapPin className="w-4 h-4 mr-2" />

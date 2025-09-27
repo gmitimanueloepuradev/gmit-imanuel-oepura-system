@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import AppNavbar from "@/components/partials/AppNavbar";
 import AppFooter from "@/components/partials/AppFooter";
 
@@ -13,12 +14,12 @@ export default function RoleLayout({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <AppNavbar
-        role={role}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        userInfo={userInfo}
         isCollapsed={isCollapsed}
+        role={role}
         setIsCollapsed={setIsCollapsed}
+        setSidebarOpen={setSidebarOpen}
+        sidebarOpen={sidebarOpen}
+        userInfo={userInfo}
       />
 
       {/* Main content - Responsive to sidebar collapse */}

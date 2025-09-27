@@ -2,18 +2,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm, FormProvider } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { showToast } from "@/utils/showToast";
-import pengumumanService from "@/services/pengumumanService";
-import Stepper, {
-  StepContent,
-  StepperNavigation,
-} from "@/components/ui/Stepper";
-import { Card } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import PageHeader from "@/components/ui/PageHeader";
 import {
   Bell,
   FileText,
@@ -26,6 +14,19 @@ import {
   Target,
   Settings,
 } from "lucide-react";
+
+import { showToast } from "@/utils/showToast";
+import pengumumanService from "@/services/pengumumanService";
+import Stepper, {
+  StepContent,
+  StepperNavigation,
+} from "@/components/ui/Stepper";
+import { Card } from "@/components/ui/Card";
+import PageTitle from "@/components/ui/PageTitle";
+import TextInput from "@/components/ui/inputs/TextInput";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import PageHeader from "@/components/ui/PageHeader";
 import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 import { Button } from "@/components/ui/Button";
 
@@ -335,7 +336,7 @@ const FileUploadSection = ({ form, attachments, setAttachments }) => {
         <div className="text-center">
           <Upload className="mx-auto h-12 w-12 text-gray-400" />
           <div className="mt-4">
-            <label htmlFor="file-upload" className="cursor-pointer">
+            <label className="cursor-pointer" htmlFor="file-upload">
               <span className="mt-2 block text-sm font-medium text-gray-900">
                 Pilih file untuk diupload
               </span>
@@ -343,20 +344,20 @@ const FileUploadSection = ({ form, attachments, setAttachments }) => {
                 PNG, JPG, JPEG, PDF
               </span>
               <input
+                multiple
+                accept="image/*,.pdf"
+                className="sr-only"
+                disabled={uploading}
                 id="file-upload"
                 name="file-upload"
                 type="file"
-                className="sr-only"
-                multiple
-                accept="image/*,.pdf"
                 onChange={handleFileUpload}
-                disabled={uploading}
               />
               <Button
-                type="button"
-                variant="outline"
                 className="mt-2"
                 disabled={uploading}
+                type="button"
+                variant="outline"
                 onClick={() => document.getElementById('file-upload').click()}
               >
                 {uploading ? "Mengupload..." : "Pilih File"}
@@ -413,9 +414,9 @@ const FileUploadSection = ({ form, attachments, setAttachments }) => {
                   </div>
                 </div>
                 <button
+                  className="ml-4 text-red-400 hover:text-red-600"
                   type="button"
                   onClick={() => removeFile(index)}
-                  className="ml-4 text-red-400 hover:text-red-600"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -576,13 +577,13 @@ export default function CreatePengumuman() {
   return (
     <div className="space-y-6 p-4">
       <PageHeader
-        title="Buat Pengumuman Baru"
-        description="Buat pengumuman untuk jemaat dan majelis gereja"
         breadcrumb={[
           { label: "Majelis", href: "/majelis/dashboard" },
           { label: "Pengumuman", href: "/majelis/pengumuman" },
           { label: "Buat Baru" },
         ]}
+        description="Buat pengumuman untuk jemaat dan majelis gereja"
+        title="Buat Pengumuman Baru"
       />
 
       <Card className="p-6">
@@ -613,10 +614,10 @@ export default function CreatePengumuman() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="lg:col-span-2">
                       <TextInput
-                        name="judul"
-                        label="Judul Pengumuman"
-                        placeholder="Masukkan judul pengumuman..."
                         required
+                        label="Judul Pengumuman"
+                        name="judul"
+                        placeholder="Masukkan judul pengumuman..."
                         validation={{ 
                           required: "Judul pengumuman wajib diisi",
                           maxLength: { value: 255, message: "Judul maksimal 255 karakter" }
@@ -625,33 +626,33 @@ export default function CreatePengumuman() {
                     </div>
 
                     <SelectInput
-                      name="kategoriId"
+                      required
                       label="Kategori Pengumuman"
-                      placeholder="Pilih kategori..."
+                      name="kategoriId"
                       options={kategoriOptions.map(k => ({
                         value: k.id,
                         label: k.nama
                       }))}
-                      required
+                      placeholder="Pilih kategori..."
                       validation={{ required: "Kategori pengumuman wajib dipilih" }}
                     />
 
                     {watchKategori && jenisOptions.length > 0 && (
                       <SelectInput
-                        name="jenisId"
                         label="Jenis Pengumuman"
-                        placeholder="Pilih jenis pengumuman..."
+                        name="jenisId"
                         options={jenisOptions.map(j => ({
                           value: j.id,
                           label: j.nama
                         }))}
+                        placeholder="Pilih jenis pengumuman..."
                       />
                     )}
 
                     <DatePicker
-                      name="tanggalPengumuman"
-                      label="Tanggal Pengumuman"
                       required
+                      label="Tanggal Pengumuman"
+                      name="tanggalPengumuman"
                       validation={{ required: "Tanggal pengumuman wajib diisi" }}
                     />
                   </div>
@@ -678,8 +679,8 @@ export default function CreatePengumuman() {
                   {watchKategori ? (
                     <DynamicContentForm
                       form={form}
-                      kategoriId={watchKategori}
                       jenisId={watchJenis}
+                      kategoriId={watchKategori}
                     />
                   ) : (
                     <div className="text-center py-8 text-gray-500">
@@ -709,8 +710,8 @@ export default function CreatePengumuman() {
 
                   {/* File Upload Section */}
                   <FileUploadSection
-                    form={form}
                     attachments={attachments}
+                    form={form}
                     setAttachments={setAttachments}
                   />
 
@@ -722,8 +723,8 @@ export default function CreatePengumuman() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                       <SelectInput
-                        name="status"
                         label="Status"
+                        name="status"
                         options={statusOptions.map(s => ({
                           value: s.value,
                           label: s.label
@@ -731,8 +732,8 @@ export default function CreatePengumuman() {
                       />
 
                       <SelectInput
-                        name="prioritas"
                         label="Prioritas"
+                        name="prioritas"
                         options={prioritasOptions.map(p => ({
                           value: p.value,
                           label: p.label
@@ -741,12 +742,12 @@ export default function CreatePengumuman() {
 
                       <div className="flex items-center space-x-3">
                         <input
-                          type="checkbox"
                           id="isPinned"
+                          type="checkbox"
                           {...form.register("isPinned")}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <label htmlFor="isPinned" className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-900 flex items-center gap-2" htmlFor="isPinned">
                           <Pin className="h-4 w-4" />
                           Pin Pengumuman
                         </label>
@@ -759,11 +760,11 @@ export default function CreatePengumuman() {
 
             <StepperNavigation
               currentStep={currentStep}
-              totalSteps={steps.length}
-              onPrevious={handlePrev}
-              onNext={handleNext}
-              onSubmit={handleFinish}
               isLoading={createMutation.isPending}
+              totalSteps={steps.length}
+              onNext={handleNext}
+              onPrevious={handlePrev}
+              onSubmit={handleFinish}
             />
           </form>
         </FormProvider>

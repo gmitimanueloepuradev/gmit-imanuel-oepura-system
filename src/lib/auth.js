@@ -1,5 +1,6 @@
 import { verifyToken, getTokenFromHeader } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabaseClient";
 
 // Get current user from Supabase session
 export const getCurrentUser = async () => {

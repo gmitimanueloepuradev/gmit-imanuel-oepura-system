@@ -29,17 +29,17 @@ export default function TextAreaInput({
     return (
       <div className={`${className}`}>
         <label
-          htmlFor={textareaId}
           className="block text-sm font-medium text-gray-700 mb-2"
+          htmlFor={textareaId}
         >
           {label}
         </label>
         <textarea
           id={textareaId}
           {...field}
-          rows={rows}
           className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           placeholder={placeholder}
+          rows={rows}
           {...props}
         />
         {error && <p className="text-red-500 text-sm mt-2">{error.message}</p>}
@@ -51,19 +51,19 @@ export default function TextAreaInput({
   return (
     <div className={`${className}`}>
       <label
-        htmlFor={textareaId}
         className="block text-sm font-medium text-gray-700 mb-2"
+        htmlFor={textareaId}
       >
         {label}
       </label>
       <textarea
+        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         id={textareaId}
         name={name}
+        placeholder={placeholder}
+        rows={rows}
         value={value || ""}
         onChange={(e) => onChange?.(e.target.value)}
-        rows={rows}
-        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        placeholder={placeholder}
         {...props}
       />
       {externalError && <p className="text-red-500 text-sm mt-2">{externalError}</p>}
