@@ -16,8 +16,23 @@ export const signToken = (payload, expiresIn = JWT_EXPIRES_IN) => {
   });
 };
 
-export const verifyToken = (token) => {
+export const verifyToken = (reqOrToken) => {
   try {
+    let token;
+
+    // If it's a request object, extract token from header
+    if (reqOrToken && reqOrToken.headers) {
+      const authHeader = reqOrToken.headers.authorization;
+      token = getTokenFromHeader(authHeader);
+    } else {
+      // If it's already a token string
+      token = reqOrToken;
+    }
+
+    if (!token) {
+      return null;
+    }
+
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {
     return null;

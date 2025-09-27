@@ -62,9 +62,7 @@ export default function Document() {
         <link color="#5bbad5" href="/safari-pinned-tab.svg" rel="mask-icon" />
         <link href="/favicon.ico" rel="shortcut icon" />
 
-        {/* Preload critical resources for better LCP */}
-        <link as="image" href="/header/f92411b3.webp" rel="preload" type="image/webp" />
-        <link as="image" href="/logo-GMIT.png" rel="preload" type="image/png" />
+        {/* Preload critical resources moved to specific pages where they are actually used */}
 
         {/* DNS prefetch for external domains */}
         <link href="//beta.ourmanna.com" rel="dns-prefetch" />
@@ -118,6 +116,7 @@ export default function Document() {
       </Head>
       <body className="antialiased">
         <Main />
+
         <NextScript />
       </body>
     </Html>

@@ -250,6 +250,11 @@ export const roleConfigs = {
         icon: UsersRound,
       },
       {
+        href: "/majelis/dokumen-jemaat",
+        label: "Dokumen Jemaat",
+        icon: FileText,
+      },
+      {
         href: "/majelis/jadwal-ibadah",
         label: "Jadwal Ibadah",
         icon: Calendar,

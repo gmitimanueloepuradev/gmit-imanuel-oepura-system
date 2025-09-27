@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -15,7 +15,52 @@ export default function RoleGuard({
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const redirectingRef = useRef(false);
+  const hasRedirected = useRef(false);
+
+  // Reset redirect flag on route change
+  useEffect(() => {
+    const handleRouteChange = () => {
+      hasRedirected.current = false;
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
+
+  useEffect(() => {
+    // Don't run if loading or already redirected
+    if (loading || hasRedirected.current) return;
+
+    if (!user) {
+      // User not authenticated - only redirect if not already on login
+      if (router.pathname !== "/login") {
+        hasRedirected.current = true;
+        router.replace("/login");
+      }
+
+      return;
+    }
+
+    // Check if user role is allowed
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+      // Role not allowed - redirect to appropriate dashboard
+      const redirectPath = redirectTo || getRoleBasedRedirect(user.role);
+
+      // Only redirect if not already on the target path
+      if (router.pathname !== redirectPath) {
+        hasRedirected.current = true;
+        router.replace(redirectPath);
+      }
+
+      return;
+    }
+
+    // User is authorized
+    setIsAuthorized(true);
+  }, [user, loading, router.pathname, allowedRoles, redirectTo]);
 
   // Helper function to get role-based redirect
   function getRoleBasedRedirect(userRole) {
@@ -29,49 +74,16 @@ export default function RoleGuard({
     return roleRedirects[userRole] || "/login";
   }
 
-  useEffect(() => {
-    // Skip if loading or already redirecting
-    if (loading || redirectingRef.current) {
-      return;
-    }
-
-    // User not authenticated
-    if (!user) {
-      // Only redirect if not already on login page
-      if (router.pathname !== "/login") {
-        redirectingRef.current = true;
-        router.replace("/login").finally(() => {
-          redirectingRef.current = false;
-        });
-      }
-      setIsAuthorized(false);
-
-      return;
-    }
-
-    // User authenticated - check role authorization
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-      // Role not allowed - redirect to appropriate dashboard
-      const redirectPath = redirectTo || getRoleBasedRedirect(user.role);
-
-      // Only redirect if not already on the target path
-      if (router.pathname !== redirectPath) {
-        redirectingRef.current = true;
-        router.replace(redirectPath).finally(() => {
-          redirectingRef.current = false;
-        });
-      }
-      setIsAuthorized(false);
-
-      return;
-    }
-
-    // User is authorized
-    setIsAuthorized(true);
-  }, [user, loading, allowedRoles, router, redirectTo]);
-
   // Show loading while checking authentication
-  if (loading || redirectingRef.current || !isAuthorized) {
+  if (
+    loading ||
+    (!user && !hasRedirected.current) ||
+    (user &&
+      allowedRoles.length > 0 &&
+      !allowedRoles.includes(user.role) &&
+      !hasRedirected.current) ||
+    !isAuthorized
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center space-y-4">

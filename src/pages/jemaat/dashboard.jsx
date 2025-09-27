@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   User,
   Home,
@@ -6,6 +7,10 @@ import {
   TrendingUp,
   Clock,
   MapPin,
+  Upload,
+  Bell,
+  FileText,
+  XCircle,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,9 +20,14 @@ import LogoutButton from "@/components/auth/LogoutButton";
 import OnboardingDialog from "@/components/onboarding/OnboardingDialog";
 import api from "@/lib/axios";
 import DailyVerse from "@/components/dashboard/DailyVerse";
+import DocumentProgressBar from "@/components/ui/DocumentProgressBar";
+import DocumentUploadModal from "@/components/modal/DocumentUploadModal";
 
 function JemaatDashboard() {
   const { user, refreshUser } = useAuth();
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [rejectedDocuments, setRejectedDocuments] = useState([]);
 
   // Check if user profile is incomplete (no idJemaat)
   const isProfileIncomplete = !user?.idJemaat;
@@ -49,6 +59,39 @@ function JemaatDashboard() {
     },
     enabled: !!user?.jemaat?.keluarga?.rayon?.id,
   });
+
+  const handleUploadSuccess = () => {
+    setRefreshKey(prev => prev + 1);
+    if (user?.idJemaat) {
+      fetchRejectedDocuments(user.idJemaat);
+    }
+  };
+
+  const fetchRejectedDocuments = async (jemaatId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/dokumen/jemaat/${jemaatId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const rejected = data.data.filter(doc => doc.statusDokumen === 'REJECTED');
+        setRejectedDocuments(rejected);
+      }
+    } catch (error) {
+      console.error('Error fetching rejected documents:', error);
+    }
+  };
+
+  // Fetch rejected documents when user data is available
+  useEffect(() => {
+    if (user?.idJemaat) {
+      fetchRejectedDocuments(user.idJemaat);
+    }
+  }, [user?.idJemaat, refreshKey]);
 
   return (
     <ProtectedRoute allowedRoles="JEMAAT">
@@ -184,6 +227,88 @@ function JemaatDashboard() {
           <div className="mb-6">
             <DailyVerse />
           </div>
+
+          {/* Document Upload Section */}
+          {user?.idJemaat && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <div className="lg:col-span-2">
+                <DocumentProgressBar key={refreshKey} jemaatId={user.idJemaat} />
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  <span>Dokumen Pribadi</span>
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Upload dan kelola dokumen baptis, sidi, dan nikah Anda untuk melengkapi data gereja.
+                </p>
+                <button
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Upload className="w-5 h-5" />
+                  <span>Upload Dokumen</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Rejected Documents Alert */}
+          {rejectedDocuments.length > 0 && (
+            <div className="mb-6">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0">
+                    <XCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-red-800 mb-2">
+                      Dokumen Ditolak
+                    </h3>
+                    <p className="text-red-700 mb-4">
+                      {rejectedDocuments.length} dokumen Anda telah ditolak dan perlu diperbaiki.
+                      Silakan periksa alasan penolakan dan upload ulang dokumen yang benar.
+                    </p>
+                    <div className="space-y-3">
+                      {rejectedDocuments.map((doc) => (
+                        <div key={doc.id} className="bg-white border border-red-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium text-red-900">
+                              {doc.tipeDokumen === 'BAPTIS' ? 'Surat Baptis' :
+                               doc.tipeDokumen === 'SIDI' ? 'Surat Sidi' : 'Surat Nikah'}
+                            </h4>
+                            <span className="text-xs text-red-600">
+                              Ditolak pada {new Date(doc.verifiedAt).toLocaleDateString('id-ID')}
+                            </span>
+                          </div>
+                          {doc.catatan && (
+                            <div className="bg-red-100 border border-red-200 rounded p-3 text-sm">
+                              <strong className="text-red-800">Alasan Penolakan:</strong>
+                              <p className="text-red-700 mt-1">{doc.catatan}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex space-x-3">
+                      <button
+                        onClick={() => setIsUploadModalOpen(true)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                      >
+                        Upload Ulang Dokumen
+                      </button>
+                      <button
+                        onClick={() => setRejectedDocuments([])}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
+                      >
+                        Tutup Notifikasi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Upcoming Worship Schedules */}
           <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
@@ -343,6 +468,16 @@ function JemaatDashboard() {
             </div>
           </div>
         </main>
+
+        {/* Document Upload Modal */}
+        {user?.idJemaat && (
+          <DocumentUploadModal
+            isOpen={isUploadModalOpen}
+            onClose={() => setIsUploadModalOpen(false)}
+            jemaatId={user.idJemaat}
+            onUploadSuccess={handleUploadSuccess}
+          />
+        )}
       </div>
     </ProtectedRoute>
   );

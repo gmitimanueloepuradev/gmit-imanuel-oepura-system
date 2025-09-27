@@ -4,13 +4,15 @@ import { Toaster } from "sonner";
 
 import AdminLayout from "@/components/layout/AdminLayout";
 import EmployeeLayout from "@/components/layout/EmployeeLayout";
-import Footer from "@/components/layout/footer";
+import Footer from "@/components/layout/Footer";
 import JemaatLayout from "@/components/layout/JemaatLayout";
 import MajelisLayout from "@/components/layout/MajelisLayout";
 import Navigation from "@/components/layout/navigation";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
-import PWAInstallBanner from "@/components/pwa/PWAInstallBanner";
+// import PWAInstallBanner from "@/components/pwa/PWAInstallBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
+// import { PWAProvider } from "@/contexts/PWAContext";
+import PWAInstallBanner from "@/components/pwa/PWAInstallBanner";
 import { PWAProvider } from "@/contexts/PWAContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { queryClient } from "@/lib/queryClient";
@@ -26,6 +28,7 @@ export default function App({ Component, pageProps, router }) {
   const isMajelisPage = pathname.startsWith("/majelis");
   const isEmployeePage = pathname.startsWith("/employee");
   const isOnboardingPage = pathname === "/onboarding";
+
   // If the component has a custom layout, use it
   if (Component.getLayout) {
     return (

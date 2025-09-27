@@ -20,7 +20,7 @@ export default function DailyVerse() {
         "https://beta.ourmanna.com/api/v1/get?format=json",
         {
           signal: controller.signal,
-          cache: 'force-cache' // Cache the response
+          next: { revalidate: 3600 } // Revalidate every hour instead of force-cache
         }
       );
 

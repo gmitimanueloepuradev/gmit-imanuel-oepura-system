@@ -224,6 +224,10 @@ model User {
   jemaat  Jemaat?  @relation(fields: [idJemaat], references: [id])
   majelis Majelis? @relation(fields: [idMajelis], references: [id]) // TAMBAH INI
 
+  // Document relations
+  dokumenUploaded DokumenJemaat[] @relation("DokumenUploader")
+  dokumenVerified DokumenJemaat[] @relation("DokumenVerifier")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -264,6 +268,7 @@ model Jemaat {
   atestasis                     Atestasi[]
   User                          User?
   Majelis                       Majelis[]
+  dokumenJemaat                 DokumenJemaat[] // Documents uploaded by jemaat
 
   // Keuangan relations
   // transaksiPenerimaan TransaksiPenerimaan[]
@@ -729,11 +734,47 @@ enum StatusTransaksi {
 //   @@map("rekap_keuangan")
 // }
 
-//generally useful for storing document metadata
-// model Documents{
-//   id        String   @id @default(dbgenerated("concat('doc_', gen_random_uuid())")) @db.VarChar(80)
-//   title     String   @db.VarChar(255)
-//   content   String   @db.Text
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-// }
+// === DOKUMEN JEMAAT ===
+
+enum TipeDokumen {
+  BAPTIS
+  SIDI
+  NIKAH
+}
+
+enum StatusDokumen {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Model untuk menyimpan dokumen-dokumen jemaat (surat baptis, sidi, nikah)
+model DokumenJemaat {
+  id          String        @id @default(dbgenerated("concat('dok_', gen_random_uuid())")) @db.VarChar(80)
+  jemaatId    String        @db.VarChar(80)
+  tipeDokumen TipeDokumen
+  namaFile    String        @db.VarChar(255) // Nama file asli
+  urlFile     String        @db.Text         // URL file di AWS S3
+  s3Key       String        @db.Text         // S3 key untuk delete file
+  statusDokumen StatusDokumen @default(PENDING)
+  catatan     String?       @db.Text         // Keterangan dari admin jika ditolak
+
+  // Metadata
+  uploadedBy  String        @db.VarChar(80)  // ID user yang upload
+  verifiedAt  DateTime?     @map("verified_at")
+  verifiedBy  String?       @map("verified_by") @db.VarChar(80) // ID admin yang verifikasi
+
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  jemaat    Jemaat @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+  uploader  User   @relation("DokumenUploader", fields: [uploadedBy], references: [id])
+  verifier  User?  @relation("DokumenVerifier", fields: [verifiedBy], references: [id])
+
+  @@unique([jemaatId, tipeDokumen], name: "unique_jemaat_dokumen") // Satu jemaat hanya boleh upload satu dokumen per tipe
+  @@index([jemaatId], name: "idx_dokumen_jemaat")
+  @@index([tipeDokumen], name: "idx_dokumen_tipe")
+  @@index([statusDokumen], name: "idx_dokumen_status")
+  @@map("dokumen_jemaat")
+}

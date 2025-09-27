@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import authService from "@/services/authService";
@@ -8,10 +8,12 @@ const AuthContext = createContext({});
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
-    console.warn(
+  console.warn(
       "useAuth called outside of AuthProvider. Some auth features may not work."
     );
+
     return {
       user: null,
       login: async () => ({ success: false, message: "Auth not initialized" }),
@@ -21,6 +23,7 @@ export const useAuth = () => {
       loading: false,
     };
   }
+
   return context;
 };
 
@@ -30,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session - only run once on mount
     const getInitialSession = async () => {
       try {
         // Initialize auth service and check if authenticated
@@ -38,6 +41,7 @@ export const AuthProvider = ({ children }) => {
 
         if (isAuth) {
           const userData = await authService.getCurrentUser();
+
           setUser(userData);
         }
       } catch (error) {
@@ -48,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     getInitialSession();
-  }, []);
+  }, []); // Empty dependency array - only run once
 
   const login = async (credentials) => {
     try {
@@ -57,6 +61,7 @@ export const AuthProvider = ({ children }) => {
 
       if (result.success) {
         const userData = await authService.getCurrentUser();
+
         setUser(userData);
         toast.success("Login berhasil");
 
@@ -64,17 +69,21 @@ export const AuthProvider = ({ children }) => {
         const redirectUrl =
           result.data.redirect_url ||
           authService.getRoleRedirectUrl(userData?.role || "JEMAAT");
+
         router.push(redirectUrl);
 
         return { success: true };
       } else {
         toast.error(result.message || "Login gagal");
+
         return { success: false, message: result.message };
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Terjadi kesalahan saat login";
+
       toast.error(errorMessage);
+
       return { success: false, message: errorMessage };
     } finally {
       setLoading(false);
@@ -100,12 +109,15 @@ export const AuthProvider = ({ children }) => {
     try {
       if (authService.isAuthenticated()) {
         const userData = await authService.getCurrentUser();
+
         setUser(userData);
+
         return userData;
       }
     } catch (error) {
       console.error("Error refreshing user data:", error);
     }
+
     return null;
   };
 

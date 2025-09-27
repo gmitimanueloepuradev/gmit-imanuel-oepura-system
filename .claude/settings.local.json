@@ -73,7 +73,9 @@
       "Bash(npm run wrangler:dev:*)",
       "Bash(set BUILD_TARGET=capacitor)",
       "Bash(npm run cap:build:*)",
-      "Bash(ren:*)"
+      "Bash(ren:*)",
+      "Bash(ipconfig)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

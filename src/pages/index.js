@@ -33,7 +33,8 @@ export default function Home() {
                 GMIT Imanuel Oepura
               </h1>
               <p className="text-white text-base">
-                Bersama dalam kasih, bertumbuh dalam iman, melayani dalam pengharapan.
+                Bersama dalam kasih, bertumbuh dalam iman, melayani dalam
+                pengharapan.
               </p>
             </div>
           </div>
@@ -97,12 +98,15 @@ export default function Home() {
                 src="/header/f92411b3.webp"
               />
               <div className="absolute flex flex-col p-16">
-                <p className="text-white text-4xl font-bold">Selamat Datang di</p>
+                <p className="text-white text-4xl font-bold">
+                  Selamat Datang di
+                </p>
                 <h1 className="text-white text-6xl font-bold">
                   GMIT Imanuel Oepura
                 </h1>
                 <p className="text-white text-lg">
-                  Bersama dalam kasih, bertumbuh dalam iman, melayani dalam pengharapan.
+                  Bersama dalam kasih, bertumbuh dalam iman, melayani dalam
+                  pengharapan.
                 </p>
               </div>
             </div>
