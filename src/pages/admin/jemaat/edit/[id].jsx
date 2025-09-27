@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import jemaatService from "@/services/jemaatService";
-import masterService from "@/services/masterService";
-import { showToast } from "@/utils/showToast";
+import { Card } from "@/components/ui/Card";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import PageHeader from "@/components/ui/PageHeader";
 import Stepper, {
   StepContent,
   StepperNavigation,
 } from "@/components/ui/Stepper";
-import { Card } from "@/components/ui/Card";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import PageHeader from "@/components/ui/PageHeader";
+import jemaatService from "@/services/jemaatService";
+import masterService from "@/services/masterService";
+import { showToast } from "@/utils/showToast";
 
 const steps = [
   {
@@ -41,7 +41,7 @@ const steps = [
 export default function EditJemaat() {
   const router = useRouter();
   const { id } = router.query;
-  
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     jemaat: {},
@@ -165,14 +165,22 @@ export default function EditJemaat() {
   useEffect(() => {
     if (jemaatData?.data) {
       const jemaat = jemaatData.data;
-      
+
       // Fill jemaat data
       form.setValue("nama", jemaat.nama || "");
       form.setValue("jenisKelamin", jemaat.jenisKelamin ?? true);
-      form.setValue("tanggalLahir", jemaat.tanggalLahir ? new Date(jemaat.tanggalLahir).toISOString().split('T')[0] : "");
+      form.setValue(
+        "tanggalLahir",
+        jemaat.tanggalLahir
+          ? new Date(jemaat.tanggalLahir).toISOString().split("T")[0]
+          : ""
+      );
       form.setValue("golonganDarah", jemaat.golonganDarah || "");
       form.setValue("idKeluarga", jemaat.idKeluarga || "");
-      form.setValue("idStatusDalamKeluarga", jemaat.idStatusDalamKeluarga || "");
+      form.setValue(
+        "idStatusDalamKeluarga",
+        jemaat.idStatusDalamKeluarga || ""
+      );
       form.setValue("idSuku", jemaat.idSuku || "");
       form.setValue("idPendidikan", jemaat.idPendidikan || "");
       form.setValue("idPekerjaan", jemaat.idPekerjaan || "");
@@ -188,22 +196,33 @@ export default function EditJemaat() {
       }
 
       // Check if kepala keluarga and has keluarga data
-      if (jemaat.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")) {
+      if (
+        jemaat.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
+      ) {
         setIsKepalaKeluarga(true);
         setCreateKeluarga(true);
         setCreateAlamat(true);
 
         // Fill keluarga data if exists
         if (jemaat.keluarga) {
-          form.setValue("idStatusKeluarga", jemaat.keluarga.idStatusKeluarga || "");
-          form.setValue("idStatusKepemilikanRumah", jemaat.keluarga.idStatusKepemilikanRumah || "");
+          form.setValue(
+            "idStatusKeluarga",
+            jemaat.keluarga.idStatusKeluarga || ""
+          );
+          form.setValue(
+            "idStatusKepemilikanRumah",
+            jemaat.keluarga.idStatusKepemilikanRumah || ""
+          );
           form.setValue("idKeadaanRumah", jemaat.keluarga.idKeadaanRumah || "");
           form.setValue("idRayon", jemaat.keluarga.idRayon || "");
           form.setValue("noBagungan", jemaat.keluarga.noBagungan || "");
 
           // Fill alamat data if exists
           if (jemaat.keluarga.alamat) {
-            form.setValue("idKelurahan", jemaat.keluarga.alamat.idKelurahan || "");
+            form.setValue(
+              "idKelurahan",
+              jemaat.keluarga.alamat.idKelurahan || ""
+            );
             form.setValue("rt", jemaat.keluarga.alamat.rt || "");
             form.setValue("rw", jemaat.keluarga.alamat.rw || "");
             form.setValue("jalan", jemaat.keluarga.alamat.jalan || "");
@@ -232,7 +251,11 @@ export default function EditJemaat() {
       } else {
         setIsKepalaKeluarga(false);
         // Don't automatically set to false if editing existing data
-        if (!jemaatData?.data?.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")) {
+        if (
+          !jemaatData?.data?.statusDalamKeluarga?.status
+            ?.toLowerCase()
+            .includes("kepala")
+        ) {
           setCreateKeluarga(false);
           setCreateAlamat(false);
         }
@@ -253,7 +276,8 @@ export default function EditJemaat() {
     onError: (error) => {
       showToast({
         title: "Gagal",
-        description: error.response?.data?.message || "Gagal memperbarui data jemaat",
+        description:
+          error.response?.data?.message || "Gagal memperbarui data jemaat",
         color: "error",
       });
     },
@@ -292,6 +316,7 @@ export default function EditJemaat() {
             description: "Password dan konfirmasi password tidak cocok",
             color: "error",
           });
+
           return;
         }
 
@@ -310,6 +335,7 @@ export default function EditJemaat() {
         };
 
         const password = form.getValues("password");
+
         if (password) {
           userData.password = password;
         }
@@ -343,6 +369,7 @@ export default function EditJemaat() {
   const getMaxStep = () => {
     if (!createUserAccount) return 1;
     if (!createKeluarga) return 2;
+
     // Alamat is always required when creating keluarga
     return 4;
   };
@@ -404,12 +431,7 @@ export default function EditJemaat() {
     }
 
     if (currentStep === 4 && createKeluarga) {
-      return (
-        values.idKelurahan &&
-        values.rt &&
-        values.rw &&
-        values.jalan
-      );
+      return values.idKelurahan && values.rt && values.rw && values.jalan;
     }
 
     return true;
@@ -709,7 +731,9 @@ export default function EditJemaat() {
                     onChange={(e) => setCreateUserAccount(e.target.checked)}
                   />
                   <span className="text-sm font-medium text-gray-700">
-                    {hasExistingUser ? "Perbarui akun user" : "Buatkan akun user untuk jemaat ini"}
+                    {hasExistingUser
+                      ? "Perbarui akun user"
+                      : "Buatkan akun user untuk jemaat ini"}
                   </span>
                 </label>
                 {hasExistingUser && (
@@ -751,7 +775,9 @@ export default function EditJemaat() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {hasExistingUser ? "Password Baru (kosongkan jika tidak diubah)" : "Password *"}
+                      {hasExistingUser
+                        ? "Password Baru (kosongkan jika tidak diubah)"
+                        : "Password *"}
                     </label>
                     <input
                       type="password"
@@ -759,7 +785,11 @@ export default function EditJemaat() {
                         required: !hasExistingUser && createUserAccount,
                       })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={hasExistingUser ? "Kosongkan jika tidak diubah" : "Minimal 8 karakter"}
+                      placeholder={
+                        hasExistingUser
+                          ? "Kosongkan jika tidak diubah"
+                          : "Minimal 8 karakter"
+                      }
                     />
                   </div>
 
@@ -771,7 +801,9 @@ export default function EditJemaat() {
                       <input
                         type="password"
                         {...form.register("confirmPassword", {
-                          required: (!hasExistingUser && createUserAccount) || form.watch("password"),
+                          required:
+                            (!hasExistingUser && createUserAccount) ||
+                            form.watch("password"),
                         })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Ulangi password"
@@ -789,10 +821,9 @@ export default function EditJemaat() {
               <div className="mb-6">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-700">
-                    {isKepalaKeluarga 
+                    {isKepalaKeluarga
                       ? "Jemaat ini adalah kepala keluarga. Silakan lengkapi data keluarga."
-                      : "Perbarui data keluarga untuk jemaat ini."
-                    }
+                      : "Perbarui data keluarga untuk jemaat ini."}
                   </p>
                 </div>
               </div>

@@ -5,11 +5,13 @@ import {
   BookOpen,
   Calendar,
   DollarSign,
+  PinIcon,
   UserCheck,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import DailyVerse from "@/components/dashboard/DailyVerse";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -21,9 +23,10 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 import { formatNumber } from "@/lib/formatUtils";
 import dashboardService from "@/services/dashboardService";
-import DailyVerse from "@/components/dashboard/DailyVerse";
+import { getEventTypeBadge, getStatusBadge } from "@/utils/common";
 
 export default function DashboardPageAdmin() {
   const [stats, setStats] = useState({
@@ -105,32 +108,6 @@ export default function DashboardPageAdmin() {
     },
   ];
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "completed":
-        return <Badge variant="success">Selesai</Badge>;
-      case "approved":
-        return <Badge variant="success">Disetujui</Badge>;
-      case "pending":
-        return <Badge variant="warning">Menunggu</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const getEventTypeBadge = (type) => {
-    switch (type) {
-      case "worship":
-        return <Badge variant="default">Ibadah</Badge>;
-      case "fellowship":
-        return <Badge variant="secondary">Persekutuan</Badge>;
-      case "prayer":
-        return <Badge variant="outline">Doa</Badge>;
-      default:
-        return <Badge variant="outline">{type}</Badge>;
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -155,6 +132,7 @@ export default function DashboardPageAdmin() {
 
   return (
     <>
+      <PageTitle title="Dashboard Admin" />
       <PageHeader
         breadcrumb={[
           { label: "Admin", href: "/admin" },
@@ -264,7 +242,7 @@ export default function DashboardPageAdmin() {
                           </p>
                           {event.location && (
                             <p className="text-xs text-gray-600 mt-1">
-                              📍 {event.location}
+                              <PinIcon /> {event.location}
                             </p>
                           )}
                           {event.speaker &&

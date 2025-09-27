@@ -26,15 +26,15 @@ const nextConfig = {
   },
 
   // Fix Fast Refresh issues
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-      };
-    }
-    return config;
-  },
+  // webpack: (config, { dev }) => {
+  //   if (dev) {
+  //     config.watchOptions = {
+  //       poll: 1000,
+  //       aggregateTimeout: 300,
+  //     };
+  //   }
+  //   return config;
+  // },
   
   // WebSocket configuration untuk development
   devIndicators: {

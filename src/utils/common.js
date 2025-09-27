@@ -1,5 +1,7 @@
 import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
 
+import { Badge } from "@/components/ui/Badge";
+
 export function formatDate(d, locale = "id-ID") {
   return d.toLocaleDateString(locale, {
     weekday: "long",
@@ -17,6 +19,7 @@ export function getGreeting(hour) {
   if (hour >= 4 && hour < 10) return { text: "Pagi", Icon: Sunrise };
   if (hour >= 10 && hour < 15) return { text: "Siang", Icon: Sun };
   if (hour >= 15 && hour < 18) return { text: "Sore", Icon: Sunset };
+
   return { text: "Malam", Icon: Moon };
 }
 
@@ -61,5 +64,32 @@ export function getIndonesianTimezone() {
 
   // Jika bukan timezone Indonesia, tampilkan singkatan generik
   const shortTimezone = timezone.split("/").pop() || "LOCAL";
+
   return shortTimezone.length > 4 ? "LOCAL" : shortTimezone;
 }
+
+export const getStatusBadge = (status) => {
+  switch (status) {
+    case "completed":
+      return <Badge variant="success">Selesai</Badge>;
+    case "approved":
+      return <Badge variant="success">Disetujui</Badge>;
+    case "pending":
+      return <Badge variant="warning">Menunggu</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
+
+export const getEventTypeBadge = (type) => {
+  switch (type) {
+    case "worship":
+      return <Badge variant="default">Ibadah</Badge>;
+    case "fellowship":
+      return <Badge variant="secondary">Persekutuan</Badge>;
+    case "prayer":
+      return <Badge variant="outline">Doa</Badge>;
+    default:
+      return <Badge variant="outline">{type}</Badge>;
+  }
+};

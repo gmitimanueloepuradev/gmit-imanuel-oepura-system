@@ -83,126 +83,134 @@ async function handlePatch(req, res) {
     } = requestData;
 
     if (updateUser || updateKeluarga || updateAlamat) {
-      // Handle complex update with transaction
-      const result = await prisma.$transaction(async (tx) => {
-        // Extract only valid Jemaat fields
-        const {
-          nama,
-          jenisKelamin,
-          tanggalLahir,
-          golonganDarah,
-          idKeluarga,
-          idStatusDalamKeluarga,
-          idSuku,
-          idPendidikan,
-          idPekerjaan,
-          idPendapatan,
-          idJaminanKesehatan,
-          idPernikahan,
-          status,
-        } = jemaatFields;
+      // Handle complex update with transaction - increased timeout for complex operations
+      const result = await prisma.$transaction(
+        async (tx) => {
+          // Extract only valid Jemaat fields
+          const {
+            nama,
+            jenisKelamin,
+            tanggalLahir,
+            golonganDarah,
+            idKeluarga,
+            idStatusDalamKeluarga,
+            idSuku,
+            idPendidikan,
+            idPekerjaan,
+            idPendapatan,
+            idJaminanKesehatan,
+            idPernikahan,
+            status,
+          } = jemaatFields;
 
-        // Create data object with only valid jemaat fields
-        const jemaatUpdateData = {
-          ...(nama !== undefined && { nama }),
-          ...(jenisKelamin !== undefined && {
-            jenisKelamin:
-              jenisKelamin === true ||
-              jenisKelamin === "true" ||
-              jenisKelamin === 1,
-          }),
-          ...(tanggalLahir !== undefined && { tanggalLahir }),
-          ...(golonganDarah !== undefined && { golonganDarah }),
-          ...(idStatusDalamKeluarga !== undefined && { idStatusDalamKeluarga }),
-          ...(idSuku !== undefined && { idSuku }),
-          ...(idPendidikan !== undefined && { idPendidikan }),
-          ...(idPekerjaan !== undefined && { idPekerjaan }),
-          ...(idPendapatan !== undefined && { idPendapatan }),
-          ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
-          ...(idPernikahan !== undefined && { idPernikahan }),
-          ...(status !== undefined && { status }),
-        };
-
-        // Process date fields
-        const processedJemaatData = processDateFields(jemaatUpdateData, [
-          "tanggalLahir",
-        ]);
-
-        // 1. Update Alamat if requested
-        if (updateAlamat && alamatData) {
-          // First get the jemaat to find keluarga
-          const currentJemaat = await tx.jemaat.findUnique({
-            where: { id },
-            include: { keluarga: true },
-          });
-
-          if (currentJemaat && currentJemaat.keluarga.idAlamat) {
-            await tx.alamat.update({
-              where: { id: currentJemaat.keluarga.idAlamat },
-              data: alamatData,
-            });
-          }
-        }
-
-        // 2. Update Keluarga if requested
-        if (updateKeluarga && keluargaData) {
-          // First get the jemaat to find keluarga
-          const currentJemaat = await tx.jemaat.findUnique({
-            where: { id },
-            include: { keluarga: true },
-          });
-
-          if (currentJemaat) {
-            await tx.keluarga.update({
-              where: { id: currentJemaat.idKeluarga },
-              data: keluargaData,
-            });
-          }
-        }
-
-        // 3. Update Jemaat
-        const updatedJemaat = await tx.jemaat.update({
-          where: { id },
-          data: processedJemaatData,
-          include: {
-            keluarga: {
-              include: {
-                alamat: {
-                  include: {
-                    kelurahan: true,
-                  },
-                },
-                statusKeluarga: true,
-                rayon: true,
-              },
-            },
-            statusDalamKeluarga: true,
-            suku: true,
-            pendidikan: true,
-            pekerjaan: true,
-            pendapatan: true,
-            jaminanKesehatan: true,
-            User: true,
-          },
-        });
-
-        // 4. Update User if requested
-        if (updateUser && updatedJemaat.User) {
-          const userUpdateData = {
-            ...(email !== undefined && { email }),
-            ...(role !== undefined && { role }),
+          // Create data object with only valid jemaat fields
+          const jemaatUpdateData = {
+            ...(nama !== undefined && { nama }),
+            ...(jenisKelamin !== undefined && {
+              jenisKelamin:
+                jenisKelamin === true ||
+                jenisKelamin === "true" ||
+                jenisKelamin === 1,
+            }),
+            ...(tanggalLahir !== undefined && { tanggalLahir }),
+            ...(golonganDarah !== undefined && { golonganDarah }),
+            ...(idStatusDalamKeluarga !== undefined && {
+              idStatusDalamKeluarga,
+            }),
+            ...(idSuku !== undefined && { idSuku }),
+            ...(idPendidikan !== undefined && { idPendidikan }),
+            ...(idPekerjaan !== undefined && { idPekerjaan }),
+            ...(idPendapatan !== undefined && { idPendapatan }),
+            ...(idJaminanKesehatan !== undefined && { idJaminanKesehatan }),
+            ...(idPernikahan !== undefined && { idPernikahan }),
+            ...(status !== undefined && { status }),
           };
 
-          if (Object.keys(userUpdateData).length > 0) {
-            await tx.user.update({
-              where: { id: updatedJemaat.User.id },
-              data: userUpdateData,
-            });
-          }
-        }
+          // Process date fields
+          const processedJemaatData = processDateFields(jemaatUpdateData, [
+            "tanggalLahir",
+          ]);
 
-        return updatedJemaat;
-      });
+          // 1. Update Alamat if requested
+          if (updateAlamat && alamatData) {
+            // First get the jemaat to find keluarga
+            const currentJemaat = await tx.jemaat.findUnique({
+              where: { id },
+              include: { keluarga: true },
+            });
+
+            if (currentJemaat && currentJemaat.keluarga.idAlamat) {
+              await tx.alamat.update({
+                where: { id: currentJemaat.keluarga.idAlamat },
+                data: alamatData,
+              });
+            }
+          }
+
+          // 2. Update Keluarga if requested
+          if (updateKeluarga && keluargaData) {
+            // First get the jemaat to find keluarga
+            const currentJemaat = await tx.jemaat.findUnique({
+              where: { id },
+              include: { keluarga: true },
+            });
+
+            if (currentJemaat) {
+              await tx.keluarga.update({
+                where: { id: currentJemaat.idKeluarga },
+                data: keluargaData,
+              });
+            }
+          }
+
+          // 3. Update Jemaat
+          const updatedJemaat = await tx.jemaat.update({
+            where: { id },
+            data: processedJemaatData,
+            include: {
+              keluarga: {
+                include: {
+                  alamat: {
+                    include: {
+                      kelurahan: true,
+                    },
+                  },
+                  statusKeluarga: true,
+                  rayon: true,
+                },
+              },
+              statusDalamKeluarga: true,
+              suku: true,
+              pendidikan: true,
+              pekerjaan: true,
+              pendapatan: true,
+              jaminanKesehatan: true,
+              User: true,
+            },
+          });
+
+          // 4. Update User if requested
+          if (updateUser && updatedJemaat.User) {
+            const userUpdateData = {
+              ...(email !== undefined && { email }),
+              ...(role !== undefined && { role }),
+            };
+
+            if (Object.keys(userUpdateData).length > 0) {
+              await tx.user.update({
+                where: { id: updatedJemaat.User.id },
+                data: userUpdateData,
+              });
+            }
+          }
+
+          return updatedJemaat;
+        },
+        {
+          timeout: 20000, // 20 seconds timeout for complex operations
+          maxWait: 25000, // Maximum time to wait for a connection from the pool
+        }
+      );
 
       return res
         .status(200)

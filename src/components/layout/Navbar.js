@@ -1,4 +1,4 @@
-import { Home, LogOut, User } from "lucide-react";
+import { ChevronDown, ChevronRight, Home, LogOut, User, FileText, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -37,9 +37,11 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
         <li className="flex items-center">
           <details className="flex items-center">
             <summary className="btn btn-ghost flex items-center px-4 py-2 text-white hover:text-blue-200 dark:hover:text-blue-300 hover:bg-white/10 dark:hover:bg-white/20 transition-all duration-200">
+              <FileText className="w-4 h-4 mr-2" />
               UPP
+              <ChevronDown className="w-4 h-4 ml-2" />
             </summary>
-            <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-60 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 max-h-96 overflow-y-auto">
+            <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-72 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 max-h-96 overflow-y-auto">
               {uppLoading ? (
                 <li className="text-center py-2">
                   <span className="loading loading-spinner loading-sm" />
@@ -48,11 +50,12 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
                 uppItems.map((kategori) => (
                   <li key={kategori.id}>
                     {/* Category Header */}
-                    <div className="font-semibold px-2 py-1 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                    <div className="font-semibold px-2 py-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
                       <Link
-                        className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                        className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                         href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}`}
                       >
+                        <FileText className="w-4 h-4 mr-2" />
                         {kategori.nama}
                       </Link>
                     </div>
@@ -63,9 +66,10 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
                         {kategori.jenisPengumuman.map((jenis) => (
                           <li key={jenis.id}>
                             <Link
-                              className="block px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
+                              className="flex items-center px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
                               href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}/${jenis.nama.toLowerCase().replace(/\s+/g, "-")}`}
                             >
+                              <ChevronRight className="w-3 h-3 mr-2" />
                               {jenis.nama}
                             </Link>
                           </li>
@@ -75,7 +79,10 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
                   </li>
                 ))
               ) : (
-                <li className="text-center py-2 text-gray-500 dark:text-gray-400">Tidak ada kategori tersedia</li>
+                <li className="text-center py-4 text-gray-500 dark:text-gray-400">
+                  <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <div className="text-sm">Tidak ada kategori tersedia</div>
+                </li>
               )}
             </ul>
           </details>
