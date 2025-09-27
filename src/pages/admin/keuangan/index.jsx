@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
 import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function KeuanganDashboard() {
   const router = useRouter();
@@ -225,6 +226,8 @@ export default function KeuanganDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+
+      <PageTitle title="Dashboard Keuangan" />
       <PageHeader
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },

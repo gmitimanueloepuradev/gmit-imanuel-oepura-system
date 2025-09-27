@@ -1,11 +1,22 @@
-import { ChevronDown, ChevronRight, Home, LogOut, User, FileText, Users } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  Home,
+  LogOut,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function Navbar({ menuItems, uppItems = [], uppLoading = false }) {
+export default function Navbar({
+  menuItems,
+  uppItems = [],
+  uppLoading = false,
+}) {
   const authContext = useAuth();
   const { user, logout } = authContext || {};
   const router = useRouter();
@@ -21,10 +32,7 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
     <div className="hidden flex-none lg:block">
       <ul className="menu menu-horizontal items-center">
         {menuItems.map((item) => (
-          <li
-            key={item.name}
-            className="flex items-center"
-          >
+          <li key={item.name} className="flex items-center">
             <a
               className="flex items-center text-white hover:text-blue-200 dark:hover:text-blue-300 transition-colors duration-200"
               href={item.path}
@@ -61,21 +69,22 @@ export default function Navbar({ menuItems, uppItems = [], uppLoading = false })
                     </div>
 
                     {/* Subcategories */}
-                    {kategori.jenisPengumuman && kategori.jenisPengumuman.length > 0 && (
-                      <ul className="ml-4 mb-2">
-                        {kategori.jenisPengumuman.map((jenis) => (
-                          <li key={jenis.id}>
-                            <Link
-                              className="flex items-center px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
-                              href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}/${jenis.nama.toLowerCase().replace(/\s+/g, "-")}`}
-                            >
-                              <ChevronRight className="w-3 h-3 mr-2" />
-                              {jenis.nama}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    {kategori.jenisPengumuman &&
+                      kategori.jenisPengumuman.length > 0 && (
+                        <ul className="ml-4 mb-2">
+                          {kategori.jenisPengumuman.map((jenis) => (
+                            <li key={jenis.id}>
+                              <Link
+                                className="flex items-center px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
+                                href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}/${jenis.nama.toLowerCase().replace(/\s+/g, "-")}`}
+                              >
+                                <ChevronRight className="w-3 h-3 mr-2" />
+                                {jenis.nama}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                   </li>
                 ))
               ) : (

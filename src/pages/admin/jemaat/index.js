@@ -21,6 +21,7 @@ import useDebounce from "@/hooks/useDebounce";
 import exportService from "@/services/exportService";
 import jemaatService from "@/services/jemaatService";
 import { showToast } from "@/utils/showToast";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function MembersManagement() {
   const router = useRouter();
@@ -107,7 +108,7 @@ export default function MembersManagement() {
       // Get data from API - merge current queryParams with export config filters
       const mergedFilters = {
         ...queryParams, // Base filters from current search and filters
-        ...exportConfig.filters // Additional filters from selected values in export modal
+        ...exportConfig.filters, // Additional filters from selected values in export modal
       };
 
       const exportData = await jemaatService.exportData(
@@ -293,11 +294,6 @@ export default function MembersManagement() {
   ];
 
   // Breadcrumb
-  const breadcrumb = [
-    { label: "Dashboard", href: "/admin/dashboard" },
-    { label: "Jemaat", href: "/admin/members" },
-    { label: "Daftar Jemaat" },
-  ];
 
   // Handle loading and error states
   if (isLoading) {
@@ -331,6 +327,7 @@ export default function MembersManagement() {
 
   return (
     <>
+      <PageTitle title="Daftar Jemaat" />
       {/* Page Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -484,53 +481,113 @@ export default function MembersManagement() {
 
         {/* Custom Pagination */}
         {pagination && (
-          <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mt-4 shadow-sm">
-            <div className="flex items-center">
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                Menampilkan{" "}
-                <span className="font-medium">{members.length}</span> dari{" "}
-                <span className="font-medium">{pagination.total}</span> jemaat
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mt-4 shadow-sm">
+            {/* Mobile Layout */}
+            <div className="block md:hidden px-3 py-3 space-y-3">
+              {/* Compact Info Row */}
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                <span>
+                  {members.length}/{pagination.total} jemaat
+                </span>
                 {Object.keys(filters).length > 0 && (
                   <span className="text-blue-600 dark:text-blue-400">
-                    {` (dengan ${Object.keys(filters).length} filter aktif)`}
+                    {Object.keys(filters).length} filter
                   </span>
                 )}
-              </span>
+              </div>
+
+              {/* Compact Pagination Controls */}
+              <div className="flex items-center justify-between">
+                {/* Page Size - Compact */}
+                <select
+                  className="text-xs border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 min-w-0 w-16"
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+
+                {/* Page Info */}
+                <span className="text-xs text-gray-700 dark:text-gray-300 flex-shrink-0">
+                  {pagination.page}/{pagination.totalPages}
+                </span>
+
+                {/* Navigation Buttons */}
+                <div className="flex items-center space-x-1">
+                  <button
+                    className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 min-w-0"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  >
+                    ←
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 min-w-0"
+                    disabled={currentPage >= pagination.totalPages}
+                    onClick={() =>
+                      setCurrentPage(
+                        Math.min(pagination.totalPages, currentPage + 1)
+                      )
+                    }
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <select
-                className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-              >
-                <option value={10}>10 per halaman</option>
-                <option value={25}>25 per halaman</option>
-                <option value={50}>50 per halaman</option>
-                <option value={100}>100 per halaman</option>
-              </select>
-              <button
-                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              >
-                ← Sebelumnya
-              </button>
-              <span className="text-sm text-gray-700 dark:text-gray-300 px-2">
-                Halaman <span className="font-medium">{pagination.page}</span>{" "}
-                dari{" "}
-                <span className="font-medium">{pagination.totalPages}</span>
-              </span>
-              <button
-                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                disabled={currentPage >= pagination.totalPages}
-                onClick={() =>
-                  setCurrentPage(
-                    Math.min(pagination.totalPages, currentPage + 1)
-                  )
-                }
-              >
-                Selanjutnya →
-              </button>
+
+            {/* Desktop Layout */}
+            <div className="hidden md:flex items-center justify-between px-6 py-4">
+              <div className="flex items-center">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Menampilkan{" "}
+                  <span className="font-medium">{members.length}</span> dari{" "}
+                  <span className="font-medium">{pagination.total}</span> jemaat
+                  {Object.keys(filters).length > 0 && (
+                    <span className="text-blue-600 dark:text-blue-400">
+                      {` (dengan ${Object.keys(filters).length} filter aktif)`}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <select
+                  className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+                >
+                  <option value={10}>10 per halaman</option>
+                  <option value={25}>25 per halaman</option>
+                  <option value={50}>50 per halaman</option>
+                  <option value={100}>100 per halaman</option>
+                </select>
+                <button
+                  className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                >
+                  ← Sebelumnya
+                </button>
+                <span className="text-sm text-gray-700 dark:text-gray-300 px-2">
+                  Halaman <span className="font-medium">{pagination.page}</span>{" "}
+                  dari{" "}
+                  <span className="font-medium">{pagination.totalPages}</span>
+                </span>
+                <button
+                  className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  disabled={currentPage >= pagination.totalPages}
+                  onClick={() =>
+                    setCurrentPage(
+                      Math.min(pagination.totalPages, currentPage + 1)
+                    )
+                  }
+                >
+                  Selanjutnya →
+                </button>
+              </div>
             </div>
           </div>
         )}

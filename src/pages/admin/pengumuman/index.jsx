@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
 import pengumumanService from "@/services/pengumumanService";
 import { showToast } from "@/utils/showToast";
+import PageTitle from "@/components/ui/PageTitle";
 
 // Loading Skeleton
 function TableSkeleton() {
@@ -174,7 +175,7 @@ export default function PengumumanPage() {
   const formatDate = (dateString) => {
     try {
       return format(new Date(dateString), "dd MMM yyyy", { locale: idLocale });
-    } catch (error) {
+    } catch (_error) {
       return dateString;
     }
   };
@@ -230,6 +231,7 @@ export default function PengumumanPage() {
 
   return (
     <div className="space-y-6 p-4">
+      <PageTitle title="Daftar Pengumuman" />
       {/* Page Header */}
       <PageHeader
         actions={[

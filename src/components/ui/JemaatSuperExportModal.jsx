@@ -215,14 +215,15 @@ const JemaatSuperExportModal = ({
       pros: ["Editable", "Sortable", "Formula support"],
       cons: ["Butuh Excel software"],
     },
-    {
-      value: "csv",
-      label: "CSV File",
-      icon: Table,
-      description: "Universal format",
-      pros: ["Ringan", "Universal", "Import mudah"],
-      cons: ["Plain text only", "No formatting"],
-    },
+    //!COMMENT THIS FOR A WHILE.
+    // {
+    //   value: "csv",
+    //   label: "CSV File",
+    //   icon: Table,
+    //   description: "Universal format",
+    //   pros: ["Ringan", "Universal", "Import mudah"],
+    //   cons: ["Plain text only", "No formatting"],
+    // },
   ];
 
   // Layout options
@@ -782,7 +783,7 @@ const JemaatSuperExportModal = ({
   const preview = getExportPreview();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-auto">
+    <div className="fixed inset-0  bg-opacity -50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-auto">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">

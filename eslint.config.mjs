@@ -74,6 +74,12 @@ export default defineConfig([
     },
 
     rules: {
+      "no-unused-vars": ["warn", {
+      "vars": "all",
+      "args": "after-used",
+      "ignoreRestSiblings": false
+    }],
+
       "no-console": "warn",
       "react/prop-types": "off",
       "react/jsx-uses-react": "off",
@@ -85,7 +91,7 @@ export default defineConfig([
 
       "prettier/prettier": ["warn", { endOfLine: "auto" }],
 
-      "no-unused-vars": "off",
+      // "no-unused-vars": "off",
       "react/jsx-uses-react": "error",
       "react/jsx-uses-vars": "error",
       "no-undef": "error",

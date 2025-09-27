@@ -131,36 +131,29 @@ async function handlePatch(req, res) {
             "tanggalLahir",
           ]);
 
-          // 1. Update Alamat if requested
-          if (updateAlamat && alamatData) {
-            // First get the jemaat to find keluarga
-            const currentJemaat = await tx.jemaat.findUnique({
+          // Get current jemaat data once for efficiency
+          let currentJemaat = null;
+          if (updateAlamat || updateKeluarga) {
+            currentJemaat = await tx.jemaat.findUnique({
               where: { id },
               include: { keluarga: true },
             });
+          }
 
-            if (currentJemaat && currentJemaat.keluarga.idAlamat) {
-              await tx.alamat.update({
-                where: { id: currentJemaat.keluarga.idAlamat },
-                data: alamatData,
-              });
-            }
+          // 1. Update Alamat if requested
+          if (updateAlamat && alamatData && currentJemaat?.keluarga?.idAlamat) {
+            await tx.alamat.update({
+              where: { id: currentJemaat.keluarga.idAlamat },
+              data: alamatData,
+            });
           }
 
           // 2. Update Keluarga if requested
-          if (updateKeluarga && keluargaData) {
-            // First get the jemaat to find keluarga
-            const currentJemaat = await tx.jemaat.findUnique({
-              where: { id },
-              include: { keluarga: true },
+          if (updateKeluarga && keluargaData && currentJemaat?.idKeluarga) {
+            await tx.keluarga.update({
+              where: { id: currentJemaat.idKeluarga },
+              data: keluargaData,
             });
-
-            if (currentJemaat) {
-              await tx.keluarga.update({
-                where: { id: currentJemaat.idKeluarga },
-                data: keluargaData,
-              });
-            }
           }
 
           // 3. Update Jemaat

@@ -1,23 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import {
-  Users,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  BarChart3,
-  PieChart,
   Activity,
-  MapPin,
-  Baby,
-  GraduationCap,
-  Heart,
+  BarChart3,
   Building,
-  UserCheck,
+  Calendar,
+  Heart,
+  MapPin,
   Target,
+  TrendingUp,
+  Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import AdminLayout from "@/components/layout/AdminLayout";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
@@ -25,22 +22,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import PageHeader from "@/components/ui/PageHeader";
-import AdminLayout from "@/components/layout/AdminLayout";
-import {
-  formatNumber,
-  formatPercentage,
-} from "@/lib/formatUtils";
+import { formatNumber, formatPercentage } from "@/lib/formatUtils";
 import analyticsService from "@/services/analyticsService";
 
 // Import custom chart components
-import CustomPieChart from "@/components/charts/PieChart";
-import CustomBarChart from "@/components/charts/BarChart";
-import CustomLineChart from "@/components/charts/LineChart";
-import DonutChart from "@/components/charts/DonutChart";
 import CustomAreaChart from "@/components/charts/AreaChart";
+import CustomBarChart from "@/components/charts/BarChart";
+import DonutChart from "@/components/charts/DonutChart";
+import CustomPieChart from "@/components/charts/PieChart";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function AnalyticsPageAdmin() {
   const [analytics, setAnalytics] = useState({
@@ -48,21 +39,22 @@ export default function AnalyticsPageAdmin() {
     demographics: {},
     sacraments: {},
     trends: {},
-    distributions: {}
+    distributions: {},
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('year');
+  const [selectedPeriod, setSelectedPeriod] = useState("year");
 
   useEffect(() => {
     const loadAnalyticsData = async () => {
       try {
         setLoading(true);
         const data = await analyticsService.getFullAnalytics(selectedPeriod);
+
         setAnalytics(data);
       } catch (err) {
-        console.error('Failed to load analytics data:', err);
-        setError('Gagal memuat data analitik');
+        console.error("Failed to load analytics data:", err);
+        setError("Gagal memuat data analitik");
       } finally {
         setLoading(false);
       }
@@ -87,9 +79,7 @@ export default function AnalyticsPageAdmin() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-600 mb-2">{error}</p>
-          <Button onClick={() => window.location.reload()}>
-            Muat Ulang
-          </Button>
+          <Button onClick={() => window.location.reload()}>Muat Ulang</Button>
         </div>
       </div>
     );
@@ -137,38 +127,39 @@ export default function AnalyticsPageAdmin() {
   return (
     <>
       <PageHeader
-        breadcrumb={[
-          { label: "Admin", href: "/admin" },
-          { label: "Analitik" },
-        ]}
+        breadcrumb={[{ label: "Admin", href: "/admin" }, { label: "Analitik" }]}
         description="Analisis komprehensif data gereja dan tren keanggotaan"
         stats={headerStats}
         title="Analitik & Statistik"
       />
 
+      <PageTitle title="Analitik & Statistik" />
+
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Period Selector */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">📊 Visualisasi Data Komprehensif</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            📊 Visualisasi Data Komprehensif
+          </h2>
           <div className="flex gap-2">
             <Button
               size="sm"
-              variant={selectedPeriod === 'month' ? 'default' : 'outline'}
-              onClick={() => setSelectedPeriod('month')}
+              variant={selectedPeriod === "month" ? "default" : "outline"}
+              onClick={() => setSelectedPeriod("month")}
             >
               Bulan Ini
             </Button>
             <Button
               size="sm"
-              variant={selectedPeriod === 'year' ? 'default' : 'outline'}
-              onClick={() => setSelectedPeriod('year')}
+              variant={selectedPeriod === "year" ? "default" : "outline"}
+              onClick={() => setSelectedPeriod("year")}
             >
               Tahun Ini
             </Button>
             <Button
               size="sm"
-              variant={selectedPeriod === 'all' ? 'default' : 'outline'}
-              onClick={() => setSelectedPeriod('all')}
+              variant={selectedPeriod === "all" ? "default" : "outline"}
+              onClick={() => setSelectedPeriod("all")}
             >
               Semua Data
             </Button>
@@ -191,8 +182,16 @@ export default function AnalyticsPageAdmin() {
             <CardContent>
               <CustomPieChart
                 data={[
-                  { name: 'Pria', value: analytics.demographics.maleCount || 0, total: analytics.overview.totalMembers || 0 },
-                  { name: 'Wanita', value: analytics.demographics.femaleCount || 0, total: analytics.overview.totalMembers || 0 }
+                  {
+                    name: "Pria",
+                    value: analytics.demographics.maleCount || 0,
+                    total: analytics.overview.totalMembers || 0,
+                  },
+                  {
+                    name: "Wanita",
+                    value: analytics.demographics.femaleCount || 0,
+                    total: analytics.overview.totalMembers || 0,
+                  },
                 ]}
                 height={300}
                 showLabels={true}
@@ -215,10 +214,22 @@ export default function AnalyticsPageAdmin() {
             <CardContent>
               <DonutChart
                 data={[
-                  { name: 'Anak (0-12)', value: analytics.demographics.childrenCount || 0 },
-                  { name: 'Remaja (13-25)', value: analytics.demographics.youthCount || 0 },
-                  { name: 'Dewasa (26-59)', value: analytics.demographics.adultCount || 0 },
-                  { name: 'Lansia (60+)', value: analytics.demographics.elderlyCount || 0 }
+                  {
+                    name: "Anak (0-12)",
+                    value: analytics.demographics.childrenCount || 0,
+                  },
+                  {
+                    name: "Remaja (13-25)",
+                    value: analytics.demographics.youthCount || 0,
+                  },
+                  {
+                    name: "Dewasa (26-59)",
+                    value: analytics.demographics.adultCount || 0,
+                  },
+                  {
+                    name: "Lansia (60+)",
+                    value: analytics.demographics.elderlyCount || 0,
+                  },
                 ]}
                 height={300}
                 showTotal={true}
@@ -244,9 +255,21 @@ export default function AnalyticsPageAdmin() {
               <CustomBarChart
                 barColor="#3B82F6"
                 data={[
-                  { name: 'Baptis', value: analytics.sacraments.baptisTotal || 0, percentage: 0 },
-                  { name: 'Sidi', value: analytics.sacraments.sidiTotal || 0, percentage: 0 },
-                  { name: 'Pernikahan', value: analytics.sacraments.pernikahanTotal || 0, percentage: 0 }
+                  {
+                    name: "Baptis",
+                    value: analytics.sacraments.baptisTotal || 0,
+                    percentage: 0,
+                  },
+                  {
+                    name: "Sidi",
+                    value: analytics.sacraments.sidiTotal || 0,
+                    percentage: 0,
+                  },
+                  {
+                    name: "Pernikahan",
+                    value: analytics.sacraments.pernikahanTotal || 0,
+                    percentage: 0,
+                  },
                 ]}
                 height={300}
                 showGrid={true}
@@ -268,9 +291,18 @@ export default function AnalyticsPageAdmin() {
             <CardContent>
               <DonutChart
                 data={[
-                  { name: 'Baptis', value: analytics.sacraments.baptisThisYear || 0 },
-                  { name: 'Sidi', value: analytics.sacraments.sidiThisYear || 0 },
-                  { name: 'Pernikahan', value: analytics.sacraments.pernikahanThisYear || 0 }
+                  {
+                    name: "Baptis",
+                    value: analytics.sacraments.baptisThisYear || 0,
+                  },
+                  {
+                    name: "Sidi",
+                    value: analytics.sacraments.sidiThisYear || 0,
+                  },
+                  {
+                    name: "Pernikahan",
+                    value: analytics.sacraments.pernikahanThisYear || 0,
+                  },
                 ]}
                 height={300}
                 showTotal={true}
@@ -288,18 +320,18 @@ export default function AnalyticsPageAdmin() {
                 <MapPin className="h-5 w-5" />
                 Distribusi Per Rayon
               </CardTitle>
-              <CardDescription>
-                Sebaran jemaat di setiap rayon
-              </CardDescription>
+              <CardDescription>Sebaran jemaat di setiap rayon</CardDescription>
             </CardHeader>
             <CardContent>
               <CustomBarChart
                 barColor="#10B981"
-                data={(analytics.distributions.rayonStats || []).map(rayon => ({
-                  name: rayon.name,
-                  value: rayon.members,
-                  percentage: rayon.percentage
-                }))}
+                data={(analytics.distributions.rayonStats || []).map(
+                  (rayon) => ({
+                    name: rayon.name,
+                    value: rayon.members,
+                    percentage: rayon.percentage,
+                  })
+                )}
                 height={400}
                 showGrid={true}
               />
@@ -313,18 +345,18 @@ export default function AnalyticsPageAdmin() {
                 <BarChart3 className="h-5 w-5" />
                 Distribusi Pendidikan
               </CardTitle>
-              <CardDescription>
-                Tingkat pendidikan jemaat
-              </CardDescription>
+              <CardDescription>Tingkat pendidikan jemaat</CardDescription>
             </CardHeader>
             <CardContent>
               <CustomBarChart
                 barColor="#8B5CF6"
-                data={(analytics.distributions.educationStats || []).map(education => ({
-                  name: education.level,
-                  value: education.count,
-                  percentage: education.percentage
-                }))}
+                data={(analytics.distributions.educationStats || []).map(
+                  (education) => ({
+                    name: education.level,
+                    value: education.count,
+                    percentage: education.percentage,
+                  })
+                )}
                 height={400}
                 showGrid={true}
               />
@@ -341,18 +373,18 @@ export default function AnalyticsPageAdmin() {
                 <Building className="h-5 w-5" />
                 Top 10 Pekerjaan
               </CardTitle>
-              <CardDescription>
-                Distribusi pekerjaan jemaat
-              </CardDescription>
+              <CardDescription>Distribusi pekerjaan jemaat</CardDescription>
             </CardHeader>
             <CardContent>
               <CustomBarChart
                 barColor="#F59E0B"
-                data={(analytics.distributions.jobStats || []).slice(0, 10).map(job => ({
-                  name: job.job,
-                  value: job.count,
-                  percentage: job.percentage
-                }))}
+                data={(analytics.distributions.jobStats || [])
+                  .slice(0, 10)
+                  .map((job) => ({
+                    name: job.job,
+                    value: job.count,
+                    percentage: job.percentage,
+                  }))}
                 height={400}
                 showGrid={true}
               />
@@ -373,16 +405,56 @@ export default function AnalyticsPageAdmin() {
             <CardContent>
               <CustomAreaChart
                 areas={[
-                  { dataKey: 'children', color: '#3B82F6', name: 'Anak (0-12)' },
-                  { dataKey: 'youth', color: '#10B981', name: 'Remaja (13-25)' },
-                  { dataKey: 'adult', color: '#F59E0B', name: 'Dewasa (26-59)' },
-                  { dataKey: 'elderly', color: '#8B5CF6', name: 'Lansia (60+)' }
+                  {
+                    dataKey: "children",
+                    color: "#3B82F6",
+                    name: "Anak (0-12)",
+                  },
+                  {
+                    dataKey: "youth",
+                    color: "#10B981",
+                    name: "Remaja (13-25)",
+                  },
+                  {
+                    dataKey: "adult",
+                    color: "#F59E0B",
+                    name: "Dewasa (26-59)",
+                  },
+                  {
+                    dataKey: "elderly",
+                    color: "#8B5CF6",
+                    name: "Lansia (60+)",
+                  },
                 ]}
                 data={[
-                  { name: 'Anak', children: analytics.demographics.childrenCount || 0, youth: 0, adult: 0, elderly: 0 },
-                  { name: 'Remaja', children: 0, youth: analytics.demographics.youthCount || 0, adult: 0, elderly: 0 },
-                  { name: 'Dewasa', children: 0, youth: 0, adult: analytics.demographics.adultCount || 0, elderly: 0 },
-                  { name: 'Lansia', children: 0, youth: 0, adult: 0, elderly: analytics.demographics.elderlyCount || 0 }
+                  {
+                    name: "Anak",
+                    children: analytics.demographics.childrenCount || 0,
+                    youth: 0,
+                    adult: 0,
+                    elderly: 0,
+                  },
+                  {
+                    name: "Remaja",
+                    children: 0,
+                    youth: analytics.demographics.youthCount || 0,
+                    adult: 0,
+                    elderly: 0,
+                  },
+                  {
+                    name: "Dewasa",
+                    children: 0,
+                    youth: 0,
+                    adult: analytics.demographics.adultCount || 0,
+                    elderly: 0,
+                  },
+                  {
+                    name: "Lansia",
+                    children: 0,
+                    youth: 0,
+                    adult: 0,
+                    elderly: analytics.demographics.elderlyCount || 0,
+                  },
                 ]}
                 height={400}
                 showLegend={true}
@@ -400,17 +472,17 @@ export default function AnalyticsPageAdmin() {
                 <Heart className="h-5 w-5" />
                 Distribusi Suku
               </CardTitle>
-              <CardDescription>
-                Keberagaman etnis jemaat
-              </CardDescription>
+              <CardDescription>Keberagaman etnis jemaat</CardDescription>
             </CardHeader>
             <CardContent>
               <CustomPieChart
-                data={(analytics.distributions.ethnicStats || []).slice(0, 8).map(ethnic => ({
-                  name: ethnic.ethnicity,
-                  value: ethnic.count,
-                  total: analytics.overview.totalMembers || 0
-                }))}
+                data={(analytics.distributions.ethnicStats || [])
+                  .slice(0, 8)
+                  .map((ethnic) => ({
+                    name: ethnic.ethnicity,
+                    value: ethnic.count,
+                    total: analytics.overview.totalMembers || 0,
+                  }))}
                 height={400}
                 showLabels={true}
                 showLegend={true}
@@ -425,51 +497,90 @@ export default function AnalyticsPageAdmin() {
                 <TrendingUp className="h-5 w-5" />
                 Ringkasan Statistik
               </CardTitle>
-              <CardDescription>
-                Insight dan tren utama
-              </CardDescription>
+              <CardDescription>Insight dan tren utama</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Rata-rata per Keluarga</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {(analytics.distributions.avgMembersPerFamily || 0).toFixed(1)}
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Rata-rata per Keluarga
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">orang/keluarga</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {(analytics.distributions.avgMembersPerFamily || 0).toFixed(
+                      1
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    orang/keluarga
+                  </p>
                 </div>
                 <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Rasio Gender</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {((analytics.demographics.maleCount || 0) / (analytics.demographics.femaleCount || 1)).toFixed(2)}
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Rasio Gender
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">pria:wanita</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {(
+                      (analytics.demographics.maleCount || 0) /
+                      (analytics.demographics.femaleCount || 1)
+                    ).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    pria:wanita
+                  </p>
                 </div>
                 <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Aktivitas Baptis/Bulan</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Aktivitas Baptis/Bulan
+                  </p>
                   <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {analytics.trends.avgBaptisPerMonth || 0}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">rata-rata</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    rata-rata
+                  </p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Sakramen</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Total Sakramen
+                  </p>
                   <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {(analytics.sacraments.baptisTotal || 0) +
-                     (analytics.sacraments.sidiTotal || 0) +
-                     (analytics.sacraments.pernikahanTotal || 0)}
+                      (analytics.sacraments.sidiTotal || 0) +
+                      (analytics.sacraments.pernikahanTotal || 0)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">sepanjang masa</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    sepanjang masa
+                  </p>
                 </div>
               </div>
-              
+
               <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">📈 Insight Utama:</h4>
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                  📈 Insight Utama:
+                </h4>
                 <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
-                  <li>• Kelompok terbesar: Dewasa ({formatPercentage(analytics.demographics.adultPercentage || 0)}%)</li>
-                  <li>• Gender balance: {analytics.demographics.malePercentage > analytics.demographics.femalePercentage ? 'Pria lebih dominan' : 'Wanita lebih dominan'}</li>
-                  <li>• Total keluarga aktif: {analytics.overview.activeFamilies || 0} keluarga</li>
-                  <li>• Aktivitas tahun ini: {analytics.sacraments.totalThisYear || 0} sakramen</li>
+                  <li>
+                    • Kelompok terbesar: Dewasa (
+                    {formatPercentage(
+                      analytics.demographics.adultPercentage || 0
+                    )}
+                    %)
+                  </li>
+                  <li>
+                    • Gender balance:{" "}
+                    {analytics.demographics.malePercentage >
+                    analytics.demographics.femalePercentage
+                      ? "Pria lebih dominan"
+                      : "Wanita lebih dominan"}
+                  </li>
+                  <li>
+                    • Total keluarga aktif:{" "}
+                    {analytics.overview.activeFamilies || 0} keluarga
+                  </li>
+                  <li>
+                    • Aktivitas tahun ini:{" "}
+                    {analytics.sacraments.totalThisYear || 0} sakramen
+                  </li>
                 </ul>
               </div>
             </CardContent>

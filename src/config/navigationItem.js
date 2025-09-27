@@ -32,7 +32,7 @@ import {
 export const roleConfigs = {
   admin: {
     roleTitle: "Admin",
-    fullTitle: "GMIT Admin",
+    fullTitle: "JIO | Admin",
     description:
       "Sistem administrasi gereja untuk mengelola data jemaat, kegiatan, dan keuangan dengan mudah dan efisien.",
     baseRoute: "/admin",
@@ -227,7 +227,7 @@ export const roleConfigs = {
 
   majelis: {
     roleTitle: "Majelis",
-    fullTitle: "Portal Majelis",
+    fullTitle: "JIO | Majelis",
     description: "Sistem manajemen untuk majelis gereja dalam mengawasi dan mengelola kegiatan pelayanan.",
     baseRoute: "/majelis",
     dashboardRoute: "/majelis/dashboard",
@@ -275,7 +275,7 @@ export const roleConfigs = {
 
   employee: {
     roleTitle: "Pegawai",
-    fullTitle: "Portal Pegawai",
+    fullTitle: "JIO | Pegawai",
     description: "Sistem untuk pegawai gereja dalam mengelola tugas harian dan koordinasi pelayanan.",
     baseRoute: "/employee",
     dashboardRoute: "/employee/dashboard",

@@ -1,24 +1,25 @@
-import React, { useState } from "react";
 import {
-  Search,
-  Filter,
+  ChevronDown,
+  ChevronUp,
   Download,
-  Plus,
-  Trash2,
   Edit,
   Eye,
-  ChevronUp,
-  ChevronDown,
+  Filter,
+  Plus,
+  Search,
+  Trash2,
 } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
-import { TableSkeleton } from "./skeletons/SkeletonTable";
-import { GridSkeleton } from "./skeletons/SkeletonGrid";
 import ExportModal from "./ExportModal";
+import PageTitle from "./PageTitle";
+import { GridSkeleton } from "./skeletons/SkeletonGrid";
+import { TableSkeleton } from "./skeletons/SkeletonTable";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 // Skeleton Components
 
@@ -32,7 +33,9 @@ function PageHeader({
   className = "",
 }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 ${className}`}
+    >
       <div className="max-w-7xl mx-2 px-6 py-6">
         {/* Breadcrumb */}
         {breadcrumb && (
@@ -78,7 +81,9 @@ function PageHeader({
               {title}
             </h1>
             {description && (
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">{description}</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                {description}
+              </p>
             )}
           </div>
 
@@ -107,7 +112,10 @@ function PageHeader({
           <div className="mt-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 transition-colors duration-200">
+                <div
+                  key={index}
+                  className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 transition-colors duration-200"
+                >
                   <div className="flex items-center">
                     {stat.icon && (
                       <div
@@ -170,7 +178,7 @@ export default function ListGrid({
   // Row Actions Props - Using ButtonActions component
   rowActions = [],
   rowActionType = "vertical", // "vertical" | "horizontal"
-  maxVisibleActions = 3,   
+  maxVisibleActions = 3,
 
   // Filter & Search Props
   filters = [],
@@ -209,6 +217,30 @@ export default function ListGrid({
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [showExportModal, setShowExportModal] = useState(false);
   const [pageSize, setPageSize] = useState(itemsPerPage);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile/tablet
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    // Check on mount
+    checkIsMobile();
+
+    // Add event listener
+    window.addEventListener('resize', checkIsMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Auto-switch to grid view on mobile/tablet
+  useEffect(() => {
+    if (isMobile && viewMode === "table") {
+      setViewMode("grid");
+    }
+  }, [isMobile, viewMode]);
 
   // Merge legacy actions with new rowActions array for backward compatibility
   const allRowActions = [
@@ -262,16 +294,22 @@ export default function ListGrid({
   const sortData = (data, sortConfig) => {
     if (!sortConfig.key) {
       // Default sorting: find the first text column and sort A-Z
-      const firstTextColumn = columns.find(col =>
-        col.type !== "boolean" && col.type !== "date" && col.type !== "currency"
+      const firstTextColumn = columns.find(
+        (col) =>
+          col.type !== "boolean" &&
+          col.type !== "date" &&
+          col.type !== "currency"
       );
+
       if (firstTextColumn) {
         return [...data].sort((a, b) => {
           const aVal = String(a[firstTextColumn.key] || "").toLowerCase();
           const bVal = String(b[firstTextColumn.key] || "").toLowerCase();
+
           return aVal.localeCompare(bVal);
         });
       }
+
       return data;
     }
 
@@ -291,7 +329,9 @@ export default function ListGrid({
       } else if (aVal instanceof Date && bVal instanceof Date) {
         comparison = aVal.getTime() - bVal.getTime();
       } else {
-        comparison = String(aVal).toLowerCase().localeCompare(String(bVal).toLowerCase());
+        comparison = String(aVal)
+          .toLowerCase()
+          .localeCompare(String(bVal).toLowerCase());
       }
 
       return sortConfig.direction === "desc" ? -comparison : comparison;
@@ -301,6 +341,7 @@ export default function ListGrid({
   // Handle sort
   const handleSort = (key) => {
     let direction = "asc";
+
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
@@ -324,12 +365,11 @@ export default function ListGrid({
     // Additional filters - use custom filter function if provided
     const matchesFilters = customFilterFunction
       ? customFilterFunction(item, selectedFilters)
-      : Object.entries(selectedFilters).every(
-          ([filterKey, filterValue]) => {
-            if (!filterValue || filterValue === "all") return true;
-            return item[filterKey] === filterValue;
-          }
-        );
+      : Object.entries(selectedFilters).every(([filterKey, filterValue]) => {
+          if (!filterValue || filterValue === "all") return true;
+
+          return item[filterKey] === filterValue;
+        });
 
     return matchesSearch && matchesFilters;
   });
@@ -340,10 +380,7 @@ export default function ListGrid({
   // Pagination
   const totalPages = Math.ceil(sortedData.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = sortedData.slice(
-    startIndex,
-    startIndex + pageSize
-  );
+  const paginatedData = sortedData.slice(startIndex, startIndex + pageSize);
 
   const handleFilterChange = (filterKey, value) => {
     setSelectedFilters((prev) => ({
@@ -364,6 +401,7 @@ export default function ListGrid({
       const variant = column.badgeVariant
         ? column.badgeVariant(value)
         : "default";
+
       return <Badge variant={variant}>{value}</Badge>;
     }
 
@@ -388,7 +426,9 @@ export default function ListGrid({
   };
 
   return (
-    <div className={`space-y-6 p-4 transition-colors duration-200 ${className}`}>
+    <div
+      className={`space-y-6 p-4 transition-colors duration-200 ${className}`}
+    >
       {/* Integrated Page Header */}
       {(title ||
         description ||
@@ -403,6 +443,9 @@ export default function ListGrid({
           title={title}
         />
       )}
+
+      {/*  i make a condition here if the title is exist. used */}
+      {title && <PageTitle title={title} />}
 
       {/* Search and Filters */}
       <Card>
@@ -467,29 +510,31 @@ export default function ListGrid({
                 </div>
               )}
 
-              {/* View Mode Toggle */}
-              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 transition-colors duration-200">
-                <button
-                  className={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
-                    viewMode === "table"
-                      ? "bg-white dark:bg-gray-800 shadow text-blue-600 dark:text-blue-400"
-                      : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-                  }`}
-                  onClick={() => setViewMode("table")}
-                >
-                  Tabel
-                </button>
-                <button
-                  className={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
-                    viewMode === "grid"
-                      ? "bg-white dark:bg-gray-800 shadow text-blue-600 dark:text-blue-400"
-                      : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-                  }`}
-                  onClick={() => setViewMode("grid")}
-                >
-                  Grid
-                </button>
-              </div>
+              {/* View Mode Toggle - Hide on mobile/tablet */}
+              {!isMobile && (
+                <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 transition-colors duration-200">
+                  <button
+                    className={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
+                      viewMode === "table"
+                        ? "bg-white dark:bg-gray-800 shadow text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                    }`}
+                    onClick={() => setViewMode("table")}
+                  >
+                    Tabel
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
+                      viewMode === "grid"
+                        ? "bg-white dark:bg-gray-800 shadow text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                    }`}
+                    onClick={() => setViewMode("grid")}
+                  >
+                    Grid
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -555,14 +600,16 @@ export default function ListGrid({
                           <div className="flex flex-col">
                             <ChevronUp
                               className={`h-3 w-3 transition-colors duration-200 ${
-                                sortConfig.key === column.key && sortConfig.direction === "asc"
+                                sortConfig.key === column.key &&
+                                sortConfig.direction === "asc"
                                   ? "text-blue-600 dark:text-blue-400"
                                   : "text-gray-300 dark:text-gray-600"
                               }`}
                             />
                             <ChevronDown
                               className={`h-3 w-3 -mt-1 transition-colors duration-200 ${
-                                sortConfig.key === column.key && sortConfig.direction === "desc"
+                                sortConfig.key === column.key &&
+                                sortConfig.direction === "desc"
                                   ? "text-blue-600 dark:text-blue-400"
                                   : "text-gray-300 dark:text-gray-600"
                               }`}
@@ -580,9 +627,15 @@ export default function ListGrid({
                 </thead>
                 <tbody>
                   {paginatedData.map((item, index) => (
-                    <tr key={index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <tr
+                      key={index}
+                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    >
                       {columns.map((column, colIndex) => (
-                        <td key={colIndex} className="p-4 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                        <td
+                          key={colIndex}
+                          className="p-4 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                        >
                           {renderCellContent(item, column)}
                         </td>
                       ))}
@@ -603,27 +656,30 @@ export default function ListGrid({
             </div>
           ) : (
             /* Grid View */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
               {paginatedData.map((item, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow duration-200 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <CardContent className="p-4">
-                    {columns.slice(0, 4).map((column, colIndex) => (
-                      <div key={colIndex} className="mb-2">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                <Card
+                  key={index}
+                  className="hover:shadow-md transition-shadow duration-200 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                >
+                  <CardContent className="p-4 space-y-3">
+                    {columns.slice(0, isMobile ? 3 : 4).map((column, colIndex) => (
+                      <div key={colIndex} className="space-y-1">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors duration-200 block">
                           {column.label}:
                         </span>
-                        <div className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                        <div className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200 break-words">
                           {renderCellContent(item, column)}
                         </div>
                       </div>
                     ))}
                     {allRowActions.length > 0 && (
-                      <div className="mt-4">
+                      <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
                         <ButtonActions
                           actions={allRowActions}
                           item={item}
-                          maxVisible={maxVisibleActions}
-                          type={rowActionType}
+                          maxVisible={isMobile ? 2 : maxVisibleActions}
+                          type={isMobile ? "horizontal" : rowActionType}
                         />
                       </div>
                     )}
@@ -641,55 +697,96 @@ export default function ListGrid({
 
           {/* Pagination */}
           {!isLoading && totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-200">
-                Menampilkan {startIndex + 1} hingga{" "}
-                {Math.min(startIndex + pageSize, sortedData.length)} dari{" "}
-                {sortedData.length} data
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  disabled={currentPage === 1}
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                >
-                  Sebelumnya
-                </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (page) =>
-                      page === 1 ||
-                      page === totalPages ||
-                      Math.abs(page - currentPage) <= 2
-                  )
-                  .map((page, index, array) => (
-                    <React.Fragment key={page}>
-                      {index > 0 && array[index - 1] !== page - 1 && (
-                        <span className="px-2 py-1 text-gray-500">...</span>
-                      )}
-                      <Button
-                        size="sm"
-                        variant={currentPage === page ? "default" : "outline"}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Button>
-                    </React.Fragment>
-                  ))}
-                <Button
-                  disabled={currentPage === totalPages}
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                >
-                  Selanjutnya
-                </Button>
-              </div>
+            <div className="mt-6">
+              {/* Mobile pagination */}
+              {isMobile ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 text-center">
+                    Halaman {currentPage} dari {totalPages} ({sortedData.length} data)
+                  </div>
+                  <div className="flex justify-center gap-2">
+                    <Button
+                      disabled={currentPage === 1}
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                    >
+                      ←
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="min-w-[60px]"
+                    >
+                      {currentPage}
+                    </Button>
+                    <Button
+                      disabled={currentPage === totalPages}
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                    >
+                      →
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                /* Desktop pagination */
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                    Menampilkan {startIndex + 1} hingga{" "}
+                    {Math.min(startIndex + pageSize, sortedData.length)} dari{" "}
+                    {sortedData.length} data
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      disabled={currentPage === 1}
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                    >
+                      Sebelumnya
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(
+                        (page) =>
+                          page === 1 ||
+                          page === totalPages ||
+                          Math.abs(page - currentPage) <= 2
+                      )
+                      .map((page, index, array) => (
+                        <React.Fragment key={page}>
+                          {index > 0 && array[index - 1] !== page - 1 && (
+                            <span className="px-2 py-1 text-gray-500">...</span>
+                          )}
+                          <Button
+                            size="sm"
+                            variant={currentPage === page ? "default" : "outline"}
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </Button>
+                        </React.Fragment>
+                      ))}
+                    <Button
+                      disabled={currentPage === totalPages}
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                    >
+                      Selanjutnya
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -700,9 +797,13 @@ export default function ListGrid({
         columns={columns}
         data={sortedData}
         exportColumns={exportColumns}
-        filename={exportFilename || title?.toLowerCase().replace(/\s+/g, '-') || 'export'}
+        filename={
+          exportFilename ||
+          title?.toLowerCase().replace(/\s+/g, "-") ||
+          "export"
+        }
         isOpen={showExportModal}
-        title={title || 'Data Export'}
+        title={title || "Data Export"}
         onClose={() => setShowExportModal(false)}
       />
     </div>
