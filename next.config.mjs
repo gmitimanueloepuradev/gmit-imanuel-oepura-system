@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
 
   // Capacitor configuration only
   output: process.env.BUILD_TARGET === 'capacitor' ? 'export' : undefined,
