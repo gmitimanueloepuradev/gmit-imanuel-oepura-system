@@ -9,10 +9,11 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import TextInput from "@/components/ui/inputs/TextInput";
-import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
 import NumberInput from "@/components/ui/inputs/NumberInput";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const itemKeuanganService = {
   create: async (data) => {
@@ -35,6 +36,15 @@ export default function CreateItemKeuanganPage() {
   const [selectedPeriode, setSelectedPeriode] = useState("");
   const [items, setItems] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  // Modal states
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+    type: "warning"
+  });
 
   // Query untuk kategori options
   const { data: kategoriOptions } = useQuery({
@@ -285,8 +295,87 @@ export default function CreateItemKeuanganPage() {
     setItems(updateKodes(updatedItems));
   };
 
-  // Delete item
-  const deleteItem = (itemId) => {
+  // Helper function to count total items including children
+  const countTotalItems = (itemList) => {
+    return itemList.reduce((total, item) => {
+      return total + 1 + (item.children ? countTotalItems(item.children) : 0);
+    }, 0);
+  };
+
+  // Helper function to check if item can be deleted
+  const canDeleteItem = (itemId, itemLevel) => {
+    // If it's a root level item (level 1)
+    if (itemLevel === 1) {
+      // Must have at least 1 root item remaining
+      return items.length > 1;
+    }
+    // For sub-items (level > 1), can always be deleted
+    return true;
+  };
+
+  // Helper function to find item info by ID
+  const findItemInfo = (itemId, itemList = items, parentInfo = null) => {
+    for (const item of itemList) {
+      if (item.id === itemId) {
+        return {
+          item,
+          parent: parentInfo,
+          siblings: itemList,
+          siblingCount: itemList.length
+        };
+      }
+      if (item.children && item.children.length > 0) {
+        const found = findItemInfo(itemId, item.children, item);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Show confirmation modal for delete
+  const showDeleteConfirmation = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+
+    // Check if item can be deleted
+    if (!canDeleteItem(itemId, item.level)) {
+      toast.error("Tidak dapat menghapus item ini. Minimal harus ada 1 item utama.");
+      return;
+    }
+
+    const hasChildren = item.children && item.children.length > 0;
+    let title, message, type;
+
+    if (hasChildren) {
+      const childCount = countTotalItems(item.children);
+      title = "Hapus Item dengan Sub-Items";
+      message = `Item "${item.nama || item.kode}" memiliki ${childCount} sub-item.\n\nMenghapus item ini akan menghapus semua sub-item juga.\n\nApakah Anda yakin ingin melanjutkan?`;
+      type = "danger";
+    } else {
+      title = "Konfirmasi Hapus Item";
+      message = `Apakah Anda yakin ingin menghapus item "${item.nama || item.kode}"?`;
+      type = "warning";
+    }
+
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      onConfirm: () => handleDeleteConfirmed(itemId)
+    });
+  };
+
+  // Handle confirmed delete
+  const handleDeleteConfirmed = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+    const hasChildren = item.children && item.children.length > 0;
+
     const deleteFromTree = (itemList) => {
       return itemList
         .filter((item) => item.id !== itemId)
@@ -297,15 +386,27 @@ export default function CreateItemKeuanganPage() {
     };
 
     const updatedItems = deleteFromTree(items);
+    setItems(updateKodes(updatedItems));
 
-    // Get kategori kode for update
-    const selectedKat = kategoriOptions?.data?.find(
-      (k) => k.id === selectedKategori
+    // Close modal
+    setConfirmModal({
+      isOpen: false,
+      title: "",
+      message: "",
+      onConfirm: null,
+      type: "warning"
+    });
+
+    // Show success message
+    toast.success(
+      hasChildren
+        ? `Item "${item.nama || item.kode}" dan sub-itemnya berhasil dihapus`
+        : `Item "${item.nama || item.kode}" berhasil dihapus`
     );
-    const kategoriKode = selectedKat?.kode || "A";
-
-    setItems(updateKodes(updatedItems, "", 1, kategoriKode));
   };
+
+  // Legacy function name for compatibility
+  const deleteItem = showDeleteConfirmation;
 
   // Update item
   const updateItem = (itemId, field, value) => {
@@ -491,15 +592,24 @@ export default function CreateItemKeuanganPage() {
                   Sibling
                 </Button>
 
-                {items.length > 1 && (
+                {canDeleteItem(item.id, item.level) && (
                   <Button
                     size="sm"
                     type="button"
                     variant="outline"
                     onClick={() => deleteItem(item.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                    title={item.level === 1 ? "Hapus item utama" : "Hapus sub-item"}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
+                )}
+
+                {/* Show info if item cannot be deleted */}
+                {!canDeleteItem(item.id, item.level) && (
+                  <div className="text-xs text-gray-400 dark:text-gray-500 px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">
+                    Min. 1 item
+                  </div>
                 )}
               </div>
             </div>
@@ -535,7 +645,9 @@ export default function CreateItemKeuanganPage() {
                   label="Target Frekuensi"
                   placeholder="12"
                   value={item.targetFrekuensi}
-                  onChange={(value) => updateItem(item.id, "targetFrekuensi", value)}
+                  onChange={(value) =>
+                    updateItem(item.id, "targetFrekuensi", value)
+                  }
                 />
               </div>
 
@@ -548,11 +660,13 @@ export default function CreateItemKeuanganPage() {
                     { value: "Bulan", label: "Per Bulan" },
                     { value: "Tahun", label: "Per Tahun" },
                     { value: "Minggu", label: "Per Minggu" },
-                    { value: "Hari", label: "Per Hari" }
+                    { value: "Hari", label: "Per Hari" },
                   ]}
                   placeholder="Pilih satuan"
                   value={item.satuanFrekuensi}
-                  onChange={(value) => updateItem(item.id, "satuanFrekuensi", value)}
+                  onChange={(value) =>
+                    updateItem(item.id, "satuanFrekuensi", value)
+                  }
                 />
               </div>
 
@@ -562,7 +676,9 @@ export default function CreateItemKeuanganPage() {
                   label="Nominal Per Satuan"
                   placeholder="1000000"
                   value={item.nominalSatuan}
-                  onChange={(value) => updateItem(item.id, "nominalSatuan", value)}
+                  onChange={(value) =>
+                    updateItem(item.id, "nominalSatuan", value)
+                  }
                 />
               </div>
 
@@ -572,7 +688,9 @@ export default function CreateItemKeuanganPage() {
                   label="Total Target Anggaran"
                   placeholder="12000000"
                   value={item.totalTarget}
-                  onChange={(value) => updateItem(item.id, "totalTarget", value)}
+                  onChange={(value) =>
+                    updateItem(item.id, "totalTarget", value)
+                  }
                 />
                 {item.targetFrekuensi && item.nominalSatuan && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -610,7 +728,9 @@ export default function CreateItemKeuanganPage() {
             Kembali
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Buat Item Keuangan</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Buat Rancangan Item Keuangan
+            </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Buat struktur hierarkis item keuangan
             </p>
@@ -635,10 +755,12 @@ export default function CreateItemKeuanganPage() {
           </CardHeader>
           <CardContent>
             <SelectInput
-              options={kategoriOptions?.data?.map((cat) => ({
-                value: cat.id,
-                label: `${cat.kode} - ${cat.nama}`
-              })) || []}
+              options={
+                kategoriOptions?.data?.map((cat) => ({
+                  value: cat.id,
+                  label: `${cat.kode} - ${cat.nama}`,
+                })) || []
+              }
               placeholder="Pilih kategori keuangan"
               value={selectedKategori}
               onChange={(value) => setSelectedKategori(value)}
@@ -652,10 +774,12 @@ export default function CreateItemKeuanganPage() {
           </CardHeader>
           <CardContent>
             <SelectInput
-              options={periodeOptions?.data?.map((periode) => ({
-                value: periode.value,
-                label: periode.label
-              })) || []}
+              options={
+                periodeOptions?.data?.map((periode) => ({
+                  value: periode.value,
+                  label: periode.label,
+                })) || []
+              }
               placeholder="Pilih periode anggaran"
               value={selectedPeriode}
               onChange={(value) => setSelectedPeriode(value)}
@@ -682,6 +806,19 @@ export default function CreateItemKeuanganPage() {
           </Card>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        type={confirmModal.type}
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        confirmVariant="destructive"
+      />
     </div>
   );
 }

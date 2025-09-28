@@ -76,7 +76,8 @@
       "Bash(ren:*)",
       "Bash(ipconfig)",
       "Bash(findstr:*)",
-      "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=lanjutkan)"
+      "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=lanjutkan)",
+      "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"oke then continue the todos\" npx prisma migrate reset --force)"
     ],
     "deny": [],
     "ask": []

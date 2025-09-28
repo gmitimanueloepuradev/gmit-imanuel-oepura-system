@@ -1,33 +1,45 @@
 // pages/admin/data-master/keuangan/item/edit.jsx
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from 'next/navigation';
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Plus,
+  Save,
+  Trash2,
+  Undo2,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import DeleteOptionsModal from "@/components/ui/DeleteOptionsModal";
 
 const itemKeuanganService = {
   create: async (data) => {
     const response = await axios.post("/api/keuangan/item", data);
+
     return response.data;
   },
   update: async (id, data) => {
     const response = await axios.patch(`/api/keuangan/item/${id}`, data);
+
     return response.data;
   },
   delete: async (id) => {
     const response = await axios.delete(`/api/keuangan/item/${id}`);
+
     return response.data;
   },
   getByKategoriAndPeriode: async (kategoriId, periodeId) => {
     const response = await axios.get(
       `/api/keuangan/item?kategoriId=${kategoriId}&periodeId=${periodeId}`
     );
+
     return response.data;
   },
 };
@@ -35,18 +47,46 @@ const itemKeuanganService = {
 export default function EditItemKeuanganPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Get periode and kategori from URL params
-  const [selectedKategori, setSelectedKategori] = useState(searchParams?.get('kategoriId') || "");
-  const [selectedPeriode, setSelectedPeriode] = useState(searchParams?.get('periodeId') || "");
+  const [selectedKategori, setSelectedKategori] = useState(
+    searchParams?.get("kategoriId") || ""
+  );
+  const [selectedPeriode, setSelectedPeriode] = useState(
+    searchParams?.get("periodeId") || ""
+  );
   const [items, setItems] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  // Track items marked for deletion
+  const [markedForDeletion, setMarkedForDeletion] = useState(new Set());
+
+  // Modal states
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+    type: "warning",
+  });
+
+  const [deleteOptionsModal, setDeleteOptionsModal] = useState({
+    isOpen: false,
+    itemId: null,
+    itemName: "",
+    itemType: "existing",
+    hasChildren: false,
+    childrenCount: 0,
+  });
+
+  const [deletingNow, setDeletingNow] = useState(false);
 
   // Query untuk kategori options
   const { data: kategoriOptions } = useQuery({
     queryKey: ["kategori-keuangan-options"],
     queryFn: async () => {
       const response = await axios.get("/api/keuangan/kategori/options");
+
       return response.data;
     },
   });
@@ -56,6 +96,7 @@ export default function EditItemKeuanganPage() {
     queryKey: ["periode-anggaran-options"],
     queryFn: async () => {
       const response = await axios.get("/api/keuangan/periode/options");
+
       return response.data;
     },
   });
@@ -63,7 +104,11 @@ export default function EditItemKeuanganPage() {
   // Query untuk existing items berdasarkan kategori dan periode
   const { data: existingItems } = useQuery({
     queryKey: ["existing-items", selectedKategori, selectedPeriode],
-    queryFn: () => itemKeuanganService.getByKategoriAndPeriode(selectedKategori, selectedPeriode),
+    queryFn: () =>
+      itemKeuanganService.getByKategoriAndPeriode(
+        selectedKategori,
+        selectedPeriode
+      ),
     enabled: !!(selectedKategori && selectedPeriode),
   });
 
@@ -71,6 +116,7 @@ export default function EditItemKeuanganPage() {
   useEffect(() => {
     if (selectedKategori && selectedPeriode && existingItems?.data?.items) {
       const existing = existingItems.data.items;
+
       if (existing.length > 0) {
         // Convert existing items ke format tree untuk editing
         setItems(buildTreeFromExisting(existing));
@@ -100,6 +146,7 @@ export default function EditItemKeuanganPage() {
     const selectedKat = kategoriOptions?.data?.find(
       (k) => k.id === selectedKategori
     );
+
     return selectedKat?.kode || "A";
   };
 
@@ -115,7 +162,9 @@ export default function EditItemKeuanganPage() {
         children: [],
         id: item.id, // Keep real ID for existing items
         // Handle target fields - ensure they're properly mapped
-        targetFrekuensi: item.targetFrekuensi ? item.targetFrekuensi.toString() : "",
+        targetFrekuensi: item.targetFrekuensi
+          ? item.targetFrekuensi.toString()
+          : "",
         satuanFrekuensi: item.satuanFrekuensi || "",
         nominalSatuan: item.nominalSatuan ? item.nominalSatuan.toString() : "",
         totalTarget: item.totalTarget ? item.totalTarget.toString() : "",
@@ -128,6 +177,7 @@ export default function EditItemKeuanganPage() {
 
       if (item.parentId) {
         const parent = itemMap.get(item.parentId);
+
         if (parent) {
           parent.children.push(itemWithChildren);
         }
@@ -211,6 +261,7 @@ export default function EditItemKeuanganPage() {
     };
 
     const updatedItems = addChildToTree(items);
+
     setItems(updateKodes(updatedItems));
   };
 
@@ -224,6 +275,7 @@ export default function EditItemKeuanganPage() {
         const afterIndex = itemList.findIndex(
           (item) => item.id === afterItemId
         );
+
         if (afterIndex !== -1) {
           const newSibling = {
             id: tempId,
@@ -240,7 +292,9 @@ export default function EditItemKeuanganPage() {
           };
 
           const newList = [...itemList];
+
           newList.splice(afterIndex + 1, 0, newSibling);
+
           return newList;
         }
       }
@@ -252,14 +306,17 @@ export default function EditItemKeuanganPage() {
             children: addSiblingToTree(item.children, targetLevel),
           };
         }
+
         return item;
       });
     };
 
     let updatedItems;
+
     if (level === 1) {
       // Add sibling di root level
       const afterIndex = items.findIndex((item) => item.id === afterItemId);
+
       if (afterIndex !== -1) {
         const newSibling = {
           id: tempId,
@@ -285,8 +342,110 @@ export default function EditItemKeuanganPage() {
     setItems(updateKodes(updatedItems));
   };
 
-  // Delete item
-  const deleteItem = (itemId) => {
+  // Helper function to count total items including children
+  const countTotalItems = (itemList) => {
+    return itemList.reduce((total, item) => {
+      return total + 1 + (item.children ? countTotalItems(item.children) : 0);
+    }, 0);
+  };
+
+  // Helper function to check if item can be deleted
+  const canDeleteItem = (itemId, itemLevel) => {
+    // If it's a root level item (level 1)
+    if (itemLevel === 1) {
+      // Must have at least 1 root item remaining
+      return items.length > 1;
+    }
+
+    // For sub-items (level > 1), can always be deleted
+    return true;
+  };
+
+  // Helper function to find item info by ID
+  const findItemInfo = (itemId, itemList = items, parentInfo = null) => {
+    for (const item of itemList) {
+      if (item.id === itemId) {
+        return {
+          item,
+          parent: parentInfo,
+          siblings: itemList,
+          siblingCount: itemList.length,
+        };
+      }
+      if (item.children && item.children.length > 0) {
+        const found = findItemInfo(itemId, item.children, item);
+
+        if (found) return found;
+      }
+    }
+
+    return null;
+  };
+
+  // Show delete confirmation or options modal
+  const showDeleteConfirmation = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+
+    // Check if item can be deleted
+    if (!canDeleteItem(itemId, item.level)) {
+      toast.error(
+        "Tidak dapat menghapus item ini. Minimal harus ada 1 item utama."
+      );
+
+      return;
+    }
+
+    const isExistingItem = !item.id.startsWith("temp_");
+    const hasChildren = item.children && item.children.length > 0;
+    const childrenCount = hasChildren ? countTotalItems(item.children) : 0;
+
+    if (isExistingItem) {
+      // Show delete options modal for existing items
+      setDeleteOptionsModal({
+        isOpen: true,
+        itemId,
+        itemName: item.nama || item.kode,
+        itemType: "existing",
+        hasChildren,
+        childrenCount,
+      });
+    } else {
+      // Show simple confirmation for new items
+      let title, message, type;
+
+      if (hasChildren) {
+        title = "Hapus Item dengan Sub-Items";
+        message = `Item "${item.nama || item.kode}" memiliki ${childrenCount} sub-item.\n\nMenghapus item ini akan menghapus semua sub-item juga.\n\nApakah Anda yakin ingin melanjutkan?`;
+        type = "danger";
+      } else {
+        title = "Konfirmasi Hapus Item";
+        message = `Apakah Anda yakin ingin menghapus item "${item.nama || item.kode}"?`;
+        type = "warning";
+      }
+
+      setConfirmModal({
+        isOpen: true,
+        title,
+        message,
+        type,
+        onConfirm: () => handleDeleteFromForm(itemId),
+      });
+    }
+  };
+
+  // Handle delete from form only (for new items)
+  const handleDeleteFromForm = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+    const hasChildren = item.children && item.children.length > 0;
+
     const deleteFromTree = (itemList) => {
       return itemList
         .filter((item) => item.id !== itemId)
@@ -297,7 +456,130 @@ export default function EditItemKeuanganPage() {
     };
 
     const updatedItems = deleteFromTree(items);
+
     setItems(updateKodes(updatedItems));
+
+    // Close modals
+    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+    setDeleteOptionsModal((prev) => ({ ...prev, isOpen: false }));
+
+    // Show success message
+    toast.success(
+      hasChildren
+        ? `Item "${item.nama || item.kode}" dan sub-itemnya berhasil dihapus dari form`
+        : `Item "${item.nama || item.kode}" berhasil dihapus dari form`
+    );
+  };
+
+  // Mark item for deletion (for existing items)
+  const markForDeletion = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+    const hasChildren = item.children && item.children.length > 0;
+
+    // Collect all IDs to mark (item + all children)
+    const collectAllIds = (item) => {
+      let ids = [item.id];
+
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((child) => {
+          ids.push(...collectAllIds(child));
+        });
+      }
+
+      return ids;
+    };
+
+    const allIds = collectAllIds(item);
+
+    setMarkedForDeletion((prev) => new Set([...prev, ...allIds]));
+
+    // Close modals
+    setDeleteOptionsModal((prev) => ({ ...prev, isOpen: false }));
+
+    // Show success message
+    toast.success(
+      hasChildren
+        ? `Item "${item.nama || item.kode}" dan sub-itemnya ditandai untuk dihapus saat simpan`
+        : `Item "${item.nama || item.kode}" ditandai untuk dihapus saat simpan`
+    );
+  };
+
+  // Cancel deletion marking
+  const cancelDeletion = (itemId) => {
+    const itemInfo = findItemInfo(itemId);
+
+    if (!itemInfo) return;
+
+    const { item } = itemInfo;
+    const hasChildren = item.children && item.children.length > 0;
+
+    // Collect all IDs to unmark (item + all children)
+    const collectAllIds = (item) => {
+      let ids = [item.id];
+
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((child) => {
+          ids.push(...collectAllIds(child));
+        });
+      }
+
+      return ids;
+    };
+
+    const allIds = collectAllIds(item);
+
+    setMarkedForDeletion((prev) => {
+      const newSet = new Set(prev);
+
+      allIds.forEach((id) => newSet.delete(id));
+
+      return newSet;
+    });
+
+    toast.success(
+      hasChildren
+        ? `Penghapusan item "${item.nama || item.kode}" dan sub-itemnya dibatalkan`
+        : `Penghapusan item "${item.nama || item.kode}" dibatalkan`
+    );
+  };
+
+  // Legacy function name for compatibility
+  const deleteItem = showDeleteConfirmation;
+
+  // Handle immediate delete for existing items
+  const handleImmediateDelete = async (itemId) => {
+    setDeletingNow(true);
+    try {
+      await itemKeuanganService.delete(itemId);
+
+      // Remove from form as well
+      const deleteFromTree = (itemList) => {
+        return itemList
+          .filter((item) => item.id !== itemId)
+          .map((item) => ({
+            ...item,
+            children: item.children ? deleteFromTree(item.children) : [],
+          }));
+      };
+
+      const updatedItems = deleteFromTree(items);
+
+      setItems(updateKodes(updatedItems));
+
+      // Close modal
+      setDeleteOptionsModal((prev) => ({ ...prev, isOpen: false }));
+
+      toast.success("Item berhasil dihapus dari database");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast.error("Gagal menghapus item dari database");
+    } finally {
+      setDeletingNow(false);
+    }
   };
 
   // Update item
@@ -342,11 +624,13 @@ export default function EditItemKeuanganPage() {
   const saveItems = async () => {
     if (!selectedKategori) {
       toast.error("Pilih kategori terlebih dahulu");
+
       return;
     }
 
     if (!selectedPeriode) {
       toast.error("Pilih periode terlebih dahulu");
+
       return;
     }
 
@@ -367,6 +651,7 @@ export default function EditItemKeuanganPage() {
       validateItems(items);
     } catch (error) {
       toast.error(error.message);
+
       return;
     }
 
@@ -374,11 +659,13 @@ export default function EditItemKeuanganPage() {
 
     try {
       // Get existing items to know which ones to delete
-      const existingItemIds = existingItems?.data?.items?.map(item => item.id) || [];
-      
+      const existingItemIds =
+        existingItems?.data?.items?.map((item) => item.id) || [];
+
       // Collect all current item IDs (excluding temp items)
       const getCurrentItemIds = (itemList) => {
         let ids = [];
+
         for (const item of itemList) {
           if (!item.id.startsWith("temp_")) {
             ids.push(item.id);
@@ -387,18 +674,30 @@ export default function EditItemKeuanganPage() {
             ids.push(...getCurrentItemIds(item.children));
           }
         }
+
         return ids;
       };
 
       const currentItemIds = getCurrentItemIds(items);
-      
-      // Find items to delete
-      const itemsToDelete = existingItemIds.filter(id => !currentItemIds.includes(id));
+
+      // Find items to delete (removed from form + marked for deletion)
+      const itemsToDelete = [
+        ...existingItemIds.filter((id) => !currentItemIds.includes(id)), // Items removed from form
+        ...Array.from(markedForDeletion).filter(
+          (id) => !id.startsWith("temp_")
+        ), // Items marked for deletion
+      ];
+
+      // Remove duplicates
+      const uniqueItemsToDelete = [...new Set(itemsToDelete)];
 
       // Delete removed items
-      for (const itemId of itemsToDelete) {
+      for (const itemId of uniqueItemsToDelete) {
         await itemKeuanganService.delete(itemId);
       }
+
+      // Clear marked for deletion after successful delete
+      setMarkedForDeletion(new Set());
 
       // Flatten items untuk save/update ke database
       const flattenItems = async (itemList, parentRealId = null) => {
@@ -427,6 +726,7 @@ export default function EditItemKeuanganPage() {
 
           // Save parent first
           let savedItem;
+
           if (item.id.startsWith("temp_")) {
             // New item
             savedItem = await itemKeuanganService.create(itemData);
@@ -440,9 +740,10 @@ export default function EditItemKeuanganPage() {
           // Save children dengan parent ID yang benar
           if (item.children && item.children.length > 0) {
             const childResults = await flattenItems(
-              item.children, 
+              item.children,
               savedItem.data?.id || savedItem.id
             );
+
             result.push(...childResults);
           }
         }
@@ -466,51 +767,109 @@ export default function EditItemKeuanganPage() {
   const renderItemForm = (item, level = 1, index = 0) => {
     const indentClass = level > 1 ? `ml-${(level - 1) * 8}` : "";
 
+    const isMarkedForDeletion = markedForDeletion.has(item.id);
+
     return (
       <div key={item.id} className={`space-y-4 ${indentClass}`}>
         {/* Item Form */}
-        <Card className="relative">
+        <Card
+          className={`relative transition-all duration-300 ${
+            isMarkedForDeletion
+              ? "opacity-60 bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800"
+              : ""
+          }`}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Badge variant="outline">
                   {item.kode} (Level {item.level})
                 </Badge>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   Urutan: {item.urutan}
                 </span>
+                {/* Indicator for existing vs new items */}
+                {markedForDeletion.has(item.id) ? (
+                  <Badge
+                    className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 animate-pulse"
+                    variant="destructive"
+                  >
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    Akan Dihapus
+                  </Badge>
+                ) : !item.id.startsWith("temp_") ? (
+                  <Badge
+                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    variant="default"
+                  >
+                    Tersimpan
+                  </Badge>
+                ) : (
+                  <Badge
+                    className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                    variant="secondary"
+                  >
+                    Baru
+                  </Badge>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                  onClick={() => addChild(item.id, item.level)}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Sub Item
-                </Button>
-
-                <Button
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                  onClick={() => addSibling(item.id, item.level)}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Sibling
-                </Button>
-
-                {items.length > 1 && (
+                {/* Show Cancel Delete button if item is marked for deletion */}
+                {markedForDeletion.has(item.id) ? (
                   <Button
+                    className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/20 border-green-300 dark:border-green-600"
                     size="sm"
+                    title="Batalkan penghapusan item ini"
                     type="button"
                     variant="outline"
-                    onClick={() => deleteItem(item.id)}
+                    onClick={() => cancelDeletion(item.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Undo2 className="w-4 h-4 mr-1" />
+                    Batal Hapus
                   </Button>
+                ) : (
+                  <>
+                    <Button
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                      onClick={() => addChild(item.id, item.level)}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Sub Item
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                      onClick={() => addSibling(item.id, item.level)}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Sibling
+                    </Button>
+
+                    {canDeleteItem(item.id, item.level) && (
+                      <Button
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                        size="sm"
+                        title={`${item.level === 1 ? "Hapus item utama" : "Hapus sub-item"} ${!item.id.startsWith("temp_") ? "(dari database)" : ""}`}
+                        type="button"
+                        variant="outline"
+                        onClick={() => deleteItem(item.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+
+                    {/* Show info if item cannot be deleted */}
+                    {!canDeleteItem(item.id, item.level) && (
+                      <div className="text-xs text-gray-400 dark:text-gray-500 px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">
+                        Min. 1 item
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -525,7 +884,12 @@ export default function EditItemKeuanganPage() {
                 </label>
                 <input
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   placeholder="Contoh: Persembahan Perpuluhan"
                   type="text"
                   value={item.nama}
@@ -539,7 +903,12 @@ export default function EditItemKeuanganPage() {
                   Deskripsi
                 </label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   placeholder="Deskripsi detail item"
                   rows="2"
                   value={item.deskripsi}
@@ -555,7 +924,12 @@ export default function EditItemKeuanganPage() {
                   Target Frekuensi
                 </label>
                 <input
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   placeholder="12"
                   type="number"
                   value={item.targetFrekuensi}
@@ -571,7 +945,12 @@ export default function EditItemKeuanganPage() {
                   Satuan Frekuensi
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   value={item.satuanFrekuensi}
                   onChange={(e) =>
                     updateItem(item.id, "satuanFrekuensi", e.target.value)
@@ -592,7 +971,12 @@ export default function EditItemKeuanganPage() {
                   Nominal Per Satuan
                 </label>
                 <input
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   placeholder="1000000"
                   type="number"
                   value={item.nominalSatuan}
@@ -608,7 +992,12 @@ export default function EditItemKeuanganPage() {
                   Total Target Anggaran
                 </label>
                 <input
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    isMarkedForDeletion
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={isMarkedForDeletion}
                   placeholder="12000000"
                   type="number"
                   value={item.totalTarget}
@@ -643,8 +1032,12 @@ export default function EditItemKeuanganPage() {
   };
 
   // Get current periode info
-  const currentPeriodeInfo = periodeOptions?.data?.find(p => p.value === selectedPeriode);
-  const currentKategoriInfo = kategoriOptions?.data?.find(k => k.id === selectedKategori);
+  const currentPeriodeInfo = periodeOptions?.data?.find(
+    (p) => p.value === selectedPeriode
+  );
+  const currentKategoriInfo = kategoriOptions?.data?.find(
+    (k) => k.id === selectedKategori
+  );
 
   return (
     <div className="space-y-6 p-6">
@@ -658,7 +1051,8 @@ export default function EditItemKeuanganPage() {
           <div>
             <h1 className="text-2xl font-bold">Edit Item Keuangan</h1>
             <p className="text-gray-600">
-              Edit struktur hierarkis item keuangan untuk {currentKategoriInfo?.nama} - {currentPeriodeInfo?.label}
+              Edit struktur hierarkis item keuangan untuk{" "}
+              {currentKategoriInfo?.nama} - {currentPeriodeInfo?.label}
             </p>
           </div>
         </div>
@@ -681,7 +1075,9 @@ export default function EditItemKeuanganPage() {
           </CardHeader>
           <CardContent>
             <div className="p-3 bg-gray-50 rounded-lg">
-              <span className="font-medium">{currentKategoriInfo?.kode} - {currentKategoriInfo?.nama}</span>
+              <span className="font-medium">
+                {currentKategoriInfo?.kode} - {currentKategoriInfo?.nama}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -693,11 +1089,18 @@ export default function EditItemKeuanganPage() {
           <CardContent>
             <div className="p-3 bg-gray-50 rounded-lg">
               <span className="font-medium">{currentPeriodeInfo?.label}</span>
-              {currentPeriodeInfo?.tanggalMulai && currentPeriodeInfo?.tanggalAkhir && (
-                <div className="text-sm text-gray-600 mt-1">
-                  {new Date(currentPeriodeInfo.tanggalMulai).toLocaleDateString('id-ID')} - {new Date(currentPeriodeInfo.tanggalAkhir).toLocaleDateString('id-ID')}
-                </div>
-              )}
+              {currentPeriodeInfo?.tanggalMulai &&
+                currentPeriodeInfo?.tanggalAkhir && (
+                  <div className="text-sm text-gray-600 mt-1">
+                    {new Date(
+                      currentPeriodeInfo.tanggalMulai
+                    ).toLocaleDateString("id-ID")}{" "}
+                    -{" "}
+                    {new Date(
+                      currentPeriodeInfo.tanggalAkhir
+                    ).toLocaleDateString("id-ID")}
+                  </div>
+                )}
             </div>
           </CardContent>
         </Card>
@@ -709,9 +1112,48 @@ export default function EditItemKeuanganPage() {
           <Card>
             <CardHeader>
               <CardTitle>Struktur Item Keuangan</CardTitle>
-              <p className="text-sm text-gray-600">
-                Kode akan di-generate otomatis berdasarkan hierarki dan urutan
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Kode akan di-generate otomatis berdasarkan hierarki dan urutan
+                </p>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Item tersimpan di database
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Item baru (belum tersimpan)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Trash2 className="w-3 h-3 text-red-500" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Hapus langsung atau saat simpan
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Undo2 className="w-3 h-3 text-green-500" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Batalkan penghapusan
+                    </span>
+                  </div>
+                </div>
+                {markedForDeletion.size > 0 && (
+                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <span className="text-sm font-medium text-red-800 dark:text-red-200">
+                        {markedForDeletion.size} item ditandai untuk dihapus
+                        saat simpan
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -732,6 +1174,34 @@ export default function EditItemKeuanganPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        cancelText="Batal"
+        confirmText="Ya, Hapus"
+        confirmVariant="destructive"
+        isOpen={confirmModal.isOpen}
+        message={confirmModal.message}
+        title={confirmModal.title}
+        type={confirmModal.type}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+      />
+
+      {/* Delete Options Modal */}
+      <DeleteOptionsModal
+        childrenCount={deleteOptionsModal.childrenCount}
+        hasChildren={deleteOptionsModal.hasChildren}
+        isOpen={deleteOptionsModal.isOpen}
+        itemName={deleteOptionsModal.itemName}
+        itemType={deleteOptionsModal.itemType}
+        loading={deletingNow}
+        onClose={() =>
+          setDeleteOptionsModal((prev) => ({ ...prev, isOpen: false }))
+        }
+        onDeleteLater={() => markForDeletion(deleteOptionsModal.itemId)}
+        onDeleteNow={() => handleImmediateDelete(deleteOptionsModal.itemId)}
+      />
     </div>
   );
 }

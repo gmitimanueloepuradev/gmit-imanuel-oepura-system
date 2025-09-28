@@ -313,7 +313,7 @@ export default function ItemKeuanganPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Kelola Item Keuangan</h1>
+          <h1 className="text-2xl font-bold">Kelola Rancangan Item Keuangan</h1>
           <p className="text-gray-600">
             Kelola item keuangan dengan struktur hierarkis untuk sistem anggaran
           </p>

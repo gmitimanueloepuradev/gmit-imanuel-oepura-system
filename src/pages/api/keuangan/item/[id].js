@@ -56,6 +56,13 @@ async function handleGet(req, res, id) {
             kode: true
           }
         },
+        periode: {
+          select: {
+            id: true,
+            nama: true,
+            tahun: true
+          }
+        },
         parent: {
           select: {
             id: true,

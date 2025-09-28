@@ -264,7 +264,7 @@ model Jemaat {
   sidis                         Sidi[]
   // ibadahPenerimaans     IbadahPenerimaan[]
   // ibadahPengeluarans    IbadahPengeluaran[]
-  ibadahKeluargaJemaatsPemimpin JadwalIbadah[] @relation("PemimpinIbadah")
+  ibadahKeluargaJemaatsPemimpin JadwalIbadah[]  @relation("PemimpinIbadah")
   atestasis                     Atestasi[]
   User                          User?
   Majelis                       Majelis[]
@@ -644,8 +644,7 @@ model ItemKeuangan {
   parent   ItemKeuangan?    @relation("HierarkiItem", fields: [parentId], references: [id])
   children ItemKeuangan[]   @relation("HierarkiItem")
 
-  // rekapKeuangan     RekapKeuangan[]
-  // RealisasiItemKeuangan RealisasiItemKeuangan[]
+  realisasiItemKeuangan RealisasiItemKeuangan[]
 
   @@unique([kategoriId, periodeId, kode], name: "unique_kode_per_kategori_periode")
   @@index([kategoriId], name: "idx_item_kategori")
@@ -656,21 +655,31 @@ model ItemKeuangan {
 }
 
 // Model untuk realisasi item keuangan (catatan transaksi aktual per item)
-// model RealisasiItemKeuangan {
-//   id               String   @id @default(dbgenerated("concat('rek_', gen_random_uuid())")) @db.VarChar(80)
-//   itemKeuanganId   String   @map("item_keuangan_id") @db.VarChar(80)
-//   // tanggalTransaksi DateTime @map("tanggal_transaksi") @db.Date
-//   nominal          Decimal  @map("nominal") @db.Decimal(15, 2)
-//   keterangan       String?  @db.Text
+// Model ini untuk mencatat realisasi - setiap record adalah 1 entry realisasi
+// Frekuensi dihitung dari jumlah records per item
+model RealisasiItemKeuangan {
+  id             String @id @default(dbgenerated("concat('rik_', gen_random_uuid())")) @db.VarChar(80)
+  itemKeuanganId String @map("item_keuangan_id") @db.VarChar(80)
+  periodeId      String @map("periode_id") @db.VarChar(80) // Same periode as ItemKeuangan
 
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
+  // Data realisasi - simple!
+  tanggalRealisasi DateTime @map("tanggal_realisasi") @db.Date // Tanggal realisasi
+  totalRealisasi   Decimal  @map("total_realisasi") @db.Decimal(15, 2) // Total amount untuk entry ini
 
-//   // Relations
-//   itemKeuangan ItemKeuangan @relation(fields: [itemKeuanganId], references: [id])
+  keterangan String? @db.Text
 
-//   @@map("realisasi_item_keuangan")
-// }
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  itemKeuangan ItemKeuangan    @relation(fields: [itemKeuanganId], references: [id], onDelete: Cascade)
+  periode      PeriodeAnggaran @relation(fields: [periodeId], references: [id])
+
+  @@index([itemKeuanganId], name: "idx_realisasi_item")
+  @@index([periodeId], name: "idx_realisasi_periode")
+  @@index([tanggalRealisasi], name: "idx_realisasi_tanggal")
+  @@map("realisasi_item_keuangan")
+}
 
 // Model untuk periode anggaran
 model PeriodeAnggaran {
@@ -688,8 +697,8 @@ model PeriodeAnggaran {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  itemKeuangan ItemKeuangan[]
-  // rekapKeuangan RekapKeuangan[]
+  itemKeuangan          ItemKeuangan[]
+  realisasiItemKeuangan RealisasiItemKeuangan[]
 
   @@map("periode_anggaran")
 }
@@ -706,33 +715,6 @@ enum StatusTransaksi {
   REJECTED
   PAID
 }
-
-// Model untuk rekap bulanan/berkala
-// model RekapKeuangan {
-//   id              String @id @default(dbgenerated("concat('rek_', gen_random_uuid())")) @db.VarChar(80)
-//   periodeId       String @map("periode_id") @db.VarChar(80)
-//   itemKeuanganId  String @map("item_keuangan_id") @db.VarChar(80)
-
-//   tahun           Int
-//   bulan           Int?    // Null jika rekap tahunan
-
-//   targetAnggaran  Decimal? @map("target_anggaran") @db.Decimal(15,2)
-//   realisasiNominal Decimal @map("realisasi_nominal") @db.Decimal(15,2)
-//   jumlahTransaksi Int    @map("jumlah_transaksi")
-
-//   persentaseRealisasi Float? @map("persentase_realisasi")
-//   selisih         Decimal? @db.Decimal(15,2) // Realisasi - Target
-
-//   createdAt       DateTime @default(now()) @map("created_at")
-//   updatedAt       DateTime @updatedAt @map("updated_at")
-
-//   // Relations
-//   periode         PeriodeAnggaran @relation(fields: [periodeId], references: [id])
-//   itemKeuangan    ItemKeuangan    @relation(fields: [itemKeuanganId], references: [id])
-
-//   @@unique([periodeId, itemKeuanganId, tahun, bulan], name: "unique_rekap")
-//   @@map("rekap_keuangan")
-// }
 
 // === DOKUMEN JEMAAT ===
 
@@ -751,28 +733,28 @@ enum StatusDokumen {
 
 // Model untuk menyimpan dokumen-dokumen jemaat (surat baptis, sidi, nikah)
 model DokumenJemaat {
-  id          String        @id @default(dbgenerated("concat('dok_', gen_random_uuid())")) @db.VarChar(80)
-  jemaatId    String        @db.VarChar(80)
-  tipeDokumen TipeDokumen
-  judulDokumen String?      @db.VarChar(255) // Custom title when tipeDokumen is LAINNYA
-  namaFile    String        @db.VarChar(255) // Nama file asli
-  urlFile     String        @db.Text         // URL file di AWS S3
-  s3Key       String        @db.Text         // S3 key untuk delete file
+  id            String        @id @default(dbgenerated("concat('dok_', gen_random_uuid())")) @db.VarChar(80)
+  jemaatId      String        @db.VarChar(80)
+  tipeDokumen   TipeDokumen
+  judulDokumen  String?       @db.VarChar(255) // Custom title when tipeDokumen is LAINNYA
+  namaFile      String        @db.VarChar(255) // Nama file asli
+  urlFile       String        @db.Text // URL file di AWS S3
+  s3Key         String        @db.Text // S3 key untuk delete file
   statusDokumen StatusDokumen @default(PENDING)
-  catatan     String?       @db.Text         // Keterangan dari admin jika ditolak
+  catatan       String?       @db.Text // Keterangan dari admin jika ditolak
 
   // Metadata
-  uploadedBy  String        @db.VarChar(80)  // ID user yang upload
-  verifiedAt  DateTime?     @map("verified_at")
-  verifiedBy  String?       @map("verified_by") @db.VarChar(80) // ID admin yang verifikasi
+  uploadedBy String    @db.VarChar(80) // ID user yang upload
+  verifiedAt DateTime? @map("verified_at")
+  verifiedBy String?   @map("verified_by") @db.VarChar(80) // ID admin yang verifikasi
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  jemaat    Jemaat @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
-  uploader  User   @relation("DokumenUploader", fields: [uploadedBy], references: [id])
-  verifier  User?  @relation("DokumenVerifier", fields: [verifiedBy], references: [id])
+  jemaat   Jemaat @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+  uploader User   @relation("DokumenUploader", fields: [uploadedBy], references: [id])
+  verifier User?  @relation("DokumenVerifier", fields: [verifiedBy], references: [id])
 
   @@unique([jemaatId, tipeDokumen], name: "unique_jemaat_dokumen") // Satu jemaat hanya boleh upload satu dokumen per tipe
   @@index([jemaatId], name: "idx_dokumen_jemaat")
@@ -785,17 +767,17 @@ model DokumenJemaat {
 
 // Model untuk profil pendeta (nama dan gambar)
 model ProfilPendeta {
-  id       String  @id @default(dbgenerated("concat('ppd_', gen_random_uuid())")) @db.VarChar(80)
-  nama     String  @db.VarChar(100)       // Nama lengkap pendeta
-  urlFoto  String? @db.Text               // URL foto di AWS S3
-  s3Key    String? @db.Text               // S3 key untuk delete file
+  id      String  @id @default(dbgenerated("concat('ppd_', gen_random_uuid())")) @db.VarChar(80)
+  nama    String  @db.VarChar(100) // Nama lengkap pendeta
+  urlFoto String? @db.Text // URL foto di AWS S3
+  s3Key   String? @db.Text // S3 key untuk delete file
 
   // Status dan visibility
   isActive Boolean @default(true) @map("is_active")
 
   // Metadata
-  createdBy String?  @map("created_by") @db.VarChar(80)  // ID user yang membuat
-  updatedBy String?  @map("updated_by") @db.VarChar(80)  // ID user yang update
+  createdBy String? @map("created_by") @db.VarChar(80) // ID user yang membuat
+  updatedBy String? @map("updated_by") @db.VarChar(80) // ID user yang update
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
