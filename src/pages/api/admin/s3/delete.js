@@ -1,6 +1,6 @@
+import { DeleteObjectsCommand, S3Client } from "@aws-sdk/client-s3";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { S3Client, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
 import { authOptions } from "@/lib/auth";
 
@@ -20,7 +20,7 @@ export async function POST(request) {
     if (!session || session.user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized access" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -35,7 +35,7 @@ export async function POST(request) {
     if (!bucketName) {
       return NextResponse.json(
         { error: "S3 bucket not configured" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -59,7 +59,7 @@ export async function POST(request) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to delete files" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
