@@ -7,8 +7,8 @@ import EmployeeLayout from "@/components/layout/EmployeeLayout";
 import Footer from "@/components/layout/Footer";
 import JemaatLayout from "@/components/layout/JemaatLayout";
 import MajelisLayout from "@/components/layout/MajelisLayout";
-import Navigation from "@/components/layout/navigation";
-import InstallPrompt from "@/components/pwa/InstallPrompt";
+// import Navigation from "@/components/layout/navigation";
+// import InstallPrompt from "@/components/pwa/InstallPrompt";
 // import PWAInstallBanner from "@/components/pwa/PWAInstallBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
 // import { PWAProvider } from "@/contexts/PWAContext";
@@ -18,6 +18,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { queryClient } from "@/lib/queryClient";
 import "@/styles/globals.css";
 import "leaflet/dist/leaflet.css";
+import Navigation from "@/components/layout/Navigation";
 
 export default function App({ Component, pageProps, router }) {
   const pathname = router.pathname;
@@ -139,7 +140,7 @@ export default function App({ Component, pageProps, router }) {
 
               <Component {...pageProps} />
               <Footer />
-              <InstallPrompt />
+              {/* <InstallPrompt /> */}
             </Navigation>
           </AuthProvider>
         </PWAProvider>

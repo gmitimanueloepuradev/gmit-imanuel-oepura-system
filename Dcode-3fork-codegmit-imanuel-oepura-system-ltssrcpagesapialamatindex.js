@@ -1,1 +1,0 @@
-Creating alamat API endpoint
