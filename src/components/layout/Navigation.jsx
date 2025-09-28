@@ -14,6 +14,7 @@ export default function Navigation({ children }) {
     { name: "Galeri", path: "/galeri" },
     { name: "Tentang", path: "/tentang" },
     { name: "Sejarah", path: "/sejarah" },
+    { name: "Profil Pendeta", path: "/profil-pendeta" },
   ];
 
   // Fetch kategori pengumuman data for UPP dropdown

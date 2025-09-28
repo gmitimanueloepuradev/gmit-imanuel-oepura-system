@@ -49,7 +49,7 @@ export default function Navbar({
             <summary className="btn btn-ghost flex items-center px-4 py-2 text-white hover:text-blue-200 dark:hover:text-blue-300 hover:bg-white/10 dark:hover:bg-white/20 transition-all duration-200">
               <FileText className="w-4 h-4 mr-2" />
               UPP
-              <ChevronDown className="w-4 h-4 ml-2" />
+              {/* <ChevronDown className="w-4 h-4 ml-2" /> */}
             </summary>
             <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-72 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 max-h-96 overflow-y-auto">
               {uppLoading ? (

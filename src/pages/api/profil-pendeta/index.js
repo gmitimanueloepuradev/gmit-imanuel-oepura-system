@@ -1,7 +1,7 @@
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 
-import { requireAuth } from "@/lib/jwt";
+import { getTokenFromHeader, verifyToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
 import { uploadFileToS3, deleteFileFromS3 } from "@/lib/s3";
 import { apiResponse } from "@/lib/apiHelper";
@@ -62,11 +62,22 @@ async function handleGet(req, res) {
 // POST - Create new pastor profile
 async function handlePost(req, res) {
   // Check authentication
-  const user = requireAuth(req, res);
-  if (!user) return;
+  const token = getTokenFromHeader(req.headers.authorization);
+  if (!token) {
+    return res.status(401).json(
+      apiResponse(false, null, "Token tidak ditemukan")
+    );
+  }
+
+  const decoded = await verifyToken(token);
+  if (!decoded) {
+    return res.status(401).json(
+      apiResponse(false, null, "Token tidak valid")
+    );
+  }
 
   // Check if user is admin
-  if (user.role !== 'ADMIN') {
+  if (decoded.role !== 'ADMIN') {
     return res.status(403).json(
       apiResponse(false, null, "Hanya admin yang dapat membuat profil pendeta")
     );
@@ -119,7 +130,7 @@ async function handlePost(req, res) {
           urlFoto,
           s3Key,
           isActive: true,
-          createdBy: user.id,
+          // createdBy: user.id,
         },
       });
 

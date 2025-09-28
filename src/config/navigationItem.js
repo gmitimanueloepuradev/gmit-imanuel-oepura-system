@@ -147,6 +147,11 @@ export const roleConfigs = {
             icon: Tag,
           },
           {
+            href: "/admin/data-master/profil-pendeta",
+            label: "Profil Pendeta",
+            icon: Tag,
+          },
+          {
             href: "/admin/data-master/jaminan-kesehatan",
             label: "Jaminan Kesehatan",
             icon: Tag,
