@@ -1,41 +1,104 @@
-// import { DocumentUploadService } from '../../../../services/documentUploadService';
-// import { verifyToken } from '../../../../lib/auth';
+import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import { requireAuth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-import { verifyToken } from "@/lib/jwt";
-import DocumentUploadService from "@/services/documentUploadService";
+async function handleGet(req, res) {
+  try {
+    const authResult = await requireAuth(req, res);
 
-export default async function handler(req, res) {
-  const { id } = req.query;
+    if (authResult.error) {
+      return res
+        .status(authResult.status)
+        .json(apiResponse(false, null, authResult.error));
+    }
 
-  if (req.method === "GET") {
-    try {
-      const user = verifyToken(req);
+    const { user } = authResult;
+    const { id } = req.query;
 
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: "Token tidak valid",
-        });
+    // Get documents for the specified jemaat
+    const where = {
+      jemaatId: id,
+    };
+
+    // For JEMAAT users, ensure they can only see their own documents
+    if (user.role === "JEMAAT" && user.jemaat) {
+      if (user.jemaat.id !== id) {
+        return res
+          .status(403)
+          .json(
+            apiResponse(false, null, "Anda hanya dapat melihat dokumen sendiri")
+          );
+      }
+    }
+
+    // For MAJELIS users, ensure the jemaat belongs to their rayon
+    if (user.role === "MAJELIS" && user.majelis && user.majelis.idRayon) {
+      const jemaat = await prisma.jemaat.findUnique({
+        where: { id },
+        include: {
+          keluarga: {
+            select: { idRayon: true },
+          },
+        },
+      });
+
+      if (!jemaat) {
+        return res
+          .status(404)
+          .json(apiResponse(false, null, "Jemaat tidak ditemukan"));
       }
 
-      const dokumen = await DocumentUploadService.getDokumenByJemaat(id);
-
-      res.status(200).json({
-        success: true,
-        data: dokumen,
-        message: "Data dokumen berhasil diambil",
-      });
-    } catch (error) {
-      console.error("Get dokumen error:", error);
-      res.status(500).json({
-        success: false,
-        message: error.message || "Gagal mengambil data dokumen",
-      });
+      if (jemaat.keluarga.idRayon !== user.majelis.idRayon) {
+        return res
+          .status(403)
+          .json(
+            apiResponse(
+              false,
+              null,
+              "Anda tidak memiliki akses ke dokumen jemaat ini"
+            )
+          );
+      }
     }
-  } else {
-    res.status(405).json({
-      success: false,
-      message: "Method tidak diizinkan",
+
+    const dokumen = await prisma.dokumenJemaat.findMany({
+      where,
+      include: {
+        jemaat: {
+          include: {
+            keluarga: {
+              include: {
+                rayon: true,
+              },
+            },
+          },
+        },
+        verifier: {
+          include: {
+            jemaat: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
+
+    return res
+      .status(200)
+      .json(apiResponse(true, dokumen, "Data dokumen berhasil diambil"));
+  } catch (error) {
+    console.error("Error fetching dokumen:", error);
+
+    return res
+      .status(500)
+      .json(
+        apiResponse(false, null, "Gagal mengambil data dokumen", error.message)
+      );
   }
 }
+
+export default createApiHandler({
+  GET: handleGet,
+});

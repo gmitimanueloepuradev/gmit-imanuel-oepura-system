@@ -1,60 +1,75 @@
-import { useState } from "react";
-import { Edit2, Save, X, User, Mail, Phone, Key } from "lucide-react";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { Edit2, Key, Mail, Phone, Save, User, X } from "lucide-react";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import * as z from "zod";
 
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PhoneInput from "@/components/ui/PhoneInput";
 import TextInput from "@/components/ui/inputs/TextInput";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { showToast } from "@/utils/showToast";
 import { useAuth } from "@/contexts/AuthContext";
+import { showToast } from "@/utils/showToast";
 
-const userSchema = z.object({
-  username: z.string().min(3, "Username minimal 3 karakter"),
-  email: z.string().email("Email tidak valid"),
-  noWhatsapp: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val === '') return true; // Optional field
-        // Check if it's a valid Indonesian phone number format
-        const cleaned = val.replace(/\D/g, '');
-        if (cleaned.startsWith('62')) {
-          const afterCountryCode = cleaned.substring(2);
-          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+const userSchema = z
+  .object({
+    username: z.string().min(3, "Username minimal 3 karakter"),
+    email: z.string().email("Email tidak valid"),
+    noWhatsapp: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val === "") return true; // Optional field
+          // Check if it's a valid Indonesian phone number format
+          const cleaned = val.replace(/\D/g, "");
+
+          if (cleaned.startsWith("62")) {
+            const afterCountryCode = cleaned.substring(2);
+
+            return (
+              afterCountryCode.startsWith("8") &&
+              afterCountryCode.length >= 9 &&
+              afterCountryCode.length <= 13
+            );
+          }
+
+          return false;
+        },
+        {
+          message:
+            "Format nomor WhatsApp tidak valid. Gunakan format +6281234567890",
         }
+      ),
+    currentPassword: z.string().optional(),
+    newPassword: z.string().optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.newPassword && !data.currentPassword) {
         return false;
-      },
-      {
-        message: 'Format nomor WhatsApp tidak valid. Gunakan format +6281234567890',
       }
-    ),
-  currentPassword: z.string().optional(),
-  newPassword: z.string().optional(),
-  confirmPassword: z.string().optional()
-}).refine((data) => {
-  if (data.newPassword && !data.currentPassword) {
-    return false;
-  }
-  if (data.newPassword && data.newPassword !== data.confirmPassword) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Password baru harus sama dengan konfirmasi password dan harus mengisi password lama",
-  path: ["confirmPassword"]
-});
+      if (data.newPassword && data.newPassword !== data.confirmPassword) {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message:
+        "Password baru harus sama dengan konfirmasi password dan harus mengisi password lama",
+      path: ["confirmPassword"],
+    }
+  );
 
 export default function UserProfileSection({ user }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const { refreshUser } = useAuth();
-  
+
   if (!user) return null;
 
   const methods = useForm({
@@ -65,34 +80,45 @@ export default function UserProfileSection({ user }) {
       noWhatsapp: user.noWhatsapp || "",
       currentPassword: "",
       newPassword: "",
-      confirmPassword: ""
-    }
+      confirmPassword: "",
+    },
   });
 
-  const { register, formState: { errors } } = methods;
+  const {
+    register,
+    formState: { errors },
+  } = methods;
 
   const updateMutation = useMutation({
     mutationFn: async (data) => {
       const payload = {
         username: data.username,
         email: data.email,
-        noWhatsapp: data.noWhatsapp
       };
-      
+
+      // Only include noWhatsapp if it has a value (not empty string)
+      if (data.noWhatsapp && data.noWhatsapp.trim() !== '') {
+        payload.noWhatsapp = data.noWhatsapp;
+      } else if (data.noWhatsapp === '' && user.noWhatsapp) {
+        // If user is clearing the WhatsApp number, explicitly set to null
+        payload.noWhatsapp = null;
+      }
+
       // Only include password fields if changing password
       if (data.newPassword && data.currentPassword) {
         payload.currentPassword = data.currentPassword;
         payload.newPassword = data.newPassword;
       }
-      
+
       const response = await axios.patch(`/api/users/${user.id}`, payload);
+
       return response.data;
     },
     onSuccess: async () => {
       showToast({
         title: "Berhasil",
         description: "Profil berhasil diperbarui",
-        color: "success"
+        color: "success",
       });
       setIsEditing(false);
       setIsChangingPassword(false);
@@ -100,17 +126,18 @@ export default function UserProfileSection({ user }) {
         ...methods.getValues(),
         currentPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
       });
       await refreshUser();
     },
     onError: (error) => {
       showToast({
         title: "Gagal",
-        description: error.response?.data?.message || "Gagal memperbarui profil",
-        color: "danger"
+        description:
+          error.response?.data?.message || "Gagal memperbarui profil",
+        color: "danger",
       });
-    }
+    },
   });
 
   const onSubmit = (data) => {
@@ -124,7 +151,7 @@ export default function UserProfileSection({ user }) {
       noWhatsapp: user.noWhatsapp || "",
       currentPassword: "",
       newPassword: "",
-      confirmPassword: ""
+      confirmPassword: "",
     });
     setIsEditing(false);
     setIsChangingPassword(false);
@@ -138,8 +165,8 @@ export default function UserProfileSection({ user }) {
           Profil Akun
         </CardTitle>
         {!isEditing ? (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={() => setIsEditing(true)}
           >
@@ -148,15 +175,11 @@ export default function UserProfileSection({ user }) {
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={handleCancel}
-            >
+            <Button size="sm" variant="outline" onClick={handleCancel}>
               <X className="h-4 w-4 mr-2" />
               Batal
             </Button>
-            <Button 
+            <Button
               disabled={updateMutation.isLoading}
               size="sm"
               onClick={methods.handleSubmit(onSubmit)}
@@ -167,7 +190,7 @@ export default function UserProfileSection({ user }) {
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent>
         {!isEditing ? (
           <div>
@@ -185,16 +208,18 @@ export default function UserProfileSection({ user }) {
                 </div>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span className="flex items-center text-gray-500 text-sm mb-1">
                   <Mail className="h-4 w-4 mr-1" />
                   Email
                 </span>
-                <span className="block text-gray-800 font-medium">{user.email}</span>
+                <span className="block text-gray-800 font-medium">
+                  {user.email}
+                </span>
               </div>
-              
+
               <div>
                 <span className="flex items-center text-gray-500 text-sm mb-1">
                   <Phone className="h-4 w-4 mr-1" />
@@ -204,25 +229,36 @@ export default function UserProfileSection({ user }) {
                   {user.noWhatsapp || "-"}
                 </span>
               </div>
-              
+
               <div>
-                <span className="block text-gray-500 text-sm mb-1">Bergabung</span>
+                <span className="block text-gray-500 text-sm mb-1">
+                  Bergabung
+                </span>
                 <span className="block text-gray-800 font-medium">
-                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString('id-ID') : "-"}
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString("id-ID")
+                    : "-"}
                 </span>
               </div>
-              
+
               <div>
-                <span className="block text-gray-500 text-sm mb-1">Terakhir Update</span>
+                <span className="block text-gray-500 text-sm mb-1">
+                  Terakhir Update
+                </span>
                 <span className="block text-gray-800 font-medium">
-                  {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('id-ID') : "-"}
+                  {user.updatedAt
+                    ? new Date(user.updatedAt).toLocaleDateString("id-ID")
+                    : "-"}
                 </span>
               </div>
             </div>
           </div>
         ) : (
           <FormProvider {...methods}>
-            <form className="space-y-4" onSubmit={methods.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-4"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
                   required
@@ -230,7 +266,7 @@ export default function UserProfileSection({ user }) {
                   name="username"
                   placeholder="Masukkan username"
                 />
-                
+
                 <TextInput
                   required
                   label="Email"
@@ -238,7 +274,7 @@ export default function UserProfileSection({ user }) {
                   placeholder="Masukkan email"
                   type="email"
                 />
-                
+
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     No. WhatsApp
@@ -250,10 +286,12 @@ export default function UserProfileSection({ user }) {
                   />
                 </div>
               </div>
-              
+
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-medium text-gray-900">Ubah Password</h4>
+                  <h4 className="text-sm font-medium text-gray-900">
+                    Ubah Password
+                  </h4>
                   <Button
                     size="sm"
                     type="button"
@@ -264,7 +302,7 @@ export default function UserProfileSection({ user }) {
                     {isChangingPassword ? "Batal Ubah" : "Ubah Password"}
                   </Button>
                 </div>
-                
+
                 {isChangingPassword && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <TextInput
@@ -274,7 +312,7 @@ export default function UserProfileSection({ user }) {
                       required={isChangingPassword}
                       type="password"
                     />
-                    
+
                     <TextInput
                       label="Password Baru"
                       name="newPassword"
@@ -282,7 +320,7 @@ export default function UserProfileSection({ user }) {
                       required={isChangingPassword}
                       type="password"
                     />
-                    
+
                     <TextInput
                       label="Konfirmasi Password"
                       name="confirmPassword"

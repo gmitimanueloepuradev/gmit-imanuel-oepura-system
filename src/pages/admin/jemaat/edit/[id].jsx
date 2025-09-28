@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -40,6 +40,7 @@ const steps = [
 
 export default function EditJemaat() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { id } = router.query;
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -266,6 +267,12 @@ export default function EditJemaat() {
   const updateJemaatMutation = useMutation({
     mutationFn: ({ id, data }) => jemaatService.update(id, data),
     onSuccess: (data) => {
+      // Invalidate queries related to jemaat data
+      queryClient.invalidateQueries(['jemaat']);
+      queryClient.invalidateQueries(['jemaat-list']);
+      queryClient.invalidateQueries(['admin-jemaat']);
+      queryClient.invalidateQueries(['jemaat', id]);
+
       showToast({
         title: "Berhasil",
         description: "Data jemaat berhasil diperbarui!",

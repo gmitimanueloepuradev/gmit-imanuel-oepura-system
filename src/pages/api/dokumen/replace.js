@@ -1,5 +1,3 @@
-// import { DocumentUploadService } from '../../../services/documentUploadService';
-// import { verifyToken } from '../../../lib/auth';
 import multer from "multer";
 
 import { verifyToken } from "@/lib/jwt";
@@ -22,7 +20,7 @@ const upload = multer({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method !== "PATCH") {
     return res.status(405).json({
       success: false,
       message: "Method tidak diizinkan",
@@ -50,34 +48,18 @@ export default async function handler(req, res) {
         });
       }
 
-      const { jemaatId, tipeDokumen, judulDokumen } = req.body;
+      const { dokumenId, judulDokumen } = req.body;
       const file = req.file;
 
-      if (!jemaatId || !tipeDokumen || !file) {
+      if (!dokumenId || !file) {
         return res.status(400).json({
           success: false,
-          message: "jemaatId, tipeDokumen, dan file harus disediakan",
+          message: "dokumenId dan file harus disediakan",
         });
       }
 
-      if (!["BAPTIS", "SIDI", "NIKAH", "LAINNYA"].includes(tipeDokumen)) {
-        return res.status(400).json({
-          success: false,
-          message: "tipeDokumen harus BAPTIS, SIDI, NIKAH, atau LAINNYA",
-        });
-      }
-
-      // Validate judulDokumen for LAINNYA type
-      if (tipeDokumen === "LAINNYA" && (!judulDokumen || !judulDokumen.trim())) {
-        return res.status(400).json({
-          success: false,
-          message: "judulDokumen harus disediakan untuk tipe dokumen LAINNYA",
-        });
-      }
-
-      const result = await DocumentUploadService.uploadDocument(
-        jemaatId,
-        tipeDokumen,
+      const result = await DocumentUploadService.replaceDocument(
+        dokumenId,
         file,
         file.size,
         user.id,
@@ -86,10 +68,10 @@ export default async function handler(req, res) {
 
       res.status(200).json(result);
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Replace error:", error);
       res.status(500).json({
         success: false,
-        message: error.message || "Gagal upload dokumen",
+        message: error.message || "Gagal replace dokumen",
       });
     }
   });

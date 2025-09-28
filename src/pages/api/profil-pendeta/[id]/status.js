@@ -1,0 +1,83 @@
+import { requireAuth } from "@/lib/jwt";
+import prisma from "@/lib/prisma";
+import { apiResponse } from "@/lib/apiHelper";
+
+// PATCH - Toggle active status
+async function handlePatch(req, res) {
+  // Check authentication
+  const user = requireAuth(req, res);
+  if (!user) return;
+
+  // Check if user is admin
+  if (user.role !== 'ADMIN') {
+    return res.status(403).json(
+      apiResponse(false, null, "Hanya admin yang dapat mengubah status profil pendeta")
+    );
+  }
+
+  try {
+    const { id } = req.query;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json(
+        apiResponse(false, null, "Status harus berupa boolean")
+      );
+    }
+
+    // Check if profile exists
+    const existingProfile = await prisma.profilPendeta.findUnique({
+      where: { id },
+    });
+
+    if (!existingProfile) {
+      return res.status(404).json(
+        apiResponse(false, null, "Profil pendeta tidak ditemukan")
+      );
+    }
+
+    // If activating this profile, deactivate all others
+    if (isActive) {
+      await prisma.profilPendeta.updateMany({
+        where: {
+          id: { not: id },
+          isActive: true
+        },
+        data: { isActive: false }
+      });
+    }
+
+    // Update the profile status
+    const updatedProfile = await prisma.profilPendeta.update({
+      where: { id },
+      data: {
+        isActive,
+        updatedBy: user.id,
+      },
+    });
+
+    return res.status(200).json(
+      apiResponse(
+        true,
+        updatedProfile,
+        `Profil pendeta berhasil ${isActive ? 'diaktifkan' : 'dinonaktifkan'}`
+      )
+    );
+  } catch (error) {
+    console.error("Error updating pastor profile status:", error);
+    return res.status(500).json(
+      apiResponse(false, null, "Gagal mengubah status profil pendeta", error.message)
+    );
+  }
+}
+
+export default async function handler(req, res) {
+  switch (req.method) {
+    case 'PATCH':
+      return handlePatch(req, res);
+    default:
+      return res.status(405).json(
+        apiResponse(false, null, "Method tidak diizinkan")
+      );
+  }
+}

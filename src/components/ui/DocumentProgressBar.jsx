@@ -21,7 +21,7 @@ const DocumentProgressBar = ({ jemaatId }) => {
   const fetchProgress = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await fetch(`/api/dokumen/progress/${jemaatId}`, {
         headers: {
           'Authorization': `Bearer ${token}`

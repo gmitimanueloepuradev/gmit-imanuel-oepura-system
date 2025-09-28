@@ -75,7 +75,8 @@
       "Bash(npm run cap:build:*)",
       "Bash(ren:*)",
       "Bash(ipconfig)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=lanjutkan)"
     ],
     "deny": [],
     "ask": []

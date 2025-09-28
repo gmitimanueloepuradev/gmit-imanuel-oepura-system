@@ -3,7 +3,7 @@ export const apiResponse = (
   success,
   data = null,
   message = "",
-  errors = null,
+  errors = null
 ) => {
   return {
     success,
@@ -16,7 +16,6 @@ export const apiResponse = (
 
 // Standard Error Response Handler
 export const handleApiError = (res, error, message = "Server error") => {
-   
   console.error(`API Error: ${message}`, error);
 
   return res.status(500).json(apiResponse(false, null, message, error.message));
@@ -48,7 +47,7 @@ export const successResponse = (
   res,
   data = null,
   message = "Berhasil",
-  statusCode = 200,
+  statusCode = 200
 ) => {
   return res.status(statusCode).json(apiResponse(true, data, message));
 };

@@ -1,16 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
+import { uploadFileToS3, deleteFileFromS3 } from "@/lib/s3";
 
 const prisma = new PrismaClient();
-
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION || "us-east-1",
-});
-
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 
 const ALLOWED_FILE_TYPES = {
   "application/pdf": ".pdf",
@@ -30,7 +22,7 @@ export class DocumentUploadService {
       throw new Error("Ukuran file maksimal 1MB");
     }
 
-    if (!ALLOWED_FILE_TYPES[file.type]) {
+    if (!ALLOWED_FILE_TYPES[file.mimetype]) {
       throw new Error("Tipe file harus PDF, PNG, atau JPG");
     }
 
@@ -39,28 +31,18 @@ export class DocumentUploadService {
 
   static async uploadToS3(file, fileName, jemaatId, tipeDokumen) {
     try {
-      const fileExtension = ALLOWED_FILE_TYPES[file.type];
+      const fileExtension = ALLOWED_FILE_TYPES[file.mimetype];
       const s3Key = `dokumen-jemaat/${jemaatId}/${tipeDokumen}/${fileName}${fileExtension}`;
 
-      const uploadParams = {
-        Bucket: BUCKET_NAME,
-        Key: s3Key,
-        Body: file,
-        ContentType: file.type,
-        ServerSideEncryption: "AES256",
-        Metadata: {
-          jemaatId: jemaatId,
-          tipeDokumen: tipeDokumen,
-          originalName: fileName,
-        },
-      };
+      const result = await uploadFileToS3(file, s3Key);
 
-      const result = await s3.upload(uploadParams).promise();
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       return {
-        url: result.Location,
-        key: result.Key,
-        bucket: result.Bucket,
+        url: result.url,
+        key: result.key,
       };
     } catch (error) {
       throw new Error(`Gagal upload ke S3: ${error.message}`);
@@ -69,12 +51,11 @@ export class DocumentUploadService {
 
   static async deleteFromS3(s3Key) {
     try {
-      const deleteParams = {
-        Bucket: BUCKET_NAME,
-        Key: s3Key,
-      };
+      const result = await deleteFileFromS3(s3Key);
 
-      await s3.deleteObject(deleteParams).promise();
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       return true;
     } catch (error) {
@@ -86,13 +67,15 @@ export class DocumentUploadService {
     jemaatId,
     tipeDokumen,
     fileData,
-    uploadedBy
+    uploadedBy,
+    judulDokumen = null
   ) {
     try {
       const dokumen = await prisma.dokumenJemaat.create({
         data: {
           jemaatId: jemaatId,
           tipeDokumen: tipeDokumen,
+          judulDokumen: judulDokumen,
           namaFile: fileData.originalName,
           urlFile: fileData.url,
           s3Key: fileData.key,
@@ -120,10 +103,11 @@ export class DocumentUploadService {
     tipeDokumen,
     file,
     fileSize,
-    uploadedBy
+    uploadedBy,
+    judulDokumen = null
   ) {
     try {
-      this.validateFile({ type: file.mimetype }, fileSize);
+      this.validateFile({ mimetype: file.mimetype }, fileSize);
 
       const fileName = `${tipeDokumen.toLowerCase()}_${Date.now()}_${uuidv4()}`;
 
@@ -144,7 +128,8 @@ export class DocumentUploadService {
         jemaatId,
         tipeDokumen,
         fileData,
-        uploadedBy
+        uploadedBy,
+        judulDokumen
       );
 
       return {
@@ -212,6 +197,79 @@ export class DocumentUploadService {
       return dokumen;
     } catch (error) {
       throw new Error(`Gagal update status: ${error.message}`);
+    }
+  }
+
+  static async replaceDocument(
+    dokumenId,
+    file,
+    fileSize,
+    uploadedBy,
+    judulDokumen = null
+  ) {
+    try {
+      // Get existing document
+      const existingDokumen = await prisma.dokumenJemaat.findUnique({
+        where: { id: dokumenId },
+      });
+
+      if (!existingDokumen) {
+        throw new Error("Dokumen tidak ditemukan");
+      }
+
+      // Validate file
+      this.validateFile({ mimetype: file.mimetype }, fileSize);
+
+      const fileName = `${existingDokumen.tipeDokumen.toLowerCase()}_${Date.now()}_${uuidv4()}`;
+
+      // Upload new file to S3
+      const s3Data = await this.uploadToS3(
+        file,
+        fileName,
+        existingDokumen.jemaatId,
+        existingDokumen.tipeDokumen
+      );
+
+      // Delete old file from S3
+      await this.deleteFromS3(existingDokumen.s3Key);
+
+      const fileData = {
+        originalName: file.originalname || file.name,
+        url: s3Data.url,
+        key: s3Data.key,
+      };
+
+      // Update document in database
+      const updatedDokumen = await prisma.dokumenJemaat.update({
+        where: { id: dokumenId },
+        data: {
+          judulDokumen: judulDokumen,
+          namaFile: fileData.originalName,
+          urlFile: fileData.url,
+          s3Key: fileData.key,
+          statusDokumen: "PENDING", // Reset status to pending
+          catatan: null, // Clear previous rejection notes
+          verifiedAt: null,
+          verifiedBy: null,
+          updatedAt: new Date(),
+        },
+        include: {
+          jemaat: {
+            select: {
+              nama: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      return {
+        success: true,
+        data: updatedDokumen,
+        message: "Dokumen berhasil diganti dan menunggu verifikasi ulang",
+      };
+    } catch (error) {
+      throw error;
     }
   }
 

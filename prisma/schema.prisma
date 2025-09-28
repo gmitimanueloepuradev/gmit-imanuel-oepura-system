@@ -740,6 +740,7 @@ enum TipeDokumen {
   BAPTIS
   SIDI
   NIKAH
+  LAINNYA
 }
 
 enum StatusDokumen {
@@ -753,6 +754,7 @@ model DokumenJemaat {
   id          String        @id @default(dbgenerated("concat('dok_', gen_random_uuid())")) @db.VarChar(80)
   jemaatId    String        @db.VarChar(80)
   tipeDokumen TipeDokumen
+  judulDokumen String?      @db.VarChar(255) // Custom title when tipeDokumen is LAINNYA
   namaFile    String        @db.VarChar(255) // Nama file asli
   urlFile     String        @db.Text         // URL file di AWS S3
   s3Key       String        @db.Text         // S3 key untuk delete file
@@ -777,4 +779,27 @@ model DokumenJemaat {
   @@index([tipeDokumen], name: "idx_dokumen_tipe")
   @@index([statusDokumen], name: "idx_dokumen_status")
   @@map("dokumen_jemaat")
+}
+
+// === PROFIL PENDETA ===
+
+// Model untuk profil pendeta (nama dan gambar)
+model ProfilPendeta {
+  id       String  @id @default(dbgenerated("concat('ppd_', gen_random_uuid())")) @db.VarChar(80)
+  nama     String  @db.VarChar(100)       // Nama lengkap pendeta
+  urlFoto  String? @db.Text               // URL foto di AWS S3
+  s3Key    String? @db.Text               // S3 key untuk delete file
+
+  // Status dan visibility
+  isActive Boolean @default(true) @map("is_active")
+
+  // Metadata
+  createdBy String?  @map("created_by") @db.VarChar(80)  // ID user yang membuat
+  updatedBy String?  @map("updated_by") @db.VarChar(80)  // ID user yang update
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive], name: "idx_profil_pendeta_active")
+  @@map("profil_pendeta")
 }
