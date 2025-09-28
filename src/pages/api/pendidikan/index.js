@@ -4,7 +4,7 @@ import { apiResponse } from "@/lib/apiHelper";
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
-      const { page = 1, limit = 10, search = "" } = req.query;
+      const { page = 1, limit = 1000, search = "" } = req.query;
       const skip = (parseInt(page) - 1) * parseInt(limit);
 
       const where = search

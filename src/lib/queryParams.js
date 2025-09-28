@@ -5,7 +5,7 @@ export function parseQueryParams(query, options = {}) {
     searchField = "nama", // default field for search
     defaultSortBy = "id",
     defaultSortOrder = "asc",
-    defaultLimit = 10,
+    defaultLimit = 1000,
     defaultPage = 1,
   } = options;
 

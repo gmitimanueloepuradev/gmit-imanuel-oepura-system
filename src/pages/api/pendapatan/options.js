@@ -4,7 +4,7 @@ import { createApiHandler } from "@/lib/apiHandler";
 
 async function handleGet(req, res) {
   try {
-    const { search } = req.query;
+    const { search, limit = 1000 } = req.query;
 
     const where = search
       ? {
@@ -25,7 +25,7 @@ async function handleGet(req, res) {
       orderBy: {
         label: "asc", // Ganti dari 'kategori' ke 'label'
       },
-      take: 20,
+      take: parseInt(limit),
     });
 
     // Format untuk AutoCompleteInput

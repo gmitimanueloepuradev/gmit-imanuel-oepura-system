@@ -5,7 +5,7 @@ import { createApiHandler } from "@/lib/apiHandler";
 async function handleGet(req, res) {
   try {
     // Public endpoint - no auth required for onboarding
-    const { search } = req.query;
+    const { search, limit = 1000 } = req.query;
 
     const where = {
       // Exclude "Kepala Keluarga" from options since each family already has one
@@ -24,7 +24,7 @@ async function handleGet(req, res) {
       orderBy: {
         status: "asc",
       },
-      take: 20, // Limit untuk autocomplete
+      take: parseInt(limit), // Customizable limit untuk dropdown/autocomplete
     });
 
     // Format untuk AutoCompleteInput

@@ -1,5 +1,5 @@
-import masterService from "@/services/masterService";
 import MasterDataPage from "@/components/ui/MasterDataPage";
+import masterService from "@/services/masterService";
 
 export default function PendidikanPage() {
   const columns = [
@@ -24,10 +24,10 @@ export default function PendidikanPage() {
   const viewFields = [
     { key: "id", label: "ID" },
     { key: "jenjang", label: "Jenjang Pendidikan" },
-    { 
-      key: "isActive", 
-      label: "Status Aktif", 
-      getValue: (item) => item?.isActive ? "Aktif" : "Tidak Aktif" 
+    {
+      key: "isActive",
+      label: "Status Aktif",
+      getValue: (item) => (item?.isActive ? "Aktif" : "Tidak Aktif"),
     },
   ];
 
@@ -37,14 +37,14 @@ export default function PendidikanPage() {
       label: "Jenjang Pendidikan",
       type: "text",
       required: true,
-      placeholder: "Masukkan jenjang pendidikan"
+      placeholder: "Masukkan jenjang pendidikan",
     },
     {
       key: "isActive",
       label: "Status Aktif",
       type: "boolean",
-      defaultValue: true
-    }
+      defaultValue: true,
+    },
   ];
 
   return (
@@ -65,7 +65,7 @@ export default function PendidikanPage() {
         get: () => masterService.getPendidikan(),
         create: (data) => masterService.createPendidikan(data),
         update: (id, data) => masterService.updatePendidikan(id, data),
-        delete: (id) => masterService.deletePendidikan(id)
+        delete: (id) => masterService.deletePendidikan(id),
       }}
       title="Data Pendidikan"
       viewFields={viewFields}
