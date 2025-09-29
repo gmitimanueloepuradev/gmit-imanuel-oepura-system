@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
 import PageHeader from "@/components/ui/PageHeader";
 
@@ -149,34 +150,29 @@ export default function CreateRealisasiPage() {
               <form className="space-y-6" onSubmit={handleSubmit}>
                 {/* Item Keuangan */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Item Keuangan <span className="text-red-500">*</span>
-                  </label>
-                  <select
+                  <AutoCompleteInput
+                    label="Item Keuangan"
+                    placeholder="Cari dan pilih item keuangan..."
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    name="itemKeuanganId"
                     value={formData.itemKeuanganId}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Pilih Item Keuangan</option>
-                    {Array.isArray(itemList) &&
-                      itemList.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.kode} - {item.nama} ({item.kategori.nama})
-                        </option>
-                      ))}
-                  </select>
+                    options={Array.isArray(itemList) ? itemList.map(item => ({
+                      value: item.id,
+                      label: `${item.kode} - ${item.nama} (${item.kategori.nama})`
+                    })) : []}
+                    onChange={(value) => {
+                      handleInputChange({ target: { name: 'itemKeuanganId', value } });
+                    }}
+                  />
                 </div>
 
                 {/* Periode */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Periode <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                     name="periodeId"
                     value={formData.periodeId}
                     onChange={handleInputChange}
@@ -191,7 +187,7 @@ export default function CreateRealisasiPage() {
                       ))}
                   </select>
                   {formData.itemKeuanganId && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Periode otomatis dipilih berdasarkan item keuangan
                     </p>
                   )}
@@ -199,12 +195,12 @@ export default function CreateRealisasiPage() {
 
                 {/* Tanggal Realisasi */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Tanggal Realisasi <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                     name="tanggalRealisasi"
                     type="date"
                     value={formData.tanggalRealisasi}
@@ -214,12 +210,12 @@ export default function CreateRealisasiPage() {
 
                 {/* Total Realisasi */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Total Realisasi <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     min="0"
                     name="totalRealisasi"
                     placeholder="Contoh: 5500000"
@@ -228,15 +224,20 @@ export default function CreateRealisasiPage() {
                     value={formData.totalRealisasi}
                     onChange={handleInputChange}
                   />
+                  {formData.totalRealisasi && (
+                    <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
+                      Format: {formatRupiah(formData.totalRealisasi)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Keterangan */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Keterangan
                   </label>
                   <textarea
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     name="keterangan"
                     placeholder="Catatan tambahan..."
                     rows="3"

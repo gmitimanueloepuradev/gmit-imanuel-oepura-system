@@ -236,7 +236,7 @@ export default function MajelisCreateJemaat() {
   const kelurahanOptions =
     kelurahan?.data?.items?.map((item) => ({
       value: item.id,
-      label: `${item.nama} - ${item.kodepos}`,
+      label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
     })) || [];
 
   // Watch status dalam keluarga to determine if user is kepala keluarga

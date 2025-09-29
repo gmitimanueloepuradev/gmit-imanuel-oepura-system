@@ -21,7 +21,7 @@ const pernikahanService = {
 
   // Update pernikahan
   update: async (id, data) => {
-    const res = await axios.patch(`/pernikahan/${id}`, data);
+    const res = await axios.put(`/pernikahan/${id}`, data);
     return res.data;
   },
 

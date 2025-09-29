@@ -45,7 +45,8 @@ export default function RealisasiKeuanganPage() {
     onSuccess: (data) => {
       // Set default to "Periode I" if not already selected
       if (!selectedPeriode && data && data.length > 0) {
-        const periodeI = data.find(periode => periode.nama === "Periode I");
+        const periodeI = data.find((periode) => periode.nama === "Periode I");
+
         if (periodeI) {
           setSelectedPeriode(periodeI.id);
         } else {
@@ -180,9 +181,11 @@ export default function RealisasiKeuanganPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Periode Filter */}
             <div>
-              <label className="block text-sm font-medium mb-1">Periode</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Periode
+              </label>
               <select
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 value={selectedPeriode}
                 onChange={(e) => setSelectedPeriode(e.target.value)}
               >
@@ -198,9 +201,11 @@ export default function RealisasiKeuanganPage() {
 
             {/* Kategori Filter */}
             <div>
-              <label className="block text-sm font-medium mb-1">Kategori</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Kategori
+              </label>
               <select
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 value={selectedKategori}
                 onChange={(e) => setSelectedKategori(e.target.value)}
               >
@@ -216,11 +221,11 @@ export default function RealisasiKeuanganPage() {
 
             {/* Item Filter */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Item Keuangan
               </label>
               <select
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 disabled={!itemList}
                 value={selectedItem}
                 onChange={(e) => setSelectedItem(e.target.value)}
@@ -348,7 +353,7 @@ export default function RealisasiKeuanganPage() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-gray-800">
                       <th className="border border-gray-300 px-4 py-2 text-left">
                         Kode
                       </th>
@@ -377,7 +382,10 @@ export default function RealisasiKeuanganPage() {
                   </thead>
                   <tbody>
                     {summaryData.items.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
+                      <tr
+                        key={item.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                      >
                         <td className="border border-gray-300 px-4 py-2 font-mono text-sm">
                           {item.kode}
                         </td>
@@ -455,7 +463,7 @@ export default function RealisasiKeuanganPage() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-gray-800">
                       <th className="border border-gray-300 px-4 py-2 text-left">
                         Item
                       </th>
@@ -478,7 +486,7 @@ export default function RealisasiKeuanganPage() {
                   </thead>
                   <tbody>
                     {realisasiData.realisasi.map((realisasi) => (
-                      <tr key={realisasi.id} className="hover:bg-gray-50">
+                      <tr key={realisasi.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="border border-gray-300 px-4 py-2">
                           <div>
                             <div className="font-mono text-sm text-gray-500">

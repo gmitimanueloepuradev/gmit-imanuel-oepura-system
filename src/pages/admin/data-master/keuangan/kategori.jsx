@@ -40,15 +40,15 @@ export default function KategoriKeuanganPage() {
       label: "Nama Kategori",
       type: "text",
     },
-    {
-      key: "_count.itemKeuangan",
-      label: "Jumlah Item",
-      type: "custom",
-      render: (item) =>
-        item && item._count && typeof item._count.itemKeuangan === "number"
-          ? `${item._count.itemKeuangan} item`
-          : "0 item",
-    },
+    // {
+    //   key: "_count.itemKeuangan",
+    //   label: "Jumlah Item",
+    //   type: "custom",
+    //   render: (item) =>
+    //     item && item._count && typeof item._count.itemKeuangan === "number"
+    //       ? `${item._count.itemKeuangan} item`
+    //       : "0 item",
+    // },
     {
       key: "isActive",
       label: "Status",

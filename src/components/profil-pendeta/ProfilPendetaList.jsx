@@ -12,6 +12,7 @@ import { useState } from "react";
 
 import ProfilPendetaModal from "./ProfilPendetaModal";
 
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import profilPendetaService from "@/services/profilPendetaService";
 import { showToast } from "@/utils/showToast";
 
@@ -19,6 +20,10 @@ const ProfilPendetaList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [toggleTarget, setToggleTarget] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -89,24 +94,30 @@ const ProfilPendetaList = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (profile) => {
-    if (
-      window.confirm(
-        `Apakah Anda yakin ingin menghapus profil \"${profile.nama}\"?`
-      )
-    ) {
-      deleteMutation.mutate(profile.id);
+  const handleDelete = (profile) => {
+    setDeleteTarget(profile);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      deleteMutation.mutate(deleteTarget.id);
+      setShowDeleteConfirm(false);
+      setDeleteTarget(null);
     }
   };
 
   const handleToggleStatus = (profile) => {
-    const newStatus = !profile.isActive;
-    const message = newStatus
-      ? `Aktifkan profil \"${profile.nama}\"? Ini akan menonaktifkan profil lain yang sedang aktif.`
-      : `Nonaktifkan profil \"${profile.nama}\"?`;
+    setToggleTarget(profile);
+    setShowToggleConfirm(true);
+  };
 
-    if (window.confirm(message)) {
-      toggleMutation.mutate({ id: profile.id, isActive: newStatus });
+  const confirmToggle = () => {
+    if (toggleTarget) {
+      const newStatus = !toggleTarget.isActive;
+      toggleMutation.mutate({ id: toggleTarget.id, isActive: newStatus });
+      setShowToggleConfirm(false);
+      setToggleTarget(null);
     }
   };
 
@@ -276,6 +287,40 @@ const ProfilPendetaList = () => {
         mode={modalMode}
         profile={selectedProfile}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Hapus Profil Pendeta"
+        message={`Apakah Anda yakin ingin menghapus profil "${deleteTarget?.nama}"? Data yang sudah dihapus tidak dapat dikembalikan.`}
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        variant="danger"
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      {/* Toggle Status Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showToggleConfirm}
+        title={toggleTarget?.isActive ? "Nonaktifkan Profil" : "Aktifkan Profil"}
+        message={
+          toggleTarget?.isActive
+            ? `Nonaktifkan profil "${toggleTarget?.nama}"?`
+            : `Aktifkan profil "${toggleTarget?.nama}"? Ini akan menonaktifkan profil lain yang sedang aktif.`
+        }
+        confirmText={toggleTarget?.isActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan"}
+        cancelText="Batal"
+        variant={toggleTarget?.isActive ? "warning" : "info"}
+        onClose={() => {
+          setShowToggleConfirm(false);
+          setToggleTarget(null);
+        }}
+        onConfirm={confirmToggle}
       />
     </div>
   );

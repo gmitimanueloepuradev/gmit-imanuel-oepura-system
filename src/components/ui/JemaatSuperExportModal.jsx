@@ -71,7 +71,7 @@ const JemaatSuperExportModal = ({
       userAccount: false,
       userRole: false,
     },
-    groupBy: "none", // none, rayon, keluarga, suku, statusDalamKeluarga
+    groupBy: "none", // Fixed to "none" - grouping disabled for jemaat export
     sortBy: "nama",
     sortOrder: "asc",
     pageSize: "a4", // a4, a3, letter, legal
@@ -190,10 +190,6 @@ const JemaatSuperExportModal = ({
       fieldsCount,
       filterCount,
       selectedValuesCount,
-      grouping:
-        exportConfig.groupBy !== "none"
-          ? `Dikelompokkan per ${exportConfig.groupBy}`
-          : "Tidak dikelompokkan",
     };
   };
 
@@ -421,7 +417,7 @@ const JemaatSuperExportModal = ({
       idKelurahan:
         masterData.kelurahan?.data?.items?.map((item) => ({
           value: item.id,
-          label: `${item.nama} - ${item.kodepos}`,
+          label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
         })) || [],
       jenisKelamin: [
         { value: "true", label: "Laki-laki" },
@@ -923,28 +919,6 @@ const JemaatSuperExportModal = ({
               </div>
             </div>
 
-            {/* Grouping */}
-            <div className="mb-6">
-              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
-                Pengelompokan Data
-              </h3>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                value={exportConfig.groupBy}
-                onChange={(e) =>
-                  setExportConfig((prev) => ({
-                    ...prev,
-                    groupBy: e.target.value,
-                  }))
-                }
-              >
-                {groupByOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             {/* Value Selection for Filters */}
             <div className="mb-6">
@@ -1147,14 +1121,6 @@ const JemaatSuperExportModal = ({
                     </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
                       {preview.estimatedSize}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      Grouping:
-                    </span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100 text-xs">
-                      {preview.grouping}
                     </span>
                   </div>
                 </div>

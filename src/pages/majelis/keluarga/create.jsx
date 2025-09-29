@@ -75,7 +75,7 @@ function MajelisCreateKeluarga() {
   // Transform options data
   const kelurahanOptions = kelurahanData?.data?.items?.map(item => ({
     value: item.id,
-    label: `${item.nama} - ${item.kodepos}`
+    label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
   })) || [];
 
   const statusKeluargaOptions = statusKeluargaData?.data?.items?.map(item => ({

@@ -585,7 +585,7 @@ export default function ListGrid({
             )
           ) : viewMode === "table" ? (
             /* Table View */
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-visible relative">
               <table className="w-full table-auto">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
@@ -619,7 +619,7 @@ export default function ListGrid({
                       </th>
                     ))}
                     {allRowActions.length > 0 && (
-                      <th className="text-left p-4 font-medium text-gray-600">
+                      <th className="text-left p-4 font-medium text-gray-600 w-24">
                         Aksi
                       </th>
                     )}
@@ -640,13 +640,15 @@ export default function ListGrid({
                         </td>
                       ))}
                       {allRowActions.length > 0 && (
-                        <td className="p-4">
-                          <ButtonActions
-                            actions={allRowActions}
-                            item={item}
-                            maxVisible={maxVisibleActions}
-                            type={rowActionType}
-                          />
+                        <td className="p-4 relative w-24">
+                          <div className="flex justify-center">
+                            <ButtonActions
+                              actions={allRowActions}
+                              item={item}
+                              maxVisible={maxVisibleActions}
+                              type={rowActionType}
+                            />
+                          </div>
                         </td>
                       )}
                     </tr>

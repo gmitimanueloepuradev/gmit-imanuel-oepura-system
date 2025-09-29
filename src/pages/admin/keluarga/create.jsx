@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -31,6 +31,7 @@ const steps = [
 
 export default function CreateKeluarga() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
 
   const form = useForm({
@@ -106,7 +107,7 @@ export default function CreateKeluarga() {
   const kelurahanOptions =
     kelurahan?.data?.items?.map((item) => ({
       value: item.id,
-      label: `${item.nama} - ${item.kodepos}`,
+      label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
     })) || [];
 
   const createKeluargaMutation = useMutation({
@@ -118,6 +119,10 @@ export default function CreateKeluarga() {
           "Keluarga berhasil dibuat! Sekarang tambahkan jemaat sebagai kepala keluarga.",
         color: "success",
       });
+
+      // Invalidate rayon queries to update family counts
+      queryClient.invalidateQueries({ queryKey: ["rayon"] });
+
       // Redirect ke halaman create jemaat dengan pre-filled keluarga ID
       router.push(
         `/admin/jemaat/create?keluargaId=${data.data.id}&isKepalaKeluarga=true`

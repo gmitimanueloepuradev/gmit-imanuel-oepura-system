@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Home } from "lucide-react";
@@ -16,6 +16,7 @@ import SelectInput from "@/components/ui/inputs/SelectInput";
 
 export default function EditKeluargaPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { id } = router.query;
 
   const methods = useForm({
@@ -68,6 +69,10 @@ export default function EditKeluargaPage() {
         description: "Data keluarga berhasil diperbarui",
         color: "success",
       });
+
+      // Invalidate rayon queries to update family counts (in case rayon changed)
+      queryClient.invalidateQueries({ queryKey: ["rayon"] });
+
       router.push(`/admin/keluarga/${id}`);
     },
     onError: (error) => {

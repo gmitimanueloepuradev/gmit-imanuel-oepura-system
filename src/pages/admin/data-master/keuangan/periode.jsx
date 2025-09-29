@@ -27,11 +27,19 @@ const periodeAnggaranService = {
 
 export default function PeriodeAnggaranPage() {
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "-";
+      return date.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "-";
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -60,47 +68,29 @@ export default function PeriodeAnggaranPage() {
       key: "tanggalMulai",
       label: "Periode",
       type: "custom",
-      render: (item) =>
+      render: (value, item) =>
         `${formatDate(item.tanggalMulai)} - ${formatDate(item.tanggalAkhir)}`,
     },
     {
       key: "status",
       label: "Status",
-      type: "badge",
-      render: (item) => getStatusBadge(item.status).text,
-      variant: (item) => getStatusBadge(item.status).variant,
+      type: "custom",
+      render: (value, item) => getStatusBadge(item.status).text,
     },
     {
-      key: "_count.anggaranItems",
-      label: "Item Anggaran",
+      key: "_count.itemKeuangan",
+      label: "Item Keuangan",
       type: "custom",
-      render: (item) =>
-        item && item._count && typeof item._count.anggaranItems === "number"
-          ? `${item._count.anggaranItems} item`
+      render: (value, item) =>
+        item && item._count && typeof item._count.itemKeuangan === "number"
+          ? `${item._count.itemKeuangan} item`
           : "0 item",
-    },
-    {
-      key: "_count.transaksiPenerimaan",
-      label: "Transaksi",
-      type: "custom",
-      render: (item) => {
-        if (item && item._count) {
-          const total =
-            (item._count.transaksiPenerimaan || 0) +
-            (item._count.transaksiPengeluaran || 0);
-
-          return `${total} transaksi`;
-        }
-
-        return "0 transaksi";
-      },
     },
     {
       key: "isActive",
       label: "Aktif",
-      type: "boolean",
-      variant: (item) => (item.isActive ? "success" : "secondary"),
-      // variant: (item) => (item.isActive ? "success" : "secondary"),
+      type: "custom",
+      render: (value, item) => (item.isActive ? "Aktif" : "Tidak Aktif"),
     },
   ];
 
@@ -124,32 +114,12 @@ export default function PeriodeAnggaranPage() {
     },
     { key: "keterangan", label: "Keterangan" },
     {
-      key: "_count.anggaranItems",
-      label: "Jumlah Item Anggaran",
+      key: "_count.itemKeuangan",
+      label: "Jumlah Item Keuangan",
       render: (item) =>
-        item && item._count && typeof item._count.anggaranItems === "number"
-          ? `${item._count.anggaranItems} item`
+        item && item._count && typeof item._count.itemKeuangan === "number"
+          ? `${item._count.itemKeuangan} item`
           : "0 item",
-    },
-    {
-      key: "_count.transaksiPenerimaan",
-      label: "Total Transaksi Penerimaan",
-      render: (item) =>
-        item &&
-        item._count &&
-        typeof item._count.transaksiPenerimaan === "number"
-          ? `${item._count.transaksiPenerimaan} transaksi`
-          : "0 transaksi",
-    },
-    {
-      key: "_count.transaksiPengeluaran",
-      label: "Total Transaksi Pengeluaran",
-      render: (item) =>
-        item &&
-        item._count &&
-        typeof item._count.transaksiPengeluaran === "number"
-          ? `${item._count.transaksiPengeluaran} transaksi`
-          : "0 transaksi",
     },
     {
       key: "isActive",

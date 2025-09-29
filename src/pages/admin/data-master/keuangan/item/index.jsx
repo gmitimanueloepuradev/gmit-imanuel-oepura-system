@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import ViewModal from "@/components/ui/ViewModal";
+import PageTitle from "@/components/ui/PageTitle";
 
 // Service untuk API calls
 const itemKeuanganService = {
@@ -167,7 +168,7 @@ export default function ItemKeuanganPage() {
       <div key={item.id}>
         {/* Item utama */}
         <div
-          className={`flex items-center justify-between p-4 border-b hover:bg-gray-50 ${indentClass}`}
+          className={`flex items-center justify-between p-4 border-b hover:bg-gray-50 dark:hover:bg-gray-700 ${indentClass}`}
         >
           <div className="flex-1">
             <div className="flex items-center gap-3">
@@ -312,6 +313,7 @@ export default function ItemKeuanganPage() {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex justify-between items-center">
+        <PageTitle title="Kelola Rancangan Item Keuangan" />
         <div>
           <h1 className="text-2xl font-bold">Kelola Rancangan Item Keuangan</h1>
           <p className="text-gray-600">

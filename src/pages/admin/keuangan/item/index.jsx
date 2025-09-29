@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
@@ -34,6 +34,13 @@ export default function ItemKeuanganPage() {
   const [expandedNodes, setExpandedNodes] = useState(new Set());
   const [itemToDelete, setItemToDelete] = useState(null);
 
+  // Check for periodeId query parameter on component mount
+  useEffect(() => {
+    if (router.query.periodeId) {
+      setSelectedPeriode(router.query.periodeId);
+    }
+  }, [router.query.periodeId]);
+
   // Query untuk get periode list
   const { data: periodeList } = useQuery({
     queryKey: ["periode-list"],
@@ -61,7 +68,7 @@ export default function ItemKeuanganPage() {
       const params = {};
       if (selectedPeriode) params.periodeId = selectedPeriode;
       if (selectedKategori) params.kategoriId = selectedKategori;
-      
+
       const response = await axios.get("/api/keuangan/item", { params });
       return response.data.data;
     },
@@ -136,9 +143,9 @@ export default function ItemKeuanganPage() {
     return (
       <div key={item.id}>
         {/* Node Row */}
-        <div 
-          className={`flex items-center justify-between p-4 border-b hover:bg-gray-50 ${
-            level > 0 ? 'border-l-2 border-l-gray-200' : ''
+        <div
+          className={`flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 ${
+            level > 0 ? 'border-l-2 border-l-gray-200 dark:border-l-gray-600' : ''
           }`}
           style={{ paddingLeft: paddingLeft + 16 }}
         >
@@ -147,7 +154,7 @@ export default function ItemKeuanganPage() {
             <div className="w-6 h-6 flex items-center justify-center mr-2">
               {hasChildren ? (
                 <button
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                   onClick={() => toggleNode(item.id)}
                 >
                   {isExpanded ? 
@@ -167,25 +174,25 @@ export default function ItemKeuanganPage() {
                   {item.kode}
                 </Badge>
                 <span className={`font-medium ${
-                  level === 0 ? 'text-lg text-gray-900' :
-                  level === 1 ? 'text-base text-gray-800' :
-                  'text-sm text-gray-700'
+                  level === 0 ? 'text-lg text-gray-900 dark:text-gray-100' :
+                  level === 1 ? 'text-base text-gray-800 dark:text-gray-200' :
+                  'text-sm text-gray-700 dark:text-gray-300'
                 }`}>
                   {item.nama}
                 </span>
               </div>
               
               {item.deskripsi && (
-                <p className="text-sm text-gray-500 mt-1 ml-12">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-12">
                   {item.deskripsi}
                 </p>
               )}
 
-              <div className="flex items-center mt-2 ml-12 space-x-4 text-xs text-gray-600">
+              <div className="flex items-center mt-2 ml-12 space-x-4 text-xs text-gray-600 dark:text-gray-400">
                 <span>Level: {item.level}</span>
                 <span>Urutan: {item.urutan}</span>
                 {item.jumlahTransaksi > 0 && (
-                  <span className="text-green-600">
+                  <span className="text-green-600 dark:text-green-400">
                     {item.jumlahTransaksi} transaksi
                   </span>
                 )}
@@ -197,11 +204,11 @@ export default function ItemKeuanganPage() {
           <div className="flex items-center space-x-4">
             <div className="text-right">
               <div className={`font-medium ${
-                parseFloat(item.nominalActual) > 0 ? 'text-green-600' : 'text-gray-400'
+                parseFloat(item.nominalActual) > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
               }`}>
                 {formatRupiah(item.nominalActual)}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
                 Total Actual
               </div>
             </div>
@@ -272,12 +279,12 @@ export default function ItemKeuanganPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Periode Anggaran *
                 </label>
                 <select
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                   value={selectedPeriode}
                   onChange={(e) => setSelectedPeriode(e.target.value)}
                 >
@@ -291,11 +298,11 @@ export default function ItemKeuanganPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Kategori (Opsional)
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                   value={selectedKategori}
                   onChange={(e) => setSelectedKategori(e.target.value)}
                 >

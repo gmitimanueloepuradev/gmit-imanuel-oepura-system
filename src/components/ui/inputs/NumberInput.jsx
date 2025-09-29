@@ -14,8 +14,15 @@ export default function NumberInput({
   error: externalError,
   rules = {},
   required = false,
+  showCurrencyFormat = false, // New prop to show currency formatting
 }) {
   const inputId = useId();
+
+  // Format rupiah helper
+  const formatRupiah = (amount) => {
+    if (!amount || amount === 0) return "Rp 0";
+    return `Rp ${parseFloat(amount).toLocaleString("id-ID")}`;
+  };
 
   // Try to get form context, but handle case where it doesn't exist
   const formContext = useFormContext();
@@ -53,6 +60,11 @@ export default function NumberInput({
           placeholder={placeholder}
           step={step}
         />
+        {showCurrencyFormat && field.value && (
+          <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            Format: {formatRupiah(field.value)}
+          </div>
+        )}
         {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
       </div>
     );
@@ -79,6 +91,11 @@ export default function NumberInput({
         value={value || ""}
         onChange={(e) => onChange?.(Number(e.target.value))}
       />
+      {showCurrencyFormat && value && (
+        <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
+          Format: {formatRupiah(value)}
+        </div>
+      )}
       {externalError && (
         <p className="text-red-500 text-sm mt-1">{externalError}</p>
       )}

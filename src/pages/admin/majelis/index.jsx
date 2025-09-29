@@ -288,41 +288,41 @@ export default function MajelisPage() {
 
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <div className="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                   Detail Majelis
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">
+                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                         ID
                       </label>
-                      <p className="text-sm text-gray-900 font-mono">
+                      <p className="text-sm text-gray-900 font-mono dark:text-gray-100">
                         {viewData.id}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">
+                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                         Nama Lengkap
                       </label>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
                         {viewData.namaLengkap}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">
+                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                         Jenis Jabatan
                       </label>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900  dark:text-gray-100">
                         {viewData.jenisJabatan?.namaJabatan || "-"}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">
+                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                         Rayon
                       </label>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
                         {viewData.rayon?.namaRayon || "-"}
                       </p>
                     </div>
@@ -330,19 +330,19 @@ export default function MajelisPage() {
 
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">
+                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                         Tanggal Mulai
                       </label>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
                         {new Date(viewData.mulai).toLocaleDateString("id-ID")}
                       </p>
                     </div>
                     {viewData.selesai && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">
+                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                           Tanggal Selesai
                         </label>
-                        <p className="text-sm text-gray-900">
+                        <p className="text-sm text-gray-900 dark:text-gray-100">
                           {new Date(viewData.selesai).toLocaleDateString(
                             "id-ID"
                           )}
@@ -358,14 +358,14 @@ export default function MajelisPage() {
                       </h4>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <span className="text-green-700">Username:</span>
-                          <span className="ml-2 font-medium">
+                          <span className="text-green-700 ">Username:</span>
+                          <span className="ml-2 font-medium text-gray-900 dark:text-gray-900">
                             {viewData.User.username}
                           </span>
                         </div>
                         <div>
                           <span className="text-green-700">Email:</span>
-                          <span className="ml-2 font-medium">
+                          <span className="ml-2 font-medium text-gray-900 dark:text-gray-900">
                             {viewData.User.email}
                           </span>
                         </div>
@@ -382,7 +382,7 @@ export default function MajelisPage() {
                   )}
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
                   className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
                   type="button"

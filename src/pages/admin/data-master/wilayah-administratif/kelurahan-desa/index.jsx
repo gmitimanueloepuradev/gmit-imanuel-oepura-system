@@ -197,36 +197,38 @@ export default function KelurahanDesaPage() {
       {/* View Modal */}
       {isViewModalOpen && viewData && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity" />
-          
+          <div className="fixed inset-0 bg-black/10 dark:bg-black/50 backdrop-blur-sm transition-opacity" />
+
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+            <div className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 mb-4">
                   Detail Kelurahan/Desa
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">ID</label>
-                    <p className="text-sm text-gray-900">{viewData.id}</p>
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">ID</label>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{viewData.id}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">Nama</label>
-                    <p className="text-sm text-gray-900">{viewData.nama}</p>
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Nama</label>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{viewData.nama}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">Status</label>
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      viewData.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      viewData.isActive
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                     }`}>
                       {viewData.isActive ? 'Aktif' : 'Tidak Aktif'}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
-                  className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
+                  className="inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 sm:w-auto"
                   type="button"
                   onClick={() => setIsViewModalOpen(false)}
                 >

@@ -347,6 +347,23 @@ export default function LaporanPage() {
             >
               Batal
             </button>
+            <button
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              disabled={isExporting}
+              onClick={() => handleExport()}
+            >
+              {isExporting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  Mengekspor...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Export
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

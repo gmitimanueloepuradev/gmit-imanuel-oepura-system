@@ -962,7 +962,7 @@ export default function EditJemaat() {
                     <option value="">Pilih kelurahan</option>
                     {kelurahan?.data?.items?.map((item) => (
                       <option key={item.id} value={item.id}>
-                        {item.nama} - {item.kodepos}
+                        {item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama}
                       </option>
                     ))}
                   </select>

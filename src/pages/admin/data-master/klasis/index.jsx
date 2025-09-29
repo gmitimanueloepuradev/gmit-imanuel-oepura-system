@@ -1,24 +1,15 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Eye,
-  Trash,
-  Plus,
-  Building2,
-  Heart,
-  Users,
-  Baby,
-  Hash,
-  Pen,
-} from "lucide-react";
+import { Baby, Building2, Eye, Heart, Pen, Trash, Users } from "lucide-react";
+import { useState } from "react";
 
-import klasisService from "@/services/klasisService";
-import { klasisSchema } from "@/validations/masterSchema";
-import useModalForm from "@/hooks/useModalForm";
 import CreateOrEditModal from "@/components/common/CreateOrEditModal";
-import ListGrid from "@/components/ui/ListGrid";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import ListGrid from "@/components/ui/ListGrid";
 import useConfirm from "@/hooks/useConfirm";
+import useModalForm from "@/hooks/useModalForm";
+import klasisService from "@/services/klasisService";
+import { showToast } from "@/utils/showToast";
+import { klasisSchema } from "@/validations/masterSchema";
 
 const klasisFields = [
   {
@@ -70,6 +61,7 @@ export default function KlasisPage() {
           (value?.pernikahans || 0) +
           (value?.baptiss || 0) +
           (value?.sidis || 0);
+
         return (
           <div className="flex items-center space-x-4">
             <span className="flex items-center text-xs">
@@ -100,6 +92,7 @@ export default function KlasisPage() {
     if (isEdit) {
       return await klasisService.update(modal.editData.id, formData);
     }
+
     return await klasisService.create(formData);
   };
 
@@ -113,6 +106,7 @@ export default function KlasisPage() {
       alert(
         "Tidak dapat menghapus klasis ini karena masih digunakan dalam data pernikahan, baptis, atau sidi"
       );
+
       return;
     }
 
@@ -126,6 +120,11 @@ export default function KlasisPage() {
         try {
           await klasisService.delete(item.id);
           refetch();
+          showToast({
+            title: "Hapus data klasis",
+            description: "data Klasis berhasil dihapus",
+            type: "success",
+          });
         } catch (error) {
           console.error("Error deleting klasis:", error);
         }
@@ -207,27 +206,31 @@ export default function KlasisPage() {
           <div className="fixed inset-0 bg-black/10 backdrop-blur-sm transition-opacity" />
 
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+            <div className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 mb-4">
                   Detail Klasis
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                       ID
                     </label>
-                    <p className="text-sm text-gray-900">{viewData.id}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {viewData.id}
+                    </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                       Nama Klasis
                     </label>
-                    <p className="text-sm text-gray-900">{viewData.nama}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {viewData.nama}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-500">
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-100">
                       Total Penggunaan
                     </label>
                     <div className="flex items-center space-x-4 mt-1">
@@ -247,7 +250,7 @@ export default function KlasisPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
                   className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
                   type="button"

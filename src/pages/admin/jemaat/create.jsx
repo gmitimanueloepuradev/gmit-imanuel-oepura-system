@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -19,6 +19,7 @@ import { USER_ROLE_OPTIONS } from "@/constants/userRoles";
 import jemaatService from "@/services/jemaatService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
+import PageTitle from "@/components/ui/PageTitle";
 
 const steps = [
   {
@@ -45,6 +46,7 @@ const steps = [
 
 export default function CreateJemaat() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { keluargaId, isKepalaKeluarga: isKepalaKeluargaParam } = router.query;
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -241,7 +243,7 @@ export default function CreateJemaat() {
   const kelurahanOptions =
     kelurahan?.data?.items?.map((item) => ({
       value: item.id,
-      label: `${item.nama} - ${item.kodepos}`,
+      label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
     })) || [];
 
   // Watch status dalam keluarga to determine if user is kepala keluarga
@@ -301,6 +303,12 @@ export default function CreateJemaat() {
           : "Jemaat berhasil dibuat!",
         color: "success",
       });
+
+      // Invalidate rayon queries to update family counts (especially when creating kepala keluarga)
+      if (preSelectedKeluarga) {
+        queryClient.invalidateQueries({ queryKey: ["rayon"] });
+      }
+
       // Redirect to keluarga page if this was a kepala keluarga creation
       router.push(preSelectedKeluarga ? "/admin/keluarga" : "/admin/jemaat");
     },
@@ -502,6 +510,7 @@ export default function CreateJemaat() {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+      <PageTitle title="Tambah Jemaat" />
       <PageHeader
         breadcrumb={[
           { label: "Dashboard", href: "/admin/dashboard" },

@@ -422,7 +422,7 @@ export default function MembersManagement() {
       </div>
 
       {/* Search and Comprehensive Filters - Full Width */}
-      <div className="px-4 sm:px-6 lg:px-8 max-w-full">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-full mt-6">
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">

@@ -246,7 +246,7 @@ export const exportToCSV = (
     ),
   ].join("\n");
 
-  const blob = new Blob(["\uFEFF" + csvContent], {
+  const blob = new Blob([csvContent], {
     type: "text/csv;charset=utf-8;",
   });
 
@@ -332,7 +332,7 @@ export const exportToPDF = (
     headers.map((header) => row[header])
   );
 
-  // Create table
+  // Create table using autoTable
   doc.autoTable({
     head: [headers],
     body: tableData,
@@ -353,7 +353,6 @@ export const exportToPDF = (
     tableWidth: "auto",
     columnStyles: headers.reduce((acc, header, index) => {
       acc[index] = { cellWidth: "auto" };
-
       return acc;
     }, {}),
   });

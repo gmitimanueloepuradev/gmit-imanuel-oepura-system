@@ -675,6 +675,7 @@ export default function CreateItemKeuanganPage() {
                 <NumberInput
                   label="Nominal Per Satuan"
                   placeholder="1000000"
+                  showCurrencyFormat={true}
                   value={item.nominalSatuan}
                   onChange={(value) =>
                     updateItem(item.id, "nominalSatuan", value)
@@ -687,6 +688,7 @@ export default function CreateItemKeuanganPage() {
                 <NumberInput
                   label="Total Target Anggaran"
                   placeholder="12000000"
+                  showCurrencyFormat={true}
                   value={item.totalTarget}
                   onChange={(value) =>
                     updateItem(item.id, "totalTarget", value)
