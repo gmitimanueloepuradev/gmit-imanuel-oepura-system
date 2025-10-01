@@ -1,32 +1,31 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  Calendar,
+  Crown,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
   User,
   UserCheck,
-  Crown,
-  Mail,
-  Lock,
-  Phone,
-  MapPin,
-  Calendar,
-  Users,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import { majelisCreationSchema } from "@/validations/masterSchema";
-import majelisService from "@/services/majelisService";
-import masterService from "@/services/masterService";
-import { showToast } from "@/utils/showToast";
-import Stepper, {
-  StepperNavigation,
-  StepContent,
-} from "@/components/ui/Stepper";
 import HookForm from "@/components/form/HookForm";
-import TextInput from "@/components/ui/inputs/TextInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import TextInput from "@/components/ui/inputs/TextInput";
+import PageTitle from "@/components/ui/PageTitle";
+import Stepper, {
+  StepContent,
+  StepperNavigation,
+} from "@/components/ui/Stepper";
+import majelisService from "@/services/majelisService";
+import { showToast } from "@/utils/showToast";
+import { majelisCreationSchema } from "@/validations/masterSchema";
 
 const steps = [
   {
@@ -84,6 +83,7 @@ export default function CreateMajelisPage() {
 
     if (fieldsToValidate.length === 0) {
       setCanProceed(true);
+
       return;
     }
 
@@ -92,7 +92,7 @@ export default function CreateMajelisPage() {
 
     // Check required fields for current step
     for (const field of fieldsToValidate) {
-      if (!values[field] || values[field] === '') {
+      if (!values[field] || values[field] === "") {
         canProceed = false;
         break;
       }
@@ -109,6 +109,7 @@ export default function CreateMajelisPage() {
     }
 
     const isValid = await trigger(fieldsToValidate);
+
     return isValid;
   };
 
@@ -131,13 +132,15 @@ export default function CreateMajelisPage() {
 
       if (isValid) {
         const nextStep = Math.min(currentStep + 1, steps.length);
+
         setCurrentStep(nextStep);
         // Reset can proceed for next step
         await checkCanProceed();
       } else {
         showToast({
           title: "Validasi Gagal",
-          description: "Mohon lengkapi semua field yang wajib diisi dengan benar",
+          description:
+            "Mohon lengkapi semua field yang wajib diisi dengan benar",
           color: "error",
         });
       }
@@ -153,6 +156,7 @@ export default function CreateMajelisPage() {
 
   const handlePrevious = async () => {
     const prevStep = Math.max(currentStep - 1, 1);
+
     setCurrentStep(prevStep);
     // Check can proceed for previous step
     await checkCanProceed();
@@ -166,11 +170,47 @@ export default function CreateMajelisPage() {
     }
   };
 
+  // Format nomor WhatsApp dengan prefix +62
+  const formatWhatsAppNumber = (number) => {
+    if (!number) return null;
+
+    // Remove all non-numeric characters
+    let cleaned = number.replace(/\D/g, "");
+
+    // Handle different formats
+    if (cleaned.startsWith("62")) {
+      // Already has 62 prefix
+      return `+${cleaned}`;
+    } else if (cleaned.startsWith("0")) {
+      // Remove leading 0 and add +62
+      return `+62${cleaned.substring(1)}`;
+    } else {
+      // Assume it's already without prefix
+      return `+62${cleaned}`;
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
 
-      const result = await majelisService.createWithAccount(data);
+      // Format WhatsApp number if provided
+      const formattedData = {
+        ...data,
+        noWhatsapp: formatWhatsAppNumber(data.noWhatsapp),
+      };
+
+      // Clean up empty optional fields
+      if (!formattedData.selesai) {
+        delete formattedData.selesai;
+      }
+      if (!formattedData.idRayon) {
+        delete formattedData.idRayon;
+      }
+
+      console.log("Submitting majelis data:", formattedData);
+
+      const result = await majelisService.createWithAccount(formattedData);
 
       if (result.success) {
         showToast({
@@ -192,9 +232,14 @@ export default function CreateMajelisPage() {
       }
     } catch (error) {
       console.error("Error creating majelis:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Terjadi kesalahan sistem";
+
       showToast({
         title: "Error",
-        description: "Terjadi kesalahan sistem",
+        description: errorMessage,
         color: "error",
       });
     } finally {
@@ -252,7 +297,6 @@ export default function CreateMajelisPage() {
                 name="idRayon"
                 placeholder="Pilih rayon (opsional)"
               />
-
             </div>
           </StepContent>
         );
@@ -312,18 +356,26 @@ export default function CreateMajelisPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Nama Lengkap:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Nama Lengkap:
+                      </span>
                       <span className="font-medium text-gray-900 dark:text-white">
                         {watchedValues.namaLengkap}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Tanggal Mulai:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{watchedValues.mulai}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Tanggal Mulai:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {watchedValues.mulai}
+                      </span>
                     </div>
                     {watchedValues.selesai && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Tanggal Selesai:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          Tanggal Selesai:
+                        </span>
                         <span className="font-medium text-gray-900 dark:text-white">
                           {watchedValues.selesai}
                         </span>
@@ -333,21 +385,31 @@ export default function CreateMajelisPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3">Data Akun</h4>
+                  <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3">
+                    Data Akun
+                  </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Username:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Username:
+                      </span>
                       <span className="font-medium text-gray-900 dark:text-white">
                         {watchedValues.username}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Email:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{watchedValues.email}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Email:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {watchedValues.email}
+                      </span>
                     </div>
                     {watchedValues.noWhatsapp && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">WhatsApp:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          WhatsApp:
+                        </span>
                         <span className="font-medium text-gray-900 dark:text-white">
                           {watchedValues.noWhatsapp}
                         </span>
@@ -375,6 +437,7 @@ export default function CreateMajelisPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      <PageTitle title="Tambah Majelis Baru" />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

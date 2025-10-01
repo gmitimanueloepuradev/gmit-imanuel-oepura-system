@@ -5,6 +5,7 @@ import {
   Edit,
   Filter,
   Plus,
+  Search,
   Target,
   Trash2,
   TrendingDown,
@@ -31,6 +32,8 @@ export default function RealisasiKeuanganPage() {
   const [selectedItem, setSelectedItem] = useState("");
   const [realisasiToDelete, setRealisasiToDelete] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchItemSummary, setSearchItemSummary] = useState("");
+  const [searchRealisasi, setSearchRealisasi] = useState("");
 
   // Query untuk get periode list
   const { data: periodeList } = useQuery({
@@ -159,6 +162,28 @@ export default function RealisasiKeuanganPage() {
   const formatPercentage = (value) => {
     return `${value.toFixed(1)}%`;
   };
+
+  // Filter item summary berdasarkan search
+  const filteredItemSummary = summaryData?.items?.filter((item) => {
+    if (!searchItemSummary) return true;
+    const searchLower = searchItemSummary.toLowerCase();
+    return (
+      item.kode.toLowerCase().includes(searchLower) ||
+      item.nama.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Filter realisasi berdasarkan search
+  const filteredRealisasi = realisasiData?.realisasi?.filter((realisasi) => {
+    if (!searchRealisasi) return true;
+    const searchLower = searchRealisasi.toLowerCase();
+    return (
+      realisasi.itemKeuangan.kode.toLowerCase().includes(searchLower) ||
+      realisasi.itemKeuangan.nama.toLowerCase().includes(searchLower) ||
+      realisasi.keterangan?.toLowerCase().includes(searchLower) ||
+      realisasi.periode?.nama?.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="space-y-6 p-4">
@@ -344,90 +369,165 @@ export default function RealisasiKeuanganPage() {
       {summaryData?.items && (
         <Card>
           <CardHeader>
-            <CardTitle>Ringkasan Realisasi per Item</CardTitle>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <CardTitle>Ringkasan Realisasi per Item</CardTitle>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Cari kode atau nama item..."
+                  value={searchItemSummary}
+                  onChange={(e) => setSearchItemSummary(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {summaryLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead>
-                    <tr className="bg-gray-50 dark:bg-gray-800">
-                      <th className="border border-gray-300 px-4 py-2 text-left">
-                        Kode
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">
-                        Nama Item
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">
-                        Target
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">
-                        Realisasi
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">
-                        Selisih
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-center">
-                        % Capaian
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-center">
-                        Status
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-center">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {summaryData.items.map((item) => (
-                      <tr
+              <>
+                {/* Desktop View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-800">
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold">
+                          Item Keuangan
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                          Target
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                          Realisasi
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                          Selisih
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-sm font-semibold">
+                          Capaian
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-sm font-semibold">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredItemSummary && filteredItemSummary.length > 0 ? (
+                        filteredItemSummary.map((item) => {
+                          const level = (item.kode.match(/\./g) || []).length + 1;
+                          const indentClass = level > 1 ? `pl-${level * 4}` : "";
+
+                          return (
+                          <tr
+                            key={item.id}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+                              <div className={`flex items-start gap-2 ${indentClass}`}>
+                                <span className="font-mono text-xs text-gray-500 dark:text-gray-400 min-w-[60px] mt-0.5">
+                                  {item.kode}
+                                </span>
+                                <span className="font-medium text-sm">{item.nama}</span>
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {formatRupiah(item.totalTarget)}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                {formatRupiah(item.totalRealisasiAmount)}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span
+                                className={`text-sm font-semibold ${
+                                  parseFloat(item.varianceAmount) >= 0
+                                    ? "text-green-600 dark:text-green-400"
+                                    : "text-red-600 dark:text-red-400"
+                                }`}
+                              >
+                                {formatRupiah(item.varianceAmount)}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
+                              <div className="flex flex-col items-center gap-1">
+                                <Badge
+                                  variant={
+                                    item.achievementPercentage >= 100
+                                      ? "success"
+                                      : item.achievementPercentage >= 75
+                                        ? "warning"
+                                        : "secondary"
+                                  }
+                                >
+                                  {formatPercentage(item.achievementPercentage)}
+                                </Badge>
+                                <Badge
+                                  variant={
+                                    item.isTargetAchieved ? "success" : "secondary"
+                                  }
+                                >
+                                  {item.isTargetAchieved ? "Tercapai" : "Belum"}
+                                </Badge>
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  router.push(
+                                    `/admin/keuangan/realisasi/${item.id}`
+                                  )
+                                }
+                              >
+                                Detail
+                              </Button>
+                            </td>
+                          </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="border border-gray-300 dark:border-gray-600 px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                            {searchItemSummary ? "Tidak ada data yang sesuai dengan pencarian" : "Tidak ada data"}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile & Tablet View */}
+                <div className="lg:hidden space-y-4">
+                  {filteredItemSummary && filteredItemSummary.length > 0 ? (
+                    filteredItemSummary.map((item) => {
+                      const level = (item.kode.match(/\./g) || []).length + 1;
+
+                      return (
+                      <div
                         key={item.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
                       >
-                        <td className="border border-gray-300 px-4 py-2 font-mono text-sm">
-                          {item.kode}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2">
-                          {item.nama}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">
-                          {formatRupiah(item.totalTarget)}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">
-                          {formatRupiah(item.totalRealisasiAmount)}
-                        </td>
-                        <td
-                          className={`border border-gray-300 px-4 py-2 text-right ${
-                            parseFloat(item.varianceAmount) >= 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {formatRupiah(item.varianceAmount)}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">
-                          <Badge
-                            variant={
-                              item.achievementPercentage >= 100
-                                ? "success"
-                                : "warning"
-                            }
-                          >
-                            {formatPercentage(item.achievementPercentage)}
-                          </Badge>
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">
-                          <Badge
-                            variant={
-                              item.isTargetAchieved ? "success" : "secondary"
-                            }
-                          >
-                            {item.isTargetAchieved ? "Tercapai" : "Belum"}
-                          </Badge>
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono text-gray-600 dark:text-gray-300">
+                                {item.kode}
+                              </span>
+                              <span className={`text-xs text-gray-500 dark:text-gray-400`}>
+                                Level {level}
+                              </span>
+                            </div>
+                            <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                              {item.nama}
+                            </h3>
+                          </div>
                           <Button
                             size="sm"
                             variant="outline"
@@ -439,12 +539,73 @@ export default function RealisasiKeuanganPage() {
                           >
                             Detail
                           </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </div>
+
+                        {/* Financial Data */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Target:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {formatRupiah(item.totalTarget)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Realisasi:
+                            </span>
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                              {formatRupiah(item.totalRealisasiAmount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Selisih:
+                            </span>
+                            <span
+                              className={`text-sm font-semibold ${
+                                parseFloat(item.varianceAmount) >= 0
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-red-600 dark:text-red-400"
+                              }`}
+                            >
+                              {formatRupiah(item.varianceAmount)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status Badges */}
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <Badge
+                            variant={
+                              item.achievementPercentage >= 100
+                                ? "success"
+                                : item.achievementPercentage >= 75
+                                  ? "warning"
+                                  : "secondary"
+                            }
+                          >
+                            {formatPercentage(item.achievementPercentage)}
+                          </Badge>
+                          <Badge
+                            variant={
+                              item.isTargetAchieved ? "success" : "secondary"
+                            }
+                          >
+                            {item.isTargetAchieved ? "Tercapai" : "Belum"}
+                          </Badge>
+                        </div>
+                      </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      {searchItemSummary ? "Tidak ada data yang sesuai dengan pencarian" : "Tidak ada data"}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
@@ -454,90 +615,221 @@ export default function RealisasiKeuanganPage() {
       {realisasiData?.realisasi && (
         <Card>
           <CardHeader>
-            <CardTitle>Data Realisasi Terbaru</CardTitle>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <CardTitle>Data Realisasi Terbaru</CardTitle>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Cari item atau keterangan..."
+                  value={searchRealisasi}
+                  onChange={(e) => setSearchRealisasi(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {realisasiLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead>
-                    <tr className="bg-gray-50 dark:bg-gray-800">
-                      <th className="border border-gray-300 px-4 py-2 text-left">
-                        Item
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">
-                        Periode
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">
-                        Total Realisasi
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-center">
-                        Tanggal
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">
-                        Keterangan
-                      </th>
-                      <th className="border border-gray-300 px-4 py-2 text-center">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {realisasiData.realisasi.map((realisasi) => (
-                      <tr key={realisasi.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td className="border border-gray-300 px-4 py-2">
-                          <div>
-                            <div className="font-mono text-sm text-gray-500">
-                              {realisasi.itemKeuangan.kode}
-                            </div>
-                            <div className="font-medium">
-                              {realisasi.itemKeuangan.nama}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2">
-                          {realisasi.periode?.nama || "-"}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-right font-medium">
-                          {formatRupiah(realisasi.totalRealisasi)}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center text-sm">
-                          {new Date(
-                            realisasi.tanggalRealisasi
-                          ).toLocaleDateString("id-ID")}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2">
-                          {realisasi.keterangan || "-"}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                router.push(
-                                  `/admin/keuangan/realisasi/edit/${realisasi.id}`
-                                )
-                              }
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => setRealisasiToDelete(realisasi)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
+              <>
+                {/* Desktop View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-800">
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold">
+                          Item Keuangan
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold">
+                          Periode
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                          Total Realisasi
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-sm font-semibold">
+                          Tanggal
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold">
+                          Keterangan
+                        </th>
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-sm font-semibold">
+                          Aksi
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {filteredRealisasi && filteredRealisasi.length > 0 ? (
+                        filteredRealisasi.map((realisasi) => (
+                          <tr
+                            key={realisasi.id}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                                {realisasi.itemKeuangan.kode}
+                              </span>
+                              <span className="font-medium text-sm">
+                                {realisasi.itemKeuangan.nama}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+                            <span className="text-sm">{realisasi.periode?.nama || "-"}</span>
+                          </td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                              {formatRupiah(realisasi.totalRealisasi)}
+                            </span>
+                          </td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              {new Date(
+                                realisasi.tanggalRealisasi
+                              ).toLocaleDateString("id-ID", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {realisasi.keterangan || "-"}
+                            </span>
+                          </td>
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  router.push(
+                                    `/admin/keuangan/realisasi/edit/${realisasi.id}`
+                                  )
+                                }
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setRealisasiToDelete(realisasi)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="border border-gray-300 dark:border-gray-600 px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                            {searchRealisasi ? "Tidak ada data yang sesuai dengan pencarian" : "Tidak ada data"}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile & Tablet View */}
+                <div className="md:hidden space-y-3">
+                  {filteredRealisasi && filteredRealisasi.length > 0 ? (
+                    filteredRealisasi.map((realisasi) => (
+                      <div
+                        key={realisasi.id}
+                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
+                      >
+                      {/* Header with Item Info */}
+                      <div className="mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono text-gray-600 dark:text-gray-300">
+                            {realisasi.itemKeuangan.kode}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {realisasi.periode?.nama || "-"}
+                          </span>
+                        </div>
+                        <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                          {realisasi.itemKeuangan.nama}
+                        </h3>
+                      </div>
+
+                      {/* Realisasi Amount & Date */}
+                      <div className="space-y-2 mb-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                            Total Realisasi:
+                          </span>
+                          <span className="text-base font-bold text-green-600 dark:text-green-400">
+                            {formatRupiah(realisasi.totalRealisasi)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                            Tanggal:
+                          </span>
+                          <span className="text-xs text-gray-700 dark:text-gray-300">
+                            {new Date(
+                              realisasi.tanggalRealisasi
+                            ).toLocaleDateString("id-ID", {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Keterangan */}
+                      {realisasi.keterangan && (
+                        <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1">
+                            Keterangan:
+                          </span>
+                          <span className="text-xs text-gray-700 dark:text-gray-300">
+                            {realisasi.keterangan}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() =>
+                            router.push(
+                              `/admin/keuangan/realisasi/edit/${realisasi.id}`
+                            )
+                          }
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={() => setRealisasiToDelete(realisasi)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Hapus
+                        </Button>
+                      </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      {searchRealisasi ? "Tidak ada data yang sesuai dengan pencarian" : "Tidak ada data"}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

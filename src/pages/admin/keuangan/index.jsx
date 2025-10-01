@@ -66,6 +66,23 @@ export default function KeuanganDashboard() {
     enabled: !!selectedPeriode,
   });
 
+  // Query untuk get realisasi summary
+  const { data: realisasiSummary } = useQuery({
+    queryKey: ["dashboard-realisasi-summary", selectedPeriode],
+    queryFn: async () => {
+      const params = {};
+
+      if (selectedPeriode) params.periodeId = selectedPeriode;
+
+      const response = await axios.get("/api/keuangan/realisasi/summary", {
+        params,
+      });
+
+      return response.data.data;
+    },
+    enabled: !!selectedPeriode,
+  });
+
   // Format rupiah
   const formatRupiah = (amount) => {
     if (!amount || amount === 0) return "Rp 0";
@@ -73,7 +90,7 @@ export default function KeuanganDashboard() {
     return `Rp ${parseFloat(amount).toLocaleString("id-ID")}`;
   };
 
-  // Calculate statistics from real data
+  // Calculate statistics from real data including realisasi
   const statistics = useMemo(() => {
     if (!itemData || !kategoriList) return null;
 
@@ -184,6 +201,14 @@ export default function KeuanganDashboard() {
     const levels = items.map((item) => item.level || 1);
     const maxLevel = levels.length > 0 ? Math.max(...levels) : 0;
 
+    // Hitung realisasi dari realisasiSummary jika tersedia
+    const totalRealisasiAmount = realisasiSummary?.summary?.totalRealisasiAmount || 0;
+    const totalTargetFromSummary = realisasiSummary?.summary?.totalTargetAmount || grandTotalTarget;
+    const realisasiAchievementPercentage =
+      totalTargetFromSummary > 0
+        ? (totalRealisasiAmount / totalTargetFromSummary) * 100
+        : 0;
+
     return {
       totalPenerimaanTarget,
       totalPengeluaranTarget,
@@ -199,8 +224,12 @@ export default function KeuanganDashboard() {
       totalPengeluaran: pengeluaran.length,
       itemsByLevel,
       maxLevel,
+      // Realisasi data
+      totalRealisasiAmount,
+      realisasiAchievementPercentage,
+      totalTargetFromSummary,
     };
-  }, [itemData, kategoriList]);
+  }, [itemData, kategoriList, realisasiSummary]);
 
   const selectedPeriodeData = periodeList?.find(
     (p) => p.id === selectedPeriode
@@ -340,6 +369,127 @@ export default function KeuanganDashboard() {
           </div>
         ) : (
           <>
+            {/* Realisasi vs Target Comparison Section */}
+            {statistics && realisasiSummary && (
+              <Card className="mb-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-purple-700 dark:text-purple-300">
+                    <BarChart3 className="h-6 w-6 mr-2" />
+                    Perbandingan Target vs Realisasi
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Total Target */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          Total Target Anggaran
+                        </span>
+                        <Target className="h-5 w-5 text-blue-500" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {formatRupiah(statistics.totalTargetFromSummary)}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {realisasiSummary.summary?.totalItems || 0} item anggaran
+                      </div>
+                    </div>
+
+                    {/* Total Realisasi */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          Total Realisasi
+                        </span>
+                        <TrendingUp className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {formatRupiah(statistics.totalRealisasiAmount)}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {realisasiSummary.summary?.totalRealisasiCount || 0} transaksi realisasi
+                      </div>
+                    </div>
+
+                    {/* Achievement Percentage */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          Persentase Capaian
+                        </span>
+                        <Activity className="h-5 w-5 text-purple-500" />
+                      </div>
+                      <div
+                        className={`text-2xl font-bold ${
+                          statistics.realisasiAchievementPercentage >= 80
+                            ? "text-green-600 dark:text-green-400"
+                            : statistics.realisasiAchievementPercentage >= 50
+                              ? "text-yellow-600 dark:text-yellow-400"
+                              : "text-red-600 dark:text-red-400"
+                        }`}
+                      >
+                        {statistics.realisasiAchievementPercentage.toFixed(1)}%
+                      </div>
+                      <div className="mt-2">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all ${
+                              statistics.realisasiAchievementPercentage >= 80
+                                ? "bg-green-500"
+                                : statistics.realisasiAchievementPercentage >= 50
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(statistics.realisasiAchievementPercentage, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Variance Summary */}
+                  <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Calculator className="h-5 w-5 text-purple-500 mr-2" />
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          Selisih (Variance)
+                        </span>
+                      </div>
+                      <div
+                        className={`text-xl font-bold ${
+                          (realisasiSummary.summary?.totalVarianceAmount || 0) >= 0
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-red-600 dark:text-red-400"
+                        }`}
+                      >
+                        {formatRupiah(
+                          realisasiSummary.summary?.totalVarianceAmount || 0
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span>Target Tercapai:</span>
+                      <Badge
+                        variant={
+                          (realisasiSummary.summary?.itemsTargetAchieved || 0) >=
+                          (realisasiSummary.summary?.totalItems || 0) * 0.7
+                            ? "success"
+                            : "warning"
+                        }
+                      >
+                        {realisasiSummary.summary?.itemsTargetAchieved || 0} dari{" "}
+                        {realisasiSummary.summary?.totalItems || 0} item
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Financial Overview Stats */}
             {statistics && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -579,6 +729,211 @@ export default function KeuanganDashboard() {
               </Card>
             </div>
 
+            {/* Realisasi Detail per Item */}
+            {realisasiSummary?.items && realisasiSummary.items.length > 0 && (
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <PieChart className="h-5 w-5 mr-2" />
+                    Detail Realisasi per Item Anggaran
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Desktop View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                      <thead>
+                        <tr className="bg-gray-100 dark:bg-gray-800">
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold">
+                            Item Keuangan
+                          </th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                            Target
+                          </th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                            Realisasi
+                          </th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right text-sm font-semibold">
+                            Variance
+                          </th>
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-sm font-semibold">
+                            Capaian
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {realisasiSummary.items.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                                  {item.kode}
+                                </span>
+                                <span className="font-medium text-sm">
+                                  {item.nama}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {formatRupiah(item.totalTarget)}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                {formatRupiah(item.totalRealisasiAmount)}
+                              </span>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {item.totalRealisasiCount} transaksi
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-right">
+                              <span
+                                className={`text-sm font-semibold ${
+                                  parseFloat(item.varianceAmount) >= 0
+                                    ? "text-green-600 dark:text-green-400"
+                                    : "text-red-600 dark:text-red-400"
+                                }`}
+                              >
+                                {formatRupiah(item.varianceAmount)}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
+                              <div className="flex flex-col items-center gap-1">
+                                <Badge
+                                  variant={
+                                    item.achievementPercentage >= 100
+                                      ? "success"
+                                      : item.achievementPercentage >= 70
+                                        ? "warning"
+                                        : "secondary"
+                                  }
+                                >
+                                  {item.achievementPercentage.toFixed(1)}%
+                                </Badge>
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 max-w-[80px]">
+                                  <div
+                                    className={`h-1.5 rounded-full ${
+                                      item.achievementPercentage >= 100
+                                        ? "bg-green-500"
+                                        : item.achievementPercentage >= 70
+                                          ? "bg-yellow-500"
+                                          : "bg-red-500"
+                                    }`}
+                                    style={{
+                                      width: `${Math.min(item.achievementPercentage, 100)}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile View */}
+                  <div className="md:hidden space-y-4">
+                    {realisasiSummary.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
+                      >
+                        {/* Header */}
+                        <div className="mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono text-gray-600 dark:text-gray-300">
+                              {item.kode}
+                            </span>
+                          </div>
+                          <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                            {item.nama}
+                          </h3>
+                        </div>
+
+                        {/* Financial Data */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Target:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {formatRupiah(item.totalTarget)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Realisasi:
+                            </span>
+                            <div className="text-right">
+                              <span className="text-sm font-semibold text-green-600 dark:text-green-400 block">
+                                {formatRupiah(item.totalRealisasiAmount)}
+                              </span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {item.totalRealisasiCount} transaksi
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Variance:
+                            </span>
+                            <span
+                              className={`text-sm font-semibold ${
+                                parseFloat(item.varianceAmount) >= 0
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-red-600 dark:text-red-400"
+                              }`}
+                            >
+                              {formatRupiah(item.varianceAmount)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Achievement Progress */}
+                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              Capaian:
+                            </span>
+                            <Badge
+                              variant={
+                                item.achievementPercentage >= 100
+                                  ? "success"
+                                  : item.achievementPercentage >= 70
+                                    ? "warning"
+                                    : "secondary"
+                              }
+                            >
+                              {item.achievementPercentage.toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                item.achievementPercentage >= 100
+                                  ? "bg-green-500"
+                                  : item.achievementPercentage >= 70
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
+                              }`}
+                              style={{
+                                width: `${Math.min(item.achievementPercentage, 100)}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Detail Item Summary */}
             <Card className="mb-8">
               <CardHeader>
@@ -588,30 +943,42 @@ export default function KeuanganDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                {/* Desktop View */}
+                <div className="hidden md:block space-y-4">
                   {itemData &&
                     itemData.items &&
                     itemData.items.length > 0 &&
-                    itemData.items.map((item, index) => (
-                      <div
-                        key={item.id || index}
-                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                              item.level === 1
-                                ? "bg-blue-500"
-                                : item.level === 2
-                                  ? "bg-green-500"
-                                  : item.level === 3
-                                    ? "bg-yellow-500"
-                                    : "bg-purple-500"
-                            }`}
-                          >
-                            {item.kode}
-                          </div>
-                          <div>
+                    itemData.items.map((item, index) => {
+                      // Calculate indentation based on level
+                      const level = item.level || 1;
+                      const indentClass = level > 1 ? `ml-${(level - 1) * 8}` : "";
+
+                      return (
+                        <div
+                          key={item.id || index}
+                          className={`flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${indentClass}`}
+                        >
+                          <div className="flex items-center space-x-4">
+                            {/* Hierarchy Indicator */}
+                            {level > 1 && (
+                              <div className="flex items-center">
+                                <div className="w-6 h-0.5 bg-gray-300 dark:bg-gray-600" />
+                              </div>
+                            )}
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                                item.level === 1
+                                  ? "bg-blue-500"
+                                  : item.level === 2
+                                    ? "bg-green-500"
+                                    : item.level === 3
+                                      ? "bg-yellow-500"
+                                      : "bg-purple-500"
+                              }`}
+                            >
+                              {item.kode}
+                            </div>
+                            <div>
                             <h4 className="font-medium text-gray-900 dark:text-white">
                               {item.nama}
                             </h4>
@@ -648,8 +1015,113 @@ export default function KeuanganDashboard() {
                             {formatRupiah(item.nominalSatuan)}
                           </div>
                         </div>
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {/* Mobile View */}
+                <div className="md:hidden space-y-3">
+                  {itemData &&
+                    itemData.items &&
+                    itemData.items.length > 0 &&
+                    itemData.items.map((item, index) => {
+                      const level = item.level || 1;
+                      // Use padding instead of margin for mobile
+                      const paddingClass =
+                        level > 1 ? `pl-${(level - 1) * 4}` : "";
+
+                      return (
+                        <div
+                          key={item.id || index}
+                          className={`border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm ${paddingClass}`}
+                        >
+                          {/* Header with Level & Code */}
+                          <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            {/* Hierarchy Indicator for Mobile */}
+                            {level > 1 && (
+                              <div className="flex items-center">
+                                <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600" />
+                              </div>
+                            )}
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 ${
+                                item.level === 1
+                                  ? "bg-blue-500"
+                                  : item.level === 2
+                                    ? "bg-green-500"
+                                    : item.level === 3
+                                      ? "bg-yellow-500"
+                                      : "bg-purple-500"
+                              }`}
+                            >
+                              {item.kode}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                                {item.nama}
+                              </h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+                                  Level {item.level}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  {item.kategori?.nama || "Unknown"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          {item.deskripsi && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                              {item.deskripsi}
+                            </p>
+                          )}
+
+                          {/* Parent Info */}
+                          {item.parent && (
+                            <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Parent:{" "}
+                              </span>
+                              <span className="text-gray-900 dark:text-white font-medium">
+                                {item.parent.nama}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Financial Data */}
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-gray-600 dark:text-gray-400">
+                                Target:
+                              </span>
+                              <span className="text-base font-bold text-gray-900 dark:text-white">
+                                {formatRupiah(item.totalTarget)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-gray-600 dark:text-gray-400">
+                                Actual:
+                              </span>
+                              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                                {formatRupiah(item.nominalActual)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Frekuensi:
+                              </span>
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {item.targetFrekuensi} {item.satuanFrekuensi} ×{" "}
+                                {formatRupiah(item.nominalSatuan)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </CardContent>
             </Card>

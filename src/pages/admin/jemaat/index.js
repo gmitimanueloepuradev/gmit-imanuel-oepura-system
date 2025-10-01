@@ -215,14 +215,14 @@ export default function MembersManagement() {
   // Reusable row actions using ButtonActions
   const rowActions = [
     {
-      label: "Lihat Detail",
+      label: "Detail",
       icon: Eye,
       onClick: (item) => router.push(`/admin/jemaat/${item.id}`),
       variant: "outline",
       tooltip: "Lihat detail lengkap jemaat",
     },
     {
-      label: "Edit Data",
+      label: "Edit",
       icon: Edit,
       onClick: (item) => router.push(`/admin/jemaat/edit/${item.id}`),
       variant: "outline",

@@ -72,13 +72,13 @@ export const roleConfigs = {
         label: "Pernikahan",
         icon: Heart,
       },
-      { href: "/admin/keuangan", label: "Keuangan", icon: DollarSign },
+
       {
-        href: "/admin/keuangan/realisasi",
-        label: "Realisasi Keuangan ",
-        icon: List,
+        href: "/admin/galeri",
+        label: "Galeri",
+        icon: Image,
       },
-      { href: "/admin/laporan", label: "Laporan", icon: FileText },
+
       {
         href: "/admin/data-master",
         label: "Data Master",
@@ -174,6 +174,16 @@ export const roleConfigs = {
         ],
       },
       {
+        href: "/admin/keuangan",
+        label: "Statistik Keuangan",
+        icon: DollarSign,
+      },
+      {
+        href: "/admin/keuangan/realisasi",
+        label: "Realisasi Keuangan ",
+        icon: List,
+      },
+      {
         href: "/admin/data-master-keuangan",
         label: "Data Master Keuangan",
         icon: DollarSign,
@@ -195,6 +205,8 @@ export const roleConfigs = {
           },
         ],
       },
+      { href: "/admin/laporan", label: "Laporan", icon: FileText },
+
       { href: "/admin/analytics", label: "Analitik", icon: BarChart3 },
       { href: "/admin/system-info", label: "Informasi Sistem", icon: Monitor },
       // { href: "/admin/settings", label: "Pengaturan", icon: Settings },

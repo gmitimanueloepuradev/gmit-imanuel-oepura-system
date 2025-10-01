@@ -307,6 +307,26 @@ export default function UsersPage() {
     },
   ];
 
+  // Format nomor WhatsApp dengan prefix +62
+  const formatWhatsAppNumber = (number) => {
+    if (!number) return null;
+
+    // Remove all non-numeric characters
+    let cleaned = number.replace(/\D/g, "");
+
+    // Handle different formats
+    if (cleaned.startsWith("62")) {
+      // Already has 62 prefix
+      return `+${cleaned}`;
+    } else if (cleaned.startsWith("0")) {
+      // Remove leading 0 and add +62
+      return `+62${cleaned.substring(1)}`;
+    } else {
+      // Assume it's already without prefix
+      return `+62${cleaned}`;
+    }
+  };
+
   const deleteMutation = useMutation({
     mutationFn: (id) => userService.delete(id),
     onSuccess: () => {
@@ -320,7 +340,18 @@ export default function UsersPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => userService.update(id, data),
+    mutationFn: ({ id, data }) => {
+      // Format WhatsApp number if provided
+      const cleanData = { ...data };
+
+      if (cleanData.noWhatsapp && cleanData.noWhatsapp !== "") {
+        cleanData.noWhatsapp = formatWhatsAppNumber(cleanData.noWhatsapp);
+      } else {
+        cleanData.noWhatsapp = null;
+      }
+
+      return userService.update(id, cleanData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("User berhasil diperbarui");
@@ -340,7 +371,11 @@ export default function UsersPage() {
       if (!cleanData.idJemaat || cleanData.idJemaat === "") {
         cleanData.idJemaat = null;
       }
-      if (!cleanData.noWhatsapp || cleanData.noWhatsapp === "") {
+
+      // Format WhatsApp number with +62 prefix
+      if (cleanData.noWhatsapp && cleanData.noWhatsapp !== "") {
+        cleanData.noWhatsapp = formatWhatsAppNumber(cleanData.noWhatsapp);
+      } else {
         cleanData.noWhatsapp = null;
       }
 
@@ -757,7 +792,7 @@ export default function UsersPage() {
             component: PhoneInput,
             value: selectedUserForAccountData?.noWhatsapp || "",
             placeholder: "Masukkan nomor WhatsApp jika kosong",
-            required: true,
+            required: false,
           },
           {
             key: "tempPassword",

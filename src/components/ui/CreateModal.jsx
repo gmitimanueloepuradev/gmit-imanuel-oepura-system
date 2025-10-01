@@ -13,6 +13,8 @@ export default function CreateModal({
   onClose,
   onSubmit,
   title = "Tambah Data",
+  description,
+  submitLabel = "Simpan",
   fields = [],
   isLoading = false,
 }) {
@@ -94,9 +96,61 @@ export default function CreateModal({
 
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
+              {description && (
+                <div className="p-4 pb-0">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {description}
+                  </p>
+                </div>
+              )}
               <div className="p-4 max-h-96 overflow-y-auto">
                 <div className="space-y-4">
                   {getFields().map((field) => {
+                    // Check if field has condition and should be displayed
+                    const shouldDisplay =
+                      !field.condition ||
+                      (typeof field.condition === "function"
+                        ? field.condition(form.watch())
+                        : field.condition);
+
+                    if (!shouldDisplay) return null;
+
+                    // Handle display-only fields
+                    if (field.type === "display") {
+                      return (
+                        <div key={field.key}>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {field.label}
+                          </label>
+                          <div className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-gray-100">
+                            {field.value || "-"}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Handle custom component fields
+                    if (field.type === "custom" && field.component) {
+                      const CustomComponent = field.component;
+                      return (
+                        <div key={field.key}>
+                          <CustomComponent
+                            name={field.key}
+                            label={field.label}
+                            placeholder={field.placeholder}
+                            required={field.required}
+                            disabled={isLoading}
+                            value={field.value}
+                          />
+                          {field.description && (
+                            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                              {field.description}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    }
+
                     const fieldProps = {
                       key: field.key,
                       name: field.key,
@@ -169,7 +223,7 @@ export default function CreateModal({
                   loadingText="Menyimpan..."
                   type="submit"
                 >
-                  Simpan
+                  {submitLabel}
                 </Button>
               </div>
             </form>

@@ -1,15 +1,75 @@
-import { Briefcase, Calendar, Clock, FileText, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Briefcase, Calendar, FileText, User } from "lucide-react";
 import { useRouter } from "next/router";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import { useAuth } from "@/contexts/AuthContext";
-import { getRoleConfig } from "@/config/navigationItem";
 import DailyVerse from "@/components/dashboard/DailyVerse";
+import { getRoleConfig } from "@/config/navigationItem";
+import { useAuth } from "@/contexts/AuthContext";
+import axios from "@/lib/axios";
 
 function EmployeeDashboard() {
   const { user } = useAuth();
   const router = useRouter();
-  const employeeConfig = getRoleConfig('employee');
+  const employeeConfig = getRoleConfig("employee");
+
+  const {
+    data: dashboardData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["employeeDashboard"],
+    queryFn: async () => {
+      const response = await axios.get("/dashboard/employee");
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        throw new Error(
+          response.data.message || "Gagal mengambil data dashboard"
+        );
+      }
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute allowedRoles="EMPLOYEE">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div className="flex items-center space-x-3">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-orange-600 border-t-transparent" />
+            <span className="text-gray-700 dark:text-gray-300">
+              Memuat data dashboard...
+            </span>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (error) {
+    return (
+      <ProtectedRoute allowedRoles="EMPLOYEE">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <p className="text-red-600 dark:text-red-400 mb-4">
+              {error.message}
+            </p>
+            <button
+              className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+              onClick={() => window.location.reload()}
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  const { statistics } = dashboardData;
 
   return (
     <ProtectedRoute allowedRoles="EMPLOYEE">
@@ -64,71 +124,6 @@ function EmployeeDashboard() {
             </div>
           </div>
 
-          {/* Today's Tasks */}
-          {/* <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-8 transition-colors">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Tugas Hari Ini
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <input
-                    className="h-4 w-4 text-orange-600 mr-3"
-                    type="checkbox"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      Persiapan ibadah minggu
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Deadline: 10:00 WIB
-                    </p>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                    Pending
-                  </span>
-                </div>
-
-                <div className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <input
-                    checked
-                    className="h-4 w-4 text-orange-600 mr-3"
-                    type="checkbox"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white line-through">
-                      Update data jemaat
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Selesai: 09:30 WIB
-                    </p>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                    Selesai
-                  </span>
-                </div>
-
-                <div className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <input
-                    className="h-4 w-4 text-orange-600 mr-3"
-                    type="checkbox"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      Koordinasi dengan majelis
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Deadline: 15:00 WIB
-                    </p>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                    Dalam Proses
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           {/* Church Data Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition-colors">
@@ -143,7 +138,7 @@ function EmployeeDashboard() {
                         Data Baptis
                       </dt>
                       <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                        45
+                        {statistics?.totalBaptis || 0}
                       </dd>
                     </dl>
                   </div>
@@ -163,7 +158,7 @@ function EmployeeDashboard() {
                         Data Sidi
                       </dt>
                       <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                        23
+                        {statistics?.totalSidi || 0}
                       </dd>
                     </dl>
                   </div>
@@ -183,7 +178,7 @@ function EmployeeDashboard() {
                         Data Pernikahan
                       </dt>
                       <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                        12
+                        {statistics?.totalPernikahan || 0}
                       </dd>
                     </dl>
                   </div>
@@ -203,7 +198,7 @@ function EmployeeDashboard() {
                         Data Atestasi
                       </dt>
                       <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                        8
+                        {statistics?.totalAtestasi || 0}
                       </dd>
                     </dl>
                   </div>
@@ -225,10 +220,14 @@ function EmployeeDashboard() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {employeeConfig.navigation
-                  .filter(item => !item.children && item.href !== '/employee/dashboard')
+                  .filter(
+                    (item) =>
+                      !item.children && item.href !== "/employee/dashboard"
+                  )
                   .slice(0, 3)
                   .map((item) => {
                     const IconComponent = item.icon;
+
                     return (
                       <button
                         key={item.href}

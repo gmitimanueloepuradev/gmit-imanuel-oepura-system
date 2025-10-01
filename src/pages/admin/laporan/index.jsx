@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import * as XLSX from "xlsx";
 
 import PageTitle from "@/components/ui/PageTitle";
 import statisticsService from "@/services/statisticsService";
@@ -26,6 +27,8 @@ export default function LaporanPage() {
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
   const [isExporting, setIsExporting] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [selectedExportFormat, setSelectedExportFormat] = useState("excel");
+  const [selectedExportData, setSelectedExportData] = useState("current");
 
   // Queries
   const {
@@ -102,16 +105,17 @@ export default function LaporanPage() {
   );
 
   // Handle export functionality
-  const handleExport = async (type = null) => {
+  const handleExport = async () => {
     setIsExporting(true);
 
     try {
-      const exportType = type || activeTab;
+      // Determine export type based on selection
+      const exportType = selectedExportData === "current" ? activeTab : "all";
 
       // Try API export first
       try {
         await statisticsService.exportReport({
-          format: "excel",
+          format: selectedExportFormat,
           type: exportType,
           period: selectedPeriod,
           year: selectedYear,
@@ -120,7 +124,7 @@ export default function LaporanPage() {
 
         showToast({
           title: "Berhasil",
-          description: `Laporan ${exportType} berhasil diunduh dalam format Excel`,
+          description: `Laporan ${exportType} berhasil diunduh`,
           color: "success",
         });
       } catch (apiError) {
@@ -130,8 +134,12 @@ export default function LaporanPage() {
         const reportData =
           await statisticsService.generateReportData(exportType);
 
-        // Create Excel format as fallback
-        downloadExcelReport(reportData.data, exportType);
+        // Create Excel/CSV format as fallback
+        if (selectedExportFormat === "excel") {
+          downloadExcelReport(reportData.data, exportType);
+        } else {
+          downloadCSVReport(reportData.data, exportType);
+        }
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -146,133 +154,166 @@ export default function LaporanPage() {
     }
   };
 
-  // Fallback Excel download function
+  // Excel download function using XLSX library
   const downloadExcelReport = (data, type) => {
-    let excelContent = "";
     const timestamp = new Date().toISOString().split("T")[0];
+    const workbook = XLSX.utils.book_new();
 
     if (type === "overview" && data.overview) {
-      excelContent = generateOverviewExcel(data.overview);
+      generateOverviewSheet(workbook, data.overview);
     } else if (type === "demographics" && data.demographics) {
-      excelContent = generateDemographicsExcel(data.demographics);
+      generateDemographicsSheet(workbook, data.demographics);
     } else if (type === "growth" && data.growth) {
-      excelContent = generateGrowthExcel(data.growth);
+      generateGrowthSheet(workbook, data.growth);
     } else if (type === "all") {
-      excelContent = generateFullReportExcel(data);
+      if (data.overview) generateOverviewSheet(workbook, data.overview);
+      if (data.demographics) generateDemographicsSheet(workbook, data.demographics);
+      if (data.growth) generateGrowthSheet(workbook, data.growth);
     }
 
-    // Create and download Excel
-    const blob = new Blob([excelContent], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8;",
+    // Generate Excel file and download
+    XLSX.writeFile(workbook, `laporan-${type}-${timestamp}.xlsx`);
+
+    showToast({
+      title: "Berhasil",
+      description: `Laporan berhasil diunduh dalam format Excel`,
+      color: "success",
     });
-    const link = document.createElement("a");
-
-    link.href = URL.createObjectURL(blob);
-    link.download = `laporan-${type}-${timestamp}.xlsx`;
-    link.click();
   };
 
-  // Excel generation functions (CSV format for simplicity)
-  const generateOverviewExcel = (data) => {
-    let excel = "LAPORAN RINGKASAN JEMAAT\n\n";
+  const downloadCSVReport = (data, type) => {
+    // Fallback to Excel format
+    downloadExcelReport(data, type);
+  };
 
-    excel += "Statistik Utama\n";
-    excel += "Total Jemaat," + (data?.totalMembers || 0) + "\n";
-    excel += "Total Keluarga," + (data?.totalFamilies || 0) + "\n";
-    excel += "Laki-laki," + (data?.membersByGender?.male || 0) + "\n";
-    excel += "Perempuan," + (data?.membersByGender?.female || 0) + "\n\n";
+  // Excel sheet generation functions
+  const generateOverviewSheet = (workbook, data) => {
+    const wsData = [];
 
-    excel += "Sakramen\n";
-    excel += "Baptis (Total)," + (data?.sacraments?.baptis?.total || 0) + "\n";
-    excel +=
-      "Baptis (Tahun Ini)," + (data?.sacraments?.baptis?.thisYear || 0) + "\n";
-    excel += "Sidi (Total)," + (data?.sacraments?.sidi?.total || 0) + "\n";
-    excel +=
-      "Sidi (Tahun Ini)," + (data?.sacraments?.sidi?.thisYear || 0) + "\n";
-    excel +=
-      "Pernikahan (Total)," + (data?.sacraments?.pernikahan?.total || 0) + "\n";
-    excel +=
-      "Pernikahan (Tahun Ini)," +
-      (data?.sacraments?.pernikahan?.thisYear || 0) +
-      "\n\n";
+    // Header
+    wsData.push(["LAPORAN RINGKASAN JEMAAT"]);
+    wsData.push([]);
 
-    if (data?.rayonDistribution) {
-      excel += "Distribusi per Rayon\n";
-      excel += "Rayon,Keluarga,Jemaat\n";
+    // Statistik Utama
+    wsData.push(["STATISTIK UTAMA"]);
+    wsData.push(["Kategori", "Nilai"]);
+    wsData.push(["Total Jemaat", data?.totalMembers || 0]);
+    wsData.push(["Total Keluarga", data?.totalFamilies || 0]);
+    wsData.push(["Laki-laki", data?.membersByGender?.male || 0]);
+    wsData.push(["Perempuan", data?.membersByGender?.female || 0]);
+    wsData.push([]);
+
+    // Sakramen
+    wsData.push(["SAKRAMEN"]);
+    wsData.push(["Jenis", "Total", "Tahun Ini"]);
+    wsData.push(["Baptis", data?.sacraments?.baptis?.total || 0, data?.sacraments?.baptis?.thisYear || 0]);
+    wsData.push(["Sidi", data?.sacraments?.sidi?.total || 0, data?.sacraments?.sidi?.thisYear || 0]);
+    wsData.push(["Pernikahan", data?.sacraments?.pernikahan?.total || 0, data?.sacraments?.pernikahan?.thisYear || 0]);
+    wsData.push([]);
+
+    // Distribusi per Rayon
+    if (data?.rayonDistribution && data.rayonDistribution.length > 0) {
+      wsData.push(["DISTRIBUSI PER RAYON"]);
+      wsData.push(["Rayon", "Keluarga", "Jemaat"]);
       data.rayonDistribution.forEach((rayon) => {
-        excel += `"${rayon.rayon}",${rayon.families},${rayon.members}\n`;
+        wsData.push([rayon.rayon, rayon.families, rayon.members]);
       });
     }
 
-    return excel;
+    const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Ringkasan");
   };
 
-  const generateDemographicsExcel = (data) => {
-    let excel = "LAPORAN DEMOGRAFI JEMAAT\n\n";
+  const generateDemographicsSheet = (workbook, data) => {
+    const wsData = [];
 
-    excel += "Ringkasan\n";
-    excel += "Total Anggota," + (data?.summary?.totalMembers || 0) + "\n";
-    excel += "Total Keluarga," + (data?.summary?.totalFamilies || 0) + "\n";
-    excel +=
-      "Rata-rata Umur," + (data?.summary?.averageAge || 0) + " tahun\n\n";
+    // Header
+    wsData.push(["LAPORAN DEMOGRAFI JEMAAT"]);
+    wsData.push([]);
 
-    if (data?.education) {
-      excel += "Distribusi Pendidikan\n";
-      excel += "Tingkat Pendidikan,Jumlah,Persentase\n";
+    // Ringkasan
+    wsData.push(["RINGKASAN"]);
+    wsData.push(["Kategori", "Nilai"]);
+    wsData.push(["Total Anggota", data?.summary?.totalMembers || 0]);
+    wsData.push(["Total Keluarga", data?.summary?.totalFamilies || 0]);
+    wsData.push(["Rata-rata Umur", `${data?.summary?.averageAge || 0} tahun`]);
+    wsData.push([]);
+
+    // Distribusi Pendidikan
+    if (data?.education && data.education.length > 0) {
+      wsData.push(["DISTRIBUSI PENDIDIKAN"]);
+      wsData.push(["Tingkat Pendidikan", "Jumlah", "Persentase (%)"]);
       data.education.forEach((item) => {
-        excel += `"${item.label}",${item.count},${item.percentage}%\n`;
+        wsData.push([item.label, item.count, item.percentage]);
       });
-      excel += "\n";
+      wsData.push([]);
     }
 
-    if (data?.jobs) {
-      excel += "Pekerjaan Teratas\n";
-      excel += "Pekerjaan,Jumlah,Persentase\n";
+    // Pekerjaan Teratas
+    if (data?.jobs && data.jobs.length > 0) {
+      wsData.push(["PEKERJAAN TERATAS"]);
+      wsData.push(["Pekerjaan", "Jumlah", "Persentase (%)"]);
       data.jobs.slice(0, 10).forEach((item) => {
-        excel += `"${item.label}",${item.count},${item.percentage}%\n`;
+        wsData.push([item.label, item.count, item.percentage]);
       });
     }
 
-    return excel;
+    const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Demografi");
   };
 
-  const generateGrowthExcel = (data) => {
-    let excel = "LAPORAN PERTUMBUHAN JEMAAT\n\n";
+  const generateGrowthSheet = (workbook, data) => {
+    const wsData = [];
 
-    excel += "Ringkasan\n";
-    excel += "Anggota Baru," + (data?.summary?.totalNewMembers || 0) + "\n";
-    excel +=
-      "Rata-rata Pertumbuhan," + (data?.summary?.averageGrowth || 0) + "\n\n";
+    // Header
+    wsData.push(["LAPORAN PERTUMBUHAN JEMAAT"]);
+    wsData.push([]);
 
-    if (data?.sacramentTrends) {
-      excel += "Tren Sakramen\n";
-      excel += "Periode,Baptis,Sidi,Pernikahan,Total\n";
+    // Ringkasan
+    wsData.push(["RINGKASAN"]);
+    wsData.push(["Kategori", "Nilai"]);
+    wsData.push(["Anggota Baru", data?.summary?.totalNewMembers || 0]);
+    wsData.push(["Rata-rata Pertumbuhan", data?.summary?.averageGrowth || 0]);
+    wsData.push([]);
+
+    // Tren Sakramen
+    if (data?.sacramentTrends && data.sacramentTrends.length > 0) {
+      wsData.push(["TREN SAKRAMEN"]);
+      wsData.push(["Periode", "Baptis", "Sidi", "Pernikahan", "Total"]);
       data.sacramentTrends.forEach((trend) => {
         const total = trend.baptis + trend.sidi + trend.pernikahan;
-
-        excel += `"${trend.period}",${trend.baptis},${trend.sidi},${trend.pernikahan},${total}\n`;
+        wsData.push([trend.period, trend.baptis, trend.sidi, trend.pernikahan, total]);
       });
     }
 
-    return excel;
-  };
+    const worksheet = XLSX.utils.aoa_to_sheet(wsData);
 
-  const generateFullReportExcel = (data) => {
-    let excel = "LAPORAN LENGKAP GMIT IMANUEL OEPURA\n\n";
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
 
-    if (data.overview) {
-      excel += generateOverviewExcel(data.overview) + "\n\n";
-    }
-
-    if (data.demographics) {
-      excel += generateDemographicsExcel(data.demographics) + "\n\n";
-    }
-
-    if (data.growth) {
-      excel += generateGrowthExcel(data.growth);
-    }
-
-    return excel;
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Pertumbuhan");
   };
 
   // Export Modal Component
@@ -280,77 +321,129 @@ export default function LaporanPage() {
     if (!showExportModal) return null;
 
     return (
-      <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Export Laporan
           </h3>
 
           <div className="space-y-4">
+            {/* Format Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Format Export:
               </label>
               <div className="space-y-2">
                 <button
-                  className="w-full flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className={`w-full flex items-center p-3 border rounded-lg transition-colors duration-200 ${
+                    selectedExportFormat === "excel"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
                   disabled={isExporting}
-                  onClick={() => handleExport()}
+                  onClick={() => setSelectedExportFormat("excel")}
                 >
-                  <Table className="w-5 h-5 mr-3 text-green-600" />
-                  <div className="text-left">
+                  <Table className={`w-5 h-5 mr-3 ${
+                    selectedExportFormat === "excel" ? "text-blue-600" : "text-green-600"
+                  }`} />
+                  <div className="text-left flex-1">
                     <div className="font-medium text-gray-900 dark:text-white">
                       Excel File (.xlsx)
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Format Excel untuk analisis data
+                      Format Excel asli dengan multiple sheets
                     </div>
                   </div>
+                  {selectedExportFormat === "excel" && (
+                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full" />
+                    </div>
+                  )}
                 </button>
               </div>
             </div>
 
+            {/* Data Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Pilih Data:
               </label>
               <div className="space-y-2">
                 <button
-                  className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className={`w-full p-3 text-left border rounded-lg transition-colors duration-200 ${
+                    selectedExportData === "current"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
                   disabled={isExporting}
-                  onClick={() => handleExport(activeTab)}
+                  onClick={() => setSelectedExportData("current")}
                 >
-                  Tab Saat Ini (
-                  {activeTab === "overview"
-                    ? "Ringkasan"
-                    : activeTab === "growth"
-                      ? "Pertumbuhan"
-                      : "Demografi"}
-                  )
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        Tab Saat Ini
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {activeTab === "overview"
+                          ? "Ringkasan"
+                          : activeTab === "growth"
+                            ? "Pertumbuhan"
+                            : "Demografi"}
+                      </div>
+                    </div>
+                    {selectedExportData === "current" && (
+                      <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full" />
+                      </div>
+                    )}
+                  </div>
                 </button>
                 <button
-                  className="w-full p-2 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className={`w-full p-3 text-left border rounded-lg transition-colors duration-200 ${
+                    selectedExportData === "all"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
                   disabled={isExporting}
-                  onClick={() => handleExport("all")}
+                  onClick={() => setSelectedExportData("all")}
                 >
-                  Semua Data Lengkap
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        Semua Data Lengkap
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        Ringkasan, Pertumbuhan & Demografi
+                      </div>
+                    </div>
+                    {selectedExportData === "all" && (
+                      <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full" />
+                      </div>
+                    )}
+                  </div>
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex justify-end space-x-3 mt-6">
             <button
               className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
               disabled={isExporting}
-              onClick={() => setShowExportModal(false)}
+              onClick={() => {
+                setShowExportModal(false);
+                setSelectedExportFormat("excel");
+                setSelectedExportData("current");
+              }}
             >
               Batal
             </button>
             <button
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
               disabled={isExporting}
-              onClick={() => handleExport()}
+              onClick={handleExport}
             >
               {isExporting ? (
                 <>

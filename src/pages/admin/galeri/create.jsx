@@ -223,7 +223,7 @@ export default function CreateGaleri() {
       });
       // Invalidate galeri queries to refresh the list
       queryClient.invalidateQueries(["galeri"]);
-      router.push("/employee/galeri");
+      router.push("/admin/galeri");
     },
     onError: (error) => {
       showToast({
@@ -297,8 +297,8 @@ export default function CreateGaleri() {
       <PageTitle title="Buat Galeri Baru" />
       <PageHeader
         breadcrumb={[
-          { label: "Employee", href: "/employee/dashboard" },
-          { label: "Galeri", href: "/employee/galeri" },
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Galeri", href: "/admin/galeri" },
           { label: "Buat Baru" },
         ]}
         description="Dokumentasikan kegiatan gereja dalam galeri foto"
@@ -388,7 +388,7 @@ export default function CreateGaleri() {
               </div>
               <p className="mt-2 text-sm text-gray-500">
                 Jika tidak dicentang, galeri akan disimpan sebagai draft dan
-                hanya bisa diakses oleh employee
+                hanya bisa diakses oleh admin
               </p>
             </CardContent>
           </Card>

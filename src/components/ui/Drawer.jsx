@@ -25,11 +25,11 @@ const Drawer = ({
 
       {/* Drawer Panel */}
       <div
-        className={`fixed ${positionClasses[position]} top-0 h-full ${width} bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col`}
+        className={`fixed ${positionClasses[position]} top-0 h-full ${width} bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white dark:bg-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
           <button
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             onClick={onClose}

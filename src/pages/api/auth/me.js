@@ -1,6 +1,7 @@
 import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
 import { requireAuth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
@@ -20,11 +21,29 @@ async function handleGet(req, res) {
       isHasProfile = false;
     }
 
-    // Return user data with profile status
-    const userData = {
+    // Include majelis data if user has idMajelis
+    let userData = {
       ...user,
       isHasProfile
     };
+
+    if (user.idMajelis) {
+      try {
+        const majelis = await prisma.majelis.findUnique({
+          where: { id: user.idMajelis },
+          include: {
+            rayon: true
+          }
+        });
+        
+        if (majelis) {
+          userData.majelis = majelis;
+        }
+      } catch (error) {
+        console.error("Error fetching majelis data:", error);
+        // Continue without majelis data if there's an error
+      }
+    }
 
     return res
       .status(200)

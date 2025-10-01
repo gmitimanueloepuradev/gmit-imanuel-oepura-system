@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  Plus, 
+import {
+  Plus,
   Calendar,
   List,
   Trash2,
@@ -12,7 +12,8 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronRight,
-  Filter
+  Filter,
+  Eye
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -217,16 +218,27 @@ export default function ItemKeuanganPage() {
               <Button
                 size="sm"
                 variant="outline"
+                onClick={() => router.push(`/admin/keuangan/item/${item.id}`)}
+                title="Lihat Detail"
+              >
+                <Eye className="h-3 w-3" />
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={() => router.push(`/admin/keuangan/item/${item.id}/edit`)}
+                title="Edit Item"
               >
                 <Edit className="h-3 w-3" />
               </Button>
-              
+
               <Button
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30"
                 size="sm"
                 variant="outline"
                 onClick={() => setItemToDelete(item)}
+                title="Hapus Item"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
