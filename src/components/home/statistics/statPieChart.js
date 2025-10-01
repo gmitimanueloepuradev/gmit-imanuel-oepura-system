@@ -1,9 +1,25 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const RADIAN = Math.PI / 180;
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+// Function to generate a random color
+const generateColor = (index) => {
+  // Generate colors with good contrast and saturation
+  const hue = (index * 137.508) % 360; // Golden angle approximation for good distribution
+  const saturation = 70 + (index % 3) * 10; // 70%, 80%, or 90%
+  const lightness = 50 + (index % 2) * 10; // 50% or 60%
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};
+
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN);
   const y = cy + radius * Math.sin(-(midAngle ?? 0) * RADIAN);
@@ -61,14 +77,20 @@ export default function StatPieChart({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <h2 className={`text-center text-white dark:text-gray-200 ${sizing.titleClass} mb-1`}>{title}</h2>
+      <h2
+        className={`text-center text-white dark:text-gray-200 ${sizing.titleClass} mb-1`}
+      >
+        {title}
+      </h2>
 
       <div className="flex flex-col items-center">
-        <div style={{ width: sizing.outerRadius * 2 + 20, height: sizing.outerRadius * 2 + 20 }}>
-          <ResponsiveContainer
-            height="100%"
-            width="100%"
-          >
+        <div
+          style={{
+            width: sizing.outerRadius * 2 + 20,
+            height: sizing.outerRadius * 2 + 20,
+          }}
+        >
+          <ResponsiveContainer height="100%" width="100%">
             <PieChart>
               <Pie
                 cx="50%"
@@ -83,7 +105,7 @@ export default function StatPieChart({
                 {data.map((entry, index) => (
                   <Cell
                     key={`cell-${entry.name}`}
-                    fill={COLORS[index % COLORS.length]}
+                    fill={generateColor(index)}
                   />
                 ))}
               </Pie>
@@ -93,15 +115,17 @@ export default function StatPieChart({
 
         <div className="mt-1 flex flex-wrap justify-center gap-x-2 gap-y-1 text-sm">
           {data.map((entry, index) => (
-            <div
-              key={entry.name}
-              className="flex items-center"
-            >
+            <div key={entry.name} className="flex items-center">
               <div
                 className="w-2.5 h-2.5 mr-1.5"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-               />
-              <span className="text-white dark:text-gray-200" style={{ fontSize: sizing.fontSize }}>{entry.name}</span>
+                style={{ backgroundColor: generateColor(index) }}
+              />
+              <span
+                className="text-white dark:text-gray-200"
+                style={{ fontSize: sizing.fontSize }}
+              >
+                {entry.name}
+              </span>
             </div>
           ))}
         </div>

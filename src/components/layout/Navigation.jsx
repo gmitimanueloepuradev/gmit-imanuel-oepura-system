@@ -1,3 +1,5 @@
+"use client";
+
 import { Menu } from "lucide-react";
 import Head from "next/head";
 
