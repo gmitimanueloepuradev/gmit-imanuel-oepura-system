@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tantml:parameter>@tanstack/react-query";
+// import { useMutation, useQuery, useQueryClient } from "@tantml:parameter>@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Calculator, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/Button";
@@ -28,9 +29,11 @@ export default function RealisasiModal({
     queryKey: ["item-level-4", periodeId],
     queryFn: async () => {
       const params = { level: 4, limit: 500 };
+
       if (periodeId) params.periodeId = periodeId;
 
       const response = await axios.get("/api/keuangan/item", { params });
+
       return response.data.data.items;
     },
     enabled: !itemKeuangan && isOpen, // Only fetch if item not provided and modal is open
@@ -38,7 +41,8 @@ export default function RealisasiModal({
 
   // Get selected item details
   const selectedItem =
-    itemKeuangan || itemList?.find((item) => item.id === formData.itemKeuanganId);
+    itemKeuangan ||
+    itemList?.find((item) => item.id === formData.itemKeuanganId);
 
   // Initialize form with existing data in edit mode
   useEffect(() => {
@@ -63,6 +67,7 @@ export default function RealisasiModal({
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const response = await axios.post("/api/keuangan/realisasi", data);
+
       return response.data;
     },
     onSuccess: () => {
@@ -74,7 +79,9 @@ export default function RealisasiModal({
       handleClose();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Gagal menambahkan realisasi");
+      toast.error(
+        error.response?.data?.message || "Gagal menambahkan realisasi"
+      );
     },
   });
 
@@ -82,6 +89,7 @@ export default function RealisasiModal({
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }) => {
       const response = await axios.put(`/api/keuangan/realisasi/${id}`, data);
+
       return response.data;
     },
     onSuccess: () => {
@@ -93,7 +101,9 @@ export default function RealisasiModal({
       handleClose();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Gagal memperbarui realisasi");
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui realisasi"
+      );
     },
   });
 
@@ -109,6 +119,7 @@ export default function RealisasiModal({
     // Auto set periode when item is selected (if not already set)
     if (name === "itemKeuanganId" && value && !periodeId) {
       const item = itemList?.find((item) => item.id === value);
+
       if (item) {
         setFormData((prev) => ({
           ...prev,
@@ -130,6 +141,7 @@ export default function RealisasiModal({
       !formData.totalRealisasi
     ) {
       toast.error("Mohon lengkapi semua field yang wajib diisi");
+
       return;
     }
 
@@ -155,6 +167,7 @@ export default function RealisasiModal({
   // Format rupiah for display
   const formatRupiah = (amount) => {
     if (!amount || amount === 0) return "Rp 0";
+
     return `Rp ${parseFloat(amount).toLocaleString("id-ID")}`;
   };
 
