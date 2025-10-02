@@ -66,8 +66,9 @@ export default function ProfilPendetaPage() {
   return (
     <>
       <PageTitle
-        title="Profil Pendeta"
-        description="Profil pendeta dan pelayan gereja GMIT Jemaat Imanuel Oepura yang melayani dengan dedikasi tinggi."
+        title="Profil Pendeta GMIT Imanuel Oepura"
+        description="Profil pendeta dan pelayan gereja GMIT Jemaat Imanuel Oepura yang melayani dengan dedikasi tinggi di Kupang, Nusa Tenggara Timur."
+        keywords="Profil Pendeta, Pendeta GMIT, Pendeta Gereja, Pelayan Gereja, Pendeta Kupang, Gereja Masehi Injili, Pelayan JIO"
       />
 
       <div className="bg-gray-50 min-h-screen">

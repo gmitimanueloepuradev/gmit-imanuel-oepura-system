@@ -18,8 +18,9 @@ export default function Tentang() {
   return (
     <div className="bg-gray-50">
       <PageTitle
-        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
+        description="Tentang GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi di Kupang, Nusa Tenggara Timur. Sejarah, Visi, dan Misi Gereja."
         title="Tentang Kami"
+        keywords="Tentang GMIT Imanuel Oepura, Sejarah Gereja, Visi Misi Gereja, Profil Gereja, Gereja di Kupang, Gereja Masehi Injili, JIO Kupang"
       />
       {/* Hero Section with Parallax */}
       <div className="relative h-screen flex justify-center items-center overflow-hidden">

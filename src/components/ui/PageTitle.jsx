@@ -21,7 +21,11 @@ export default function PageTitle({
     <Head>
       <title>{fullTitle}</title>
       <meta content={baseDescription} name="description" />
-      {keywords && <meta content={keywords} name="keywords" />}
+      {keywords ? (
+        <meta content={`${keywords}, GMIT, GMIT Jemaat Imanuel Oepura, JIO, Gereja Kupang, Gereja Kristen, Ibadah Minggu, Pelayanan Gereja, Kegiatan Gereja`} name="keywords" />
+      ) : (
+        <meta content="GMIT, GMIT Jemaat Imanuel Oepura, JIO, Gereja Masehi Injili di Timor, Gereja Kupang, Ibadah Minggu, Pelayanan Gereja, Kegiatan Gereja, Sidi, Baptis, Pernikahan, Nusa Tenggara Timur" name="keywords" />
+      )}
       <meta content="width=device-width, initial-scale=1" name="viewport" />
       <meta content="index, follow" name="robots" />
       <meta content="GMIT Jemaat Imanuel Oepura" name="author" />

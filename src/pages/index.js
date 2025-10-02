@@ -14,8 +14,9 @@ export default function Home() {
   return (
     <>
       <PageTitle
-        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
+        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi di Kupang, Nusa Tenggara Timur. Ibadah Minggu, Cell Group, Sidi, Pernikahan, Baptis, Pelayanan Jemaat."
         title="Beranda"
+        keywords="GMIT Jemaat Imanuel Oepura, JIO, Gereja Kupang, Ibadah Minggu Kupang, Gereja Kristen, Gereja Protestan, Gereja di NTT, Ibadah Gereja, Pelayanan Jemaat, Kegiatan Gereja"
       />
       <div className="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
         {/* Mobile Layout - Vertical Stack */}

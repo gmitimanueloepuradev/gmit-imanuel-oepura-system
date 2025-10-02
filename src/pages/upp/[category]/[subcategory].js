@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import UppCardContainer from "@/components/upp/uppCardContainer";
+import PageTitle from "@/components/ui/PageTitle";
 import useKategoriPengumuman from "@/hooks/useKategoriPengumuman";
 
 export default function UppSubcategory() {
@@ -48,6 +49,11 @@ export default function UppSubcategory() {
 
   return (
     <div>
+      <PageTitle
+        title={`UPP ${categoryData.nama} - ${subcategoryData.nama} - GMIT Imanuel Oepura`}
+        description={`Unit Pelayanan Persekutuan (UPP) ${categoryData.nama} - ${subcategoryData.nama} di GMIT Jemaat Imanuel Oepura Kupang, Nusa Tenggara Timur.`}
+        keywords={`UPP ${categoryData.nama}, ${subcategoryData.nama}, Unit Pelayanan Persekutuan, Pelayanan Gereja, GMIT Imanuel Oepura, Gereja Kupang`}
+      />
       <div className="flex justify-center items-center h-screen">
         <Image
           fill

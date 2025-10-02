@@ -39,8 +39,9 @@ export default function Galeri() {
   return (
     <div>
       <PageTitle
-        description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi. Bergabunglah bersama kami dalam ibadah, persekutuan, dan pelayanan."
-        title="Galeri"
+        description="Galeri Kegiatan GMIT Jemaat Imanuel Oepura (JIO) - Dokumentasi Ibadah Minggu, Cell Group, Sidi, Pernikahan, Baptis dan berbagai kegiatan gereja di Kupang, Nusa Tenggara Timur."
+        title="Galeri Kegiatan Gereja"
+        keywords="Galeri Gereja, Galeri GMIT, Galeri Jemaat, Foto Ibadah Minggu, Kegiatan Gereja Kupang, Dokumentasi Gereja, Galeri Kegiatan GMIT Imanuel Oepura, JIO Galeri"
       />
       <div className="flex justify-center items-center h-screen relative">
         <Image

@@ -18,8 +18,9 @@ export default function SejarahPage() {
   return (
     <>
       <PageTitle
-        description="Sejarah perjalanan GMIT Jemaat Imanuel Oepura dari masa ke masa. Mengenal jejak pelayanan dan perkembangan jemaat dalam melayani Tuhan dan sesama."
-        title="Sejarah"
+        description="Sejarah perjalanan GMIT Jemaat Imanuel Oepura dari masa ke masa. Mengenal jejak pelayanan dan perkembangan jemaat dalam melayani Tuhan dan sesama di Kupang, Nusa Tenggara Timur."
+        title="Sejarah GMIT Imanuel Oepura"
+        keywords="Sejarah GMIT Imanuel Oepura, Sejarah Gereja di Kupang, Perjalanan Gereja, Sejarah Jemaat, Gereja Masehi Injili di Timor, Misi Gereja, Sejarah JIO"
       />
       <div className="bg-gray-50">
         {/* Hero Section with Parallax */}
