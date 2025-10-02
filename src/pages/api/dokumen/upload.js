@@ -8,7 +8,7 @@ import DocumentUploadService from "@/services/documentUploadService";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024, // 1MB
+    fileSize: 2 * 1024 * 1024, // 2MB
   },
   fileFilter: (req, file, cb) => {
     // Allow PDF and image files

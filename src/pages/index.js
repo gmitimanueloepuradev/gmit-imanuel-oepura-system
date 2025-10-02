@@ -22,10 +22,13 @@ export default function Home() {
         <div className="lg:hidden">
           {/* Hero Section */}
           <div className="relative flex justify-start items-center h-screen">
-            <img
+            <Image
               alt="Home Head"
               className="object-cover w-full h-full"
               src="/header/f92411b3.webp"
+              fill
+              sizes="100vw"
+              priority
             />
             <div className="absolute flex flex-col p-8">
               <p className="text-white text-2xl font-bold">Selamat Datang di</p>
@@ -92,10 +95,13 @@ export default function Home() {
           <div className="flex-1 flex flex-col overflow-y-auto">
             {/* Hero */}
             <div className="relative flex justify-start items-center h-screen">
-              <img
+              <Image
                 alt="Home Head"
                 className="object-cover w-full h-full brightness-60"
                 src="/header/f92411b3.webp"
+                fill
+                sizes="100vw"
+                priority
               />
               <div className="absolute flex flex-col p-16">
                 <p className="text-white text-4xl font-bold">

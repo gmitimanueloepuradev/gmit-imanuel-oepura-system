@@ -27,8 +27,8 @@ const DocumentUploadModal = ({ isOpen, onClose, jemaatId, onUploadSuccess }) => 
       return;
     }
 
-    if (file.size > 1024 * 1024) {
-      setError('Ukuran file maksimal 1MB');
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Ukuran file maksimal 2MB');
       return;
     }
 
@@ -171,7 +171,7 @@ const DocumentUploadModal = ({ isOpen, onClose, jemaatId, onUploadSuccess }) => 
                   atau drag and drop
                 </div>
                 <div className="text-xs text-gray-500">
-                  PDF, PNG, JPG (max. 1MB)
+                  PDF, PNG, JPG (max. 2MB)
                 </div>
               </label>
             </div>

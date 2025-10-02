@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { User, Calendar, GraduationCap, Award } from "lucide-react";
 
@@ -105,10 +106,13 @@ export default function ProfilPendetaPage() {
                   {/* Photo Section */}
                   <div className="md:w-1/3 bg-gradient-to-br from-blue-50 to-blue-100 p-8 flex items-center justify-center">
                     {activeProfile.urlFoto ? (
-                      <img
+                      <Image
                         src={activeProfile.urlFoto}
                         alt={activeProfile.nama}
                         className="w-64 h-64 object-cover rounded-full shadow-lg border-4 border-white"
+                        width={256}
+                        height={256}
+                        style={{ objectFit: 'cover' }}
                       />
                     ) : (
                       <div className="w-64 h-64 bg-gray-300 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
@@ -171,10 +175,13 @@ export default function ProfilPendetaPage() {
                     <div className="p-6">
                       <div className="text-center mb-4">
                         {profile.urlFoto ? (
-                          <img
+                          <Image
                             src={profile.urlFoto}
                             alt={profile.nama}
                             className="w-24 h-24 object-cover rounded-full mx-auto shadow-md border-2 border-gray-200"
+                            width={96}
+                            height={96}
+                            style={{ objectFit: 'cover' }}
                           />
                         ) : (
                           <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto flex items-center justify-center shadow-md border-2 border-gray-200">

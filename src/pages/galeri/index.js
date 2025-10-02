@@ -44,11 +44,12 @@ export default function Galeri() {
       />
       <div className="flex justify-center items-center h-screen relative">
         <Image
+          fill
           priority
           alt="Galeri Head"
-          layout="fill"
-          objectFit="cover"
+          sizes="100vw"
           src="/header/gallery.webp"
+          style={{ objectFit: "cover" }}
         />
         <h1 className="absolute text-8xl font-bold mt-4 text-white">Galeri</h1>
       </div>

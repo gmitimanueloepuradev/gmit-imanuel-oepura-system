@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import multer from 'multer';
 import { uploadFileToS3, generateFileName } from '@/lib/s3';
 
@@ -61,19 +62,40 @@ export default function handler(req, res) {
       }
 
       const uploadPromises = files.map(async (file) => {
-        const fileName = generateFileName(file.originalname);
-        const uploadResult = await uploadFileToS3(file, fileName);
+        // Compress and convert image to WebP
+        const processedImage = await sharp(file.buffer)
+          .resize(1920, 1080, {
+            fit: 'inside',
+            withoutEnlargement: true,
+          })
+          .webp({ 
+            quality: 80,           // Quality for lossy compression
+            effort: 4,             // Balance between speed and compression
+            alphaQuality: 85,      // Quality for alpha channel if present
+          })
+          .toBuffer();
+
+        const fileName = generateFileName(file.originalname, 'webp');
+        const uploadResult = await uploadFileToS3(processedImage, fileName, 'image/webp');
 
         if (!uploadResult.success) {
           throw new Error(`Failed to upload ${file.originalname}: ${uploadResult.error}`);
         }
 
+        // Get original and processed file sizes for comparison
+        const originalSize = file.buffer.length;
+        const processedSize = processedImage.length;
+        const compressionRatio = Math.round(((originalSize - processedSize) / originalSize) * 100);
+
         return {
           originalName: file.originalname,
           fileName: fileName,
           url: uploadResult.url,
-          size: file.size,
-          mimetype: file.mimetype,
+          size: processedImage.length,
+          originalSize: originalSize,
+          mimetype: 'image/webp',
+          compressionRatio: compressionRatio,
+          processed: true,
         };
       });
 

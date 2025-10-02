@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -48,9 +49,12 @@ export default function UppCategory() {
   return (
     <div>
       <div className="flex justify-center items-center h-screen">
-        <img
+        <Image
+          fill
+          priority
           alt="UPP Header"
           className="object-cover w-full h-full"
+          sizes="100vw"
           src="/header/anak.webp"
         />
         <h1 className="absolute text-6xl md:text-8xl text-white font-bold mt-4">

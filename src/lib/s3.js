@@ -12,13 +12,13 @@ const s3Config = {
 
 const s3 = new AWS.S3(s3Config);
 
-export const uploadFileToS3 = async (file, key) => {
+export const uploadFileToS3 = async (fileBuffer, key, mimeType = 'image/webp') => {
   try {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
+      Body: fileBuffer,
+      ContentType: mimeType,
       ACL: 'public-read', // Untuk bisa diakses public
     };
 
@@ -55,11 +55,10 @@ export const deleteFileFromS3 = async (key) => {
   }
 };
 
-export const generateFileName = (originalName) => {
+export const generateFileName = (originalName, newExtension = 'webp') => {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(2, 15);
-  const extension = originalName.split('.').pop();
-  return `galeri/${timestamp}-${randomString}.${extension}`;
+  return `galeri/${timestamp}-${randomString}.${newExtension}`;
 };
 
 export default s3;

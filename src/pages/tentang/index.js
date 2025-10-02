@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import History from "@/components/about/history";
 import VisionAndMission from "@/components/about/visionAndMission";
 import PageTitle from "@/components/ui/PageTitle";
 
@@ -27,9 +27,12 @@ export default function Tentang() {
           className="absolute inset-0 w-full h-full"
           style={{ transform: `translateY(${scrollY * 0.5}px)` }}
         >
-          <img
+          <Image
+            fill
+            priority
             alt="GMIT Imanuel Oepura"
             className="w-full h-full object-cover"
+            sizes="100vw"
             src="/header/190c3d1c.webp"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
