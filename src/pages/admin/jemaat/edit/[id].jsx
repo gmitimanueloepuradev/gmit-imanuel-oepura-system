@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Card } from "@/components/ui/Card";
+import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
 import PageHeader from "@/components/ui/PageHeader";
 import Stepper, {
   StepContent,
@@ -545,183 +548,122 @@ export default function EditJemaat() {
           {currentStep === 1 && (
             <StepContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nama Lengkap *
-                  </label>
-                  <input
-                    type="text"
-                    {...form.register("nama", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Masukkan nama lengkap"
-                  />
-                </div>
+                <TextInput
+                  name="nama"
+                  label="Nama Lengkap"
+                  placeholder="Masukkan nama lengkap"
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jenis Kelamin *
-                  </label>
-                  <select
-                    {...form.register("jenisKelamin", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value={true}>Laki-laki</option>
-                    <option value={false}>Perempuan</option>
-                  </select>
-                </div>
+                <SelectInput
+                  name="jenisKelamin"
+                  label="Jenis Kelamin"
+                  placeholder="Pilih jenis kelamin"
+                  options={[
+                    { value: "true", label: "Laki-laki" },
+                    { value: "false", label: "Perempuan" }
+                  ]}
+                  required
+                />
 
-                <div>
-                  <DatePicker
-                    label="Tanggal Lahir"
-                    placeholder="Pilih tanggal lahir"
-                    required={true}
-                    value={form.watch("tanggalLahir")}
-                    onChange={(value) => form.setValue("tanggalLahir", value)}
-                  />
-                </div>
+                <DatePicker
+                  label="Tanggal Lahir"
+                  placeholder="Pilih tanggal lahir"
+                  required={true}
+                  value={form.watch("tanggalLahir")}
+                  onChange={(value) => form.setValue("tanggalLahir", value)}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Golongan Darah
-                  </label>
-                  <select
-                    {...form.register("golonganDarah")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih golongan darah</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="AB">AB</option>
-                    <option value="O">O</option>
-                  </select>
-                </div>
+                <SelectInput
+                  name="golonganDarah"
+                  label="Golongan Darah"
+                  placeholder="Pilih golongan darah"
+                  options={[
+                    { value: "A", label: "A" },
+                    { value: "B", label: "B" },
+                    { value: "AB", label: "AB" },
+                    { value: "O", label: "O" }
+                  ]}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status Dalam Keluarga *
-                  </label>
-                  <select
-                    {...form.register("idStatusDalamKeluarga", {
-                      required: true,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih status</option>
-                    {statusDalamKeluarga?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idStatusDalamKeluarga"
+                  label="Status Dalam Keluarga"
+                  placeholder="Pilih status"
+                  options={statusDalamKeluarga?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.status
+                  })) || []}
+                  required
+                />
 
                 {!isKepalaKeluarga && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Keluarga *
-                    </label>
-                    <select
-                      {...form.register("idKeluarga", {
-                        required: !isKepalaKeluarga,
-                      })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Pilih keluarga</option>
-                      {keluargaList?.data?.items?.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.rayon?.namaRayon} - {item.noBagungan}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <AutoCompleteInput
+                    name="idKeluarga"
+                    label="Keluarga"
+                    placeholder="Pilih keluarga"
+                    options={keluargaList?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: `${item.rayon?.namaRayon} - ${item.noBagungan}`
+                    })) || []}
+                    required
+                  />
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Suku *
-                  </label>
-                  <select
-                    {...form.register("idSuku", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih suku</option>
-                    {suku?.data?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.namaSuku}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idSuku"
+                  label="Suku"
+                  placeholder="Pilih suku"
+                  options={suku?.data?.map((item) => ({
+                    value: item.id,
+                    label: item.namaSuku
+                  })) || []}
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pendidikan *
-                  </label>
-                  <select
-                    {...form.register("idPendidikan", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih pendidikan</option>
-                    {pendidikan?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.jenjang}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idPendidikan"
+                  label="Pendidikan"
+                  placeholder="Pilih pendidikan"
+                  options={pendidikan?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.jenjang
+                  })) || []}
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pekerjaan *
-                  </label>
-                  <select
-                    {...form.register("idPekerjaan", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih pekerjaan</option>
-                    {pekerjaan?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.namaPekerjaan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idPekerjaan"
+                  label="Pekerjaan"
+                  placeholder="Pilih pekerjaan"
+                  options={pekerjaan?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.namaPekerjaan
+                  })) || []}
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pendapatan *
-                  </label>
-                  <select
-                    {...form.register("idPendapatan", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih pendapatan</option>
-                    {pendapatan?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idPendapatan"
+                  label="Pendapatan"
+                  placeholder="Pilih pendapatan"
+                  options={pendapatan?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.label
+                  })) || []}
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jaminan Kesehatan *
-                  </label>
-                  <select
-                    {...form.register("idJaminanKesehatan", {
-                      required: true,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih jaminan kesehatan</option>
-                    {jaminanKesehatan?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.jenisJaminan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idJaminanKesehatan"
+                  label="Jaminan Kesehatan"
+                  placeholder="Pilih jaminan kesehatan"
+                  options={jaminanKesehatan?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.jenisJaminan
+                  })) || []}
+                  required
+                />
               </div>
             </StepContent>
           )}
@@ -752,70 +694,41 @@ export default function EditJemaat() {
 
               {createUserAccount && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      {...form.register("email", {
-                        required: createUserAccount,
-                      })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="contoh@email.com"
-                    />
-                  </div>
+                  <TextInput
+                    name="email"
+                    type="email"
+                    label="Email"
+                    placeholder="contoh@email.com"
+                    required={createUserAccount}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Role
-                    </label>
-                    <select
-                      {...form.register("role")}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="JEMAAT">Jemaat</option>
-                      <option value="MAJELIS">Majelis</option>
-                      <option value="EMPLOYEE">Employee</option>
-                    </select>
-                  </div>
+                  <SelectInput
+                    name="role"
+                    label="Role"
+                    placeholder="Pilih role"
+                    options={[
+                      { value: "JEMAAT", label: "Jemaat" },
+                      { value: "MAJELIS", label: "Majelis" },
+                      { value: "EMPLOYEE", label: "Employee" }
+                    ]}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {hasExistingUser
-                        ? "Password Baru (kosongkan jika tidak diubah)"
-                        : "Password *"}
-                    </label>
-                    <input
-                      type="password"
-                      {...form.register("password", {
-                        required: !hasExistingUser && createUserAccount,
-                      })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={
-                        hasExistingUser
-                          ? "Kosongkan jika tidak diubah"
-                          : "Minimal 8 karakter"
-                      }
-                    />
-                  </div>
+                  <TextInput
+                    name="password"
+                    type="password"
+                    label={hasExistingUser ? "Password Baru (kosongkan jika tidak diubah)" : "Password"}
+                    placeholder={hasExistingUser ? "Kosongkan jika tidak diubah" : "Minimal 8 karakter"}
+                    required={!hasExistingUser && createUserAccount}
+                  />
 
                   {(!hasExistingUser || form.watch("password")) && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Konfirmasi Password *
-                      </label>
-                      <input
-                        type="password"
-                        {...form.register("confirmPassword", {
-                          required:
-                            (!hasExistingUser && createUserAccount) ||
-                            form.watch("password"),
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Ulangi password"
-                      />
-                    </div>
+                    <TextInput
+                      name="confirmPassword"
+                      type="password"
+                      label="Konfirmasi Password"
+                      placeholder="Ulangi password"
+                      required={(!hasExistingUser && createUserAccount) || !!form.watch("password")}
+                    />
                   )}
                 </div>
               )}
@@ -836,95 +749,57 @@ export default function EditJemaat() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status Keluarga *
-                  </label>
-                  <select
-                    {...form.register("idStatusKeluarga", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih status keluarga</option>
-                    {statusKeluarga?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idStatusKeluarga"
+                  label="Status Keluarga"
+                  placeholder="Pilih status keluarga"
+                  options={statusKeluarga?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.status
+                  })) || []}
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status Kepemilikan Rumah *
-                  </label>
-                  <select
-                    {...form.register("idStatusKepemilikanRumah", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih status kepemilikan</option>
-                    {statusKepemilikanRumah?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idStatusKepemilikanRumah"
+                  label="Status Kepemilikan Rumah"
+                  placeholder="Pilih status kepemilikan"
+                  options={statusKepemilikanRumah?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.status
+                  })) || []}
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Keadaan Rumah *
-                  </label>
-                  <select
-                    {...form.register("idKeadaanRumah", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih keadaan rumah</option>
-                    {keadaanRumah?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.keadaan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idKeadaanRumah"
+                  label="Keadaan Rumah"
+                  placeholder="Pilih keadaan rumah"
+                  options={keadaanRumah?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.keadaan
+                  })) || []}
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rayon *
-                  </label>
-                  <select
-                    {...form.register("idRayon", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih rayon</option>
-                    {rayon?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.namaRayon}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idRayon"
+                  label="Rayon"
+                  placeholder="Pilih rayon"
+                  options={rayon?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.namaRayon
+                  })) || []}
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    No. Bagungan *
-                  </label>
-                  <input
-                    type="number"
-                    {...form.register("noBagungan", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Masukkan nomor bagungan"
-                  />
-                </div>
+                <TextInput
+                  name="noBagungan"
+                  type="number"
+                  label="No. Bagungan"
+                  placeholder="Masukkan nomor bagungan"
+                  required={createKeluarga}
+                />
               </div>
 
               <div className="mt-6">
@@ -949,60 +824,39 @@ export default function EditJemaat() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Kelurahan *
-                  </label>
-                  <select
-                    {...form.register("idKelurahan", {
-                      required: createKeluarga,
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Pilih kelurahan</option>
-                    {kelurahan?.data?.items?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AutoCompleteInput
+                  name="idKelurahan"
+                  label="Kelurahan"
+                  placeholder="Pilih kelurahan"
+                  options={kelurahan?.data?.items?.map((item) => ({
+                    value: item.id,
+                    label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
+                  })) || []}
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jalan *
-                  </label>
-                  <input
-                    type="text"
-                    {...form.register("jalan", { required: createKeluarga })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Nama jalan / kampung"
-                  />
-                </div>
+                <TextInput
+                  name="jalan"
+                  label="Jalan"
+                  placeholder="Nama jalan / kampung"
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    RT *
-                  </label>
-                  <input
-                    type="number"
-                    {...form.register("rt", { required: createKeluarga })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="001"
-                  />
-                </div>
+                <TextInput
+                  name="rt"
+                  type="number"
+                  label="RT"
+                  placeholder="001"
+                  required={createKeluarga}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    RW *
-                  </label>
-                  <input
-                    type="number"
-                    {...form.register("rw", { required: createKeluarga })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="001"
-                  />
-                </div>
+                <TextInput
+                  name="rw"
+                  type="number"
+                  label="RW"
+                  placeholder="001"
+                  required={createKeluarga}
+                />
               </div>
             </StepContent>
           )}

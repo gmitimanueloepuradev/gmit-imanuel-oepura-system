@@ -22,6 +22,18 @@ const upload = multer({
   },
 });
 
+// Helper to run multer middleware
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
 // GET - Get pastor profile by ID
 async function handleGet(req, res) {
   try {
@@ -50,97 +62,99 @@ async function handleGet(req, res) {
 
 // PATCH - Update pastor profile
 async function handlePatch(req, res) {
-  // Check authentication
-  const authResult = await requireAuth(req, res);
-  if (authResult.error) {
-    return res.status(authResult.status).json(
-      apiResponse(false, null, authResult.error)
+  try {
+    // Check authentication
+    const authResult = await requireAuth(req, res);
+    if (authResult.error) {
+      return res.status(authResult.status).json(
+        apiResponse(false, null, authResult.error)
+      );
+    }
+
+    const { user } = authResult;
+
+    // Check if user is admin
+    if (user.role !== 'ADMIN') {
+      return res.status(403).json(
+        apiResponse(false, null, "Hanya admin yang dapat mengubah profil pendeta")
+      );
+    }
+
+    // Run multer middleware
+    await runMiddleware(req, res, upload.single("foto"));
+
+    const { id } = req.query;
+    const { nama } = req.body;
+    const file = req.file;
+
+    // Check if profile exists
+    const existingProfile = await prisma.profilPendeta.findUnique({
+      where: { id },
+    });
+
+    if (!existingProfile) {
+      return res.status(404).json(
+        apiResponse(false, null, "Profil pendeta tidak ditemukan")
+      );
+    }
+
+    const updateData = {
+      updatedBy: user.id,
+    };
+
+    // Update name if provided
+    if (nama) {
+      updateData.nama = nama;
+    }
+
+    // Handle photo update
+    if (file) {
+      // Delete old photo if exists
+      if (existingProfile.s3Key) {
+        try {
+          await deleteFileFromS3(existingProfile.s3Key);
+        } catch (deleteError) {
+          console.warn("Failed to delete old photo:", deleteError);
+        }
+      }
+
+      // Upload new photo
+      const fileName = `profil-pendeta-${Date.now()}-${uuidv4()}`;
+      const fileExtension = file.mimetype === 'image/png' ? '.png' : '.jpg';
+      const s3Key = `profil-pendeta/${fileName}${fileExtension}`;
+
+      const uploadResult = await uploadFileToS3(file.buffer, s3Key, file.mimetype);
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error);
+      }
+
+      updateData.urlFoto = uploadResult.url;
+      updateData.s3Key = s3Key;
+    }
+
+    // Update profile
+    const updatedProfile = await prisma.profilPendeta.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return res.status(200).json(
+      apiResponse(true, updatedProfile, "Profil pendeta berhasil diperbarui")
     );
-  }
+  } catch (error) {
+    console.error("Error updating pastor profile:", error);
 
-  const { user } = authResult;
-
-  // Check if user is admin
-  if (user.role !== 'ADMIN') {
-    return res.status(403).json(
-      apiResponse(false, null, "Hanya admin yang dapat mengubah profil pendeta")
-    );
-  }
-
-  upload.single("foto")(req, res, async (err) => {
-    if (err) {
-      console.error('Multer error:', err);
+    // Handle multer errors
+    if (error.message === 'Tipe file harus PNG, JPG, atau JPEG') {
       return res.status(400).json(
-        apiResponse(false, null, err.message)
+        apiResponse(false, null, error.message)
       );
     }
 
-    try {
-      const { id } = req.query;
-      const { nama } = req.body;
-      const file = req.file;
-
-      // Check if profile exists
-      const existingProfile = await prisma.profilPendeta.findUnique({
-        where: { id },
-      });
-
-      if (!existingProfile) {
-        return res.status(404).json(
-          apiResponse(false, null, "Profil pendeta tidak ditemukan")
-        );
-      }
-
-      const updateData = {
-        updatedBy: user.id,
-      };
-
-      // Update name if provided
-      if (nama) {
-        updateData.nama = nama;
-      }
-
-      // Handle photo update
-      if (file) {
-        // Delete old photo if exists
-        if (existingProfile.s3Key) {
-          try {
-            await deleteFileFromS3(existingProfile.s3Key);
-          } catch (deleteError) {
-            console.warn("Failed to delete old photo:", deleteError);
-          }
-        }
-
-        // Upload new photo
-        const fileName = `profil-pendeta-${Date.now()}-${uuidv4()}`;
-        const fileExtension = file.mimetype === 'image/png' ? '.png' : '.jpg';
-        const s3Key = `profil-pendeta/${fileName}${fileExtension}`;
-
-        const uploadResult = await uploadFileToS3(file, s3Key);
-        if (!uploadResult.success) {
-          throw new Error(uploadResult.error);
-        }
-
-        updateData.urlFoto = uploadResult.url;
-        updateData.s3Key = s3Key;
-      }
-
-      // Update profile
-      const updatedProfile = await prisma.profilPendeta.update({
-        where: { id },
-        data: updateData,
-      });
-
-      return res.status(200).json(
-        apiResponse(true, updatedProfile, "Profil pendeta berhasil diperbarui")
-      );
-    } catch (error) {
-      console.error("Error updating pastor profile:", error);
-      return res.status(500).json(
-        apiResponse(false, null, "Gagal memperbarui profil pendeta", error.message)
-      );
-    }
-  });
+    return res.status(500).json(
+      apiResponse(false, null, "Gagal memperbarui profil pendeta", error.message)
+    );
+  }
 }
 
 // DELETE - Delete pastor profile

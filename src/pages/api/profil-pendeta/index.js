@@ -22,6 +22,18 @@ const upload = multer({
   },
 });
 
+// Helper to run multer middleware
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
 // GET - Get all pastor profiles or active one
 async function handleGet(req, res) {
   try {
@@ -61,89 +73,91 @@ async function handleGet(req, res) {
 
 // POST - Create new pastor profile
 async function handlePost(req, res) {
-  // Check authentication
-  const token = getTokenFromHeader(req.headers.authorization);
-  if (!token) {
-    return res.status(401).json(
-      apiResponse(false, null, "Token tidak ditemukan")
-    );
-  }
+  try {
+    // Check authentication
+    const token = getTokenFromHeader(req.headers.authorization);
+    if (!token) {
+      return res.status(401).json(
+        apiResponse(false, null, "Token tidak ditemukan")
+      );
+    }
 
-  const decoded = await verifyToken(token);
-  if (!decoded) {
-    return res.status(401).json(
-      apiResponse(false, null, "Token tidak valid")
-    );
-  }
+    const decoded = await verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json(
+        apiResponse(false, null, "Token tidak valid")
+      );
+    }
 
-  // Check if user is admin
-  if (decoded.role !== 'ADMIN') {
-    return res.status(403).json(
-      apiResponse(false, null, "Hanya admin yang dapat membuat profil pendeta")
-    );
-  }
+    // Check if user is admin
+    if (decoded.role !== 'ADMIN') {
+      return res.status(403).json(
+        apiResponse(false, null, "Hanya admin yang dapat membuat profil pendeta")
+      );
+    }
 
-  upload.single("foto")(req, res, async (err) => {
-    if (err) {
-      console.error('Multer error:', err);
+    // Run multer middleware
+    await runMiddleware(req, res, upload.single("foto"));
+
+    const { nama } = req.body;
+    const file = req.file;
+
+    if (!nama) {
       return res.status(400).json(
-        apiResponse(false, null, err.message)
+        apiResponse(false, null, "Nama pendeta harus diisi")
       );
     }
 
-    try {
-      const { nama } = req.body;
-      const file = req.file;
+    let urlFoto = null;
+    let s3Key = null;
 
-      if (!nama) {
-        return res.status(400).json(
-          apiResponse(false, null, "Nama pendeta harus diisi")
-        );
+    // Upload photo if provided
+    if (file) {
+      const fileName = `profil-pendeta-${Date.now()}-${uuidv4()}`;
+      const fileExtension = file.mimetype === 'image/png' ? '.png' : '.jpg';
+      s3Key = `profil-pendeta/${fileName}${fileExtension}`;
+
+      const uploadResult = await uploadFileToS3(file.buffer, s3Key, file.mimetype);
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error);
       }
+      urlFoto = uploadResult.url;
+    }
 
-      let urlFoto = null;
-      let s3Key = null;
+    // Deactivate all existing profiles
+    await prisma.profilPendeta.updateMany({
+      where: { isActive: true },
+      data: { isActive: false }
+    });
 
-      // Upload photo if provided
-      if (file) {
-        const fileName = `profil-pendeta-${Date.now()}-${uuidv4()}`;
-        const fileExtension = file.mimetype === 'image/png' ? '.png' : '.jpg';
-        s3Key = `profil-pendeta/${fileName}${fileExtension}`;
+    // Create new profile
+    const newProfile = await prisma.profilPendeta.create({
+      data: {
+        nama,
+        urlFoto,
+        s3Key,
+        isActive: true,
+        // createdBy: user.id,
+      },
+    });
 
-        const uploadResult = await uploadFileToS3(file, s3Key);
-        if (!uploadResult.success) {
-          throw new Error(uploadResult.error);
-        }
-        urlFoto = uploadResult.url;
-      }
+    return res.status(201).json(
+      apiResponse(true, newProfile, "Profil pendeta berhasil dibuat")
+    );
+  } catch (error) {
+    console.error("Error creating pastor profile:", error);
 
-      // Deactivate all existing profiles
-      await prisma.profilPendeta.updateMany({
-        where: { isActive: true },
-        data: { isActive: false }
-      });
-
-      // Create new profile
-      const newProfile = await prisma.profilPendeta.create({
-        data: {
-          nama,
-          urlFoto,
-          s3Key,
-          isActive: true,
-          // createdBy: user.id,
-        },
-      });
-
-      return res.status(201).json(
-        apiResponse(true, newProfile, "Profil pendeta berhasil dibuat")
-      );
-    } catch (error) {
-      console.error("Error creating pastor profile:", error);
-      return res.status(500).json(
-        apiResponse(false, null, "Gagal membuat profil pendeta", error.message)
+    // Handle multer errors
+    if (error.message === 'Tipe file harus PNG, JPG, atau JPEG') {
+      return res.status(400).json(
+        apiResponse(false, null, error.message)
       );
     }
-  });
+
+    return res.status(500).json(
+      apiResponse(false, null, "Gagal membuat profil pendeta", error.message)
+    );
+  }
 }
 
 export default async function handler(req, res) {
