@@ -6,14 +6,15 @@ async function handleGet(req, res) {
   try {
     const { search, limit = 1000 } = req.query;
 
-    const where = search
-      ? {
-          jenisJaminan: {
-            contains: search,
-            mode: "insensitive",
-          },
-        }
-      : {};
+    const where = {
+      isActive: true,
+      ...(search && {
+        jenisJaminan: {
+          contains: search,
+          mode: "insensitive",
+        },
+      }),
+    };
 
     const options = await prisma.jaminanKesehatan.findMany({
       where,

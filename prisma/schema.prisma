@@ -227,6 +227,7 @@ model User {
   jemaat  Jemaat?  @relation(fields: [idJemaat], references: [id])
   majelis Majelis? @relation(fields: [idMajelis], references: [id]) // TAMBAH INI
   rayon   Rayon?   @relation(fields: [idRayon], references: [id]) // TAMBAH INI
+  isActive Boolean  @default(true)
 
   // Document relations
   dokumenUploaded DokumenJemaat[] @relation("DokumenUploader")

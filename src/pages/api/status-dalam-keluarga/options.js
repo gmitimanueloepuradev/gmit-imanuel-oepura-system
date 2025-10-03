@@ -8,6 +8,7 @@ async function handleGet(req, res) {
     const { search, limit = 1000 } = req.query;
 
     const where = {
+      isActive: true,
       // Exclude "Kepala Keluarga" from options since each family already has one
       status: {
         not: "Kepala Keluarga",

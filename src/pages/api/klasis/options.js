@@ -5,6 +5,9 @@ import { createApiHandler } from "@/lib/apiHandler";
 async function handleGet(req, res) {
   try {
     const klasisList = await prisma.klasis.findMany({
+      where: {
+        isActive: true,
+      },
       select: {
         id: true,
         nama: true,

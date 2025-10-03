@@ -30,6 +30,7 @@ async function handlePost(req, res) {
         role: true,
         noWhatsapp: true,
         idJemaat: true,
+        isActive: true,
         jemaat: {
           select: {
             id: true,
@@ -54,6 +55,13 @@ async function handlePost(req, res) {
       return res
         .status(401)
         .json(apiResponse(false, null, "Email/Username atau password salah"));
+    }
+
+    // Check if user account is active
+    if (!user.isActive) {
+      return res
+        .status(403)
+        .json(apiResponse(false, null, "Akun Anda telah dinonaktifkan. Silakan hubungi pihak gereja untuk informasi lebih lanjut."));
     }
 
     // Verify password
