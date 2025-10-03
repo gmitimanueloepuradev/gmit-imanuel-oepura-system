@@ -1,12 +1,18 @@
-import { requireAuth } from "@/lib/jwt";
+import { requireAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/apiHelper";
 
 // PATCH - Toggle active status
 async function handlePatch(req, res) {
   // Check authentication
-  const user = requireAuth(req, res);
-  if (!user) return;
+  const authResult = await requireAuth(req, res);
+  if (authResult.error) {
+    return res.status(authResult.status).json(
+      apiResponse(false, null, authResult.error)
+    );
+  }
+
+  const { user } = authResult;
 
   // Check if user is admin
   if (user.role !== 'ADMIN') {

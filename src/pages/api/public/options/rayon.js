@@ -10,13 +10,17 @@ async function handler(req, res) {
       select: {
         id: true,
         namaRayon: true
-      },
-      orderBy: {
-        namaRayon: 'asc'
       }
     });
 
-    const options = rayons.map(rayon => ({
+    // Sort berdasarkan angka di dalam nama rayon
+    const sortedRayons = rayons.sort((a, b) => {
+      const numA = parseInt(a.namaRayon.match(/\d+/)?.[0] || "0");
+      const numB = parseInt(b.namaRayon.match(/\d+/)?.[0] || "0");
+      return numA - numB;
+    });
+
+    const options = sortedRayons.map(rayon => ({
       value: rayon.id,
       label: rayon.namaRayon
     }));

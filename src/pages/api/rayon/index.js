@@ -16,9 +16,6 @@ async function handleGet(req, res) {
       where,
       skip: pagination.skip,
       take: pagination.take,
-      orderBy: {
-        [sort.sortBy]: sort.sortOrder,
-      },
       include: {
         keluargas: {
           select: {
@@ -40,10 +37,28 @@ async function handleGet(req, res) {
       },
     });
 
+    // Sort berdasarkan angka di dalam nama rayon jika sortBy adalah namaRayon
+    let sortedItems = items;
+    if (sort.sortBy === "namaRayon") {
+      sortedItems = items.sort((a, b) => {
+        const numA = parseInt(a.namaRayon.match(/\d+/)?.[0] || "0");
+        const numB = parseInt(b.namaRayon.match(/\d+/)?.[0] || "0");
+        return sort.sortOrder === "asc" ? numA - numB : numB - numA;
+      });
+    } else {
+      // Untuk sort field lain, gunakan orderBy Prisma
+      sortedItems = items.sort((a, b) => {
+        if (sort.sortOrder === "asc") {
+          return a[sort.sortBy] > b[sort.sortBy] ? 1 : -1;
+        }
+        return a[sort.sortBy] < b[sort.sortBy] ? 1 : -1;
+      });
+    }
+
     const totalPages = Math.ceil(total / pagination.limit);
 
     const result = {
-      items,
+      items: sortedItems,
       pagination: {
         ...pagination,
         total,

@@ -21,14 +21,18 @@ async function handleGet(req, res) {
         id: true,
         namaRayon: true,
       },
-      orderBy: {
-        namaRayon: "asc",
-      },
       take: parseInt(limit), // Customizable limit untuk dropdown/autocomplete
     });
 
+    // Sort berdasarkan angka di dalam nama rayon
+    const sortedOptions = options.sort((a, b) => {
+      const numA = parseInt(a.namaRayon.match(/\d+/)?.[0] || "0");
+      const numB = parseInt(b.namaRayon.match(/\d+/)?.[0] || "0");
+      return numA - numB;
+    });
+
     // Format untuk AutoCompleteInput
-    const formattedOptions = options.map((item) => ({
+    const formattedOptions = sortedOptions.map((item) => ({
       value: item.id,
       label: item.namaRayon,
     }));

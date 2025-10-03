@@ -78,7 +78,13 @@
       "Bash(findstr:*)",
       "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=lanjutkan)",
       "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"oke then continue the todos\" npx prisma migrate reset --force)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(pg_isready:*)",
+      "Bash(psql:*)",
+      "Bash(where psql)",
+      "Bash(copy .env.development .env.local)",
+      "Bash(cp:*)",
+      "Bash(set DATABASE_URL=postgresql://postgres:554yy@localhost:5432/Db_GmitImanuelOepura?schema=public)"
     ],
     "deny": [],
     "ask": []

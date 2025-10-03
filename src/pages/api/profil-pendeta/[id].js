@@ -1,7 +1,7 @@
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 
-import { requireAuth } from "@/lib/jwt";
+import { requireAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { uploadFileToS3, deleteFileFromS3 } from "@/lib/s3";
 import { apiResponse } from "@/lib/apiHelper";
@@ -51,8 +51,14 @@ async function handleGet(req, res) {
 // PATCH - Update pastor profile
 async function handlePatch(req, res) {
   // Check authentication
-  const user = requireAuth(req, res);
-  if (!user) return;
+  const authResult = await requireAuth(req, res);
+  if (authResult.error) {
+    return res.status(authResult.status).json(
+      apiResponse(false, null, authResult.error)
+    );
+  }
+
+  const { user } = authResult;
 
   // Check if user is admin
   if (user.role !== 'ADMIN') {
@@ -140,8 +146,14 @@ async function handlePatch(req, res) {
 // DELETE - Delete pastor profile
 async function handleDelete(req, res) {
   // Check authentication
-  const user = requireAuth(req, res);
-  if (!user) return;
+  const authResult = await requireAuth(req, res);
+  if (authResult.error) {
+    return res.status(authResult.status).json(
+      apiResponse(false, null, authResult.error)
+    );
+  }
+
+  const { user } = authResult;
 
   // Check if user is admin
   if (user.role !== 'ADMIN') {
