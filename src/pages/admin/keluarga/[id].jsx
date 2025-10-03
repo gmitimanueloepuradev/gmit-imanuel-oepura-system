@@ -3,6 +3,7 @@ import { ArrowLeft, Home, MapPin, User, Users } from "lucide-react";
 import { useRouter } from "next/router";
 
 import { Card } from "@/components/ui/Card";
+import PageTitle from "@/components/ui/PageTitle";
 import keluargaService from "@/services/keluargaService";
 
 export default function KeluargaDetailPage() {
@@ -54,29 +55,32 @@ export default function KeluargaDetailPage() {
   }
 
   const kepalaKeluarga = keluarga.jemaats?.find(
-    (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga",
+    (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga"
   );
 
   const anggotaKeluarga = keluarga.jemaats?.filter(
-    (jemaat) => jemaat.statusDalamKeluarga?.status !== "Kepala Keluarga",
+    (jemaat) => jemaat.statusDalamKeluarga?.status !== "Kepala Keluarga"
   );
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      <PageTitle
+        title={`Detail Keluarga - No. Bangunan ${keluarga.noBagungan}`}
+      />
       {/* Header */}
       <div className="flex items-center mb-6">
         <button
-          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+          className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
           onClick={() => router.back()}
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
           Kembali
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Detail Keluarga - No. Bangunan {keluarga.noBagungan}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Informasi lengkap keluarga dan anggota keluarga
           </p>
         </div>
@@ -93,34 +97,41 @@ export default function KeluargaDetailPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   No. Bangunan
                 </label>
-                <p className="text-gray-900 font-medium">
+                <p className="text-gray-900 dark:text-gray-100 font-medium">
                   {keluarga.noBagungan || "-"}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  No. Kartu Keluarga (KK)
+                </label>
+                <p className="text-gray-900 dark:text-gray-100">{keluarga.noKK || "-"}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Rayon
                 </label>
-                <p className="text-gray-900">
+                <p className="text-gray-900 dark:text-gray-100">
                   {keluarga.rayon?.namaRayon || "-"}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Status Keluarga
                 </label>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     keluarga.statusKeluarga?.status === "Kawin"
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
                       : keluarga.statusKeluarga?.status === "Belum Kawin"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                        : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {keluarga.statusKeluarga?.status || "-"}
@@ -128,18 +139,18 @@ export default function KeluargaDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Status Kepemilikan Rumah
                 </label>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     keluarga.statusKepemilikanRumah?.status === "Milik Sendiri"
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
                       : keluarga.statusKepemilikanRumah?.status === "Kredit/KPR"
-                        ? "bg-yellow-100 text-yellow-800"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
                         : keluarga.statusKepemilikanRumah?.status === "Sewa"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {keluarga.statusKepemilikanRumah?.status || "-"}
@@ -147,20 +158,20 @@ export default function KeluargaDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Keadaan Rumah
                 </label>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     keluarga.keadaanRumah?.keadaan === "Sangat Baik"
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
                       : keluarga.keadaanRumah?.keadaan === "Baik"
-                        ? "bg-blue-100 text-blue-800"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                         : keluarga.keadaanRumah?.keadaan === "Cukup Baik"
-                          ? "bg-yellow-100 text-yellow-800"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
                           : keluarga.keadaanRumah?.keadaan === "Kurang Baik"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {keluarga.keadaanRumah?.keadaan || "-"}

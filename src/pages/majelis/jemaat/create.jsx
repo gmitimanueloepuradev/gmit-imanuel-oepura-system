@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -49,6 +49,7 @@ const steps = [
 export default function MajelisCreateJemaat() {
   const router = useRouter();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { keluargaId, isKepalaKeluarga: isKepalaKeluargaParam } = router.query;
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -77,9 +78,11 @@ export default function MajelisCreateJemaat() {
       idPendapatan: "",
       idJaminanKesehatan: "",
       // User fields - WAJIB untuk semua jemaat
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
+      noWhatsapp: "",
       role: "JEMAAT",
       // Keluarga fields
       idStatusKeluarga: "",
@@ -306,6 +309,10 @@ export default function MajelisCreateJemaat() {
           : "Jemaat berhasil dibuat!",
         color: "success",
       });
+
+      // Invalidate jemaat query to refetch data
+      queryClient.invalidateQueries({ queryKey: ["jemaat"] });
+
       // Redirect to majelis jemaat page
       router.push("/majelis/jemaat");
     },
@@ -377,8 +384,10 @@ export default function MajelisCreateJemaat() {
       }
 
       const userData = {
+        username: form.getValues("username"),
         email: form.getValues("email"),
         password: form.getValues("password"),
+        noWhatsapp: form.getValues("noWhatsapp") || null,
         role: form.getValues("role"),
       };
 
@@ -407,6 +416,17 @@ export default function MajelisCreateJemaat() {
     }
   };
 
+  const handleGenerateDefaultPassword = () => {
+    const defaultPassword = "oepura78";
+    form.setValue("password", defaultPassword);
+    form.setValue("confirmPassword", defaultPassword);
+    showToast({
+      title: "Password Generated",
+      description: `Password default "${defaultPassword}" berhasil diisi`,
+      color: "success",
+    });
+  };
+
   const getMaxStep = () => {
     if (!createKeluarga) return 2; // Always include user account step
     // Alamat is always required when creating keluarga
@@ -424,9 +444,11 @@ export default function MajelisCreateJemaat() {
     "idPendapatan",
     "idJaminanKesehatan",
     "idKeluarga",
+    "username",
     "email",
     "password",
     "confirmPassword",
+    "noWhatsapp",
     "idStatusKeluarga",
     "idStatusKepemilikanRumah",
     "idKeadaanRumah",
@@ -471,7 +493,7 @@ export default function MajelisCreateJemaat() {
 
     if (currentStep === 2) {
       // User account is MANDATORY
-      return values.email && values.password && values.confirmPassword;
+      return values.username && values.email && values.password && values.confirmPassword;
     }
 
     if (currentStep === 3 && createKeluarga) {
@@ -501,10 +523,19 @@ export default function MajelisCreateJemaat() {
   };
 
   const handleSubmit = async () => {
+    // Get user data directly from form (in case user clicked submit without clicking "next" on step 2)
+    const userData = {
+      username: form.getValues("username"),
+      email: form.getValues("email"),
+      password: form.getValues("password"),
+      noWhatsapp: form.getValues("noWhatsapp") || null,
+      role: form.getValues("role"),
+    };
+
     const submitData = {
       ...formData.jemaat,
       createUser: true, // ALWAYS create user account for majelis
-      ...formData.user,
+      ...userData, // Use fresh data from form instead of formData.user
       createKeluarga,
       ...(createKeluarga && { keluargaData: formData.keluarga }),
       createAlamat: createKeluarga, // Always create alamat when creating keluarga
@@ -726,7 +757,41 @@ export default function MajelisCreateJemaat() {
                       </div>
                     </div>
 
+                    <div className="mb-4">
+                      <button
+                        type="button"
+                        onClick={handleGenerateDefaultPassword}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Generate Password Default (oepura78)
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Klik tombol di atas untuk mengisi password dengan default <strong>oepura78</strong>
+                      </p>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <TextInput
+                          required
+                          label="Username"
+                          name="username"
+                          placeholder="Username untuk login"
+                        />
+                      </div>
+
                       <div>
                         <TextInput
                           required
@@ -734,6 +799,15 @@ export default function MajelisCreateJemaat() {
                           name="email"
                           placeholder="contoh@email.com"
                           type="email"
+                        />
+                      </div>
+
+                      <div>
+                        <TextInput
+                          label="No. WhatsApp"
+                          name="noWhatsapp"
+                          placeholder="08123456789"
+                          type="tel"
                         />
                       </div>
 
@@ -754,7 +828,7 @@ export default function MajelisCreateJemaat() {
                           required
                           label="Password"
                           name="password"
-                          placeholder="Minimal 8 karakter"
+                          placeholder="Masukkan password"
                           type="password"
                         />
                       </div>

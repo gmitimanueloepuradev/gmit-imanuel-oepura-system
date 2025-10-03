@@ -160,10 +160,27 @@ export const majelisEditSchema = z.object({
 // Keluarga Edit Schema
 export const keluargaEditSchema = z.object({
   noBagungan: z.string().min(1, "No. Bangunan wajib diisi"),
+  noKK: z.string().optional(),
   idRayon: z.string().nonempty("Rayon wajib dipilih"),
   idStatusKeluarga: z.string().optional(),
   idStatusKepemilikanRumah: z.string().optional(),
   idKeadaanRumah: z.string().optional(),
+});
+
+// Keluarga Create Schema
+export const keluargaCreateSchema = z.object({
+  noBagungan: z.string().min(1, "No. Bangunan wajib diisi"),
+  noKK: z.string().min(1, "No. Kartu Keluarga wajib diisi"),
+  idRayon: z.string().nonempty("Rayon wajib dipilih"),
+  idStatusKeluarga: z.string().optional(),
+  idStatusKepemilikanRumah: z.string().optional(),
+  idKeadaanRumah: z.string().optional(),
+  alamat: z.object({
+    idKelurahan: z.string().nonempty("Kelurahan wajib dipilih"),
+    rt: z.number().min(1, "RT wajib diisi"),
+    rw: z.number().min(1, "RW wajib diisi"),
+    jalan: z.string().min(1, "Jalan wajib diisi"),
+  }),
 });
 
 // Kategori Pengumuman Schema

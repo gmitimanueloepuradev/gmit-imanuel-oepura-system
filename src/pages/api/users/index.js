@@ -28,8 +28,15 @@ async function handleGet(req, res) {
         noWhatsapp: true,
         role: true,
         idJemaat: true,
+        idRayon: true,
         createdAt: true,
         updatedAt: true,
+        rayon: {
+          select: {
+            id: true,
+            namaRayon: true,
+          },
+        },
         jemaat: {
           select: {
             id: true,

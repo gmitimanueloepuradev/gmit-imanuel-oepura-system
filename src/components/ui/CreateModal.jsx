@@ -34,6 +34,8 @@ export default function CreateModal({
       currentFields.forEach((field) => {
         if (field.defaultValue !== undefined) {
           initialData[field.key] = field.defaultValue;
+        } else if (field.value !== undefined) {
+          initialData[field.key] = field.value;
         } else if (field.type === "boolean") {
           initialData[field.key] = true;
         } else if (field.type === "number") {
@@ -44,7 +46,8 @@ export default function CreateModal({
       });
       form.reset(initialData);
     }
-  }, [isOpen, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleSubmit = (data) => {
     onSubmit(data);
@@ -141,6 +144,8 @@ export default function CreateModal({
                             required={field.required}
                             disabled={isLoading}
                             value={field.value}
+                            apiEndpoint={field.apiEndpoint}
+                            options={field.options}
                           />
                           {field.description && (
                             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">

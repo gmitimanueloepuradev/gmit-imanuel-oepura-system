@@ -51,114 +51,26 @@ export default function KeluargaPage() {
 
   const columns = [
     {
+      key: "noKK",
+      label: "No. KK",
+      type: "text",
+      render: (value) => value || "-",
+    },
+    {
       key: "noBagungan",
       label: "No. Bangunan",
       type: "text",
       render: (value) => value || "-",
     },
     {
-      key: "alamat",
-      label: "Alamat",
+      key: "kepalaKeluarga",
+      label: "Kepala Keluarga",
       type: "text",
       render: (value, row) => {
-        if (!value) return "-";
-        return `${value.jalan}, RT ${value.rt}/RW ${value.rw}`;
-      },
-    },
-    {
-      key: "kelurahan",
-      label: "Kelurahan",
-      type: "text",
-      render: (value, row) => {
-        return row.alamat?.kelurahan?.nama || "-";
-      },
-    },
-    {
-      key: "kecamatan",
-      label: "Kecamatan",
-      type: "text",
-      render: (value, row) => {
-        return row.alamat?.kelurahan?.kecamatan?.nama || "-";
-      },
-    },
-    {
-      key: "kotaKab",
-      label: "Kota/Kabupaten",
-      type: "text",
-      render: (value, row) => {
-        return row.alamat?.kelurahan?.kecamatan?.kotaKab?.nama || "-";
-      },
-    },
-    {
-      key: "statusKeluarga",
-      label: "Status Keluarga",
-      type: "badge",
-      render: (value) => {
-        const status = value?.status || "-";
-        const badgeClass =
-          status === "Kawin"
-            ? "bg-green-100 text-green-800"
-            : status === "Belum Kawin"
-              ? "bg-blue-100 text-blue-800"
-              : "bg-gray-100 text-gray-800";
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}
-          >
-            {status}
-          </span>
+        const kepalaKeluarga = row.jemaats?.find(
+          (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga"
         );
-      },
-    },
-    {
-      key: "statusKepemilikanRumah",
-      label: "Status Rumah",
-      type: "badge",
-      render: (value) => {
-        const status = value?.status || "-";
-        const badgeClass =
-          status === "Milik Sendiri"
-            ? "bg-green-100 text-green-800"
-            : status === "Kredit/KPR"
-              ? "bg-yellow-100 text-yellow-800"
-              : status === "Sewa"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-800";
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}
-          >
-            {status}
-          </span>
-        );
-      },
-    },
-    {
-      key: "keadaanRumah",
-      label: "Keadaan Rumah",
-      type: "badge",
-      render: (value) => {
-        const keadaan = value?.keadaan || "-";
-        const badgeClass =
-          keadaan === "Sangat Baik"
-            ? "bg-green-100 text-green-800"
-            : keadaan === "Baik"
-              ? "bg-blue-100 text-blue-800"
-              : keadaan === "Cukup Baik"
-                ? "bg-yellow-100 text-yellow-800"
-                : keadaan === "Kurang Baik"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-gray-100 text-gray-800";
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}
-          >
-            {keadaan}
-          </span>
-        );
+        return kepalaKeluarga?.nama || "-";
       },
     },
     {
@@ -179,17 +91,6 @@ export default function KeluargaPage() {
             {count} orang
           </span>
         );
-      },
-    },
-    {
-      key: "kepalaKeluarga",
-      label: "Kepala Keluarga",
-      type: "text",
-      render: (value, row) => {
-        const kepalaKeluarga = row.jemaats?.find(
-          (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga"
-        );
-        return kepalaKeluarga?.nama || "-";
       },
     },
   ];

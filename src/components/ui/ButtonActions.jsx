@@ -26,13 +26,16 @@ export default function ButtonActions({
 
   // Filter actions based on their condition
   const availableActions = actions.filter((action) => {
-    if (action.condition && typeof action.condition === "function") {
-      return action.condition(item);
-    }
-    if (action.disabled && typeof action.disabled === "function") {
-      return !action.disabled(item);
+    // Check if action has a condition function
+    if (action.condition !== undefined) {
+      if (typeof action.condition === "function") {
+        return action.condition(item);
+      }
+      // If condition is a boolean value
+      return action.condition;
     }
 
+    // If no condition, show the action
     return true;
   });
 

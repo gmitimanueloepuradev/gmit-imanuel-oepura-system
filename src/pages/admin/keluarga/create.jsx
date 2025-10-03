@@ -11,10 +11,12 @@ import Stepper, {
 } from "@/components/ui/Stepper";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import NumberInput from "@/components/ui/inputs/NumberInput";
+import TextInput from "@/components/ui/inputs/TextInput";
 import SkeletonInput from "@/components/ui/skeletons/SkeletonInput";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
+import PageTitle from "@/components/ui/PageTitle";
 
 const steps = [
   {
@@ -41,6 +43,7 @@ export default function CreateKeluarga() {
       idKeadaanRumah: "",
       idRayon: "",
       noBagungan: "",
+      noKK: "",
       idKelurahan: "",
       rt: "",
       rw: "",
@@ -164,7 +167,8 @@ export default function CreateKeluarga() {
         !values.idStatusKepemilikanRumah ||
         !values.idKeadaanRumah ||
         !values.idRayon ||
-        !values.noBagungan
+        !values.noBagungan ||
+        !values.noKK
       ) {
         showToast({
           title: "Error",
@@ -194,6 +198,7 @@ export default function CreateKeluarga() {
     "idKeadaanRumah",
     "idRayon",
     "noBagungan",
+    "noKK",
     "idKelurahan",
     "rt",
     "rw",
@@ -219,7 +224,9 @@ export default function CreateKeluarga() {
         values.idKeadaanRumah &&
         values.idRayon &&
         values.noBagungan &&
-        values.noBagungan.toString().trim() !== ""
+        values.noBagungan.toString().trim() !== "" &&
+        values.noKK &&
+        values.noKK.toString().trim() !== ""
       );
 
       return canProceed;
@@ -255,6 +262,7 @@ export default function CreateKeluarga() {
       !values.idKeadaanRumah ||
       !values.idRayon ||
       !values.noBagungan ||
+      !values.noKK ||
       !values.idKelurahan ||
       !values.rt ||
       !values.rw ||
@@ -284,6 +292,7 @@ export default function CreateKeluarga() {
       idKeadaanRumah: values.idKeadaanRumah,
       idRayon: values.idRayon,
       noBagungan: parseInt(values.noBagungan),
+      noKK: values.noKK,
       alamat: alamatData,
     };
 
@@ -292,6 +301,7 @@ export default function CreateKeluarga() {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+      <PageTitle title="Tambah Keluarga Baru" />
       <PageHeader
         breadcrumb={[
           { label: "Dashboard", href: "/admin/dashboard" },
@@ -387,6 +397,15 @@ export default function CreateKeluarga() {
                       },
                     }}
                   />
+
+                  <TextInput
+                    required
+                    label="No. Kartu Keluarga (KK)"
+                    maxLength={16}
+                    name="noKK"
+                    placeholder="Masukkan nomor KK (16 digit)"
+                    type="text"
+                  />
                 </div>
               </StepContent>
             )}
@@ -419,41 +438,27 @@ export default function CreateKeluarga() {
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Jalan *
-                    </label>
-                    <input
-                      type="text"
-                      {...form.register("jalan", { required: true })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Nama jalan / kampung"
-                    />
-                  </div>
+                  <TextInput
+                    required
+                    label="Jalan"
+                    name="jalan"
+                    placeholder="Nama jalan / kampung"
+                    type="text"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      RT *
-                    </label>
-                    <input
-                      type="number"
-                      {...form.register("rt", { required: true })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="001"
-                    />
-                  </div>
+                  <NumberInput
+                    required
+                    label="RT"
+                    name="rt"
+                    placeholder="001"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      RW *
-                    </label>
-                    <input
-                      type="number"
-                      {...form.register("rw", { required: true })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="001"
-                    />
-                  </div>
+                  <NumberInput
+                    required
+                    label="RW"
+                    name="rw"
+                    placeholder="001"
+                  />
                 </div>
               </StepContent>
             )}

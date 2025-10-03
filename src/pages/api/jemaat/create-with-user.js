@@ -2,10 +2,36 @@ import bcrypt from "bcryptjs";
 
 import { createApiHandler } from "@/lib/apiHandler";
 import { apiResponse } from "@/lib/apiHelper";
+import { requireAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 async function handlePost(req, res) {
   try {
+    // Require authentication
+    const authResult = await requireAuth(req, res);
+    if (authResult.error) {
+      return res
+        .status(authResult.status)
+        .json(apiResponse(false, null, authResult.error));
+    }
+
+    const user = authResult.user;
+
+    // Get majelis data to get rayon id (if user is MAJELIS)
+    let rayonId = null;
+    if (user.role === "MAJELIS") {
+      const majelis = await prisma.majelis.findUnique({
+        where: { id: user.idMajelis },
+        include: {
+          rayon: true,
+        },
+      });
+
+      if (majelis && majelis.idRayon) {
+        rayonId = majelis.idRayon;
+      }
+    }
+
     const {
       // Jemaat data
       idKeluarga,
@@ -21,8 +47,10 @@ async function handlePost(req, res) {
       golonganDarah,
       // User data
       createUser,
+      username,
       email,
       password,
+      noWhatsapp,
       role = "JEMAAT",
       // Keluarga data (if status is Kepala Keluarga)
       createKeluarga,
@@ -35,7 +63,7 @@ async function handlePost(req, res) {
     // Hash password outside transaction to reduce transaction time
     let hashedPassword = null;
 
-    if (createUser && email && password) {
+    if (createUser && username && email && password) {
       hashedPassword = await bcrypt.hash(password, 12);
     }
 
@@ -97,7 +125,7 @@ async function handlePost(req, res) {
         // Step 4: Create User if requested
         let newUser = null;
 
-        if (createUser && email && hashedPassword) {
+        if (createUser && username && email && hashedPassword) {
           // Check if email already exists
           const existingUser = await tx.user.findUnique({
             where: { email },
@@ -107,18 +135,33 @@ async function handlePost(req, res) {
             throw new Error("Email sudah terdaftar");
           }
 
+          // Check if username already exists
+          const existingUsername = await tx.user.findUnique({
+            where: { username },
+          });
+
+          if (existingUsername) {
+            throw new Error("Username sudah terdaftar");
+          }
+
           newUser = await tx.user.create({
             data: {
+              username,
               email,
               password: hashedPassword,
+              noWhatsapp: noWhatsapp || null,
               role,
               idJemaat: newJemaat.id,
+              idRayon: rayonId, // Auto-assign rayon from majelis
             },
             select: {
               id: true,
+              username: true,
               email: true,
+              noWhatsapp: true,
               role: true,
               idJemaat: true,
+              idRayon: true,
             },
           });
         }

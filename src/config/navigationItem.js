@@ -265,6 +265,11 @@ export const roleConfigs = {
     navigation: [
       { href: "/majelis/dashboard", label: "Dashboard", icon: Home },
       {
+        href: "/majelis/akun-jemaat",
+        label: "Kelola Akun Jemaat",
+        icon: UserCog,
+      },
+      {
         href: "/majelis/jemaat",
         label: "Data Jemaat",
         icon: Users,

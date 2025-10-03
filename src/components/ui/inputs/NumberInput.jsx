@@ -74,7 +74,7 @@ export default function NumberInput({
   return (
     <div>
       <label
-        className="block text-sm font-medium text-gray-700 mb-2"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
         htmlFor={inputId}
       >
         {label} {required && "*"}

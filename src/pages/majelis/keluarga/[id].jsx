@@ -399,6 +399,15 @@ export default function KeluargaDetailPage() {
 
                   <div>
                     <label className="text-sm font-medium text-gray-500">
+                      No. Kartu Keluarga (KK)
+                    </label>
+                    <p className="text-sm text-gray-900">
+                      {keluarga.noKK || "-"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
                       Rayon
                     </label>
                     <p className="text-sm text-gray-900">

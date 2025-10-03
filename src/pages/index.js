@@ -15,8 +15,8 @@ export default function Home() {
     <>
       <PageTitle
         description="GMIT Jemaat Imanuel Oepura (JIO) - Gereja Masehi Injili di Timor yang melayani jemaat dengan penuh kasih dan dedikasi di Kupang, Nusa Tenggara Timur. Ibadah Minggu, Cell Group, Sidi, Pernikahan, Baptis, Pelayanan Jemaat."
-        title="Beranda"
         keywords="GMIT Jemaat Imanuel Oepura, JIO, Gereja Kupang, Ibadah Minggu Kupang, Gereja Kristen, Gereja Protestan, Gereja di NTT, Ibadah Gereja, Pelayanan Jemaat, Kegiatan Gereja"
+        title="Beranda"
       />
       <div className="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
         {/* Mobile Layout - Vertical Stack */}
@@ -24,12 +24,12 @@ export default function Home() {
           {/* Hero Section */}
           <div className="relative flex justify-start items-center h-screen">
             <Image
+              fill
+              priority
               alt="Home Head"
               className="object-cover w-full h-full"
-              src="/header/f92411b3.webp"
-              fill
               sizes="100vw"
-              priority
+              src="/header/f92411b3.webp"
             />
             <div className="absolute flex flex-col p-8">
               <p className="text-white text-2xl font-bold">Selamat Datang di</p>
@@ -97,12 +97,12 @@ export default function Home() {
             {/* Hero */}
             <div className="relative flex justify-start items-center h-screen">
               <Image
+                fill
+                priority
                 alt="Home Head"
                 className="object-cover w-full h-full brightness-60"
-                src="/header/f92411b3.webp"
-                fill
                 sizes="100vw"
-                priority
+                src="/header/f92411b3.webp"
               />
               <div className="absolute flex flex-col p-16">
                 <p className="text-white text-4xl font-bold">
@@ -142,7 +142,7 @@ export default function Home() {
                 sizes="100vw"
                 src="/header/5dd0a95e.webp"
               />
-              <div className="relative z-10 flex flex-col w-full p-8">
+              <div className="relative z-10 flex flex-col w-full p-10">
                 <ScheduleRow
                   jenisIbadah="Cell Group/Kelompok Kecil"
                   limit={4}

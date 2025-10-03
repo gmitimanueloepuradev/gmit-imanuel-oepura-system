@@ -8,6 +8,7 @@ import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
 import TextInput from "@/components/ui/inputs/TextInput";
 import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 import SkeletonInput from "@/components/ui/skeletons/SkeletonInput";
 import Stepper, {
   StepContent,
@@ -19,7 +20,6 @@ import { USER_ROLE_OPTIONS } from "@/constants/userRoles";
 import jemaatService from "@/services/jemaatService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
-import PageTitle from "@/components/ui/PageTitle";
 
 const steps = [
   {
@@ -76,9 +76,11 @@ export default function CreateJemaat() {
       idPendapatan: "",
       idJaminanKesehatan: "",
       // User fields
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
+      noWhatsapp: "",
       role: "JEMAAT",
       // Keluarga fields
       idStatusKeluarga: "",
@@ -86,6 +88,7 @@ export default function CreateJemaat() {
       idKeadaanRumah: "",
       idRayon: "",
       noBagungan: "",
+      noKK: "",
       // Alamat fields
       idKelurahan: "",
       rt: "",
@@ -137,7 +140,7 @@ export default function CreateJemaat() {
       queryKey: ["status-keluarga"],
       queryFn: () => masterService.getStatusKeluarga(),
       enabled: createKeluarga,
-    },
+    }
   );
 
   const {
@@ -176,10 +179,11 @@ export default function CreateJemaat() {
 
   const keluargaListOptions =
     keluargaList?.data?.items?.map((item) => {
-      const kepalaKeluarga = item.jemaats?.find(j =>
-        j.statusDalamKeluarga?.status?.toLowerCase().includes('kepala')
+      const kepalaKeluarga = item.jemaats?.find((j) =>
+        j.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
       );
-      const kepalaName = kepalaKeluarga?.nama || 'Belum ada kepala keluarga';
+      const kepalaName = kepalaKeluarga?.nama || "Belum ada kepala keluarga";
+
       return {
         value: item.id,
         label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
@@ -258,7 +262,7 @@ export default function CreateJemaat() {
       // Auto-set kepala keluarga status
       if (statusDalamKeluarga?.data?.items) {
         const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-          (status) => status.status.toLowerCase().includes("kepala"),
+          (status) => status.status.toLowerCase().includes("kepala")
         );
 
         if (kepalaKeluargaStatus) {
@@ -272,7 +276,7 @@ export default function CreateJemaat() {
   useEffect(() => {
     if (statusDalamKeluarga?.data?.items) {
       const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-        (status) => status.status.toLowerCase().includes("kepala"),
+        (status) => status.status.toLowerCase().includes("kepala")
       );
 
       if (
@@ -304,10 +308,10 @@ export default function CreateJemaat() {
         color: "success",
       });
 
-      // Invalidate rayon queries to update family counts (especially when creating kepala keluarga)
-      if (preSelectedKeluarga) {
-        queryClient.invalidateQueries({ queryKey: ["rayon"] });
-      }
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["jemaat"] });
+      queryClient.invalidateQueries({ queryKey: ["keluarga"] });
+      queryClient.invalidateQueries({ queryKey: ["rayon"] });
 
       // Redirect to keluarga page if this was a kepala keluarga creation
       router.push(preSelectedKeluarga ? "/admin/keluarga" : "/admin/jemaat");
@@ -359,8 +363,10 @@ export default function CreateJemaat() {
         }
 
         const userData = {
+          username: form.getValues("username"),
           email: form.getValues("email"),
           password: form.getValues("password"),
+          noWhatsapp: form.getValues("noWhatsapp") || null,
           role: form.getValues("role"),
         };
 
@@ -374,6 +380,7 @@ export default function CreateJemaat() {
         idKeadaanRumah: form.getValues("idKeadaanRumah"),
         idRayon: form.getValues("idRayon"),
         noBagungan: parseInt(form.getValues("noBagungan")),
+        noKK: form.getValues("noKK"),
       };
 
       setFormData((prev) => ({ ...prev, keluarga: keluargaData }));
@@ -388,6 +395,18 @@ export default function CreateJemaat() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleGenerateDefaultPassword = () => {
+    const defaultPassword = "oepura78";
+
+    form.setValue("password", defaultPassword);
+    form.setValue("confirmPassword", defaultPassword);
+    showToast({
+      title: "Password Generated",
+      description: `Password default "${defaultPassword}" berhasil diisi`,
+      color: "success",
+    });
   };
 
   const getMaxStep = () => {
@@ -409,9 +428,11 @@ export default function CreateJemaat() {
     "idPendapatan",
     "idJaminanKesehatan",
     "idKeluarga",
+    "username",
     "email",
     "password",
     "confirmPassword",
+    "noWhatsapp",
     "idStatusKeluarga",
     "idStatusKepemilikanRumah",
     "idKeadaanRumah",
@@ -456,7 +477,12 @@ export default function CreateJemaat() {
     }
 
     if (currentStep === 2 && createUserAccount) {
-      return values.email && values.password && values.confirmPassword;
+      return (
+        values.username &&
+        values.email &&
+        values.password &&
+        values.confirmPassword
+      );
     }
 
     if (currentStep === 3 && createKeluarga) {
@@ -488,10 +514,21 @@ export default function CreateJemaat() {
   };
 
   const handleSubmit = async () => {
+    // Get user data directly from form (in case user clicked submit without clicking "next" on step 2)
+    const userData = createUserAccount
+      ? {
+          username: form.getValues("username"),
+          email: form.getValues("email"),
+          password: form.getValues("password"),
+          noWhatsapp: form.getValues("noWhatsapp") || null,
+          role: form.getValues("role"),
+        }
+      : {};
+
     const submitData = {
       ...formData.jemaat,
       createUser: createUserAccount,
-      ...(createUserAccount && formData.user),
+      ...userData, // Use fresh data from form instead of formData.user
       createKeluarga,
       ...(createKeluarga && { keluargaData: formData.keluarga }),
       createAlamat: createKeluarga, // Always create alamat when creating keluarga
@@ -715,46 +752,94 @@ export default function CreateJemaat() {
                 </div>
 
                 {createUserAccount && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <TextInput
-                        label="Email"
-                        name="email"
-                        placeholder="contoh@email.com"
-                        required={createUserAccount}
-                        type="email"
-                      />
+                  <>
+                    <div className="mb-4">
+                      <button
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                        type="button"
+                        onClick={handleGenerateDefaultPassword}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                            fillRule="evenodd"
+                          />
+                        </svg>
+                        Generate Password Default (oepura78)
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Klik tombol di atas untuk mengisi password dengan
+                        default <strong>oepura78</strong>
+                      </p>
                     </div>
 
-                    <div>
-                      <AutoCompleteInput
-                        label="Role"
-                        name="role"
-                        options={USER_ROLE_OPTIONS}
-                        placeholder="Pilih role"
-                      />
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <TextInput
+                          label="Username"
+                          name="username"
+                          placeholder="Username untuk login"
+                          required={createUserAccount}
+                          type="text"
+                        />
+                      </div>
 
-                    <div>
-                      <TextInput
-                        label="Password"
-                        name="password"
-                        placeholder="Minimal 8 karakter"
-                        required={createUserAccount}
-                        type="password"
-                      />
-                    </div>
+                      <div>
+                        <TextInput
+                          label="Email"
+                          name="email"
+                          placeholder="contoh@email.com"
+                          required={createUserAccount}
+                          type="email"
+                        />
+                      </div>
 
-                    <div>
-                      <TextInput
-                        label="Konfirmasi Password"
-                        name="confirmPassword"
-                        placeholder="Ulangi password"
-                        required={createUserAccount}
-                        type="password"
-                      />
+                      <div>
+                        <TextInput
+                          label="No. WhatsApp"
+                          name="noWhatsapp"
+                          placeholder="08123456789"
+                          required={true}
+                          type="tel"
+                        />
+                      </div>
+
+                      <div>
+                        <AutoCompleteInput
+                          label="Role"
+                          name="role"
+                          options={USER_ROLE_OPTIONS}
+                          placeholder="Pilih role"
+                        />
+                      </div>
+
+                      <div>
+                        <TextInput
+                          label="Password"
+                          name="password"
+                          placeholder="Masukkan password"
+                          required={createUserAccount}
+                          type="password"
+                        />
+                      </div>
+
+                      <div>
+                        <TextInput
+                          label="Konfirmasi Password"
+                          name="confirmPassword"
+                          placeholder="Ulangi password"
+                          required={createUserAccount}
+                          type="password"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </StepContent>
             )}
@@ -835,6 +920,17 @@ export default function CreateJemaat() {
                       placeholder="Masukkan nomor bagungan"
                       required={createKeluarga}
                       type="number"
+                    />
+                  </div>
+
+                  <div>
+                    <TextInput
+                      required
+                      label="No. Kartu Keluarga (KK)"
+                      maxLength={16}
+                      name="noKK"
+                      placeholder="Masukkan nomor KK (16 digit)"
+                      type="text"
                     />
                   </div>
                 </div>

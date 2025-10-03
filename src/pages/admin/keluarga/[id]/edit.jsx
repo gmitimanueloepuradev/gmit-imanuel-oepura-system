@@ -23,6 +23,7 @@ export default function EditKeluargaPage() {
     resolver: zodResolver(keluargaEditSchema),
     defaultValues: {
       noBagungan: "",
+      noKK: "",
       idRayon: "",
       idStatusKeluarga: "",
       idStatusKepemilikanRumah: "",
@@ -90,6 +91,7 @@ export default function EditKeluargaPage() {
       const keluarga = keluargaData.data;
       reset({
         noBagungan: keluarga.noBagungan || "",
+        noKK: keluarga.noKK || "",
         idRayon: keluarga.idRayon || "",
         idStatusKeluarga: keluarga.idStatusKeluarga || "",
         idStatusKepemilikanRumah: keluarga.idStatusKepemilikanRumah || "",
@@ -158,6 +160,12 @@ export default function EditKeluargaPage() {
               label="No. Bangunan"
               name="noBagungan"
               placeholder="Masukkan no. bangunan"
+            />
+
+            <TextInput
+              label="No. Kartu Keluarga (KK)"
+              name="noKK"
+              placeholder="Masukkan no. kartu keluarga"
             />
 
             <SelectInput

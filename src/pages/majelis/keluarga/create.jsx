@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 // Validation schema for majelis keluarga creation
 const keluargaSchema = z.object({
   noBagungan: z.string().min(1, "No. Bangunan wajib diisi"),
+  noKK: z.string().min(1, "No. Kartu Keluarga (KK) wajib diisi"),
   rt: z.string().min(1, "RT wajib diisi"),
   rw: z.string().min(1, "RW wajib diisi"),
   jalan: z.string().min(1, "Alamat jalan wajib diisi"),
@@ -39,6 +40,7 @@ function MajelisCreateKeluarga() {
     resolver: zodResolver(keluargaSchema),
     defaultValues: {
       noBagungan: "",
+      noKK: "",
       rt: "",
       rw: "",
       jalan: "",
@@ -109,6 +111,7 @@ function MajelisCreateKeluarga() {
       // Then create keluarga with the alamat ID and majelis's rayon
       const keluargaData = {
         noBagungan: parseInt(data.noBagungan),
+        noKK: data.noKK,
         idAlamat: alamatResponse.data.id,
         idRayon: user.majelis?.idRayon, // Use majelis's rayon automatically
         idStatusKeluarga: data.idStatusKeluarga || null,
@@ -230,6 +233,15 @@ function MajelisCreateKeluarga() {
                       label="No. Bangunan"
                       placeholder="Contoh: 123"
                       type="number"
+                    />
+
+                    <TextInput
+                      {...register("noKK")}
+                      required
+                      error={errors.noKK?.message}
+                      label="No. Kartu Keluarga (KK)"
+                      maxLength={16}
+                      placeholder="Masukkan nomor KK (16 digit)"
                     />
                   </div>
 

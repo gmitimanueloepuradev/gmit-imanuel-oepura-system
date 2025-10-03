@@ -61,43 +61,39 @@ async function handlePost(req, res) {
         .json(apiResponse(false, null, "User sudah memiliki profil lengkap"));
     }
 
-    // Validate tokenPayload.keluargaId exists
-    if (!tokenPayload.keluargaId) {
-      return res
-        .status(400)
-        .json(apiResponse(false, null, "Token tidak valid: ID keluarga tidak ditemukan"));
-    }
-
-    // Verify keluarga still exists
-    const keluarga = await prisma.keluarga.findUnique({
-      where: { id: tokenPayload.keluargaId },
-      select: {
-        id: true,
-        noBagungan: true,
-        rayon: {
-          select: {
-            id: true,
-            namaRayon: true
-          }
-        },
-        jemaats: {
-          where: {
-            statusDalamKeluarga: {
-              status: "Kepala Keluarga"
+    // Verify keluarga if keluargaId is provided (optional)
+    let keluarga = null;
+    if (tokenPayload.keluargaId) {
+      keluarga = await prisma.keluarga.findUnique({
+        where: { id: tokenPayload.keluargaId },
+        select: {
+          id: true,
+          noBagungan: true,
+          rayon: {
+            select: {
+              id: true,
+              namaRayon: true
             }
           },
-          select: {
-            nama: true
-          },
-          take: 1
+          jemaats: {
+            where: {
+              statusDalamKeluarga: {
+                status: "Kepala Keluarga"
+              }
+            },
+            select: {
+              nama: true
+            },
+            take: 1
+          }
         }
-      }
-    });
+      });
 
-    if (!keluarga) {
-      return res
-        .status(404)
-        .json(apiResponse(false, null, "Keluarga tidak ditemukan"));
+      if (!keluarga) {
+        return res
+          .status(404)
+          .json(apiResponse(false, null, "Keluarga tidak ditemukan"));
+      }
     }
 
     return res
@@ -109,12 +105,12 @@ async function handlePost(req, res) {
           username: user.username,
           email: user.email
         },
-        keluarga: {
+        keluarga: keluarga ? {
           id: keluarga.id,
           noBagungan: keluarga.noBagungan,
           namaKepalaKeluarga: keluarga.jemaats[0]?.nama || null,
           rayon: keluarga.rayon
-        },
+        } : null,
         expiresAt: new Date(tokenPayload.exp * 1000).toISOString() // Convert JWT exp to ISO string
       }, "Token undangan valid"));
 

@@ -278,6 +278,14 @@ function DetailJemaatMajelisPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        No. Kartu Keluarga (KK)
+                      </label>
+                      <p className="text-gray-900 dark:text-gray-100">
+                        {jemaat.keluarga?.noKK || '-'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         No. Bangunan
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">

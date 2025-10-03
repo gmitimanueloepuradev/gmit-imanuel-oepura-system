@@ -14,59 +14,74 @@ import {
   UserCheck,
   UserX,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CreateModal from "@/components/ui/CreateModal";
 import EditModal from "@/components/ui/EditModal";
-import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import ListGrid from "@/components/ui/ListGrid";
 import PhoneInput from "@/components/ui/PhoneInput";
 import ViewModal from "@/components/ui/ViewModal";
+import { useAuth } from "@/contexts/AuthContext";
 import axios from "@/lib/axios";
 import jemaatService from "@/services/jemaatService";
 import keluargaService from "@/services/keluargaService";
-import rayonService from "@/services/rayonService";
-import userService from "@/services/userService";
 
-export default function UsersPage() {
+function MajelisAkunJemaatPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [jemaatOptions, setJemaatOptions] = useState([]);
   const [keluargaOptions, setKeluargaOptions] = useState([]);
-  const [rayonOptions, setRayonOptions] = useState([]);
+  const [pageSize, setPageSize] = useState(10);
+  const [rayonInfo, setRayonInfo] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importResults, setImportResults] = useState(null);
   const [showInvitationModal, setShowInvitationModal] = useState(false);
   const [selectedUserForInvitation, setSelectedUserForInvitation] =
     useState(null);
   const [showAccountDataModal, setShowAccountDataModal] = useState(false);
   const [selectedUserForAccountData, setSelectedUserForAccountData] =
     useState(null);
-  const [pageSize, setPageSize] = useState(10);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importFile, setImportFile] = useState(null);
-  const [importResults, setImportResults] = useState(null);
   const fileInputRef = useRef(null);
-  // const [showAssignRayonModal, setShowAssignRayonModal] = useState(false);
-  // const [selectedUserForRayon, setSelectedUserForRayon] = useState(null);
 
-  // Fetch users data
+  // Fetch users data for majelis's rayon
   const { data, isLoading, error } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => userService.getAll(),
+    queryKey: ["majelis-users"],
+    queryFn: async () => {
+      const response = await axios.get("/majelis/users");
+
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
   });
 
-  // Fetch jemaat, keluarga, and rayon data for select options
+  // Update rayon info when data is loaded
+  useEffect(() => {
+    if (data?.data?.rayonInfo) {
+      setRayonInfo(data.data.rayonInfo);
+    }
+  }, [data]);
+
+  // Fetch jemaat and keluarga options for the rayon
   useEffect(() => {
     const fetchOptions = async () => {
+      if (!user?.majelis?.idRayon) return;
+
       try {
         // Fetch jemaat options
-        const jemaatResponse = await jemaatService.getAll({ limit: 1000 });
+        const jemaatResponse = await jemaatService.getAll({
+          limit: 1000,
+          idRayon: user.majelis.idRayon,
+        });
+
         const jemaatOptions =
           jemaatResponse.data?.items?.map((jemaat) => ({
             value: jemaat.id,
@@ -76,7 +91,10 @@ export default function UsersPage() {
         setJemaatOptions(jemaatOptions);
 
         // Fetch keluarga options
-        const keluargaResponse = await keluargaService.getAll({ limit: 1000 });
+        const keluargaResponse = await keluargaService.getAll({
+          limit: 1000,
+          idRayon: user.majelis.idRayon,
+        });
         const keluargaOptions =
           keluargaResponse.data?.items?.map((keluarga) => {
             const kepalaKeluarga = keluarga.jemaats?.find(
@@ -92,23 +110,13 @@ export default function UsersPage() {
           }) || [];
 
         setKeluargaOptions(keluargaOptions);
-
-        // Fetch rayon options
-        const rayonResponse = await rayonService.getRayon({ limit: 1000 });
-        const rayonOptions =
-          rayonResponse.data?.items?.map((rayon) => ({
-            value: rayon.id,
-            label: rayon.namaRayon,
-          })) || [];
-
-        setRayonOptions(rayonOptions);
       } catch (error) {
         console.error("Failed to fetch options:", error);
       }
     };
 
     fetchOptions();
-  }, []);
+  }, [user]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -158,60 +166,10 @@ export default function UsersPage() {
       ),
     },
     {
-      key: "role",
-      label: "Role",
-      type: "badge",
-      render: (value) => {
-        const badgeClass =
-          value === "ADMIN"
-            ? "bg-purple-100 text-purple-800"
-            : value === "JEMAAT"
-              ? "bg-green-100 text-green-800"
-              : value === "PENDETA"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-800";
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}
-          >
-            {value || "-"}
-          </span>
-        );
-      },
-    },
-    {
       key: "jemaat",
       label: "Nama Jemaat",
       type: "text",
       render: (value) => value?.nama || "-",
-    },
-    {
-      key: "rayon",
-      label: "Rayon",
-      type: "text",
-      render: (value, row) => {
-        const rayonName = row.rayon?.namaRayon;
-
-        // Hanya tampilkan badge "Belum di-assign" untuk role JEMAAT
-        if (!rayonName) {
-          if (row.role === "JEMAAT") {
-            return (
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                Belum di-assign
-              </span>
-            );
-          }
-
-          return <span className="text-sm text-gray-500">-</span>;
-        }
-
-        return (
-          <span className="text-sm text-gray-700 dark:text-gray-100">
-            {rayonName}
-          </span>
-        );
-      },
     },
     {
       key: "jenisKelamin",
@@ -282,83 +240,49 @@ export default function UsersPage() {
         item?.jemaat?.tanggalLahir ? formatDate(item.jemaat.tanggalLahir) : "-",
     },
     {
-      key: "rayon",
-      label: "Rayon",
-      getValue: (item) => item?.jemaat?.keluarga?.rayon?.namaRayon || "-",
-    },
-    {
       key: "createdAt",
       label: "Tanggal Dibuat",
       getValue: (item) => formatDate(item?.createdAt),
     },
   ];
 
-  const formFields = useMemo(
-    () => [
-      {
-        key: "username",
-        label: "Username",
-        type: "text",
-        required: true,
-        placeholder: "Masukkan username (unik)",
-      },
-      {
-        key: "email",
-        label: "Email",
-        type: "email",
-        required: true,
-        placeholder: "Masukkan email user",
-      },
-      {
-        key: "noWhatsapp",
-        label: "No. WhatsApp",
-        type: "tel",
-        required: false,
-        placeholder: "Masukkan nomor WhatsApp (opsional)",
-      },
-      {
-        key: "password",
-        label: "Password",
-        type: "password",
-        required: true,
-        placeholder: "Default: oepura78",
-        defaultValue: "oepura78",
-        description:
-          "Default password: oepura78. User dapat mengubahnya setelah login.",
-      },
-      {
-        key: "role",
-        label: "Role",
-        type: "select",
-        required: true,
-        options: [
-          { value: "ADMIN", label: "Admin" },
-          { value: "JEMAAT", label: "Jemaat" },
-          { value: "MAJELIS", label: "Majelis" },
-          { value: "PENDETA", label: "Pendeta" },
-          { value: "EMPLOYEE", label: "Pegawai" },
-        ],
-      },
-      {
-        key: "idJemaat",
-        label: "Pilih Jemaat (Opsional)",
-        type: "select",
-        options: jemaatOptions,
-        placeholder: "Pilih jemaat jika role = JEMAAT",
-      },
-      {
-        key: "idRayon",
-        label: "Pilih Rayon",
-        type: "select",
-        required: false,
-        options: rayonOptions,
-        placeholder: "Pilih rayon untuk user ini (opsional)",
-        condition: (formData) =>
-          formData.role === "JEMAAT" || formData.role === "MAJELIS",
-      },
-    ],
-    [jemaatOptions, rayonOptions]
-  );
+  const formFields = [
+    {
+      key: "username",
+      label: "Username",
+      type: "text",
+      required: true,
+      placeholder: "Masukkan username (unik)",
+    },
+    {
+      key: "email",
+      label: "Email",
+      type: "email",
+      required: true,
+      placeholder: "Masukkan email user",
+    },
+    {
+      key: "noWhatsapp",
+      label: "No. WhatsApp",
+      type: "tel",
+      required: false,
+      placeholder: "Masukkan nomor WhatsApp (opsional)",
+    },
+    {
+      key: "password",
+      label: "Password",
+      type: "password",
+      required: true,
+      placeholder: "Masukkan password",
+    },
+    {
+      key: "idJemaat",
+      label: "Pilih Jemaat (Opsional)",
+      type: "select",
+      options: jemaatOptions,
+      placeholder: "Pilih jemaat untuk akun ini",
+    },
+  ];
 
   // Format nomor WhatsApp dengan prefix +62
   const formatWhatsAppNumber = (number) => {
@@ -381,14 +305,16 @@ export default function UsersPage() {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => userService.delete(id),
+    mutationFn: (id) => axios.delete(`/majelis/users/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User berhasil dihapus");
+      queryClient.invalidateQueries({ queryKey: ["majelis-users"] });
+      toast.success("Akun jemaat berhasil dihapus");
       setDeleteItem(null);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Gagal menghapus user");
+      toast.error(
+        error?.response?.data?.message || "Gagal menghapus akun jemaat"
+      );
     },
   });
 
@@ -403,15 +329,17 @@ export default function UsersPage() {
         cleanData.noWhatsapp = null;
       }
 
-      return userService.update(id, cleanData);
+      return axios.patch(`/majelis/users/${id}`, cleanData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["majelis-users"] });
+      toast.success("Akun jemaat berhasil diperbarui");
       setEditItem(null);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Gagal memperbarui user");
+      toast.error(
+        error?.response?.data?.message || "Gagal memperbarui akun jemaat"
+      );
     },
   });
 
@@ -434,25 +362,114 @@ export default function UsersPage() {
 
       console.log("Sending user data:", cleanData);
 
-      return userService.create(cleanData);
+      return axios.post("/majelis/users", cleanData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User berhasil ditambahkan");
+      queryClient.invalidateQueries({ queryKey: ["majelis-users"] });
+      toast.success("Akun jemaat berhasil ditambahkan");
       setShowCreate(false);
     },
     onError: (error) => {
       console.error("Create user error:", error);
-      toast.error(error?.response?.data?.message || "Gagal menambahkan user");
+      toast.error(
+        error?.response?.data?.message || "Gagal menambahkan akun jemaat"
+      );
     },
   });
 
+  // Handle template download
+  const handleDownloadTemplate = async () => {
+    try {
+      const response = await axios.get("/majelis/users/template", {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `template_import_akun_jemaat_rayon_${rayonInfo?.namaRayon || "data"}.xlsx`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Template berhasil diunduh");
+    } catch (error) {
+      console.error("Download template error:", error);
+      toast.error("Gagal mengunduh template");
+    }
+  };
+
+  // Handle import file selection
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      setImportFile(file);
+    }
+  };
+
+  // Import mutation with 60 second timeout
+  const importMutation = useMutation({
+    mutationFn: async (file) => {
+      const formData = new FormData();
+
+      formData.append("file", file);
+
+      const response = await axios.post("/majelis/users/import", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 60000, // 60 seconds timeout
+      });
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["majelis-users"] });
+      setImportResults(data.data);
+      setShowImportModal(false);
+      setImportFile(null);
+
+      if (data.data.summary.failed === 0) {
+        toast.success(
+          `Berhasil import ${data.data.summary.success} akun jemaat`
+        );
+      } else {
+        toast.warning(
+          `Import selesai: ${data.data.summary.success} berhasil, ${data.data.summary.failed} gagal`
+        );
+      }
+    },
+    onError: (error) => {
+      console.error("Import error:", error);
+      toast.error(
+        error?.response?.data?.message || "Gagal import data akun jemaat"
+      );
+    },
+  });
+
+  const handleImportSubmit = () => {
+    if (!importFile) {
+      toast.error("Pilih file Excel terlebih dahulu");
+
+      return;
+    }
+
+    importMutation.mutate(importFile);
+  };
+
   const invitationMutation = useMutation({
-    mutationFn: async ({ userId, keluargaId, whatsappNumber }) => {
+    mutationFn: async ({ userId, keluargaId, whatsappNumber, password }) => {
       const response = await axios.post("/auth/generate-invitation", {
         userId,
         keluargaId,
         whatsappNumber,
+        password,
       });
 
       return response.data;
@@ -535,140 +552,6 @@ export default function UsersPage() {
     setShowAccountDataModal(true);
   };
 
-  const [showAssignRayonModal, setShowAssignRayonModal] = useState(false);
-  const [selectedUserForRayon, setSelectedUserForRayon] = useState(null);
-
-  // const assignRayonMutation = useMutation({
-  //   mutationFn: async ({ userId, idRayon }) => {
-  //     const response = await axios.patch(`/users/${userId}/rayon`, {
-  //       idRayon,
-  //     });
-
-  //     return response.data;
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["users"] });
-  //     toast.success("Rayon berhasil ditetapkan!");
-  //     setShowAssignRayonModal(false);
-  //     setSelectedUserForRayon(null);
-  //   },
-  //   onError: (error) => {
-  //     console.error("Assign rayon error:", error);
-  //     toast.error(error?.response?.data?.message || "Gagal menetapkan rayon");
-  //   },
-  // });
-
-  // const handleAssignRayon = (user) => {
-  //   setSelectedUserForRayon(user);
-  //   setShowAssignRayonModal(true);
-  // };
-
-  // Assign rayon mutation
-  const assignRayonMutation = useMutation({
-    mutationFn: async ({ userId, idRayon }) => {
-      const response = await axios.post("/users/assign-rayon", {
-        userId,
-        idRayon,
-      });
-
-      return response.data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success(data.message || "Berhasil assign rayon ke user");
-      setShowAssignRayonModal(false);
-      setSelectedUserForRayon(null);
-    },
-    onError: (error) => {
-      console.error("Assign rayon error:", error);
-      toast.error(error?.response?.data?.message || "Gagal assign rayon");
-    },
-  });
-
-  const handleAssignRayon = (user) => {
-    setSelectedUserForRayon(user);
-    setShowAssignRayonModal(true);
-  };
-
-  // Handle template download
-  const handleDownloadTemplate = async () => {
-    try {
-      const response = await axios.get("/users/template", {
-        responseType: "blob",
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.setAttribute("download", "template_import_users.xlsx");
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast.success("Template berhasil diunduh");
-    } catch (error) {
-      console.error("Download template error:", error);
-      toast.error("Gagal mengunduh template");
-    }
-  };
-
-  // Handle import file selection
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      setImportFile(file);
-    }
-  };
-
-  // Import mutation with 60 second timeout
-  const importMutation = useMutation({
-    mutationFn: async (file) => {
-      const formData = new FormData();
-
-      formData.append("file", file);
-
-      const response = await axios.post("/users/import", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 60000, // 60 seconds timeout
-      });
-
-      return response.data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setImportResults(data.data);
-      setShowImportModal(false);
-      setImportFile(null);
-
-      if (data.data.summary.failed === 0) {
-        toast.success(`Berhasil import ${data.data.summary.success} user`);
-      } else {
-        toast.warning(
-          `Import selesai: ${data.data.summary.success} berhasil, ${data.data.summary.failed} gagal`
-        );
-      }
-    },
-    onError: (error) => {
-      console.error("Import error:", error);
-      toast.error(error?.response?.data?.message || "Gagal import data user");
-    },
-  });
-
-  const handleImportSubmit = () => {
-    if (!importFile) {
-      toast.error("Pilih file Excel terlebih dahulu");
-
-      return;
-    }
-
-    importMutation.mutate(importFile);
-  };
-
   // Enhanced search function
   const enhancedSearch = (item, searchTerm) => {
     if (!searchTerm) return true;
@@ -680,55 +563,29 @@ export default function UsersPage() {
       (item.username || "").toLowerCase().includes(searchLower) ||
       (item.email || "").toLowerCase().includes(searchLower) ||
       (item.noWhatsapp || "").toLowerCase().includes(searchLower) ||
-      (item.jemaat?.nama || "").toLowerCase().includes(searchLower) ||
-      (item.role || "").toLowerCase().includes(searchLower) ||
-      (item.rayon?.namaRayon || "").toLowerCase().includes(searchLower)
+      (item.jemaat?.nama || "").toLowerCase().includes(searchLower)
     );
   };
 
   // Create filter options based on available data
-  const userFilters = useMemo(() => {
-    const filters = [
-      {
-        key: "role",
-        label: "Semua Role",
-        options: [
-          { value: "ADMIN", label: "Admin" },
-          { value: "JEMAAT", label: "Jemaat" },
-          { value: "MAJELIS", label: "Majelis" },
-          { value: "PENDETA", label: "Pendeta" },
-          { value: "EMPLOYEE", label: "Pegawai" },
-        ],
-      },
-      {
-        key: "hasJemaat",
-        label: "Status Profil",
-        options: [
-          { value: "true", label: "Profil Lengkap" },
-          { value: "false", label: "Belum Lengkap" },
-        ],
-      },
-      {
-        key: "hasWhatsapp",
-        label: "Status WhatsApp",
-        options: [
-          { value: "true", label: "Ada WhatsApp" },
-          { value: "false", label: "Belum Ada WhatsApp" },
-        ],
-      },
-    ];
-
-    // Add rayon filter if rayon options are available
-    if (rayonOptions.length > 0) {
-      filters.push({
-        key: "rayonId",
-        label: "Semua Rayon",
-        options: rayonOptions,
-      });
-    }
-
-    return filters;
-  }, [rayonOptions]);
+  const userFilters = [
+    {
+      key: "hasJemaat",
+      label: "Status Profil",
+      options: [
+        { value: "true", label: "Profil Lengkap" },
+        { value: "false", label: "Belum Lengkap" },
+      ],
+    },
+    {
+      key: "hasWhatsapp",
+      label: "Status WhatsApp",
+      options: [
+        { value: "true", label: "Ada WhatsApp" },
+        { value: "false", label: "Belum Ada WhatsApp" },
+      ],
+    },
+  ];
 
   // Custom filter function
   const customFilterFunction = (item, filters) => {
@@ -736,8 +593,6 @@ export default function UsersPage() {
       if (!filterValue || filterValue === "all") return true;
 
       switch (filterKey) {
-        case "role":
-          return item.role === filterValue;
         case "hasJemaat":
           const hasJemaat = !!item.idJemaat;
 
@@ -746,8 +601,6 @@ export default function UsersPage() {
           const hasWhatsapp = !!item.noWhatsapp;
 
           return hasWhatsapp.toString() === filterValue;
-        case "rayonId":
-          return item.idRayon === filterValue;
         default:
           return item[filterKey] === filterValue;
       }
@@ -755,21 +608,21 @@ export default function UsersPage() {
   };
 
   return (
-    <>
+    <ProtectedRoute allowedRoles={["MAJELIS"]}>
       <ListGrid
         breadcrumb={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Users" },
+          { label: "Dashboard", href: "/majelis/dashboard" },
+          { label: "Kelola Akun Jemaat" },
         ]}
         columns={columns}
         customFilterFunction={customFilterFunction}
         customSearchFunction={enhancedSearch}
         data={data?.data?.items || []}
-        description="Kelola data pengguna sistem"
+        description={`Kelola akun jemaat untuk rayon ${rayonInfo?.namaRayon || "Anda"}`}
         emptyStateProps={{
-          title: "Belum Ada Data User",
-          description: "Mulai dengan menambahkan user pertama",
-          actionLabel: "Tambah User",
+          title: "Belum Ada Akun Jemaat",
+          description: "Mulai dengan menambahkan akun jemaat pertama",
+          actionLabel: "Tambah Akun",
           onAction: () => setShowCreate(true),
         }}
         error={error}
@@ -787,11 +640,6 @@ export default function UsersPage() {
           {
             key: "noWhatsapp",
             label: "No WhatsApp",
-            type: "text",
-          },
-          {
-            key: "role",
-            label: "Role",
             type: "text",
           },
           {
@@ -816,7 +664,7 @@ export default function UsersPage() {
             type: "datetime",
           },
         ]}
-        exportFilename="users"
+        exportFilename={`akun-jemaat-rayon-${rayonInfo?.namaRayon || "data"}`}
         exportable={true}
         filters={userFilters}
         headerActions={[
@@ -827,7 +675,7 @@ export default function UsersPage() {
             variant: "outline",
           },
           {
-            label: "Import Users",
+            label: "Import Akun",
             icon: Upload,
             onClick: () => setShowImportModal(true),
             variant: "default",
@@ -848,7 +696,7 @@ export default function UsersPage() {
             icon: Edit,
             onClick: (item) => setEditItem(item),
             variant: "outline",
-            tooltip: "Edit user",
+            tooltip: "Edit akun",
           },
           {
             label: "Kirim Self Onboarding",
@@ -868,33 +716,25 @@ export default function UsersPage() {
             condition: (item) => item.noWhatsapp,
           },
           {
-            label: "Atur Rayon",
-            icon: User,
-            onClick: (item) => handleAssignRayon(item),
-            variant: "outline",
-            tooltip: "Atur Rayon untuk User",
-            condition: (item) => item.role === "JEMAAT",
-          },
-          {
             label: "Hapus",
             icon: Trash2,
             onClick: (item) => setDeleteItem(item),
             variant: "outline",
-            tooltip: "Hapus user",
+            tooltip: "Hapus akun",
           },
         ]}
-        searchPlaceholder="Cari username, email, nama jemaat, role, rayon..."
+        searchPlaceholder="Cari username, email, nama jemaat..."
         searchable={true}
         showPageSizeSelector={true}
-        title="Manajemen Users"
+        title="Kelola Akun Jemaat"
         onAdd={() => setShowCreate(true)}
       />
 
       <ConfirmDialog
         isLoading={deleteMutation.isPending}
         isOpen={!!deleteItem}
-        message={`Apakah Anda yakin ingin menghapus user "${deleteItem?.username}" (${deleteItem?.email})? Data yang sudah dihapus tidak dapat dikembalikan.`}
-        title="Hapus User"
+        message={`Apakah Anda yakin ingin menghapus akun "${deleteItem?.username}" (${deleteItem?.email})? Data yang sudah dihapus tidak dapat dikembalikan.`}
+        title="Hapus Akun Jemaat"
         variant="danger"
         onClose={() => setDeleteItem(null)}
         onConfirm={() => deleteMutation.mutate(deleteItem.id)}
@@ -912,7 +752,7 @@ export default function UsersPage() {
             : []
         }
         isOpen={!!viewItem}
-        title="Detail User"
+        title="Detail Akun Jemaat"
         onClose={() => setViewItem(null)}
       />
 
@@ -921,7 +761,7 @@ export default function UsersPage() {
         initialData={editItem}
         isLoading={updateMutation.isPending}
         isOpen={!!editItem}
-        title="Edit User"
+        title="Edit Akun Jemaat"
         onClose={() => setEditItem(null)}
         onSubmit={(formData) =>
           updateMutation.mutate({ id: editItem.id, data: formData })
@@ -932,102 +772,14 @@ export default function UsersPage() {
         fields={formFields}
         isLoading={createMutation.isPending}
         isOpen={showCreate}
-        title="Tambah User"
+        title="Tambah Akun Jemaat"
         onClose={() => setShowCreate(false)}
         onSubmit={(formData) => createMutation.mutate(formData)}
       />
 
-      {/* Invitation Modal */}
-      <CreateModal
-        description="Link self onboarding akan dikirim melalui WhatsApp yang berlaku selama 7 hari."
-        fields={[
-          {
-            key: "userInfo",
-            label: "Informasi User",
-            type: "display",
-            value: selectedUserForInvitation
-              ? `${selectedUserForInvitation.username} (${selectedUserForInvitation.email})`
-              : "-",
-          },
-          {
-            key: "whatsappNumber",
-            label: "No. WhatsApp",
-            type: "custom",
-            component: PhoneInput,
-            value: selectedUserForInvitation?.noWhatsapp || "",
-            placeholder: "Masukkan nomor WhatsApp jika kosong",
-          },
-          {
-            key: "keluargaId",
-            label: "Pilih Keluarga",
-            type: "select",
-            required: false,
-            options: keluargaOptions,
-            placeholder: "Pilih keluarga untuk user ini (opsional)",
-            description:
-              "Kosongkan jika jemaat akan mencari sendiri dengan No. KK saat onboarding",
-          },
-        ]}
-        isLoading={invitationMutation.isPending}
-        isOpen={showInvitationModal}
-        submitLabel="Kirim Link"
-        title="Kirim Self Onboarding via WhatsApp"
-        onClose={() => {
-          setShowInvitationModal(false);
-          setSelectedUserForInvitation(null);
-        }}
-        onSubmit={(formData) =>
-          invitationMutation.mutate({
-            userId: selectedUserForInvitation?.id,
-            keluargaId: formData.keluargaId,
-            whatsappNumber:
-              selectedUserForInvitation?.noWhatsapp || formData.whatsappNumber,
-          })
-        }
-      />
-
-      {/* Account Data Modal */}
-      <CreateModal
-        description="Info akun (username, email) dan password default akan dikirim melalui WhatsApp. User dapat login dan segera mengganti password sesuai keinginan."
-        fields={[
-          {
-            key: "userInfo",
-            label: "Informasi User",
-            type: "display",
-            value: selectedUserForAccountData
-              ? `${selectedUserForAccountData.username} (${selectedUserForAccountData.email}) - ${selectedUserForAccountData.role}`
-              : "-",
-          },
-          {
-            key: "whatsappNumber",
-            label: "No. WhatsApp",
-            type: "custom",
-            component: PhoneInput,
-            value: selectedUserForAccountData?.noWhatsapp || "",
-            placeholder: "Masukkan nomor WhatsApp jika kosong",
-            required: false,
-          },
-        ]}
-        isLoading={accountDataMutation.isPending}
-        isOpen={showAccountDataModal}
-        submitLabel="Kirim Info Akun"
-        title="Kirim Info Akun via WhatsApp"
-        onClose={() => {
-          setShowAccountDataModal(false);
-          setSelectedUserForAccountData(null);
-        }}
-        onSubmit={(formData) =>
-          accountDataMutation.mutate({
-            userId: selectedUserForAccountData?.id,
-            whatsappNumber:
-              selectedUserForAccountData?.noWhatsapp || formData.whatsappNumber,
-          })
-        }
-      />
-
       {/* Import Modal */}
       <CreateModal
-        description="Upload file Excel untuk import data user. Download template terlebih dahulu untuk format yang benar."
+        description="Upload file Excel untuk import akun jemaat. Download template terlebih dahulu untuk format yang benar."
         fields={[
           {
             key: "fileInfo",
@@ -1066,11 +818,10 @@ export default function UsersPage() {
                     <li>email - Email unik untuk user (wajib)</li>
                     <li>password - Password untuk user (wajib)</li>
                     <li>noWhatsapp - Nomor WhatsApp (opsional)</li>
-                    <li>
-                      role - Role user: ADMIN, JEMAAT, MAJELIS, EMPLOYEE,
-                      PENDETA (wajib)
-                    </li>
                   </ul>
+                  <p className="mt-2 text-sm text-blue-800 font-medium">
+                    Semua akun yang diimport otomatis menjadi role JEMAAT
+                  </p>
                 </div>
               </div>
             ),
@@ -1079,7 +830,7 @@ export default function UsersPage() {
         isLoading={importMutation.isPending}
         isOpen={showImportModal}
         submitLabel="Import Data"
-        title="Import Users dari Excel"
+        title="Import Akun Jemaat dari Excel"
         onClose={() => {
           setShowImportModal(false);
           setImportFile(null);
@@ -1142,49 +893,112 @@ export default function UsersPage() {
           ]}
           isOpen={!!importResults}
           submitLabel="Tutup"
-          title="Hasil Import Users"
+          title="Hasil Import Akun Jemaat"
           onClose={() => setImportResults(null)}
           onSubmit={() => setImportResults(null)}
         />
       )}
 
-      {/* Assign Rayon Modal */}
+      {/* Invitation Modal */}
       <CreateModal
-        description="Pilih rayon untuk mengaitkan user dengan rayon tertentu. Ini akan memudahkan dalam pengelolaan data berdasarkan wilayah."
+        description="Link self onboarding akan dikirim melalui WhatsApp yang berlaku selama 7 hari."
         fields={[
           {
             key: "userInfo",
             label: "Informasi User",
             type: "display",
-            value: selectedUserForRayon
-              ? `${selectedUserForRayon.username} (${selectedUserForRayon.email}) - ${selectedUserForRayon.role}`
+            value: selectedUserForInvitation
+              ? `${selectedUserForInvitation.username} (${selectedUserForInvitation.email})`
               : "-",
           },
           {
-            key: "idRayon",
-            label: "Pilih Rayon",
+            key: "whatsappNumber",
+            label: "No. WhatsApp",
             type: "custom",
-            component: AutoCompleteInput,
-            apiEndpoint: "/rayon/options",
+            component: PhoneInput,
+            value: selectedUserForInvitation?.noWhatsapp || "",
+            placeholder: "Masukkan nomor WhatsApp jika kosong",
+          },
+          {
+            key: "keluargaId",
+            label: "Pilih Keluarga",
+            type: "select",
+            required: false,
+            options: keluargaOptions,
+            placeholder: "Pilih keluarga untuk user ini (opsional)",
+            description:
+              "Kosongkan jika jemaat akan mencari sendiri dengan No. KK saat onboarding",
+          },
+          {
+            key: "password",
+            label: "Password",
+            type: "password",
             required: true,
-            placeholder: "Ketik untuk mencari rayon...",
+            placeholder: "Default: oepura78",
+            defaultValue: "oepura78",
+            description:
+              "Password default: oepura78. Password akan ditampilkan di pesan WhatsApp agar jemaat bisa login setelah lengkapi data.",
           },
         ]}
-        isLoading={assignRayonMutation.isPending}
-        isOpen={!!showAssignRayonModal}
-        submitLabel="Atur Rayon"
-        title="Atur Rayon untuk User"
+        isLoading={invitationMutation.isPending}
+        isOpen={showInvitationModal}
+        submitLabel="Kirim Link"
+        title="Kirim Self Onboarding via WhatsApp"
         onClose={() => {
-          setShowAssignRayonModal(false);
-          setSelectedUserForRayon(null);
+          setShowInvitationModal(false);
+          setSelectedUserForInvitation(null);
         }}
         onSubmit={(formData) =>
-          assignRayonMutation.mutate({
-            userId: selectedUserForRayon?.id,
-            idRayon: formData.idRayon,
+          invitationMutation.mutate({
+            userId: selectedUserForInvitation?.id,
+            keluargaId: formData.keluargaId,
+            whatsappNumber:
+              selectedUserForInvitation?.noWhatsapp || formData.whatsappNumber,
+            password: formData.password,
           })
         }
       />
-    </>
+
+      {/* Account Data Modal */}
+      <CreateModal
+        description="Info akun (username, email) dan password default akan dikirim melalui WhatsApp. User dapat login dan segera mengganti password sesuai keinginan."
+        fields={[
+          {
+            key: "userInfo",
+            label: "Informasi User",
+            type: "display",
+            value: selectedUserForAccountData
+              ? `${selectedUserForAccountData.username} (${selectedUserForAccountData.email}) - ${selectedUserForAccountData.role}`
+              : "-",
+          },
+          {
+            key: "whatsappNumber",
+            label: "No. WhatsApp",
+            type: "custom",
+            component: PhoneInput,
+            value: selectedUserForAccountData?.noWhatsapp || "",
+            placeholder: "Masukkan nomor WhatsApp jika kosong",
+            required: false,
+          },
+        ]}
+        isLoading={accountDataMutation.isPending}
+        isOpen={showAccountDataModal}
+        submitLabel="Kirim Info Akun"
+        title="Kirim Info Akun via WhatsApp"
+        onClose={() => {
+          setShowAccountDataModal(false);
+          setSelectedUserForAccountData(null);
+        }}
+        onSubmit={(formData) =>
+          accountDataMutation.mutate({
+            userId: selectedUserForAccountData?.id,
+            whatsappNumber:
+              selectedUserForAccountData?.noWhatsapp || formData.whatsappNumber,
+          })
+        }
+      />
+    </ProtectedRoute>
   );
 }
+
+export default MajelisAkunJemaatPage;

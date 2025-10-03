@@ -182,18 +182,20 @@ model Rayon {
   keluargas     Keluarga[]
   jadwalIbadahs JadwalIbadah[]
   Majelis       Majelis[]
+  User          User[]
 
   @@map("rayon")
 }
 
 model Keluarga {
-  id                       String @id @default(dbgenerated("concat('kel_', gen_random_uuid())")) @db.VarChar(80)
-  idAlamat                 String @db.VarChar(80)
-  idStatusKeluarga         String @db.VarChar(80)
-  idStatusKepemilikanRumah String @db.VarChar(80)
-  idKeadaanRumah           String @db.VarChar(80)
-  idRayon                  String @db.VarChar(80)
+  id                       String  @id @default(dbgenerated("concat('kel_', gen_random_uuid())")) @db.VarChar(80)
+  idAlamat                 String  @db.VarChar(80)
+  idStatusKeluarga         String  @db.VarChar(80)
+  idStatusKepemilikanRumah String  @db.VarChar(80)
+  idKeadaanRumah           String  @db.VarChar(80)
+  idRayon                  String  @db.VarChar(80)
   noBagungan               Int
+  noKK                     String? @unique @db.VarChar(20)
 
   alamat                 Alamat                 @relation(fields: [idAlamat], references: [id])
   statusKeluarga         StatusKeluarga         @relation(fields: [idStatusKeluarga], references: [id])
@@ -220,9 +222,11 @@ model User {
   role       Role
   idJemaat   String? @unique @db.VarChar(80) // Untuk role: JEMAAT
   idMajelis  String? @unique @db.VarChar(80) // TAMBAH INI - Untuk role: MAJELIS
+  idRayon    String? @db.VarChar(80) // TAMBAH INI - Untuk memudahkan akses data berdasarkan rayon
 
   jemaat  Jemaat?  @relation(fields: [idJemaat], references: [id])
   majelis Majelis? @relation(fields: [idMajelis], references: [id]) // TAMBAH INI
+  rayon   Rayon?   @relation(fields: [idRayon], references: [id]) // TAMBAH INI
 
   // Document relations
   dokumenUploaded DokumenJemaat[] @relation("DokumenUploader")
