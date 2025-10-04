@@ -99,70 +99,166 @@ export default function EditJemaat() {
     enabled: !!id,
   });
 
-  // Fetch master data
+  // Fetch master data with caching (same queryKey as create/filters for cache reuse!)
   const { data: statusDalamKeluarga } = useQuery({
     queryKey: ["status-dalam-keluarga"],
-    queryFn: () => masterService.getStatusDalamKeluarga(),
+    queryFn: async () => {
+      const response = await masterService.getStatusDalamKeluarga();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.status,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: keluargaList } = useQuery({
     queryKey: ["keluarga-list"],
-    queryFn: () => masterService.getKeluarga(),
+    queryFn: async () => {
+      const response = await masterService.getKeluarga();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
+      })) || [];
+    },
+    staleTime: 3 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
 
   const { data: suku } = useQuery({
     queryKey: ["suku"],
-    queryFn: () => masterService.getSuku(),
+    queryFn: async () => {
+      const response = await masterService.getSuku();
+      return response.data?.map((item) => ({
+        value: item.id,
+        label: item.namaSuku,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pendidikan } = useQuery({
     queryKey: ["pendidikan"],
-    queryFn: () => masterService.getPendidikan(),
+    queryFn: async () => {
+      const response = await masterService.getPendidikan();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.jenjang,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pekerjaan } = useQuery({
     queryKey: ["pekerjaan"],
-    queryFn: () => masterService.getPekerjaan(),
+    queryFn: async () => {
+      const response = await masterService.getPekerjaan();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.namaPekerjaan,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pendapatan } = useQuery({
     queryKey: ["pendapatan"],
-    queryFn: () => masterService.getPendapatan(),
+    queryFn: async () => {
+      const response = await masterService.getPendapatan();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.label,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: jaminanKesehatan } = useQuery({
     queryKey: ["jaminan-kesehatan"],
-    queryFn: () => masterService.getJaminanKesehatan(),
+    queryFn: async () => {
+      const response = await masterService.getJaminanKesehatan();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.jenisJaminan,
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: statusKeluarga } = useQuery({
     queryKey: ["status-keluarga"],
-    queryFn: () => masterService.getStatusKeluarga(),
+    queryFn: async () => {
+      const response = await masterService.getStatusKeluarga();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.status,
+      })) || [];
+    },
     enabled: createKeluarga,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: statusKepemilikanRumah } = useQuery({
     queryKey: ["status-kepemilikan-rumah"],
-    queryFn: () => masterService.getStatusKepemilikanRumah(),
+    queryFn: async () => {
+      const response = await masterService.getStatusKepemilikanRumah();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.status,
+      })) || [];
+    },
     enabled: createKeluarga,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: keadaanRumah } = useQuery({
     queryKey: ["keadaan-rumah"],
-    queryFn: () => masterService.getKeadaanRumah(),
+    queryFn: async () => {
+      const response = await masterService.getKeadaanRumah();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.keadaan,
+      })) || [];
+    },
     enabled: createKeluarga,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: rayon } = useQuery({
     queryKey: ["rayon"],
-    queryFn: () => masterService.getRayon(),
+    queryFn: async () => {
+      const response = await masterService.getRayon();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.namaRayon,
+      })) || [];
+    },
     enabled: createKeluarga,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: kelurahan } = useQuery({
     queryKey: ["kelurahan"],
-    queryFn: () => masterService.getKelurahan(),
+    queryFn: async () => {
+      const response = await masterService.getKelurahan();
+      return response.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
+      })) || [];
+    },
     enabled: createKeluarga,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   // Pre-fill form when data loaded
@@ -606,12 +702,7 @@ export default function EditJemaat() {
                   required
                   label="Status Dalam Keluarga"
                   name="idStatusDalamKeluarga"
-                  options={
-                    statusDalamKeluarga?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.status,
-                    })) || []
-                  }
+                  options={statusDalamKeluarga || []}
                   placeholder="Pilih status"
                 />
 
@@ -620,12 +711,7 @@ export default function EditJemaat() {
                     required
                     label="Keluarga"
                     name="idKeluarga"
-                    options={
-                      keluargaList?.data?.items?.map((item) => ({
-                        value: item.id,
-                        label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
-                      })) || []
-                    }
+                    options={keluargaList || []}
                     placeholder="Pilih keluarga"
                   />
                 )}
@@ -634,12 +720,7 @@ export default function EditJemaat() {
                   required
                   label="Suku"
                   name="idSuku"
-                  options={
-                    suku?.data?.map((item) => ({
-                      value: item.id,
-                      label: item.namaSuku,
-                    })) || []
-                  }
+                  options={suku || []}
                   placeholder="Pilih suku"
                 />
 
@@ -647,12 +728,7 @@ export default function EditJemaat() {
                   required
                   label="Pendidikan"
                   name="idPendidikan"
-                  options={
-                    pendidikan?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.jenjang,
-                    })) || []
-                  }
+                  options={pendidikan || []}
                   placeholder="Pilih pendidikan"
                 />
 
@@ -660,12 +736,7 @@ export default function EditJemaat() {
                   required
                   label="Pekerjaan"
                   name="idPekerjaan"
-                  options={
-                    pekerjaan?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.namaPekerjaan,
-                    })) || []
-                  }
+                  options={pekerjaan || []}
                   placeholder="Pilih pekerjaan"
                 />
 
@@ -673,12 +744,7 @@ export default function EditJemaat() {
                   required
                   label="Pendapatan"
                   name="idPendapatan"
-                  options={
-                    pendapatan?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.label,
-                    })) || []
-                  }
+                  options={pendapatan || []}
                   placeholder="Pilih pendapatan"
                 />
 
@@ -686,12 +752,7 @@ export default function EditJemaat() {
                   required
                   label="Jaminan Kesehatan"
                   name="idJaminanKesehatan"
-                  options={
-                    jaminanKesehatan?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.jenisJaminan,
-                    })) || []
-                  }
+                  options={jaminanKesehatan || []}
                   placeholder="Pilih jaminan kesehatan"
                 />
               </div>
@@ -793,12 +854,7 @@ export default function EditJemaat() {
                 <AutoCompleteInput
                   label="Status Keluarga"
                   name="idStatusKeluarga"
-                  options={
-                    statusKeluarga?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.status,
-                    })) || []
-                  }
+                  options={statusKeluarga || []}
                   placeholder="Pilih status keluarga"
                   required={createKeluarga}
                 />
@@ -806,12 +862,7 @@ export default function EditJemaat() {
                 <AutoCompleteInput
                   label="Status Kepemilikan Rumah"
                   name="idStatusKepemilikanRumah"
-                  options={
-                    statusKepemilikanRumah?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.status,
-                    })) || []
-                  }
+                  options={statusKepemilikanRumah || []}
                   placeholder="Pilih status kepemilikan"
                   required={createKeluarga}
                 />
@@ -819,12 +870,7 @@ export default function EditJemaat() {
                 <AutoCompleteInput
                   label="Keadaan Rumah"
                   name="idKeadaanRumah"
-                  options={
-                    keadaanRumah?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.keadaan,
-                    })) || []
-                  }
+                  options={keadaanRumah || []}
                   placeholder="Pilih keadaan rumah"
                   required={createKeluarga}
                 />
@@ -832,12 +878,7 @@ export default function EditJemaat() {
                 <AutoCompleteInput
                   label="Rayon"
                   name="idRayon"
-                  options={
-                    rayon?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.namaRayon,
-                    })) || []
-                  }
+                  options={rayon || []}
                   placeholder="Pilih rayon"
                   required={createKeluarga}
                 />
@@ -876,14 +917,7 @@ export default function EditJemaat() {
                 <AutoCompleteInput
                   label="Kelurahan"
                   name="idKelurahan"
-                  options={
-                    kelurahan?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: item.kodepos
-                        ? `${item.nama} - ${item.kodepos}`
-                        : item.nama,
-                    })) || []
-                  }
+                  options={kelurahan || []}
                   placeholder="Pilih kelurahan"
                   required={createKeluarga}
                 />

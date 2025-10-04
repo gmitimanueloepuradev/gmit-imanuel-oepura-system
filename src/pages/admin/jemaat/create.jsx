@@ -97,158 +97,375 @@ export default function CreateJemaat() {
     },
   });
 
-  // Fetch master data with loading states
-  const { data: statusDalamKeluarga, isLoading: isLoadingStatusDalamKeluarga } =
-    useQuery({
-      queryKey: ["status-dalam-keluarga"],
-      queryFn: () => masterService.getStatusDalamKeluarga(),
-    });
+  // ===== STEP 1 OPTIONS (Lazy Load with Cache) =====
+  const {
+    data: statusDalamKeluargaData,
+    isLoading: isLoadingStatusDalamKeluarga,
+    refetch: refetchStatusDalamKeluarga,
+  } = useQuery({
+    queryKey: ["status-dalam-keluarga"],
+    queryFn: async () => {
+      const response = await masterService.getStatusDalamKeluarga();
 
-  const { data: keluargaList, isLoading: isLoadingKeluargaList } = useQuery({
-    queryKey: ["keluarga-list"],
-    queryFn: () => masterService.getKeluarga(),
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+          raw: item,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000, // 10 menit (static data)
+    cacheTime: 30 * 60 * 1000,
   });
-
-  const { data: suku, isLoading: isLoadingSuku } = useQuery({
-    queryKey: ["suku"],
-    queryFn: () => masterService.getSuku(),
-  });
-
-  const { data: pendidikan, isLoading: isLoadingPendidikan } = useQuery({
-    queryKey: ["pendidikan"],
-    queryFn: () => masterService.getPendidikan(),
-  });
-
-  const { data: pekerjaan, isLoading: isLoadingPekerjaan } = useQuery({
-    queryKey: ["pekerjaan"],
-    queryFn: () => masterService.getPekerjaan(),
-  });
-
-  const { data: pendapatan, isLoading: isLoadingPendapatan } = useQuery({
-    queryKey: ["pendapatan"],
-    queryFn: () => masterService.getPendapatan(),
-  });
-
-  const { data: jaminanKesehatan, isLoading: isLoadingJaminanKesehatan } =
-    useQuery({
-      queryKey: ["jaminan-kesehatan"],
-      queryFn: () => masterService.getJaminanKesehatan(),
-    });
-
-  const { data: statusKeluarga, isLoading: isLoadingStatusKeluarga } = useQuery(
-    {
-      queryKey: ["status-keluarga"],
-      queryFn: () => masterService.getStatusKeluarga(),
-      enabled: createKeluarga,
-    }
-  );
 
   const {
-    data: statusKepemilikanRumah,
+    data: keluargaListData,
+    isLoading: isLoadingKeluargaList,
+    refetch: refetchKeluargaList,
+  } = useQuery({
+    queryKey: ["keluarga-list"],
+    queryFn: async () => {
+      const response = await masterService.getKeluarga();
+
+      return (
+        response.data?.items?.map((item) => {
+          const kepalaKeluarga = item.jemaats?.find((j) =>
+            j.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
+          );
+          const kepalaName =
+            kepalaKeluarga?.nama || "Belum ada kepala keluarga";
+
+          return {
+            value: item.id,
+            label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
+          };
+        }) || []
+      );
+    },
+    enabled: false,
+    staleTime: 3 * 60 * 1000, // 3 menit (dynamic data)
+    cacheTime: 10 * 60 * 1000,
+  });
+
+  const {
+    data: sukuData,
+    isLoading: isLoadingSuku,
+    refetch: refetchSuku,
+  } = useQuery({
+    queryKey: ["suku"],
+    queryFn: async () => {
+      const response = await masterService.getSuku();
+
+      return (
+        response.data?.map((item) => ({
+          value: item.id,
+          label: item.namaSuku,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  const {
+    data: pendidikanData,
+    isLoading: isLoadingPendidikan,
+    refetch: refetchPendidikan,
+  } = useQuery({
+    queryKey: ["pendidikan"],
+    queryFn: async () => {
+      const response = await masterService.getPendidikan();
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenjang,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  const {
+    data: pekerjaanData,
+    isLoading: isLoadingPekerjaan,
+    refetch: refetchPekerjaan,
+  } = useQuery({
+    queryKey: ["pekerjaan"],
+    queryFn: async () => {
+      const response = await masterService.getPekerjaan();
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaPekerjaan,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  const {
+    data: pendapatanData,
+    isLoading: isLoadingPendapatan,
+    refetch: refetchPendapatan,
+  } = useQuery({
+    queryKey: ["pendapatan"],
+    queryFn: async () => {
+      const response = await masterService.getPendapatan();
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.label,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  const {
+    data: jaminanKesehatanData,
+    isLoading: isLoadingJaminanKesehatan,
+    refetch: refetchJaminanKesehatan,
+  } = useQuery({
+    queryKey: ["jaminan-kesehatan"],
+    queryFn: async () => {
+      const response = await masterService.getJaminanKesehatan();
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenisJaminan,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  // ===== STEP 3 OPTIONS (Conditional Load) =====
+  const {
+    data: statusKeluargaData,
+    isLoading: isLoadingStatusKeluarga,
+    refetch: refetchStatusKeluarga,
+  } = useQuery({
+    queryKey: ["status-keluarga"],
+    queryFn: async () => {
+      const response = await masterService.getStatusKeluarga();
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
+
+  const {
+    data: statusKepemilikanRumahData,
     isLoading: isLoadingStatusKepemilikanRumah,
+    refetch: refetchStatusKepemilikanRumah,
   } = useQuery({
     queryKey: ["status-kepemilikan-rumah"],
-    queryFn: () => masterService.getStatusKepemilikanRumah(),
-    enabled: createKeluarga,
-  });
+    queryFn: async () => {
+      const response = await masterService.getStatusKepemilikanRumah();
 
-  const { data: keadaanRumah, isLoading: isLoadingKeadaanRumah } = useQuery({
-    queryKey: ["keadaan-rumah"],
-    queryFn: () => masterService.getKeadaanRumah(),
-    enabled: createKeluarga,
-  });
-
-  const { data: rayon, isLoading: isLoadingRayon } = useQuery({
-    queryKey: ["rayon"],
-    queryFn: () => masterService.getRayon(),
-    enabled: createKeluarga,
-  });
-
-  const { data: kelurahan, isLoading: isLoadingKelurahan } = useQuery({
-    queryKey: ["kelurahan"],
-    queryFn: () => masterService.getKelurahan(),
-    enabled: createKeluarga,
-  });
-
-  // Transform data for AutoCompleteInput
-  const statusDalamKeluargaOptions =
-    statusDalamKeluarga?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.status,
-    })) || [];
-
-  const keluargaListOptions =
-    keluargaList?.data?.items?.map((item) => {
-      const kepalaKeluarga = item.jemaats?.find((j) =>
-        j.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || []
       );
-      const kepalaName = kepalaKeluarga?.nama || "Belum ada kepala keluarga";
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
 
-      return {
-        value: item.id,
-        label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
-      };
-    }) || [];
+  const {
+    data: keadaanRumahData,
+    isLoading: isLoadingKeadaanRumah,
+    refetch: refetchKeadaanRumah,
+  } = useQuery({
+    queryKey: ["keadaan-rumah"],
+    queryFn: async () => {
+      const response = await masterService.getKeadaanRumah();
 
-  const sukuOptions =
-    suku?.data?.map((item) => ({
-      value: item.id,
-      label: item.namaSuku,
-    })) || [];
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.keadaan,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
 
-  const pendidikanOptions =
-    pendidikan?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.jenjang,
-    })) || [];
+  const {
+    data: rayonData,
+    isLoading: isLoadingRayon,
+    refetch: refetchRayon,
+  } = useQuery({
+    queryKey: ["rayon"],
+    queryFn: async () => {
+      const response = await masterService.getRayon();
 
-  const pekerjaanOptions =
-    pekerjaan?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.namaPekerjaan,
-    })) || [];
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaRayon,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
 
-  const pendapatanOptions =
-    pendapatan?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.label,
-    })) || [];
+  // ===== STEP 4 OPTIONS =====
+  const {
+    data: kelurahanData,
+    isLoading: isLoadingKelurahan,
+    refetch: refetchKelurahan,
+  } = useQuery({
+    queryKey: ["kelurahan"],
+    queryFn: async () => {
+      const response = await masterService.getKelurahan();
 
-  const jaminanKesehatanOptions =
-    jaminanKesehatan?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.jenisJaminan,
-    })) || [];
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
+        })) || []
+      );
+    },
+    enabled: false,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  });
 
-  const statusKeluargaOptions =
-    statusKeluarga?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.status,
-    })) || [];
+  // Local state for options
+  const [statusDalamKeluargaOptions, setStatusDalamKeluargaOptions] = useState(
+    []
+  );
+  const [keluargaListOptions, setKeluargaListOptions] = useState([]);
+  const [sukuOptions, setSukuOptions] = useState([]);
+  const [pendidikanOptions, setPendidikanOptions] = useState([]);
+  const [pekerjaanOptions, setPekerjaanOptions] = useState([]);
+  const [pendapatanOptions, setPendapatanOptions] = useState([]);
+  const [jaminanKesehatanOptions, setJaminanKesehatanOptions] = useState([]);
+  const [statusKeluargaOptions, setStatusKeluargaOptions] = useState([]);
+  const [statusKepemilikanRumahOptions, setStatusKepemilikanRumahOptions] =
+    useState([]);
+  const [keadaanRumahOptions, setKeadaanRumahOptions] = useState([]);
+  const [rayonOptions, setRayonOptions] = useState([]);
+  const [kelurahanOptions, setKelurahanOptions] = useState([]);
 
-  const statusKepemilikanRumahOptions =
-    statusKepemilikanRumah?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.status,
-    })) || [];
+  // Sync query data to local state
+  useEffect(() => {
+    if (statusDalamKeluargaData)
+      setStatusDalamKeluargaOptions(statusDalamKeluargaData);
+  }, [statusDalamKeluargaData]);
 
-  const keadaanRumahOptions =
-    keadaanRumah?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.keadaan,
-    })) || [];
+  useEffect(() => {
+    if (keluargaListData) setKeluargaListOptions(keluargaListData);
+  }, [keluargaListData]);
 
-  const rayonOptions =
-    rayon?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.namaRayon,
-    })) || [];
+  useEffect(() => {
+    if (sukuData) setSukuOptions(sukuData);
+  }, [sukuData]);
 
-  const kelurahanOptions =
-    kelurahan?.data?.items?.map((item) => ({
-      value: item.id,
-      label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
-    })) || [];
+  useEffect(() => {
+    if (pendidikanData) setPendidikanOptions(pendidikanData);
+  }, [pendidikanData]);
+
+  useEffect(() => {
+    if (pekerjaanData) setPekerjaanOptions(pekerjaanData);
+  }, [pekerjaanData]);
+
+  useEffect(() => {
+    if (pendapatanData) setPendapatanOptions(pendapatanData);
+  }, [pendapatanData]);
+
+  useEffect(() => {
+    if (jaminanKesehatanData) setJaminanKesehatanOptions(jaminanKesehatanData);
+  }, [jaminanKesehatanData]);
+
+  useEffect(() => {
+    if (statusKeluargaData) setStatusKeluargaOptions(statusKeluargaData);
+  }, [statusKeluargaData]);
+
+  useEffect(() => {
+    if (statusKepemilikanRumahData)
+      setStatusKepemilikanRumahOptions(statusKepemilikanRumahData);
+  }, [statusKepemilikanRumahData]);
+
+  useEffect(() => {
+    if (keadaanRumahData) setKeadaanRumahOptions(keadaanRumahData);
+  }, [keadaanRumahData]);
+
+  useEffect(() => {
+    if (rayonData) setRayonOptions(rayonData);
+  }, [rayonData]);
+
+  useEffect(() => {
+    if (kelurahanData) setKelurahanOptions(kelurahanData);
+  }, [kelurahanData]);
+
+  // Load functions with cache check
+  const loadStep1Options = () => {
+    if (statusDalamKeluargaOptions.length === 0) refetchStatusDalamKeluarga();
+    if (sukuOptions.length === 0) refetchSuku();
+    if (pendidikanOptions.length === 0) refetchPendidikan();
+    if (pekerjaanOptions.length === 0) refetchPekerjaan();
+    if (pendapatanOptions.length === 0) refetchPendapatan();
+    if (jaminanKesehatanOptions.length === 0) refetchJaminanKesehatan();
+    if (!isKepalaKeluarga && keluargaListOptions.length === 0)
+      refetchKeluargaList();
+  };
+
+  const loadStep3Options = () => {
+    if (statusKeluargaOptions.length === 0) refetchStatusKeluarga();
+    if (statusKepemilikanRumahOptions.length === 0)
+      refetchStatusKepemilikanRumah();
+    if (keadaanRumahOptions.length === 0) refetchKeadaanRumah();
+    if (rayonOptions.length === 0) refetchRayon();
+  };
+
+  const loadStep4Options = () => {
+    if (kelurahanOptions.length === 0) refetchKelurahan();
+  };
+
+  // Auto-load options when component mounts (Step 1)
+  useEffect(() => {
+    loadStep1Options();
+  }, []);
+
+  // Load options when navigating to steps
+  useEffect(() => {
+    if (currentStep === 3 && createKeluarga) {
+      loadStep3Options();
+    } else if (currentStep === 4 && createAlamat) {
+      loadStep4Options();
+    }
+  }, [currentStep, createKeluarga, createAlamat]);
 
   // Watch status dalam keluarga to determine if user is kepala keluarga
   const watchStatusDalamKeluarga = form.watch("idStatusDalamKeluarga");
@@ -260,28 +477,28 @@ export default function CreateJemaat() {
       setPreSelectedKeluarga(keluargaId);
 
       // Auto-set kepala keluarga status
-      if (statusDalamKeluarga?.data?.items) {
-        const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-          (status) => status.status.toLowerCase().includes("kepala")
+      if (statusDalamKeluargaOptions.length > 0) {
+        const kepalaKeluargaStatus = statusDalamKeluargaOptions.find((status) =>
+          status.label.toLowerCase().includes("kepala")
         );
 
         if (kepalaKeluargaStatus) {
-          form.setValue("idStatusDalamKeluarga", kepalaKeluargaStatus.id);
+          form.setValue("idStatusDalamKeluarga", kepalaKeluargaStatus.value);
           setIsKepalaKeluarga(true);
         }
       }
     }
-  }, [keluargaId, isKepalaKeluargaParam, statusDalamKeluarga, form]);
+  }, [keluargaId, isKepalaKeluargaParam, statusDalamKeluargaOptions, form]);
 
   useEffect(() => {
-    if (statusDalamKeluarga?.data?.items) {
-      const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-        (status) => status.status.toLowerCase().includes("kepala")
+    if (statusDalamKeluargaOptions.length > 0) {
+      const kepalaKeluargaStatus = statusDalamKeluargaOptions.find((status) =>
+        status.label.toLowerCase().includes("kepala")
       );
 
       if (
         kepalaKeluargaStatus &&
-        watchStatusDalamKeluarga === kepalaKeluargaStatus.id
+        watchStatusDalamKeluarga === kepalaKeluargaStatus.value
       ) {
         setIsKepalaKeluarga(true);
         setCreateKeluarga(true);
@@ -295,7 +512,11 @@ export default function CreateJemaat() {
         }
       }
     }
-  }, [watchStatusDalamKeluarga, statusDalamKeluarga, preSelectedKeluarga]);
+  }, [
+    watchStatusDalamKeluarga,
+    statusDalamKeluargaOptions,
+    preSelectedKeluarga,
+  ]);
 
   const createJemaatMutation = useMutation({
     mutationFn: jemaatService.createWithUser,

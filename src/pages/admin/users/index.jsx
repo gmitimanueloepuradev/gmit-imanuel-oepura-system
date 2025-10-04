@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CreateModal from "@/components/ui/CreateModal";
 import EditModal from "@/components/ui/EditModal";
-import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import ListGrid from "@/components/ui/ListGrid";
 import PhoneInput from "@/components/ui/PhoneInput";
 import ViewModal from "@/components/ui/ViewModal";
@@ -61,54 +60,114 @@ export default function UsersPage() {
     keepPreviousData: true,
   });
 
-  // Fetch jemaat, keluarga, and rayon data for select options
+  // Fetch jemaat options with React Query (auto-cached)
+  const {
+    data: jemaatQueryData,
+    isLoading: jemaatLoading,
+    refetch: refetchJemaat,
+  } = useQuery({
+    queryKey: ["jemaat-options"],
+    queryFn: async () => {
+      const response = await jemaatService.getAll({ limit: 1000 });
+      const options =
+        response.data?.items?.map((jemaat) => ({
+          value: jemaat.id,
+          label: `${jemaat.nama} (${jemaat.keluarga?.noBagungan || "No Bangunan"})`,
+        })) || [];
+
+      return options;
+    },
+    enabled: false, // Tidak auto-fetch saat mount
+    staleTime: 5 * 60 * 1000, // Cache 5 menit
+    cacheTime: 10 * 60 * 1000, // Keep in cache 10 menit
+  });
+
+  // Set jemaatOptions dari query data
   useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        // Fetch jemaat options
-        const jemaatResponse = await jemaatService.getAll({ limit: 1000 });
-        const jemaatOptions =
-          jemaatResponse.data?.items?.map((jemaat) => ({
-            value: jemaat.id,
-            label: `${jemaat.nama} (${jemaat.keluarga?.noBagungan || "No Bangunan"})`,
-          })) || [];
+    if (jemaatQueryData) {
+      setJemaatOptions(jemaatQueryData);
+    }
+  }, [jemaatQueryData]);
 
-        setJemaatOptions(jemaatOptions);
+  // Function untuk load jemaat (hanya trigger refetch jika belum ada data)
+  const loadJemaatOptions = () => {
+    if (jemaatOptions.length > 0) return; // Already cached
+    refetchJemaat();
+  };
 
-        // Fetch keluarga options
-        const keluargaResponse = await keluargaService.getAll({ limit: 1000 });
-        const keluargaOptions =
-          keluargaResponse.data?.items?.map((keluarga) => {
-            const kepalaKeluarga = keluarga.jemaats?.find(
-              (j) => j.statusDalamKeluarga?.status === "Kepala Keluarga"
-            );
-            const displayName =
-              kepalaKeluarga?.nama || `Bangunan ${keluarga.noBagungan}`;
+  // Fetch keluarga options with React Query (auto-cached)
+  const {
+    data: keluargaQueryData,
+    isLoading: keluargaLoading,
+    refetch: refetchKeluarga,
+  } = useQuery({
+    queryKey: ["keluarga-options"],
+    queryFn: async () => {
+      const response = await keluargaService.getAll({ limit: 1000 });
+      const options =
+        response.data?.items?.map((keluarga) => {
+          const kepalaKeluarga = keluarga.jemaats?.find(
+            (j) => j.statusDalamKeluarga?.status === "Kepala Keluarga"
+          );
+          const displayName =
+            kepalaKeluarga?.nama || `Bangunan ${keluarga.noBagungan}`;
 
-            return {
-              value: keluarga.id,
-              label: `${displayName} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
-            };
-          }) || [];
+          return {
+            value: keluarga.id,
+            label: `${displayName} - ${keluarga.rayon?.namaRayon || "Rayon"}`,
+          };
+        }) || [];
 
-        setKeluargaOptions(keluargaOptions);
+      return options;
+    },
+    enabled: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+  });
 
-        // Fetch rayon options
-        const rayonResponse = await rayonService.getRayon({ limit: 1000 });
-        const rayonOptions =
-          rayonResponse.data?.items?.map((rayon) => ({
-            value: rayon.id,
-            label: rayon.namaRayon,
-          })) || [];
+  useEffect(() => {
+    if (keluargaQueryData) {
+      setKeluargaOptions(keluargaQueryData);
+    }
+  }, [keluargaQueryData]);
 
-        setRayonOptions(rayonOptions);
-      } catch (error) {
-        console.error("Failed to fetch options:", error);
-      }
-    };
+  const loadKeluargaOptions = () => {
+    if (keluargaOptions.length > 0) return;
+    refetchKeluarga();
+  };
 
-    fetchOptions();
-  }, []);
+  // Fetch rayon options with React Query (auto-cached)
+  const {
+    data: rayonQueryData,
+    isLoading: rayonLoading,
+    refetch: refetchRayon,
+  } = useQuery({
+    queryKey: ["rayon-options"],
+    queryFn: async () => {
+      const response = await rayonService.getRayon({ limit: 1000 });
+      const options =
+        response.data?.items?.map((rayon) => ({
+          value: rayon.id,
+          label: rayon.namaRayon,
+        })) || [];
+
+      return options;
+    },
+    enabled: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (rayonQueryData) {
+      setRayonOptions(rayonQueryData);
+    }
+  }, [rayonQueryData]);
+
+  const loadRayonOptions = () => {
+    if (rayonOptions.length > 0) return;
+    refetchRayon();
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -345,6 +404,8 @@ export default function UsersPage() {
         type: "select",
         options: jemaatOptions,
         placeholder: "Pilih jemaat jika role = JEMAAT",
+        loading: jemaatLoading,
+        onMenuOpen: loadJemaatOptions,
       },
       {
         key: "idRayon",
@@ -353,11 +414,20 @@ export default function UsersPage() {
         required: false,
         options: rayonOptions,
         placeholder: "Pilih rayon untuk user ini (opsional)",
+        loading: rayonLoading,
+        onMenuOpen: loadRayonOptions,
         condition: (formData) =>
           formData.role === "JEMAAT" || formData.role === "MAJELIS",
       },
     ],
-    [jemaatOptions, rayonOptions]
+    [
+      jemaatOptions,
+      rayonOptions,
+      jemaatLoading,
+      rayonLoading,
+      loadJemaatOptions,
+      loadRayonOptions,
+    ]
   );
 
   // Format nomor WhatsApp dengan prefix +62
@@ -538,6 +608,14 @@ export default function UsersPage() {
   const [showAssignRayonModal, setShowAssignRayonModal] = useState(false);
   const [selectedUserForRayon, setSelectedUserForRayon] = useState(null);
 
+  // Handler untuk buka edit modal dengan pre-load options
+  const handleEditClick = (item) => {
+    // Load options sebelum buka modal
+    loadJemaatOptions();
+    loadRayonOptions();
+    setEditItem(item);
+  };
+
   // const assignRayonMutation = useMutation({
   //   mutationFn: async ({ userId, idRayon }) => {
   //     const response = await axios.patch(`/users/${userId}/rayon`, {
@@ -586,6 +664,8 @@ export default function UsersPage() {
   });
 
   const handleAssignRayon = (user) => {
+    // Load rayon options sebelum buka modal (pakai cache jika sudah ada)
+    loadRayonOptions();
     setSelectedUserForRayon(user);
     setShowAssignRayonModal(true);
   };
@@ -724,11 +804,13 @@ export default function UsersPage() {
         key: "rayonId",
         label: "Semua Rayon",
         options: rayonOptions,
+        loading: rayonLoading,
+        onMenuOpen: loadRayonOptions,
       });
     }
 
     return filters;
-  }, [rayonOptions]);
+  }, [rayonOptions, rayonLoading, loadRayonOptions]);
 
   // Custom filter function
   const customFilterFunction = (item, filters) => {
@@ -846,7 +928,7 @@ export default function UsersPage() {
           },
           {
             icon: Edit,
-            onClick: (item) => setEditItem(item),
+            onClick: handleEditClick,
             variant: "outline",
             tooltip: "Edit user",
           },
@@ -963,6 +1045,8 @@ export default function UsersPage() {
             type: "select",
             required: false,
             options: keluargaOptions,
+            loading: keluargaLoading,
+            onMenuOpen: loadKeluargaOptions,
             placeholder: "Pilih keluarga untuk user ini (opsional)",
             description:
               "Kosongkan jika jemaat akan mencari sendiri dengan No. KK saat onboarding",
@@ -1163,11 +1247,12 @@ export default function UsersPage() {
           {
             key: "idRayon",
             label: "Pilih Rayon",
-            type: "custom",
-            component: AutoCompleteInput,
-            apiEndpoint: "/rayon/options",
+            type: "select",
+            options: rayonOptions,
+            loading: rayonLoading,
+            onMenuOpen: loadRayonOptions,
             required: true,
-            placeholder: "Ketik untuk mencari rayon...",
+            placeholder: "Pilih rayon...",
           },
         ]}
         isLoading={assignRayonMutation.isPending}

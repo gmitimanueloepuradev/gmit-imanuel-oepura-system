@@ -11,117 +11,162 @@ const JemaatFilters = ({ onFiltersChange, initialFilters = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  // Fetch master data for filter options
+  // Fetch master data with lazy load + caching (same queryKey as create/edit pages for cache reuse!)
   const { data: sukuData } = useQuery({
     queryKey: ['suku'],
-    queryFn: () => masterService.getSuku(),
+    queryFn: async () => {
+      const response = await masterService.getSuku();
+      return response.data?.map(item => ({
+        value: item.id,
+        label: item.namaSuku
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000, // Cache 10 menit
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pendidikanData } = useQuery({
     queryKey: ['pendidikan'],
-    queryFn: () => masterService.getPendidikan(),
+    queryFn: async () => {
+      const response = await masterService.getPendidikan();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.jenjang
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pekerjaanData } = useQuery({
     queryKey: ['pekerjaan'],
-    queryFn: () => masterService.getPekerjaan(),
+    queryFn: async () => {
+      const response = await masterService.getPekerjaan();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.namaPekerjaan
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: pendapatanData } = useQuery({
     queryKey: ['pendapatan'],
-    queryFn: () => masterService.getPendapatan(),
+    queryFn: async () => {
+      const response = await masterService.getPendapatan();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.label
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: jaminanKesehatanData } = useQuery({
     queryKey: ['jaminan-kesehatan'],
-    queryFn: () => masterService.getJaminanKesehatan(),
+    queryFn: async () => {
+      const response = await masterService.getJaminanKesehatan();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.jenisJaminan
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: statusDalamKeluargaData } = useQuery({
     queryKey: ['status-dalam-keluarga'],
-    queryFn: () => masterService.getStatusDalamKeluarga(),
+    queryFn: async () => {
+      const response = await masterService.getStatusDalamKeluarga();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.status
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: rayonData } = useQuery({
     queryKey: ['rayon'],
-    queryFn: () => masterService.getRayon(),
+    queryFn: async () => {
+      const response = await masterService.getRayon();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.namaRayon
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: statusKeluargaData } = useQuery({
     queryKey: ['status-keluarga'],
-    queryFn: () => masterService.getStatusKeluarga(),
+    queryFn: async () => {
+      const response = await masterService.getStatusKeluarga();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.status
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: keadaanRumahData } = useQuery({
     queryKey: ['keadaan-rumah'],
-    queryFn: () => masterService.getKeadaanRumah(),
+    queryFn: async () => {
+      const response = await masterService.getKeadaanRumah();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.keadaan
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: statusKepemilikanRumahData } = useQuery({
     queryKey: ['status-kepemilikan-rumah'],
-    queryFn: () => masterService.getStatusKepemilikanRumah(),
+    queryFn: async () => {
+      const response = await masterService.getStatusKepemilikanRumah();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.status
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
   const { data: kelurahanData } = useQuery({
     queryKey: ['kelurahan'],
-    queryFn: () => masterService.getKelurahan(),
+    queryFn: async () => {
+      const response = await masterService.getKelurahan();
+      return response.data?.items?.map(item => ({
+        value: item.id,
+        label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
+      })) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 
-  // Transform data for options - handle new API response structure
-  const sukuOptions = sukuData?.data?.map(item => ({
-    value: item.id,
-    label: item.namaSuku
-  })) || [];
-
-  const pendidikanOptions = pendidikanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.jenjang
-  })) || [];
-
-  const pekerjaanOptions = pekerjaanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.namaPekerjaan
-  })) || [];
-
-  const pendapatanOptions = pendapatanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.label
-  })) || [];
-
-  const jaminanKesehatanOptions = jaminanKesehatanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.jenisJaminan
-  })) || [];
-
-  const statusDalamKeluargaOptions = statusDalamKeluargaData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.status
-  })) || [];
-
-  const rayonOptions = rayonData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.namaRayon
-  })) || [];
-
-  const statusKeluargaOptions = statusKeluargaData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.status
-  })) || [];
-
-  const keadaanRumahOptions = keadaanRumahData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.keadaan
-  })) || [];
-
-  const statusKepemilikanRumahOptions = statusKepemilikanRumahData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.status
-  })) || [];
-
-  const kelurahanOptions = kelurahanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
-  })) || [];
+  // Direct assignment with array safety check
+  const sukuOptions = Array.isArray(sukuData) ? sukuData : [];
+  const pendidikanOptions = Array.isArray(pendidikanData) ? pendidikanData : [];
+  const pekerjaanOptions = Array.isArray(pekerjaanData) ? pekerjaanData : [];
+  const pendapatanOptions = Array.isArray(pendapatanData) ? pendapatanData : [];
+  const jaminanKesehatanOptions = Array.isArray(jaminanKesehatanData) ? jaminanKesehatanData : [];
+  const statusDalamKeluargaOptions = Array.isArray(statusDalamKeluargaData) ? statusDalamKeluargaData : [];
+  const rayonOptions = Array.isArray(rayonData) ? rayonData : [];
+  const statusKeluargaOptions = Array.isArray(statusKeluargaData) ? statusKeluargaData : [];
+  const keadaanRumahOptions = Array.isArray(keadaanRumahData) ? keadaanRumahData : [];
+  const statusKepemilikanRumahOptions = Array.isArray(statusKepemilikanRumahData) ? statusKepemilikanRumahData : [];
+  const kelurahanOptions = Array.isArray(kelurahanData) ? kelurahanData : [];
 
   // Static options
   const jenisKelaminOptions = [
