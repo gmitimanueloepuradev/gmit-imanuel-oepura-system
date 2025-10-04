@@ -1,17 +1,16 @@
-import React, { useState } from "react";
 import {
   Calendar,
   Clock,
-  MapPin,
-  Users,
-  Plus,
   Edit,
+  MapPin,
+  Plus,
   Trash2,
+  Users,
 } from "lucide-react";
 
-import PageHeader from "@/components/ui/PageHeader";
-import ListGrid from "@/components/ui/ListGrid";
 import { Badge } from "@/components/ui/Badge";
+import ListGrid from "@/components/ui/ListGrid";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function EventsManagement() {
   // Dummy data for demonstration
@@ -54,6 +53,7 @@ export default function EventsManagement() {
           label: value,
           variant: "outline",
         };
+
         return <Badge variant={typeInfo.variant}>{typeInfo.label}</Badge>;
       },
     },
@@ -99,6 +99,7 @@ export default function EventsManagement() {
           pending: "Menunggu",
           cancelled: "Dibatalkan",
         };
+
         return labels[value] || value;
       },
     },
@@ -112,6 +113,7 @@ export default function EventsManagement() {
           weekly: "Mingguan",
           monthly: "Bulanan",
         };
+
         return (
           <Badge className="text-xs" variant="outline">
             {labels[value] || value}
@@ -187,25 +189,15 @@ export default function EventsManagement() {
     },
   ];
 
-  const handleAdd = () => {
-    console.log("Add new event");
-  };
+  const handleAdd = () => {};
 
-  const handleView = (item) => {
-    console.log("View event:", item);
-  };
+  const handleView = (item) => {};
 
-  const handleEdit = (item) => {
-    console.log("Edit event:", item);
-  };
+  const handleEdit = (item) => {};
 
-  const handleDelete = (item) => {
-    console.log("Delete event:", item);
-  };
+  const handleDelete = (item) => {};
 
-  const handleExport = () => {
-    console.log("Export events data");
-  };
+  const handleExport = () => {};
 
   const rowActions = [
     {

@@ -1,5 +1,5 @@
+import { Download, Plus, Share, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { X, Download, Share, Plus } from "lucide-react";
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -13,20 +13,22 @@ export default function InstallPrompt() {
     const userAgent = window.navigator.userAgent.toLowerCase();
     const iOS = /ipad|iphone|ipod/.test(userAgent) && !window.MSStream;
     const android = /android/.test(userAgent);
-    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
-                      window.navigator.standalone === true;
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
 
     setIsIOS(iOS);
     setIsAndroid(android);
     setIsStandalone(standalone);
 
     // Check if user has already dismissed the prompt
-    const hasSeenPrompt = localStorage.getItem('pwa-install-dismissed');
-    const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
+    const hasSeenPrompt = localStorage.getItem("pwa-install-dismissed");
+    const dismissedTime = localStorage.getItem("pwa-install-dismissed-time");
 
     // Show prompt again after 7 days
-    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-    const shouldShowAgain = !dismissedTime || parseInt(dismissedTime) < sevenDaysAgo;
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const shouldShowAgain =
+      !dismissedTime || parseInt(dismissedTime) < sevenDaysAgo;
 
     // Handle beforeinstallprompt event (Android/Chrome)
     const handleBeforeInstallPrompt = (e) => {
@@ -43,7 +45,7 @@ export default function InstallPrompt() {
       setTimeout(() => setShowInstallPrompt(true), 3000);
     }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     // Hide prompt if app gets installed
     const handleAppInstalled = () => {
@@ -51,11 +53,14 @@ export default function InstallPrompt() {
       setDeferredPrompt(null);
     };
 
-    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -65,10 +70,8 @@ export default function InstallPrompt() {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
 
-      if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
+      if (outcome === "accepted") {
       } else {
-        console.log('User dismissed the install prompt');
       }
 
       setDeferredPrompt(null);
@@ -78,8 +81,8 @@ export default function InstallPrompt() {
 
   const handleDismiss = () => {
     setShowInstallPrompt(false);
-    localStorage.setItem('pwa-install-dismissed', 'true');
-    localStorage.setItem('pwa-install-dismissed-time', Date.now().toString());
+    localStorage.setItem("pwa-install-dismissed", "true");
+    localStorage.setItem("pwa-install-dismissed-time", Date.now().toString());
   };
 
   // Don't show if already installed or not mobile

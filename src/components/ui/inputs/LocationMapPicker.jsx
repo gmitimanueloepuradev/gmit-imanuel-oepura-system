@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useController, useFormContext } from "react-hook-form";
-import { MapPin, ExternalLink, Map, Navigation } from "lucide-react";
+import { ExternalLink, Map, MapPin, Navigation } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { useController, useFormContext } from "react-hook-form";
 
 // Dynamic import to avoid SSR issues
 const LeafletMap = dynamic(() => import("../LeafletMap"), {
@@ -13,7 +13,7 @@ const LeafletMap = dynamic(() => import("../LeafletMap"), {
         <p className="mt-2 text-sm text-gray-600">Memuat peta...</p>
       </div>
     </div>
-  )
+  ),
 });
 
 export default function LocationMapPicker({
@@ -24,7 +24,7 @@ export default function LocationMapPicker({
   lokasiName = "lokasi",
   label = "Pilih Lokasi di Peta",
   defaultCenter = [-6.2088, 106.8456], // Jakarta coordinates
-  zoom = 13
+  zoom = 13,
 }) {
   const { control, setValue, watch } = useFormContext();
   const [selectedPosition, setSelectedPosition] = useState(null);
@@ -33,7 +33,10 @@ export default function LocationMapPicker({
   // Controllers for form fields
   const { field: latField } = useController({ name: latitudeName, control });
   const { field: lngField } = useController({ name: longitudeName, control });
-  const { field: gmapField } = useController({ name: googleMapsLinkName, control });
+  const { field: gmapField } = useController({
+    name: googleMapsLinkName,
+    control,
+  });
   const { field: alamatField } = useController({ name: alamatName, control });
   const { field: lokasiField } = useController({ name: lokasiName, control });
 
@@ -47,6 +50,7 @@ export default function LocationMapPicker({
     if (currentLat && currentLng) {
       const lat = parseFloat(currentLat);
       const lng = parseFloat(currentLng);
+
       if (!isNaN(lat) && !isNaN(lng)) {
         setSelectedPosition([lat, lng]);
         setMapCenter([lat, lng]);
@@ -57,19 +61,19 @@ export default function LocationMapPicker({
   // Handle map click - INI YANG KAMU MAU BRO!
   const handleMapClick = (event) => {
     const { lat, lng } = event.latlng;
-    console.log('Clicked coordinates:', lat, lng);
-    
+
     // Update form values
     setValue(latitudeName, lat.toString());
     setValue(longitudeName, lng.toString());
-    
+
     // Update local state
     setSelectedPosition([lat, lng]);
-    
+
     // Generate Google Maps link
     const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
     setValue(googleMapsLinkName, googleMapsUrl);
-    
+
     // Try reverse geocoding untuk dapet alamat
     reverseGeocode(lat, lng);
   };
@@ -81,14 +85,23 @@ export default function LocationMapPicker({
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
       );
       const data = await response.json();
-      
+
       if (data.display_name) {
         // Auto fill alamat dari hasil reverse geocoding
         setValue(alamatName, data.display_name);
-        
+
         // Extract nama lokasi kalau ada
-        if (data.address && (data.address.amenity || data.address.building || data.address.house_name)) {
-          const locationName = data.address.amenity || data.address.building || data.address.house_name;
+        if (
+          data.address &&
+          (data.address.amenity ||
+            data.address.building ||
+            data.address.house_name)
+        ) {
+          const locationName =
+            data.address.amenity ||
+            data.address.building ||
+            data.address.house_name;
+
           setValue(lokasiName, locationName);
         }
       }
@@ -104,16 +117,17 @@ export default function LocationMapPicker({
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          
+
           // Update form dan map
           setValue(latitudeName, lat.toString());
           setValue(longitudeName, lng.toString());
           setSelectedPosition([lat, lng]);
           setMapCenter([lat, lng]);
-          
+
           const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
           setValue(googleMapsLinkName, googleMapsUrl);
-          
+
           reverseGeocode(lat, lng);
         },
         (error) => {
@@ -129,6 +143,7 @@ export default function LocationMapPicker({
   const generateGoogleMapsLink = () => {
     if (currentLat && currentLng) {
       const googleMapsUrl = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
+
       setValue(googleMapsLinkName, googleMapsUrl);
     }
   };
@@ -145,10 +160,13 @@ export default function LocationMapPicker({
         <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <MapPin className="h-5 w-5 text-blue-600" />
-            <p className="text-sm font-medium text-blue-800">Klik di peta untuk memilih lokasi</p>
+            <p className="text-sm font-medium text-blue-800">
+              Klik di peta untuk memilih lokasi
+            </p>
           </div>
           <p className="text-xs text-blue-600">
-            Koordinat latitude & longitude akan otomatis terisi saat kamu klik titik di peta!
+            Koordinat latitude & longitude akan otomatis terisi saat kamu klik
+            titik di peta!
           </p>
         </div>
 
@@ -268,7 +286,8 @@ export default function LocationMapPicker({
       {selectedPosition && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <p className="text-xs text-green-700">
-            <strong>✅ Lokasi terpilih:</strong> {selectedPosition[0].toFixed(6)}, {selectedPosition[1].toFixed(6)}
+            <strong>✅ Lokasi terpilih:</strong>{" "}
+            {selectedPosition[0].toFixed(6)}, {selectedPosition[1].toFixed(6)}
           </p>
         </div>
       )}

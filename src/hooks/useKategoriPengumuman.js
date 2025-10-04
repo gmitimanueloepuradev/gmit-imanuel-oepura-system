@@ -11,10 +11,13 @@ export const useKategoriPengumuman = () => {
       setError(null);
 
       const params = new URLSearchParams();
+
       params.append("includeJenis", "true");
       params.append("isActive", "true");
 
-      const response = await fetch(`/api/kategori-pengumuman/options?${params.toString()}`);
+      const response = await fetch(
+        `/api/kategori-pengumuman/options?${params.toString()}`
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -25,7 +28,9 @@ export const useKategoriPengumuman = () => {
       if (result.success) {
         setKategoriOptions(result.data || []);
       } else {
-        throw new Error(result.message || "Failed to fetch kategori pengumuman");
+        throw new Error(
+          result.message || "Failed to fetch kategori pengumuman"
+        );
       }
     } catch (err) {
       console.error("Error fetching kategori pengumuman:", err);
@@ -45,15 +50,21 @@ export const useKategoriPengumuman = () => {
 
   // Helper function to get category by name (slug)
   const getCategoryBySlug = (slug) => {
-    return kategoriOptions.find((category) => category.nama.toLowerCase().replace(/\s+/g, "-") === slug);
+    return kategoriOptions.find(
+      (category) => category.nama.toLowerCase().replace(/\s+/g, "-") === slug
+    );
   };
 
   // Helper function to get subcategory by name within a category
   const getSubcategoryBySlug = (categorySlug, subcategorySlug) => {
     const category = getCategoryBySlug(categorySlug);
+
     if (!category || !category.jenisPengumuman) return null;
 
-    return category.jenisPengumuman.find((jenis) => jenis.nama.toLowerCase().replace(/\s+/g, "-") === subcategorySlug);
+    return category.jenisPengumuman.find(
+      (jenis) =>
+        jenis.nama.toLowerCase().replace(/\s+/g, "-") === subcategorySlug
+    );
   };
 
   return {

@@ -26,6 +26,7 @@ export default async function handler(req, res) {
         return await handleDelete(req, res);
       default:
         res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+
         return res
           .status(405)
           .json(apiResponse(false, null, `Method ${method} not allowed`));
@@ -112,16 +113,10 @@ async function handleGet(req, res) {
       .status(200)
       .json(apiResponse(true, result, "Data galeri berhasil diambil"));
   } catch (error) {
-    console.error("Error fetching galeri:", error);
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal mengambil data galeri",
-          error.message
-        )
+        apiResponse(false, null, "Gagal mengambil data galeri", error.message)
       );
   }
 }
@@ -186,25 +181,11 @@ async function handlePost(req, res) {
 
     return res
       .status(201)
-      .json(
-        apiResponse(
-          true,
-          newGaleri,
-          "Galeri berhasil dibuat"
-        )
-      );
+      .json(apiResponse(true, newGaleri, "Galeri berhasil dibuat"));
   } catch (error) {
-    console.error("Error creating galeri:", error);
     return res
       .status(500)
-      .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal membuat galeri",
-          error.message
-        )
-      );
+      .json(apiResponse(false, null, "Gagal membuat galeri", error.message));
   }
 }
 
@@ -243,13 +224,17 @@ async function handlePut(req, res) {
     // Prepare data untuk update
     const updateData = {};
 
-    if (namaKegiatan !== undefined) updateData.namaKegiatan = namaKegiatan.trim();
-    if (deskripsi !== undefined) updateData.deskripsi = deskripsi ? deskripsi.trim() : null;
+    if (namaKegiatan !== undefined)
+      updateData.namaKegiatan = namaKegiatan.trim();
+    if (deskripsi !== undefined)
+      updateData.deskripsi = deskripsi ? deskripsi.trim() : null;
     if (tempat !== undefined) updateData.tempat = tempat.trim();
-    if (tanggalKegiatan !== undefined) updateData.tanggalKegiatan = new Date(tanggalKegiatan);
-    if (fotos !== undefined) updateData.fotos = fotos ? JSON.stringify(fotos) : null;
+    if (tanggalKegiatan !== undefined)
+      updateData.tanggalKegiatan = new Date(tanggalKegiatan);
+    if (fotos !== undefined)
+      updateData.fotos = fotos ? JSON.stringify(fotos) : null;
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
-    
+
     if (isPublished !== undefined) {
       updateData.isPublished = Boolean(isPublished);
       // Set publishedAt jika status berubah ke published dan belum pernah dipublish
@@ -266,24 +251,12 @@ async function handlePut(req, res) {
 
     return res
       .status(200)
-      .json(
-        apiResponse(
-          true,
-          updatedGaleri,
-          "Galeri berhasil diperbarui"
-        )
-      );
+      .json(apiResponse(true, updatedGaleri, "Galeri berhasil diperbarui"));
   } catch (error) {
-    console.error("Error updating galeri:", error);
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal memperbarui galeri",
-          error.message
-        )
+        apiResponse(false, null, "Gagal memperbarui galeri", error.message)
       );
   }
 }
@@ -315,19 +288,17 @@ async function handleDelete(req, res) {
     if (existingGaleri.fotos) {
       try {
         const fotos = JSON.parse(existingGaleri.fotos);
+
         if (Array.isArray(fotos) && fotos.length > 0) {
-          console.log(`Menghapus ${fotos.length} foto dari S3...`);
-          
           // Hapus semua foto dari S3
           const deletePromises = fotos.map(async (foto) => {
             if (foto.fileName) {
-              console.log(`Menghapus foto: ${foto.fileName}`);
               const deleteResult = await deleteFileFromS3(foto.fileName);
+
               if (!deleteResult.success) {
-                console.error(`Gagal menghapus ${foto.fileName}:`, deleteResult.error);
               } else {
-                console.log(`✅ Berhasil menghapus ${foto.fileName}`);
               }
+
               return deleteResult;
             }
           });
@@ -335,7 +306,6 @@ async function handleDelete(req, res) {
           await Promise.all(deletePromises);
         }
       } catch (parseError) {
-        console.error("Error parsing fotos JSON:", parseError);
         // Lanjutkan proses delete meskipun parsing gagal
       }
     }
@@ -350,16 +320,8 @@ async function handleDelete(req, res) {
       .status(200)
       .json(apiResponse(true, null, "Galeri dan foto berhasil dihapus"));
   } catch (error) {
-    console.error("Error deleting galeri:", error);
     return res
       .status(500)
-      .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal menghapus galeri",
-          error.message
-        )
-      );
+      .json(apiResponse(false, null, "Gagal menghapus galeri", error.message));
   }
 }

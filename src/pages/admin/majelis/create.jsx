@@ -208,8 +208,6 @@ export default function CreateMajelisPage() {
         delete formattedData.idRayon;
       }
 
-      console.log("Submitting majelis data:", formattedData);
-
       const result = await majelisService.createWithAccount(formattedData);
 
       if (result.success) {

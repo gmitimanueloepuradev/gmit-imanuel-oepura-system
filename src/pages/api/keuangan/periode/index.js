@@ -21,12 +21,14 @@ export default async function handler(req, res) {
         return await handlePost(req, res);
       default:
         res.setHeader("Allow", ["GET", "POST"]);
+
         return res
           .status(405)
           .json(apiResponse(false, null, `Method ${method} not allowed`));
     }
   } catch (error) {
     console.error("API Periode Anggaran Error:", error);
+
     return res
       .status(500)
       .json(apiResponse(false, null, "Server error", error.message));
@@ -39,11 +41,11 @@ async function handleGet(req, res) {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = {};
-    
+
     if (search) {
       where.OR = [
-        { nama: { contains: search, mode: 'insensitive' } },
-        { keterangan: { contains: search, mode: 'insensitive' } },
+        { nama: { contains: search, mode: "insensitive" } },
+        { keterangan: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -51,7 +53,7 @@ async function handleGet(req, res) {
       where.tahun = parseInt(tahun);
     }
 
-    if (status && status !== '') {
+    if (status && status !== "") {
       where.status = status;
     }
 
@@ -61,25 +63,22 @@ async function handleGet(req, res) {
         include: {
           _count: {
             select: {
-              itemKeuangan: true
-            }
-          }
+              itemKeuangan: true,
+            },
+          },
         },
         skip,
         take: parseInt(limit),
-        orderBy: [
-          { tahun: 'desc' },
-          { tanggalMulai: 'desc' }
-        ]
+        orderBy: [{ tahun: "desc" }, { tanggalMulai: "desc" }],
       }),
-      prisma.periodeAnggaran.count({ where })
+      prisma.periodeAnggaran.count({ where }),
     ]);
 
     const pagination = {
       page: parseInt(page),
       limit: parseInt(limit),
       total,
-      totalPages: Math.ceil(total / parseInt(limit))
+      totalPages: Math.ceil(total / parseInt(limit)),
     };
 
     return res
@@ -87,34 +86,42 @@ async function handleGet(req, res) {
       .json(apiResponse(true, { items, pagination }, "Data berhasil diambil"));
   } catch (error) {
     console.error("Error fetching periode anggaran:", error);
+
     return res
       .status(500)
-      .json(apiResponse(false, null, "Gagal mengambil data periode anggaran", error.message));
+      .json(
+        apiResponse(
+          false,
+          null,
+          "Gagal mengambil data periode anggaran",
+          error.message
+        )
+      );
   }
 }
 
 async function handlePost(req, res) {
   try {
-    const { 
-      nama, 
-      tahun, 
-      tanggalMulai, 
-      tanggalAkhir, 
+    const {
+      nama,
+      tahun,
+      tanggalMulai,
+      tanggalAkhir,
       keterangan,
       status = "DRAFT",
       isActive = true,
-      autoPopulateItems = false // Parameter baru untuk auto populate
+      autoPopulateItems = false, // Parameter baru untuk auto populate
     } = req.body;
 
     if (!nama || !tahun || !tanggalMulai || !tanggalAkhir) {
-      return res
-        .status(400)
-        .json(apiResponse(false, null, "Validasi gagal", {
+      return res.status(400).json(
+        apiResponse(false, null, "Validasi gagal", {
           nama: !nama ? "Nama periode wajib diisi" : undefined,
           tahun: !tahun ? "Tahun wajib diisi" : undefined,
           tanggalMulai: !tanggalMulai ? "Tanggal mulai wajib diisi" : undefined,
           tanggalAkhir: !tanggalAkhir ? "Tanggal akhir wajib diisi" : undefined,
-        }));
+        })
+      );
     }
 
     // Validate dates
@@ -122,11 +129,11 @@ async function handlePost(req, res) {
     const endDate = new Date(tanggalAkhir);
 
     if (startDate >= endDate) {
-      return res
-        .status(400)
-        .json(apiResponse(false, null, "Validasi gagal", {
-          tanggalAkhir: "Tanggal akhir harus setelah tanggal mulai"
-        }));
+      return res.status(400).json(
+        apiResponse(false, null, "Validasi gagal", {
+          tanggalAkhir: "Tanggal akhir harus setelah tanggal mulai",
+        })
+      );
     }
 
     // Check for overlapping periods
@@ -136,29 +143,35 @@ async function handlePost(req, res) {
           {
             AND: [
               { tanggalMulai: { lte: startDate } },
-              { tanggalAkhir: { gte: startDate } }
-            ]
+              { tanggalAkhir: { gte: startDate } },
+            ],
           },
           {
             AND: [
               { tanggalMulai: { lte: endDate } },
-              { tanggalAkhir: { gte: endDate } }
-            ]
+              { tanggalAkhir: { gte: endDate } },
+            ],
           },
           {
             AND: [
               { tanggalMulai: { gte: startDate } },
-              { tanggalAkhir: { lte: endDate } }
-            ]
-          }
-        ]
-      }
+              { tanggalAkhir: { lte: endDate } },
+            ],
+          },
+        ],
+      },
     });
 
     if (overlapping) {
       return res
         .status(400)
-        .json(apiResponse(false, null, "Periode anggaran tidak boleh tumpang tindih dengan periode lain"));
+        .json(
+          apiResponse(
+            false,
+            null,
+            "Periode anggaran tidak boleh tumpang tindih dengan periode lain"
+          )
+        );
     }
 
     const periode = await prisma.periodeAnggaran.create({
@@ -169,8 +182,8 @@ async function handlePost(req, res) {
         tanggalAkhir: endDate,
         keterangan: keterangan || null,
         status,
-        isActive
-      }
+        isActive,
+      },
     });
 
     // Auto populate anggaran items jika diminta
@@ -178,36 +191,34 @@ async function handlePost(req, res) {
       try {
         // Get all active item keuangan
         const itemKeuanganList = await prisma.itemKeuangan.findMany({
-          where: { 
-            isActive: true 
+          where: {
+            isActive: true,
           },
           orderBy: [
-            { kategoriId: 'asc' },
-            { level: 'asc' },
-            { urutan: 'asc' },
-            { kode: 'asc' }
-          ]
+            { kategoriId: "asc" },
+            { level: "asc" },
+            { urutan: "asc" },
+            { kode: "asc" },
+          ],
         });
 
         if (itemKeuanganList.length > 0) {
           // Prepare anggaran items data
-          const anggaranItemsData = itemKeuanganList.map(item => ({
+          const anggaranItemsData = itemKeuanganList.map((item) => ({
             periodeId: periode.id,
             itemKeuanganId: item.id,
             targetFrekuensi: item.targetFrekuensi || null,
             satuanFrekuensi: item.satuanFrekuensi || null,
             nominalSatuan: item.nominalSatuan || null,
             totalAnggaran: item.totalTarget || 0,
-            keterangan: `Auto-populated dari template: ${item.nama}`
+            keterangan: `Auto-populated dari template: ${item.nama}`,
           }));
 
           // Create anggaran items in batch
           // Note: This would need to be implemented if AnggaranItem model exists
           // For now, we'll skip auto population
-          console.log("Auto populate anggaran items skipped - model not implemented");
         }
       } catch (populateError) {
-        console.warn("Gagal auto populate anggaran items:", populateError);
         // Tidak menggagalkan pembuatan periode, hanya warning
       }
     }
@@ -216,9 +227,15 @@ async function handlePost(req, res) {
       .status(201)
       .json(apiResponse(true, periode, "Periode anggaran berhasil dibuat"));
   } catch (error) {
-    console.error("Error creating periode anggaran:", error);
     return res
       .status(500)
-      .json(apiResponse(false, null, "Gagal membuat periode anggaran", error.message));
+      .json(
+        apiResponse(
+          false,
+          null,
+          "Gagal membuat periode anggaran",
+          error.message
+        )
+      );
   }
 }

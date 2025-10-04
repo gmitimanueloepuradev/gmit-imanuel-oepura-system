@@ -11,12 +11,15 @@ export const useJenisPengumuman = (kategoriId = null) => {
       setError(null);
 
       const params = new URLSearchParams();
+
       if (kategoriId) {
         params.append("kategoriId", kategoriId);
       }
       params.append("isActive", "true");
 
-      const response = await fetch(`/api/jenis-pengumuman/options?${params.toString()}`);
+      const response = await fetch(
+        `/api/jenis-pengumuman/options?${params.toString()}`
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

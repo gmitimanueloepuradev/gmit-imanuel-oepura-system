@@ -32,8 +32,6 @@ export default function CreateOrEditModal({
 
   const { reset, setError, handleSubmit } = methods;
 
-  console.log("default value : ", defaultValues);
-
   // Reset form when modal opens/closes or editData changes
   useEffect(() => {
     if (isOpen) {

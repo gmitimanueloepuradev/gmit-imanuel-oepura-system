@@ -1,6 +1,6 @@
 import { Book, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function DailyVerse() {
   const [verse, setVerse] = useState(null);
@@ -20,7 +20,7 @@ export default function DailyVerse() {
         "https://beta.ourmanna.com/api/v1/get?format=json",
         {
           signal: controller.signal,
-          next: { revalidate: 3600 } // Revalidate every hour instead of force-cache
+          next: { revalidate: 3600 }, // Revalidate every hour instead of force-cache
         }
       );
 
@@ -38,10 +38,8 @@ export default function DailyVerse() {
         throw new Error("Format respons tidak valid");
       }
     } catch (err) {
-      if (err.name === 'AbortError') {
-        console.log('Fetch aborted due to timeout');
+      if (err.name === "AbortError") {
       } else {
-        console.error("Error fetching daily verse:", err);
       }
       setError(err.message);
       // Fallback verse - show immediately

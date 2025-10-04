@@ -94,10 +94,6 @@ export default function KeuanganDashboard() {
   const statistics = useMemo(() => {
     if (!itemData || !kategoriList) return null;
 
-    // Debug log untuk melihat struktur data (optional)
-    // console.log("itemData structure:", itemData);
-    // console.log("kategoriList structure:", kategoriList);
-
     // Ambil items dari struktur API response yang sebenarnya
     let items = [];
 
@@ -131,9 +127,6 @@ export default function KeuanganDashboard() {
     ) {
       kategoris = kategoriList.data.items;
     }
-
-    // console.log("Processed items:", items);
-    // console.log("Processed kategoris:", kategoris);
 
     if (items.length === 0 || kategoris.length === 0) {
       return null;
@@ -202,8 +195,10 @@ export default function KeuanganDashboard() {
     const maxLevel = levels.length > 0 ? Math.max(...levels) : 0;
 
     // Hitung realisasi dari realisasiSummary jika tersedia
-    const totalRealisasiAmount = realisasiSummary?.summary?.totalRealisasiAmount || 0;
-    const totalTargetFromSummary = realisasiSummary?.summary?.totalTargetAmount || grandTotalTarget;
+    const totalRealisasiAmount =
+      realisasiSummary?.summary?.totalRealisasiAmount || 0;
+    const totalTargetFromSummary =
+      realisasiSummary?.summary?.totalTargetAmount || grandTotalTarget;
     const realisasiAchievementPercentage =
       totalTargetFromSummary > 0
         ? (totalRealisasiAmount / totalTargetFromSummary) * 100
@@ -255,7 +250,6 @@ export default function KeuanganDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-
       <PageTitle title="Dashboard Keuangan" />
       <PageHeader
         breadcrumb={[
@@ -392,7 +386,8 @@ export default function KeuanganDashboard() {
                         {formatRupiah(statistics.totalTargetFromSummary)}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {realisasiSummary.summary?.totalItems || 0} item anggaran
+                        {realisasiSummary.summary?.totalItems || 0} item
+                        anggaran
                       </div>
                     </div>
 
@@ -408,7 +403,8 @@ export default function KeuanganDashboard() {
                         {formatRupiah(statistics.totalRealisasiAmount)}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {realisasiSummary.summary?.totalRealisasiCount || 0} transaksi realisasi
+                        {realisasiSummary.summary?.totalRealisasiCount || 0}{" "}
+                        transaksi realisasi
                       </div>
                     </div>
 
@@ -437,7 +433,8 @@ export default function KeuanganDashboard() {
                             className={`h-2 rounded-full transition-all ${
                               statistics.realisasiAchievementPercentage >= 80
                                 ? "bg-green-500"
-                                : statistics.realisasiAchievementPercentage >= 50
+                                : statistics.realisasiAchievementPercentage >=
+                                    50
                                   ? "bg-yellow-500"
                                   : "bg-red-500"
                             }`}
@@ -461,7 +458,8 @@ export default function KeuanganDashboard() {
                       </div>
                       <div
                         className={`text-xl font-bold ${
-                          (realisasiSummary.summary?.totalVarianceAmount || 0) >= 0
+                          (realisasiSummary.summary?.totalVarianceAmount ||
+                            0) >= 0
                             ? "text-green-600 dark:text-green-400"
                             : "text-red-600 dark:text-red-400"
                         }`}
@@ -475,14 +473,15 @@ export default function KeuanganDashboard() {
                       <span>Target Tercapai:</span>
                       <Badge
                         variant={
-                          (realisasiSummary.summary?.itemsTargetAchieved || 0) >=
+                          (realisasiSummary.summary?.itemsTargetAchieved ||
+                            0) >=
                           (realisasiSummary.summary?.totalItems || 0) * 0.7
                             ? "success"
                             : "warning"
                         }
                       >
-                        {realisasiSummary.summary?.itemsTargetAchieved || 0} dari{" "}
-                        {realisasiSummary.summary?.totalItems || 0} item
+                        {realisasiSummary.summary?.itemsTargetAchieved || 0}{" "}
+                        dari {realisasiSummary.summary?.totalItems || 0} item
                       </Badge>
                     </div>
                   </div>
@@ -951,7 +950,8 @@ export default function KeuanganDashboard() {
                     itemData.items.map((item, index) => {
                       // Calculate indentation based on level
                       const level = item.level || 1;
-                      const indentClass = level > 1 ? `ml-${(level - 1) * 8}` : "";
+                      const indentClass =
+                        level > 1 ? `ml-${(level - 1) * 8}` : "";
 
                       return (
                         <div
@@ -979,42 +979,42 @@ export default function KeuanganDashboard() {
                               {item.kode}
                             </div>
                             <div>
-                            <h4 className="font-medium text-gray-900 dark:text-white">
-                              {item.nama}
-                            </h4>
-                            <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
-                              <span>Level {item.level}</span>
-                              <span>•</span>
-                              <span>{item.kategori?.nama || "Unknown"}</span>
-                              {item.parent && (
-                                <>
-                                  <span>•</span>
-                                  <span>Parent: {item.parent.nama}</span>
-                                </>
+                              <h4 className="font-medium text-gray-900 dark:text-white">
+                                {item.nama}
+                              </h4>
+                              <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                <span>Level {item.level}</span>
+                                <span>•</span>
+                                <span>{item.kategori?.nama || "Unknown"}</span>
+                                {item.parent && (
+                                  <>
+                                    <span>•</span>
+                                    <span>Parent: {item.parent.nama}</span>
+                                  </>
+                                )}
+                              </div>
+                              {item.deskripsi && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {item.deskripsi}
+                                </p>
                               )}
                             </div>
-                            {item.deskripsi && (
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                {item.deskripsi}
-                              </p>
-                            )}
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-lg text-gray-900 dark:text-white">
-                            {formatRupiah(item.totalTarget)}
+                          <div className="text-right">
+                            <div className="font-bold text-lg text-gray-900 dark:text-white">
+                              {formatRupiah(item.totalTarget)}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              Target
+                            </div>
+                            <div className="text-sm text-green-600 dark:text-green-400">
+                              Actual: {formatRupiah(item.nominalActual)}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {item.targetFrekuensi} {item.satuanFrekuensi} ×{" "}
+                              {formatRupiah(item.nominalSatuan)}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Target
-                          </div>
-                          <div className="text-sm text-green-600 dark:text-green-400">
-                            Actual: {formatRupiah(item.nominalActual)}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {item.targetFrekuensi} {item.satuanFrekuensi} ×{" "}
-                            {formatRupiah(item.nominalSatuan)}
-                          </div>
-                        </div>
                         </div>
                       );
                     })}

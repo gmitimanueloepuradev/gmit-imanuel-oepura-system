@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from "react";
 
 const PWAContext = createContext(null);
 
@@ -12,8 +12,10 @@ export function PWAProvider({ children }) {
   useEffect(() => {
     // Check if app is already installed
     const checkInstalled = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                           window.navigator.standalone === true;
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
       setIsInstalled(isStandalone);
     };
 
@@ -24,7 +26,6 @@ export function PWAProvider({ children }) {
 
     // Handle beforeinstallprompt
     const handleBeforeInstallPrompt = (e) => {
-      console.log('PWA: beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
@@ -32,7 +33,6 @@ export function PWAProvider({ children }) {
 
     // Handle app installed
     const handleAppInstalled = (e) => {
-      console.log('PWA: app installed', e);
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
@@ -47,18 +47,22 @@ export function PWAProvider({ children }) {
     updateOnlineStatus();
 
     // Add event listeners
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
 
     // Service worker registration and update detection
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
-        registration.addEventListener('updatefound', () => {
+        registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+
+          newWorker.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
               handleSWUpdate();
             }
           });
@@ -67,10 +71,13 @@ export function PWAProvider({ children }) {
     }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
     };
   }, []);
 
@@ -81,27 +88,25 @@ export function PWAProvider({ children }) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
 
-      if (outcome === 'accepted') {
-        console.log('PWA: User accepted the install prompt');
+      if (outcome === "accepted") {
         setIsInstalled(true);
         setIsInstallable(false);
         setDeferredPrompt(null);
+
         return true;
       } else {
-        console.log('PWA: User dismissed the install prompt');
         return false;
       }
     } catch (error) {
-      console.error('PWA: Error installing app:', error);
       return false;
     }
   };
 
   const updateApp = () => {
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
         if (registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
           window.location.reload();
         }
       });
@@ -115,20 +120,18 @@ export function PWAProvider({ children }) {
     isOnline,
     updateAvailable,
     installApp,
-    updateApp
+    updateApp,
   };
 
-  return (
-    <PWAContext.Provider value={value}>
-      {children}
-    </PWAContext.Provider>
-  );
+  return <PWAContext.Provider value={value}>{children}</PWAContext.Provider>;
 }
 
 export function usePWA() {
   const context = useContext(PWAContext);
+
   if (!context) {
-    throw new Error('usePWA must be used within a PWAProvider');
+    throw new Error("usePWA must be used within a PWAProvider");
   }
+
   return context;
 }

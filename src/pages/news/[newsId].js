@@ -8,6 +8,7 @@ const downloadAttachment = (attachment) => {
     // Convert base64 to binary
     const byteCharacters = atob(attachment.base64Data);
     const byteNumbers = new Array(byteCharacters.length);
+
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
@@ -19,6 +20,7 @@ const downloadAttachment = (attachment) => {
     // Create download link
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
+
     link.href = url;
     link.download = attachment.fileName;
     document.body.appendChild(link);
@@ -39,6 +41,7 @@ const formatFileSize = (bytes) => {
   const k = 1024;
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
@@ -47,6 +50,7 @@ const getFileIcon = (fileType) => {
   if (fileType.startsWith("image/")) {
     return <ImageIcon className="w-5 h-5 text-blue-600" />;
   }
+
   return <FileText className="w-5 h-5 text-gray-600" />;
 };
 
@@ -84,16 +88,20 @@ export default function News() {
     async function fetchNewsDetail() {
       const res = await fetch(`/api/pengumuman/${newsId}`);
       const data = await res.json();
+
       if (data.success && data.data) {
         setNews(data.data);
-        console.log(data.data);
       }
     }
     fetchNewsDetail();
   }, [newsId]);
 
   if (!news) {
-    return <div className="min-h-screen py-24 px-4 md:px-24 bg-gray-100">Memuat...</div>;
+    return (
+      <div className="min-h-screen py-24 px-4 md:px-24 bg-gray-100">
+        Memuat...
+      </div>
+    );
   }
 
   return (
@@ -104,7 +112,10 @@ export default function News() {
         <div className="mt-2 text-sm text-gray-600 flex gap-4">
           <span>Kategori: {news.kategori?.nama}</span>
           <span>Jenis: {news.jenis?.nama}</span>
-          <span>Tanggal: {new Date(news.tanggalPengumuman).toLocaleDateString("id-ID")}</span>
+          <span>
+            Tanggal:{" "}
+            {new Date(news.tanggalPengumuman).toLocaleDateString("id-ID")}
+          </span>
         </div>
         <div className="mt-6">
           <p className="text-lg">{news.konten?.deskripsi || ""}</p>
@@ -122,10 +133,7 @@ export default function News() {
             <h3 className="font-semibold text-lg mb-4">Lampiran:</h3>
             <div className="space-y-3">
               {news.attachments.map((attachment, index) => (
-                <AttachmentItem
-                  key={index}
-                  attachment={attachment}
-                />
+                <AttachmentItem key={index} attachment={attachment} />
               ))}
             </div>
           </div>

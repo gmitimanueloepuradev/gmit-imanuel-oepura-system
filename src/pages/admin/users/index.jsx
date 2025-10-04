@@ -502,8 +502,6 @@ export default function UsersPage() {
         cleanData.noWhatsapp = null;
       }
 
-      console.log("Sending user data:", cleanData);
-
       return userService.create(cleanData);
     },
     onSuccess: () => {
@@ -512,7 +510,6 @@ export default function UsersPage() {
       setShowCreate(false);
     },
     onError: (error) => {
-      console.error("Create user error:", error);
       toast.error(error?.response?.data?.message || "Gagal menambahkan user");
     },
   });

@@ -5,7 +5,12 @@ import publicJadwalService from "../../../services/publicJadwalService";
 
 import ScheduleCard from "./scheduleCard";
 
-export default function ScheduleRow({ jenisIbadah = null, kategori = null, title = "Schedule", limit = 6 }) {
+export default function ScheduleRow({
+  jenisIbadah = null,
+  kategori = null,
+  title = "Schedule",
+  limit = 6,
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +21,6 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
     const fetchSchedules = async () => {
       try {
         setLoading(true);
-        console.log(`Fetching schedules for: ${title}`, { jenisIbadah, kategori, limit });
 
         const response = await publicJadwalService.getJadwalIbadah({
           jenisIbadah,
@@ -25,14 +29,11 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
           upcoming: true,
         });
 
-        console.log(`Response for ${title}:`, response);
-
-        const formattedSchedules = publicJadwalService.formatForScheduleRow(response);
-        console.log(`Formatted schedules for ${title}:`, formattedSchedules);
+        const formattedSchedules =
+          publicJadwalService.formatForScheduleRow(response);
 
         setSchedules(formattedSchedules);
       } catch (err) {
-        console.error(`Failed to fetch schedules for ${title}:`, err);
         setError("Gagal memuat jadwal ibadah");
         setSchedules([]);
       } finally {
@@ -51,12 +52,15 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
 
   const prevSlide = () => {
     if (schedules.length > 0) {
-      setCurrentIndex((prev) => (prev - 1 + schedules.length) % schedules.length);
+      setCurrentIndex(
+        (prev) => (prev - 1 + schedules.length) % schedules.length
+      );
     }
   };
 
   const getSlidePosition = (index) => {
-    const position = (index - currentIndex + schedules.length) % schedules.length;
+    const position =
+      (index - currentIndex + schedules.length) % schedules.length;
 
     switch (position) {
       case 0:
@@ -118,7 +122,9 @@ export default function ScheduleRow({ jenisIbadah = null, kategori = null, title
         <div className="flex items-center justify-center h-80">
           <div className="text-white text-center">
             <p className="text-lg">
-              Tidak ada jadwal {jenisIbadah ? jenisIbadah.toLowerCase() : "ibadah"} yang akan datang
+              Tidak ada jadwal{" "}
+              {jenisIbadah ? jenisIbadah.toLowerCase() : "ibadah"} yang akan
+              datang
             </p>
           </div>
         </div>

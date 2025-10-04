@@ -14,13 +14,16 @@ class DashboardService {
       return response.data.data;
     } catch (error) {
       console.error("Majelis Dashboard Service Error:", error);
-      
+
       // Handle 403 error specifically - show the actual API error message
       if (error.response && error.response.status === 403) {
-        const apiErrorMessage = error.response.data?.message || "Akses ditolak. Anda bukan majelis atau tidak memiliki izin untuk mengakses dashboard majelis.";
+        const apiErrorMessage =
+          error.response.data?.message ||
+          "Akses ditolak. Anda bukan majelis atau tidak memiliki izin untuk mengakses dashboard majelis.";
+
         throw new Error(apiErrorMessage);
       }
-      
+
       throw error;
     }
   }
@@ -50,10 +53,9 @@ class DashboardService {
     } catch (error) {
       // If 403, user is not majelis - fall back to general dashboard stats
       if (error.response && error.response.status === 403) {
-        console.log("User is not majelis, falling back to general dashboard");
         return await this.getDashboardStats();
       }
-      
+
       // Re-throw other errors
       throw error;
     }

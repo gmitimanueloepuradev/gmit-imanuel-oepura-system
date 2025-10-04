@@ -50,55 +50,57 @@ export const baptisSchema = z.object({
 });
 
 // Atestasi
-export const atestasiSchema = z.object({
-  tipe: z.enum(["MASUK", "KELUAR"], {
-    required_error: "Tipe atestasi wajib dipilih",
-  }),
-  tanggal: z.string().nonempty("Tanggal wajib diisi"),
-  idJemaat: z.string().optional(),
-  idKlasis: z.string().optional(),
-  gerejaAsal: z.string().optional(),
-  gerejaTujuan: z.string().optional(),
-  alasan: z.string().optional(),
-  keterangan: z.string().optional(),
-  namaCalonJemaat: z.string().optional(),
-}).superRefine((data, ctx) => {
-  // Validasi untuk atestasi MASUK
-  if (data.tipe === "MASUK") {
-    if (!data.namaCalonJemaat) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["namaCalonJemaat"],
-        message: "Nama calon jemaat wajib diisi untuk atestasi masuk",
-      });
+export const atestasiSchema = z
+  .object({
+    tipe: z.enum(["MASUK", "KELUAR"], {
+      required_error: "Tipe atestasi wajib dipilih",
+    }),
+    tanggal: z.string().nonempty("Tanggal wajib diisi"),
+    idJemaat: z.string().optional(),
+    idKlasis: z.string().optional(),
+    gerejaAsal: z.string().optional(),
+    gerejaTujuan: z.string().optional(),
+    alasan: z.string().optional(),
+    keterangan: z.string().optional(),
+    namaCalonJemaat: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Validasi untuk atestasi MASUK
+    if (data.tipe === "MASUK") {
+      if (!data.namaCalonJemaat) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["namaCalonJemaat"],
+          message: "Nama calon jemaat wajib diisi untuk atestasi masuk",
+        });
+      }
+      if (!data.gerejaAsal) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["gerejaAsal"],
+          message: "Gereja asal wajib diisi untuk atestasi masuk",
+        });
+      }
     }
-    if (!data.gerejaAsal) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["gerejaAsal"],
-        message: "Gereja asal wajib diisi untuk atestasi masuk",
-      });
+
+    // Validasi untuk atestasi KELUAR
+    if (data.tipe === "KELUAR") {
+      if (!data.idJemaat) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["idJemaat"],
+          message: "Jemaat wajib dipilih untuk atestasi keluar",
+        });
+      }
+      if (!data.gerejaTujuan) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["gerejaTujuan"],
+          message: "Gereja tujuan wajib diisi untuk atestasi keluar",
+        });
+      }
     }
-  }
-  
-  // Validasi untuk atestasi KELUAR
-  if (data.tipe === "KELUAR") {
-    if (!data.idJemaat) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["idJemaat"],
-        message: "Jemaat wajib dipilih untuk atestasi keluar",
-      });
-    }
-    if (!data.gerejaTujuan) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["gerejaTujuan"],
-        message: "Gereja tujuan wajib diisi untuk atestasi keluar",
-      });
-    }
-  }
-});
+  });
 
 // Jenis Ibadah
 export const jenisIbadahSchema = z.object({
@@ -123,7 +125,7 @@ export const majelisCreationSchema = z.object({
   selesai: z.string().optional(),
   idRayon: z.string().optional(),
   jenisJabatanId: z.string().nonempty("Jenis jabatan wajib dipilih"),
-  
+
   // User account data
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
@@ -133,17 +135,25 @@ export const majelisCreationSchema = z.object({
     .optional()
     .refine(
       (val) => {
-        if (!val || val === '') return true; // Optional field
+        if (!val || val === "") return true; // Optional field
         // Check if it's a valid Indonesian phone number format
-        const cleaned = val.replace(/\D/g, '');
-        if (cleaned.startsWith('62')) {
+        const cleaned = val.replace(/\D/g, "");
+
+        if (cleaned.startsWith("62")) {
           const afterCountryCode = cleaned.substring(2);
-          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+
+          return (
+            afterCountryCode.startsWith("8") &&
+            afterCountryCode.length >= 9 &&
+            afterCountryCode.length <= 13
+          );
         }
+
         return false;
       },
       {
-        message: 'Format nomor WhatsApp tidak valid. Gunakan format +6281234567890',
+        message:
+          "Format nomor WhatsApp tidak valid. Gunakan format +6281234567890",
       }
     ),
 });
@@ -185,7 +195,8 @@ export const keluargaCreateSchema = z.object({
 
 // Kategori Pengumuman Schema
 export const kategoriPengumumanSchema = z.object({
-  nama: z.string()
+  nama: z
+    .string()
     .min(2, "Nama kategori wajib diisi")
     .max(100, "Nama maksimal 100 karakter"),
   deskripsi: z.string().optional(),
@@ -195,14 +206,13 @@ export const kategoriPengumumanSchema = z.object({
 // Jenis Pengumuman Schema
 export const jenisPengumumanSchema = z.object({
   kategoriId: z.string().nonempty("Kategori pengumuman wajib dipilih"),
-  nama: z.string()
+  nama: z
+    .string()
     .min(2, "Nama jenis wajib diisi")
     .max(150, "Nama maksimal 150 karakter"),
   deskripsi: z.string().optional(),
   isActive: z.boolean().default(true),
 });
-
-
 
 // Jemaat Create Schema
 export const jemaatCreateSchema = z.object({
@@ -210,7 +220,12 @@ export const jemaatCreateSchema = z.object({
   nama: z.string().min(2, "Nama lengkap wajib diisi"),
   jenisKelamin: z.union([
     z.boolean(),
-    z.string().refine(val => val === 'true' || val === 'false', "Jenis kelamin harus dipilih")
+    z
+      .string()
+      .refine(
+        (val) => val === "true" || val === "false",
+        "Jenis kelamin harus dipilih"
+      ),
   ]),
   tanggalLahir: z.string().min(1, "Tanggal lahir wajib diisi"),
   tempatLahir: z.string().min(2, "Tempat lahir wajib diisi"),
@@ -221,15 +236,23 @@ export const jemaatCreateSchema = z.object({
     .refine(
       (val) => {
         // Check if it's a valid Indonesian phone number format
-        const cleaned = val.replace(/\D/g, '');
-        if (cleaned.startsWith('62')) {
+        const cleaned = val.replace(/\D/g, "");
+
+        if (cleaned.startsWith("62")) {
           const afterCountryCode = cleaned.substring(2);
-          return afterCountryCode.startsWith('8') && afterCountryCode.length >= 9 && afterCountryCode.length <= 13;
+
+          return (
+            afterCountryCode.startsWith("8") &&
+            afterCountryCode.length >= 9 &&
+            afterCountryCode.length <= 13
+          );
         }
+
         return false;
       },
       {
-        message: 'Format nomor telepon tidak valid. Gunakan format +6281234567890',
+        message:
+          "Format nomor telepon tidak valid. Gunakan format +6281234567890",
       }
     ),
   email: z.string().email("Format email tidak valid"),
@@ -237,7 +260,9 @@ export const jemaatCreateSchema = z.object({
   password: z.string().min(6, "Password minimal 6 karakter"),
 
   // Required relations based on Prisma schema
-  idStatusDalamKeluarga: z.string().nonempty("Status dalam keluarga wajib dipilih"),
+  idStatusDalamKeluarga: z
+    .string()
+    .nonempty("Status dalam keluarga wajib dipilih"),
   idSuku: z.string().nonempty("Suku wajib dipilih"),
   idPendidikan: z.string().nonempty("Pendidikan wajib dipilih"),
   idPekerjaan: z.string().nonempty("Pekerjaan wajib dipilih"),
@@ -250,7 +275,3 @@ export const jemaatCreateSchema = z.object({
   // Family relation
   isKepalaKeluarga: z.boolean().default(false),
 });
-
-function testForking(){
-  console.log("test forking");
-}

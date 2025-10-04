@@ -164,7 +164,7 @@ export default function EditJadwalIbadah() {
         jumlahPerempuan: jadwal.jumlahPerempuan?.toString() || "",
       });
 
-      console.log("Form populated with data:", jadwal);
+      console.log("Form populated wi th data:", jadwal);
     }
   }, [jadwalData, form]);
 

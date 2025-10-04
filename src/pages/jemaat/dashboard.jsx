@@ -29,8 +29,7 @@ function JemaatDashboard() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [replaceDocument, setReplaceDocument] = useState(null);
 
-  console.log(user, "<< user jemaat dashboard");
-
+ 
   // Check if user profile is incomplete (no idJemaat)
   const isProfileIncomplete = !user?.idJemaat;
 

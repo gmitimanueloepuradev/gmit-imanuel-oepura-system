@@ -1,14 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 // Dynamic import leaflet to avoid SSR issues
 let L = null;
 
-const LeafletMap = ({ 
+const LeafletMap = ({
   center = [-6.2088, 106.8456], // Default Jakarta
   zoom = 13,
   selectedPosition,
   onMapClick,
-  height = "300px"
+  height = "300px",
 }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -17,15 +17,18 @@ const LeafletMap = ({
   useEffect(() => {
     // Dynamically import leaflet on client side only
     const initMap = async () => {
-      if (typeof window !== 'undefined' && !L) {
-        L = (await import('leaflet')).default;
-        
+      if (typeof window !== "undefined" && !L) {
+        L = (await import("leaflet")).default;
+
         // Fix for default markers
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
-          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconRetinaUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+          iconUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+          shadowUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
         });
       }
 
@@ -39,27 +42,27 @@ const LeafletMap = ({
         });
 
         // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19,
         }).addTo(map);
 
         // Add click event
-        map.on('click', (e) => {
+        map.on("click", (e) => {
           const { lat, lng } = e.latlng;
-          console.log('Map clicked:', lat, lng);
-          
+
           // Remove existing marker
           if (markerRef.current) {
             map.removeLayer(markerRef.current);
           }
-          
+
           // Add new marker
           markerRef.current = L.marker([lat, lng])
             .addTo(map)
             .bindPopup(`Lat: ${lat.toFixed(6)}<br/>Lng: ${lng.toFixed(6)}`)
             .openPopup();
-          
+
           // Call callback
           if (onMapClick) {
             onMapClick({ latlng: { lat, lng } });
@@ -67,10 +70,11 @@ const LeafletMap = ({
         });
 
         mapInstanceRef.current = map;
-        
+
         // Add initial marker if position exists
         if (selectedPosition) {
           const [lat, lng] = selectedPosition;
+
           markerRef.current = L.marker([lat, lng])
             .addTo(map)
             .bindPopup(`Lat: ${lat.toFixed(6)}<br/>Lng: ${lng.toFixed(6)}`)
@@ -95,20 +99,23 @@ const LeafletMap = ({
   useEffect(() => {
     if (L && mapInstanceRef.current && selectedPosition) {
       const [lat, lng] = selectedPosition;
-      
+
       // Remove existing marker
       if (markerRef.current) {
         mapInstanceRef.current.removeLayer(markerRef.current);
       }
-      
+
       // Add new marker
       markerRef.current = L.marker([lat, lng])
         .addTo(mapInstanceRef.current)
         .bindPopup(`Lat: ${lat.toFixed(6)}<br/>Lng: ${lng.toFixed(6)}`)
         .openPopup();
-      
+
       // Center map on new position
-      mapInstanceRef.current.setView([lat, lng], mapInstanceRef.current.getZoom());
+      mapInstanceRef.current.setView(
+        [lat, lng],
+        mapInstanceRef.current.getZoom()
+      );
     }
   }, [selectedPosition]);
 
@@ -121,10 +128,10 @@ const LeafletMap = ({
 
   return (
     <div className="relative w-full">
-      <div 
-        ref={mapRef} 
+      <div
+        ref={mapRef}
         className="rounded-lg border border-gray-300 z-10"
-        style={{ height, width: '100%' }}
+        style={{ height, width: "100%" }}
       />
     </div>
   );

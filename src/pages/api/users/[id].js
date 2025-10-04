@@ -1,7 +1,8 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
-import { createApiHandler } from "@/lib/apiHandler";
 import bcrypt from "bcryptjs";
+
+import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
@@ -31,22 +32,22 @@ async function handleGet(req, res) {
               include: {
                 alamat: {
                   include: {
-                    kelurahan: true
-                  }
+                    kelurahan: true,
+                  },
                 },
-                rayon: true
-              }
-            }
-          }
+                rayon: true,
+              },
+            },
+          },
         },
         majelis: {
           include: {
             jenisJabatan: true,
             rayon: true,
-            jemaat: true
-          }
-        }
-      }
+            jemaat: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -60,15 +61,11 @@ async function handleGet(req, res) {
       .json(apiResponse(true, user, "Data berhasil diambil"));
   } catch (error) {
     console.error("Error fetching user:", error);
+
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal mengambil data user",
-          error.message
-        )
+        apiResponse(false, null, "Gagal mengambil data user", error.message)
       );
   }
 }
@@ -76,14 +73,20 @@ async function handleGet(req, res) {
 async function handlePatch(req, res) {
   try {
     const { id } = req.query;
-    let { username, email, password, currentPassword, newPassword, role, idJemaat, noWhatsapp } = req.body;
-    
-    console.log("PATCH User Request Body:", req.body);
-    console.log("idJemaat value:", idJemaat, "type:", typeof idJemaat);
+    let {
+      username,
+      email,
+      password,
+      currentPassword,
+      newPassword,
+      role,
+      idJemaat,
+      noWhatsapp,
+    } = req.body;
 
     // Convert empty strings to null for optional fields (only if explicitly provided)
     if (noWhatsapp !== undefined) {
-      noWhatsapp = noWhatsapp && noWhatsapp.trim() !== '' ? noWhatsapp : null;
+      noWhatsapp = noWhatsapp && noWhatsapp.trim() !== "" ? noWhatsapp : null;
     }
 
     const updateData = {};
@@ -91,7 +94,7 @@ async function handlePatch(req, res) {
     // Update username if provided and different
     if (username) {
       const existingUserByUsername = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
       });
 
       if (existingUserByUsername && existingUserByUsername.id !== id) {
@@ -106,7 +109,7 @@ async function handlePatch(req, res) {
     // Update email if provided and different
     if (email) {
       const existingUser = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (existingUser && existingUser.id !== id) {
@@ -123,7 +126,7 @@ async function handlePatch(req, res) {
       // Get current user data to verify current password
       const currentUser = await prisma.user.findUnique({
         where: { id },
-        select: { password: true }
+        select: { password: true },
       });
 
       if (!currentUser) {
@@ -133,7 +136,11 @@ async function handlePatch(req, res) {
       }
 
       // Verify current password
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, currentUser.password);
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        currentUser.password
+      );
+
       if (!isCurrentPasswordValid) {
         return res
           .status(400)
@@ -158,15 +165,17 @@ async function handlePatch(req, res) {
     }
 
     // Handle jemaat relation - only process if explicitly provided with valid value
-    console.log("Processing idJemaat:", idJemaat, "undefined check:", idJemaat !== undefined);
-    
+
     // Only process idJemaat if it's explicitly in the request body and has a valid value
-    if ('idJemaat' in req.body && idJemaat !== undefined && idJemaat !== null && idJemaat !== '') {
-      console.log("idJemaat is explicitly provided with value:", idJemaat);
-      
+    if (
+      "idJemaat" in req.body &&
+      idJemaat !== undefined &&
+      idJemaat !== null &&
+      idJemaat !== ""
+    ) {
       // Validate jemaat exists
       const jemaat = await prisma.jemaat.findUnique({
-        where: { id: idJemaat }
+        where: { id: idJemaat },
       });
 
       if (!jemaat) {
@@ -177,13 +186,15 @@ async function handlePatch(req, res) {
 
       // Check if another user already linked to this jemaat
       const existingUserForJemaat = await prisma.user.findUnique({
-        where: { idJemaat }
+        where: { idJemaat },
       });
 
       if (existingUserForJemaat && existingUserForJemaat.id !== id) {
         return res
           .status(409)
-          .json(apiResponse(false, null, "Jemaat ini sudah memiliki akun user"));
+          .json(
+            apiResponse(false, null, "Jemaat ini sudah memiliki akun user")
+          );
       }
 
       updateData.idJemaat = idJemaat;
@@ -205,29 +216,21 @@ async function handlePatch(req, res) {
         jemaat: {
           select: {
             id: true,
-            nama: true
-          }
-        }
-      }
+            nama: true,
+          },
+        },
+      },
     });
 
     return res
       .status(200)
-      .json(
-        apiResponse(true, updatedUser, "User berhasil diperbarui")
-      );
+      .json(apiResponse(true, updatedUser, "User berhasil diperbarui"));
   } catch (error) {
     console.error("Error updating user:", error);
+
     return res
       .status(500)
-      .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal memperbarui user",
-          error.message
-        )
-      );
+      .json(apiResponse(false, null, "Gagal memperbarui user", error.message));
   }
 }
 
@@ -240,8 +243,8 @@ async function handleDelete(req, res) {
       select: {
         id: true,
         email: true,
-        role: true
-      }
+        role: true,
+      },
     });
 
     return res
@@ -249,16 +252,10 @@ async function handleDelete(req, res) {
       .json(apiResponse(true, deletedUser, "User berhasil dihapus"));
   } catch (error) {
     console.error("Error deleting user:", error);
+
     return res
       .status(500)
-      .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal menghapus user",
-          error.message
-        )
-      );
+      .json(apiResponse(false, null, "Gagal menghapus user", error.message));
   }
 }
 

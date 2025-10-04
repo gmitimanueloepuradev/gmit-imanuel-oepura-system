@@ -360,8 +360,6 @@ function MajelisAkunJemaatPage() {
         cleanData.noWhatsapp = null;
       }
 
-      console.log("Sending user data:", cleanData);
-
       return axios.post("/majelis/users", cleanData);
     },
     onSuccess: () => {
@@ -370,7 +368,6 @@ function MajelisAkunJemaatPage() {
       setShowCreate(false);
     },
     onError: (error) => {
-      console.error("Create user error:", error);
       toast.error(
         error?.response?.data?.message || "Gagal menambahkan akun jemaat"
       );

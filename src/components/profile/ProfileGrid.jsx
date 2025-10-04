@@ -1,13 +1,8 @@
-import React from "react";
-
-import UserProfileSection from "./UserProfileSection";
 import JemaatProfileSection from "./JemaatProfileSection";
 import MajelisProfileSection from "./MajelisProfileSection";
-import EmployeeProfileSection from "./EmployeeProfileSection";
+import UserProfileSection from "./UserProfileSection";
 
 export default function ProfileGrid({ user }) {
-  console.log("profile grid user : ", user);
-
   if (!user) return null;
 
   return (

@@ -16,12 +16,12 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import JemaatFilters from "@/components/ui/JemaatFilters";
 import JemaatSuperExportModal from "@/components/ui/JemaatSuperExportModal";
 import ListGrid from "@/components/ui/ListGrid";
+import PageTitle from "@/components/ui/PageTitle";
 import useConfirm from "@/hooks/useConfirm";
 import useDebounce from "@/hooks/useDebounce";
 import exportService from "@/services/exportService";
 import jemaatService from "@/services/jemaatService";
 import { showToast } from "@/utils/showToast";
-import PageTitle from "@/components/ui/PageTitle";
 
 export default function MembersManagement() {
   const router = useRouter();
@@ -228,14 +228,7 @@ export default function MembersManagement() {
       variant: "outline",
       tooltip: "Edit informasi jemaat",
     },
-    {
-      label: "Aktivasi",
-      icon: UserCheck,
-      onClick: (item) => console.log("Activate:", item),
-      variant: "default",
-      condition: (item) => item.User === null, // Only show if no user account
-      tooltip: "Aktivasi akun jemaat",
-    },
+
     {
       label: "Hapus",
       icon: Trash2,
@@ -461,8 +454,8 @@ export default function MembersManagement() {
       <div className="px-4 sm:px-6 lg:px-8 max-w-full">
         <ListGrid
           // Basic props that ListGrid supports
-          searchable={false} // Disable since we have custom search above
           columns={columns}
+          searchable={false} // Disable since we have custom search above
           // Row Actions Props
           rowActions={rowActions}
           exportFilename="jemaat"

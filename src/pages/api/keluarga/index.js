@@ -1,15 +1,15 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
-import { parseQueryParams } from "@/lib/queryParams";
-import { createApiHandler } from "@/lib/apiHandler";
 import jwt from "jsonwebtoken";
+
+import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
     // Get token from header untuk majelis filter
     const token = req.headers.authorization?.replace("Bearer ", "");
     let rayonFilter = {};
-    
+
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,18 +19,17 @@ async function handleGet(req, res) {
         const user = await prisma.user.findUnique({
           where: { id: userId },
           include: {
-            majelis: true
-          }
+            majelis: true,
+          },
         });
 
         // If user is majelis, filter by rayon
-        if (user && user.majelis && user.role === 'MAJELIS') {
+        if (user && user.majelis && user.role === "MAJELIS") {
           rayonFilter = {
-            idRayon: user.majelis.idRayon
+            idRayon: user.majelis.idRayon,
           };
         }
       } catch (error) {
-        console.log("Token validation error:", error.message);
         // Continue without filter if token invalid
       }
     }
@@ -48,7 +47,7 @@ async function handleGet(req, res) {
 
     // Build where clause for keluarga
     let where = {
-      ...rayonFilter
+      ...rayonFilter,
     };
 
     // Add search functionality for keluarga
@@ -56,19 +55,19 @@ async function handleGet(req, res) {
       where.OR = [
         {
           noBagungan: {
-            equals: parseInt(search) || 0
-          }
+            equals: parseInt(search) || 0,
+          },
         },
         {
           jemaats: {
             some: {
               nama: {
                 contains: search,
-                mode: "insensitive"
-              }
-            }
-          }
-        }
+                mode: "insensitive",
+              },
+            },
+          },
+        },
       ];
     }
 
@@ -149,6 +148,7 @@ async function handleGet(req, res) {
       .json(apiResponse(true, result, "Data berhasil diambil"));
   } catch (error) {
     console.error("Error fetching keluarga:", error);
+
     return res
       .status(500)
       .json(
@@ -234,6 +234,7 @@ async function handlePost(req, res) {
       .json(apiResponse(true, newKeluarga, "Data berhasil ditambahkan"));
   } catch (error) {
     console.error("Error creating keluarga:", error);
+
     return res
       .status(500)
       .json(

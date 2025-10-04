@@ -1,35 +1,26 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useForm, FormProvider } from "react-hook-form";
-import "leaflet/dist/leaflet.css";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  FileText,
-  Book,
-  Target,
-} from "lucide-react";
+import "leaflet/dist/leaflet.css";
+import { Calendar, Clock, Users } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
-import { showToast } from "@/utils/showToast";
-import jadwalIbadahService from "@/services/jadwalIbadahService";
+import { Card } from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 import Stepper, {
   StepContent,
   StepperNavigation,
 } from "@/components/ui/Stepper";
-import { Card } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
-import TimeInput from "@/components/ui/inputs/TimeInput";
 import LocationMapPicker from "@/components/ui/inputs/LocationMapPicker";
-import PageHeader from "@/components/ui/PageHeader";
 import NumberInput from "@/components/ui/inputs/NumberInput";
 import TextAreaInput from "@/components/ui/inputs/TextAreaInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import TimeInput from "@/components/ui/inputs/TimeInput";
+import jadwalIbadahService from "@/services/jadwalIbadahService";
+import { showToast } from "@/utils/showToast";
 
 const steps = [
   {
@@ -91,7 +82,6 @@ export default function CreateJadwalIbadah() {
     queryKey: ["jadwal-ibadah-options"],
     queryFn: () => jadwalIbadahService.getOptions(),
     onError: (error) => {
-      console.error("Error fetching options:", error);
       showToast({
         title: "Gagal",
         description:
@@ -99,9 +89,7 @@ export default function CreateJadwalIbadah() {
         color: "danger",
       });
     },
-    onSuccess: (data) => {
-      console.log("Options data received:", data);
-    },
+    onSuccess: (data) => {},
   });
 
   // Create mutation
@@ -149,6 +137,7 @@ export default function CreateJadwalIbadah() {
               "Harap lengkapi semua field yang wajib diisi pada langkah ini",
             color: "danger",
           });
+
           return false;
         }
         break;
@@ -161,6 +150,7 @@ export default function CreateJadwalIbadah() {
             description: "Tanggal ibadah wajib diisi",
             color: "danger",
           });
+
           return false;
         }
         break;
@@ -171,6 +161,7 @@ export default function CreateJadwalIbadah() {
 
   const handleNext = async () => {
     const isValid = await validateCurrentStep();
+
     if (isValid && currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -200,15 +191,12 @@ export default function CreateJadwalIbadah() {
       targetPeserta: data.targetPeserta ? parseInt(data.targetPeserta) : null,
     };
 
-    console.log("Submit data:", submitData);
     createMutation.mutate(submitData);
   });
 
   const options = optionsData?.data || {};
 
-  // Debug logging
-  console.log("Options data:", optionsData);
-  console.log("Parsed options:", options);
+ 
 
   if (isOptionsLoading) {
     return (
@@ -455,9 +443,9 @@ export default function CreateJadwalIbadah() {
 
   return (
     <>
-      <PageTitle 
-        description="Buat jadwal ibadah baru untuk rayon Anda" 
-        title="Tambah Jadwal Ibadah" 
+      <PageTitle
+        description="Buat jadwal ibadah baru untuk rayon Anda"
+        title="Tambah Jadwal Ibadah"
       />
       <div className="space-y-6 p-4">
         <PageHeader
@@ -466,31 +454,31 @@ export default function CreateJadwalIbadah() {
           onBack={() => router.back()}
         />
 
-      <Card className={"p-6"}>
-        <FormProvider {...form}>
-          <form onSubmit={handleSubmit}>
-            <Stepper
-              currentStep={currentStep}
-              steps={steps}
-              onStepClick={handleStepClick}
-            />
+        <Card className={"p-6"}>
+          <FormProvider {...form}>
+            <form onSubmit={handleSubmit}>
+              <Stepper
+                currentStep={currentStep}
+                steps={steps}
+                onStepClick={handleStepClick}
+              />
 
-            {renderStepContent()}
+              {renderStepContent()}
 
-            <StepperNavigation
-              canGoNext={true}
-              currentStep={currentStep}
-              isLoading={createMutation.isLoading}
-              nextButtonText="Lanjut"
-              submitButtonText="Simpan Jadwal"
-              totalSteps={steps.length}
-              onNext={handleNext}
-              onPrevious={handlePrevious}
-              onSubmit={handleSubmit}
-            />
-          </form>
-        </FormProvider>
-      </Card>
+              <StepperNavigation
+                canGoNext={true}
+                currentStep={currentStep}
+                isLoading={createMutation.isLoading}
+                nextButtonText="Lanjut"
+                submitButtonText="Simpan Jadwal"
+                totalSteps={steps.length}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                onSubmit={handleSubmit}
+              />
+            </form>
+          </FormProvider>
+        </Card>
       </div>
     </>
   );

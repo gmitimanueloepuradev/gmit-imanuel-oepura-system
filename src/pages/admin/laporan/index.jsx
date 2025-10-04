@@ -128,8 +128,6 @@ export default function LaporanPage() {
           color: "success",
         });
       } catch (apiError) {
-        console.log("API export failed, using fallback:", apiError);
-
         // Fallback: Generate and download report data
         const reportData =
           await statisticsService.generateReportData(exportType);
@@ -167,7 +165,8 @@ export default function LaporanPage() {
       generateGrowthSheet(workbook, data.growth);
     } else if (type === "all") {
       if (data.overview) generateOverviewSheet(workbook, data.overview);
-      if (data.demographics) generateDemographicsSheet(workbook, data.demographics);
+      if (data.demographics)
+        generateDemographicsSheet(workbook, data.demographics);
       if (data.growth) generateGrowthSheet(workbook, data.growth);
     }
 
@@ -206,9 +205,21 @@ export default function LaporanPage() {
     // Sakramen
     wsData.push(["SAKRAMEN"]);
     wsData.push(["Jenis", "Total", "Tahun Ini"]);
-    wsData.push(["Baptis", data?.sacraments?.baptis?.total || 0, data?.sacraments?.baptis?.thisYear || 0]);
-    wsData.push(["Sidi", data?.sacraments?.sidi?.total || 0, data?.sacraments?.sidi?.thisYear || 0]);
-    wsData.push(["Pernikahan", data?.sacraments?.pernikahan?.total || 0, data?.sacraments?.pernikahan?.thisYear || 0]);
+    wsData.push([
+      "Baptis",
+      data?.sacraments?.baptis?.total || 0,
+      data?.sacraments?.baptis?.thisYear || 0,
+    ]);
+    wsData.push([
+      "Sidi",
+      data?.sacraments?.sidi?.total || 0,
+      data?.sacraments?.sidi?.thisYear || 0,
+    ]);
+    wsData.push([
+      "Pernikahan",
+      data?.sacraments?.pernikahan?.total || 0,
+      data?.sacraments?.pernikahan?.thisYear || 0,
+    ]);
     wsData.push([]);
 
     // Distribusi per Rayon
@@ -223,11 +234,7 @@ export default function LaporanPage() {
     const worksheet = XLSX.utils.aoa_to_sheet(wsData);
 
     // Set column widths
-    worksheet['!cols'] = [
-      { wch: 30 },
-      { wch: 15 },
-      { wch: 15 }
-    ];
+    worksheet["!cols"] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }];
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Ringkasan");
   };
@@ -269,11 +276,7 @@ export default function LaporanPage() {
     const worksheet = XLSX.utils.aoa_to_sheet(wsData);
 
     // Set column widths
-    worksheet['!cols'] = [
-      { wch: 30 },
-      { wch: 15 },
-      { wch: 15 }
-    ];
+    worksheet["!cols"] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }];
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Demografi");
   };
@@ -298,19 +301,26 @@ export default function LaporanPage() {
       wsData.push(["Periode", "Baptis", "Sidi", "Pernikahan", "Total"]);
       data.sacramentTrends.forEach((trend) => {
         const total = trend.baptis + trend.sidi + trend.pernikahan;
-        wsData.push([trend.period, trend.baptis, trend.sidi, trend.pernikahan, total]);
+
+        wsData.push([
+          trend.period,
+          trend.baptis,
+          trend.sidi,
+          trend.pernikahan,
+          total,
+        ]);
       });
     }
 
     const worksheet = XLSX.utils.aoa_to_sheet(wsData);
 
     // Set column widths
-    worksheet['!cols'] = [
+    worksheet["!cols"] = [
       { wch: 20 },
       { wch: 15 },
       { wch: 15 },
       { wch: 15 },
-      { wch: 15 }
+      { wch: 15 },
     ];
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Pertumbuhan");
@@ -343,9 +353,13 @@ export default function LaporanPage() {
                   disabled={isExporting}
                   onClick={() => setSelectedExportFormat("excel")}
                 >
-                  <Table className={`w-5 h-5 mr-3 ${
-                    selectedExportFormat === "excel" ? "text-blue-600" : "text-green-600"
-                  }`} />
+                  <Table
+                    className={`w-5 h-5 mr-3 ${
+                      selectedExportFormat === "excel"
+                        ? "text-blue-600"
+                        : "text-green-600"
+                    }`}
+                  />
                   <div className="text-left flex-1">
                     <div className="font-medium text-gray-900 dark:text-white">
                       Excel File (.xlsx)

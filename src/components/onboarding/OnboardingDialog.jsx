@@ -1,42 +1,38 @@
-import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  User,
-  Clock,
-  CheckCircle,
-  X,
-  AlertTriangle,
-  LogOut
-} from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, LogOut, User } from "lucide-react";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { showToast } from "@/utils/showToast";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
 import { useAuth } from "@/contexts/AuthContext";
 import authService from "@/services/authService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
+import { showToast } from "@/utils/showToast";
 
 const validationSchema = z.object({
   nama: z.string().min(1, "Nama lengkap harus diisi"),
-  jenisKelamin: z.union([z.boolean(), z.string()])
-    .transform((val) => {
-      if (typeof val === "string") {
-        return val === "true";
-      }
-      return val;
-    }),
-  tanggalLahir: z.string()
+  jenisKelamin: z.union([z.boolean(), z.string()]).transform((val) => {
+    if (typeof val === "string") {
+      return val === "true";
+    }
+
+    return val;
+  }),
+  tanggalLahir: z
+    .string()
     .min(1, "Tanggal lahir harus diisi")
     .transform((str) => new Date(str)),
-  idStatusDalamKeluarga: z.string().min(1, "Status dalam keluarga harus dipilih"),
+  idStatusDalamKeluarga: z
+    .string()
+    .min(1, "Status dalam keluarga harus dipilih"),
   idSuku: z.string().min(1, "Suku harus dipilih"),
   idPendidikan: z.string().min(1, "Pendidikan harus dipilih"),
   idPekerjaan: z.string().min(1, "Pekerjaan harus dipilih"),
@@ -44,19 +40,19 @@ const validationSchema = z.object({
   idJaminanKesehatan: z.string().min(1, "Jaminan kesehatan harus dipilih"),
   idKeluarga: z.string().min(1, "Kepala keluarga harus dipilih"),
   golonganDarah: z.string().optional(),
-  idPernikahan: z.string().optional()
+  idPernikahan: z.string().optional(),
 });
 
 const jenisKelaminOptions = [
   { value: "true", label: "Laki-laki" },
-  { value: "false", label: "Perempuan" }
+  { value: "false", label: "Perempuan" },
 ];
 
 const golonganDarahOptions = [
   { value: "A", label: "A" },
   { value: "B", label: "B" },
   { value: "AB", label: "AB" },
-  { value: "O", label: "O" }
+  { value: "O", label: "O" },
 ];
 
 export default function OnboardingDialog({ user, onComplete }) {
@@ -66,12 +62,12 @@ export default function OnboardingDialog({ user, onComplete }) {
 
   const methods = useForm({
     resolver: zodResolver(validationSchema),
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const {
     handleSubmit,
-    formState: { errors, isValid }
+    formState: { errors, isValid },
   } = methods;
 
   // Create jemaat profile mutation
@@ -90,32 +86,30 @@ export default function OnboardingDialog({ user, onComplete }) {
         idPekerjaan: data.idPekerjaan,
         idPendapatan: data.idPendapatan,
         idJaminanKesehatan: data.idJaminanKesehatan,
-        idPernikahan: data.idPernikahan
+        idPernikahan: data.idPernikahan,
       };
-      
+
       // Step 1: Create jemaat profile
       const jemaatResponse = await axios.post("/api/jemaat", jemaatData);
-      console.log("Jemaat created successfully:", jemaatResponse.data);
-      
+
       // Step 2: Update user with jemaat ID
       const userUpdateResponse = await axios.patch(`/api/users/${user.id}`, {
-        idJemaat: jemaatResponse.data.data.id
+        idJemaat: jemaatResponse.data.data.id,
       });
-      console.log("User updated successfully:", userUpdateResponse.data);
-      
+
       return jemaatResponse.data;
     },
     onSuccess: () => {
       showToast({
         title: "Berhasil",
         description: "Profil berhasil dilengkapi!",
-        color: "success"
+        color: "success",
       });
       // Invalidate all user-related queries to force refresh
-      queryClient.invalidateQueries(['user']);
-      queryClient.invalidateQueries(['auth']);
-      queryClient.refetchQueries(['user']);
-      
+      queryClient.invalidateQueries(["user"]);
+      queryClient.invalidateQueries(["auth"]);
+      queryClient.refetchQueries(["user"]);
+
       // Reload page to ensure fresh data
       setTimeout(() => {
         onComplete && onComplete();
@@ -126,9 +120,9 @@ export default function OnboardingDialog({ user, onComplete }) {
       showToast({
         title: "Gagal",
         description: error.response?.data?.message || "Gagal melengkapi profil",
-        color: "danger"
+        color: "danger",
       });
-    }
+    },
   });
 
   const onSubmit = (data) => {
@@ -152,7 +146,6 @@ export default function OnboardingDialog({ user, onComplete }) {
 
       // Force a hard redirect to login page
       window.location.replace("/login");
-
     } catch (error) {
       console.error("Logout error:", error);
 
@@ -165,7 +158,7 @@ export default function OnboardingDialog({ user, onComplete }) {
       showToast({
         title: "Logout",
         description: "Mengarahkan ke halaman login...",
-        color: "success"
+        color: "success",
       });
 
       // Hard redirect as fallback
@@ -188,7 +181,8 @@ export default function OnboardingDialog({ user, onComplete }) {
                   Profil Belum Lengkap
                 </h2>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Anda harus melengkapi profil terlebih dahulu untuk dapat menggunakan sistem
+                  Anda harus melengkapi profil terlebih dahulu untuk dapat
+                  menggunakan sistem
                 </p>
               </div>
             </div>
@@ -319,7 +313,9 @@ export default function OnboardingDialog({ user, onComplete }) {
                       ) : (
                         <CheckCircle className="h-4 w-4 mr-2" />
                       )}
-                      {onboardingMutation.isLoading ? "Menyimpan..." : "Simpan Profil"}
+                      {onboardingMutation.isLoading
+                        ? "Menyimpan..."
+                        : "Simpan Profil"}
                     </Button>
                   </div>
                 </form>

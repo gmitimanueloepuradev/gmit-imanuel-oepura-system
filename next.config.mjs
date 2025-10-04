@@ -2,12 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
 
-  // Capacitor configuration only
-  output: process.env.BUILD_TARGET === 'capacitor' ? 'export' : undefined,
-  trailingSlash: process.env.BUILD_TARGET === 'capacitor' ? true : false,
-  assetPrefix: process.env.BUILD_TARGET === 'capacitor' ? './' : undefined,
   images: {
-    unoptimized: process.env.BUILD_TARGET === 'capacitor' ? true : false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -44,8 +39,8 @@ const nextConfig = {
         host: 'localhost',
         allowedHosts: ['localhost', '127.0.0.1', '192.168.1.119'],
         client: {
-          webSocketURL: 'auto://0.0.0.0:0/ws'
-        }
+          webSocketURL: 'auto://0.0.0.0:0/ws',
+        },
       };
     }
     return config;
@@ -61,7 +56,7 @@ const nextConfig = {
     return {
       beforeFiles: [],
       afterFiles: [],
-      fallback: []
+      fallback: [],
     };
   },
 
@@ -74,54 +69,28 @@ const nextConfig = {
   // Disable x-powered-by header to prevent conflicts
   poweredByHeader: false,
 
-
   // Security headers
   async headers() {
     return [
       {
         source: '/admin/(.*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex, nofollow',
-          },
-        ],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         source: '/employee/(.*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex, nofollow',
-          },
-        ],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         source: '/majelis/(.*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex, nofollow',
-          },
-        ],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         source: '/jemaat/(.*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex, nofollow',
-          },
-        ],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         source: '/onboarding',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex, nofollow',
-          },
-        ],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
     ];
   },
