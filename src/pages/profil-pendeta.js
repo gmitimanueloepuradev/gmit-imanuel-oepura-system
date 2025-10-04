@@ -1,6 +1,6 @@
+import { Award, User } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { User, Calendar, GraduationCap, Award } from "lucide-react";
 
 import PageTitle from "@/components/ui/PageTitle";
 
@@ -12,7 +12,9 @@ export default function ProfilPendetaPage() {
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
+
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -25,16 +27,14 @@ export default function ProfilPendetaPage() {
         const allProfilesResponse = await fetch("/api/public/profil-pendeta");
         const allProfilesData = await allProfilesResponse.json();
 
-        // Fetch active profile
-        const activeProfileResponse = await fetch("/api/public/profil-pendeta?active=true");
-        const activeProfileData = await activeProfileResponse.json();
-
-        if (allProfilesData.success) {
+        if (allProfilesData.success && Array.isArray(allProfilesData.data)) {
           setProfiles(allProfilesData.data);
-        }
 
-        if (activeProfileData.success && activeProfileData.data) {
-          setActiveProfile(activeProfileData.data);
+          // Find active profile from the array
+          const active = allProfilesData.data.find(profile => profile.isActive === true);
+          if (active) {
+            setActiveProfile(active);
+          }
         }
       } catch (error) {
         console.error("Error fetching pastor profiles:", error);
@@ -50,12 +50,12 @@ export default function ProfilPendetaPage() {
     return (
       <>
         <PageTitle
-          title="Profil Pendeta"
           description="Profil pendeta dan pelayan gereja GMIT Jemaat Imanuel Oepura yang melayani dengan dedikasi tinggi."
+          title="Profil Pendeta"
         />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
             <p className="mt-4 text-gray-600">Memuat profil pendeta...</p>
           </div>
         </div>
@@ -66,9 +66,9 @@ export default function ProfilPendetaPage() {
   return (
     <>
       <PageTitle
-        title="Profil Pendeta GMIT Imanuel Oepura"
         description="Profil pendeta dan pelayan gereja GMIT Jemaat Imanuel Oepura yang melayani dengan dedikasi tinggi di Kupang, Nusa Tenggara Timur."
         keywords="Profil Pendeta, Pendeta GMIT, Pendeta Gereja, Pelayan Gereja, Pendeta Kupang, Gereja Masehi Injili, Pelayan JIO"
+        title="Profil Pendeta GMIT Imanuel Oepura"
       />
 
       <div className="bg-gray-50 min-h-screen">
@@ -78,7 +78,7 @@ export default function ProfilPendetaPage() {
             className="absolute inset-0 w-full h-full opacity-20"
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           >
-            <div className="w-full h-full bg-pattern"></div>
+            <div className="w-full h-full bg-pattern" />
           </div>
 
           <div className="relative z-10 text-center text-white">
@@ -91,98 +91,40 @@ export default function ProfilPendetaPage() {
           </div>
         </div>
 
-        {/* Active Pastor Section */}
-        {activeProfile && (
-          <div className="py-16 px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                  Pendeta Saat Ini
-                </h2>
-                <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="md:flex">
-                  {/* Photo Section */}
-                  <div className="md:w-1/3 bg-gradient-to-br from-blue-50 to-blue-100 p-8 flex items-center justify-center">
-                    {activeProfile.urlFoto ? (
-                      <Image
-                        src={activeProfile.urlFoto}
-                        alt={activeProfile.nama}
-                        className="w-64 h-64 object-cover rounded-full shadow-lg border-4 border-white"
-                        width={256}
-                        height={256}
-                        style={{ objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div className="w-64 h-64 bg-gray-300 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-                        <User className="w-24 h-24 text-gray-500" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info Section */}
-                  <div className="md:w-2/3 p-8">
-                    <h3 className="text-3xl font-bold text-gray-800 mb-2">
-                      {activeProfile.nama}
-                    </h3>
-
-                    <div className="flex items-center text-blue-600 mb-6">
-                      <Award className="w-5 h-5 mr-2" />
-                      <span className="text-lg font-medium">Pendeta GMIT Imanuel Oepura</span>
-                    </div>
-
-                    <div className="text-center">
-                      <p className="text-gray-600 leading-relaxed">
-                        Melayani dengan penuh dedikasi dan kasih di GMIT Jemaat Imanuel Oepura.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* All Pastors Section */}
-        {/* {profiles.length > 0 && (
+        {/* Active Pastors Section */}
+        {profiles.filter(p => p.isActive).length > 0 && (
           <div className="py-16 px-4 bg-white">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
                   Para Pendeta
                 </h2>
-                <div className="w-24 h-1 bg-blue-600 mx-auto mb-4"></div>
+                <div className="w-24 h-1 bg-blue-600 mx-auto mb-4" />
                 <p className="text-gray-600 max-w-2xl mx-auto">
                   Profil lengkap para pendeta yang pernah dan sedang melayani di GMIT Jemaat Imanuel Oepura
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {profiles.map((profile) => (
+                {profiles.filter(profile => profile.isActive).map((profile) => (
                   <div
                     key={profile.id}
-                    className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 ${
-                      profile.isActive ? 'border-blue-500' : 'border-gray-200'
-                    }`}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 border-blue-500"
                   >
-                    {profile.isActive && (
-                      <div className="bg-blue-500 text-white text-center py-2 text-sm font-medium">
-                        Aktif Melayani
-                      </div>
-                    )}
+                    <div className="bg-blue-500 text-white text-center py-2 text-sm font-medium">
+                      Aktif Melayani
+                    </div>
 
                     <div className="p-6">
                       <div className="text-center mb-4">
                         {profile.urlFoto ? (
                           <Image
-                            src={profile.urlFoto}
                             alt={profile.nama}
                             className="w-24 h-24 object-cover rounded-full mx-auto shadow-md border-2 border-gray-200"
-                            width={96}
                             height={96}
+                            src={profile.urlFoto}
                             style={{ objectFit: 'cover' }}
+                            width={96}
                           />
                         ) : (
                           <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto flex items-center justify-center shadow-md border-2 border-gray-200">
@@ -210,7 +152,7 @@ export default function ProfilPendetaPage() {
               </div>
             </div>
           </div>
-        )} */}
+        )}
 
         {profiles.length === 0 && !loading && (
           <div className="py-16 px-4">

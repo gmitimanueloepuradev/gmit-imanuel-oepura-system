@@ -42,18 +42,7 @@ async function handlePatch(req, res) {
       );
     }
 
-    // If activating this profile, deactivate all others
-    if (isActive) {
-      await prisma.profilPendeta.updateMany({
-        where: {
-          id: { not: id },
-          isActive: true
-        },
-        data: { isActive: false }
-      });
-    }
-
-    // Update the profile status
+    // Update the profile status (allow multiple active profiles)
     const updatedProfile = await prisma.profilPendeta.update({
       where: { id },
       data: {

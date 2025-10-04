@@ -1,10 +1,10 @@
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 
+import { apiResponse } from "@/lib/apiHelper";
 import { getTokenFromHeader, verifyToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
-import { uploadFileToS3, deleteFileFromS3 } from "@/lib/s3";
-import { apiResponse } from "@/lib/apiHelper";
+import { uploadFileToS3 } from "@/lib/s3";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -13,11 +13,12 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     // Allow only image files
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Tipe file harus PNG, JPG, atau JPEG'), false);
+      cb(new Error("Tipe file harus PNG, JPG, atau JPEG"), false);
     }
   },
 });
@@ -29,6 +30,7 @@ function runMiddleware(req, res, fn) {
       if (result instanceof Error) {
         return reject(result);
       }
+
       return resolve(result);
     });
   });
@@ -40,34 +42,49 @@ async function handleGet(req, res) {
     const { active } = req.query;
 
     let where = {};
-    if (active === 'true') {
+
+    if (active === "true") {
       where.isActive = true;
     }
 
     const profiles = await prisma.profilPendeta.findMany({
       where,
-      orderBy: [
-        { isActive: 'desc' },
-        { createdAt: 'desc' }
-      ],
+      orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
     });
 
     // If requesting active profile, return only the first one
-    if (active === 'true') {
+    if (active === "true") {
       const activeProfile = profiles.length > 0 ? profiles[0] : null;
-      return res.status(200).json(
-        apiResponse(true, activeProfile, "Data profil pendeta aktif berhasil diambil")
-      );
+
+      return res
+        .status(200)
+        .json(
+          apiResponse(
+            true,
+            activeProfile,
+            "Data profil pendeta aktif berhasil diambil"
+          )
+        );
     }
 
-    return res.status(200).json(
-      apiResponse(true, profiles, "Data profil pendeta berhasil diambil")
-    );
+    return res
+      .status(200)
+      .json(
+        apiResponse(true, profiles, "Data profil pendeta berhasil diambil")
+      );
   } catch (error) {
     console.error("Error fetching pastor profiles:", error);
-    return res.status(500).json(
-      apiResponse(false, null, "Gagal mengambil data profil pendeta", error.message)
-    );
+
+    return res
+      .status(500)
+      .json(
+        apiResponse(
+          false,
+          null,
+          "Gagal mengambil data profil pendeta",
+          error.message
+        )
+      );
   }
 }
 
@@ -76,24 +93,32 @@ async function handlePost(req, res) {
   try {
     // Check authentication
     const token = getTokenFromHeader(req.headers.authorization);
+
     if (!token) {
-      return res.status(401).json(
-        apiResponse(false, null, "Token tidak ditemukan")
-      );
+      return res
+        .status(401)
+        .json(apiResponse(false, null, "Token tidak ditemukan"));
     }
 
     const decoded = await verifyToken(token);
+
     if (!decoded) {
-      return res.status(401).json(
-        apiResponse(false, null, "Token tidak valid")
-      );
+      return res
+        .status(401)
+        .json(apiResponse(false, null, "Token tidak valid"));
     }
 
     // Check if user is admin
-    if (decoded.role !== 'ADMIN') {
-      return res.status(403).json(
-        apiResponse(false, null, "Hanya admin yang dapat membuat profil pendeta")
-      );
+    if (decoded.role !== "ADMIN") {
+      return res
+        .status(403)
+        .json(
+          apiResponse(
+            false,
+            null,
+            "Hanya admin yang dapat membuat profil pendeta"
+          )
+        );
     }
 
     // Run multer middleware
@@ -103,9 +128,9 @@ async function handlePost(req, res) {
     const file = req.file;
 
     if (!nama) {
-      return res.status(400).json(
-        apiResponse(false, null, "Nama pendeta harus diisi")
-      );
+      return res
+        .status(400)
+        .json(apiResponse(false, null, "Nama pendeta harus diisi"));
     }
 
     let urlFoto = null;
@@ -114,21 +139,28 @@ async function handlePost(req, res) {
     // Upload photo if provided
     if (file) {
       const fileName = `profil-pendeta-${Date.now()}-${uuidv4()}`;
-      const fileExtension = file.mimetype === 'image/png' ? '.png' : '.jpg';
+      const fileExtension = file.mimetype === "image/png" ? ".png" : ".jpg";
+
       s3Key = `profil-pendeta/${fileName}${fileExtension}`;
 
-      const uploadResult = await uploadFileToS3(file.buffer, s3Key, file.mimetype);
+      const uploadResult = await uploadFileToS3(
+        file.buffer,
+        s3Key,
+        file.mimetype
+      );
+
       if (!uploadResult.success) {
         throw new Error(uploadResult.error);
       }
       urlFoto = uploadResult.url;
     }
 
+    //! i just comment this part because it will deactivate all existing profiles.
     // Deactivate all existing profiles
-    await prisma.profilPendeta.updateMany({
-      where: { isActive: true },
-      data: { isActive: false }
-    });
+    // await prisma.profilPendeta.updateMany({
+    //   where: { isActive: true },
+    //   data: { isActive: false }
+    // });
 
     // Create new profile
     const newProfile = await prisma.profilPendeta.create({
@@ -141,35 +173,35 @@ async function handlePost(req, res) {
       },
     });
 
-    return res.status(201).json(
-      apiResponse(true, newProfile, "Profil pendeta berhasil dibuat")
-    );
+    return res
+      .status(201)
+      .json(apiResponse(true, newProfile, "Profil pendeta berhasil dibuat"));
   } catch (error) {
     console.error("Error creating pastor profile:", error);
 
     // Handle multer errors
-    if (error.message === 'Tipe file harus PNG, JPG, atau JPEG') {
-      return res.status(400).json(
-        apiResponse(false, null, error.message)
-      );
+    if (error.message === "Tipe file harus PNG, JPG, atau JPEG") {
+      return res.status(400).json(apiResponse(false, null, error.message));
     }
 
-    return res.status(500).json(
-      apiResponse(false, null, "Gagal membuat profil pendeta", error.message)
-    );
+    return res
+      .status(500)
+      .json(
+        apiResponse(false, null, "Gagal membuat profil pendeta", error.message)
+      );
   }
 }
 
 export default async function handler(req, res) {
   switch (req.method) {
-    case 'GET':
+    case "GET":
       return handleGet(req, res);
-    case 'POST':
+    case "POST":
       return handlePost(req, res);
     default:
-      return res.status(405).json(
-        apiResponse(false, null, "Method tidak diizinkan")
-      );
+      return res
+        .status(405)
+        .json(apiResponse(false, null, "Method tidak diizinkan"));
   }
 }
 

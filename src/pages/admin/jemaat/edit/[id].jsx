@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import { Card } from "@/components/ui/Card";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
@@ -172,7 +172,8 @@ export default function EditJemaat() {
 
       // Fill jemaat data
       form.setValue("nama", jemaat.nama || "");
-      form.setValue("jenisKelamin", jemaat.jenisKelamin ?? true);
+      // Convert boolean to string for SelectInput
+      form.setValue("jenisKelamin", String(jemaat.jenisKelamin ?? true));
       form.setValue(
         "tanggalLahir",
         jemaat.tanggalLahir
@@ -197,40 +198,50 @@ export default function EditJemaat() {
         setCreateUserAccount(true);
         form.setValue("email", jemaat.User.email || "");
         form.setValue("role", jemaat.User.role || "JEMAAT");
+      } else {
+        // If no user exists, still show the step but don't auto-check the checkbox
+        setHasExistingUser(false);
+        setCreateUserAccount(false);
       }
 
       // Check if kepala keluarga and has keluarga data
-      if (
-        jemaat.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
-      ) {
+      const isKepala = jemaat.statusDalamKeluarga?.status?.toLowerCase().includes("kepala");
+
+      if (isKepala) {
         setIsKepalaKeluarga(true);
         setCreateKeluarga(true);
         setCreateAlamat(true);
+      }
 
-        // Fill keluarga data if exists
-        if (jemaat.keluarga) {
-          form.setValue(
-            "idStatusKeluarga",
-            jemaat.keluarga.idStatusKeluarga || ""
-          );
-          form.setValue(
-            "idStatusKepemilikanRumah",
-            jemaat.keluarga.idStatusKepemilikanRumah || ""
-          );
-          form.setValue("idKeadaanRumah", jemaat.keluarga.idKeadaanRumah || "");
-          form.setValue("idRayon", jemaat.keluarga.idRayon || "");
-          form.setValue("noBagungan", jemaat.keluarga.noBagungan || "");
+      // Fill keluarga data if exists (regardless of status)
+      if (jemaat.keluarga) {
+        // If not kepala, still show the data for reference
+        if (!isKepala) {
+          setCreateKeluarga(true);
+          setCreateAlamat(true);
+        }
 
-          // Fill alamat data if exists
-          if (jemaat.keluarga.alamat) {
-            form.setValue(
-              "idKelurahan",
-              jemaat.keluarga.alamat.idKelurahan || ""
-            );
-            form.setValue("rt", jemaat.keluarga.alamat.rt || "");
-            form.setValue("rw", jemaat.keluarga.alamat.rw || "");
-            form.setValue("jalan", jemaat.keluarga.alamat.jalan || "");
-          }
+        form.setValue(
+          "idStatusKeluarga",
+          jemaat.keluarga.idStatusKeluarga || ""
+        );
+        form.setValue(
+          "idStatusKepemilikanRumah",
+          jemaat.keluarga.idStatusKepemilikanRumah || ""
+        );
+        form.setValue("idKeadaanRumah", jemaat.keluarga.idKeadaanRumah || "");
+        form.setValue("idRayon", jemaat.keluarga.idRayon || "");
+        form.setValue("noBagungan", String(jemaat.keluarga.noBagungan || ""));
+
+        // Fill alamat data if exists
+        if (jemaat.keluarga.alamat) {
+          form.setValue(
+            "idKelurahan",
+            jemaat.keluarga.alamat.idKelurahan || ""
+          );
+          form.setValue("rt", String(jemaat.keluarga.alamat.rt || ""));
+          form.setValue("rw", String(jemaat.keluarga.alamat.rw || ""));
+          form.setValue("jalan", jemaat.keluarga.alamat.jalan || "");
         }
       }
     }
@@ -271,10 +282,10 @@ export default function EditJemaat() {
     mutationFn: ({ id, data }) => jemaatService.update(id, data),
     onSuccess: (data) => {
       // Invalidate queries related to jemaat data
-      queryClient.invalidateQueries(['jemaat']);
-      queryClient.invalidateQueries(['jemaat-list']);
-      queryClient.invalidateQueries(['admin-jemaat']);
-      queryClient.invalidateQueries(['jemaat', id]);
+      queryClient.invalidateQueries(["jemaat"]);
+      queryClient.invalidateQueries(["jemaat-list"]);
+      queryClient.invalidateQueries(["admin-jemaat"]);
+      queryClient.invalidateQueries(["jemaat", id]);
 
       showToast({
         title: "Berhasil",
@@ -298,7 +309,7 @@ export default function EditJemaat() {
       // Validate jemaat data
       const jemaatData = {
         nama: form.getValues("nama"),
-        jenisKelamin: form.getValues("jenisKelamin"),
+        jenisKelamin: form.getValues("jenisKelamin") === "true", // Convert string to boolean
         tanggalLahir: form.getValues("tanggalLahir"),
         idStatusDalamKeluarga: form.getValues("idStatusDalamKeluarga"),
         idSuku: form.getValues("idSuku"),
@@ -377,10 +388,10 @@ export default function EditJemaat() {
   };
 
   const getMaxStep = () => {
-    if (!createUserAccount) return 1;
+    // Always show step 1 (Data Jemaat) and step 2 (User Account)
     if (!createKeluarga) return 2;
 
-    // Alamat is always required when creating keluarga
+    // If creating/editing keluarga, show all 4 steps (including alamat)
     return 4;
   };
 
@@ -422,12 +433,17 @@ export default function EditJemaat() {
       );
     }
 
-    if (currentStep === 2 && createUserAccount && !hasExistingUser) {
-      return values.email && values.password && values.confirmPassword;
-    }
+    if (currentStep === 2) {
+      // If not creating user account, can proceed
+      if (!createUserAccount) return true;
 
-    if (currentStep === 2 && createUserAccount && hasExistingUser) {
-      return values.email; // Password optional for existing user
+      // If creating new user, require email and password
+      if (!hasExistingUser) {
+        return values.email && values.password && values.confirmPassword;
+      }
+
+      // If updating existing user, only require email
+      return values.email;
     }
 
     if (currentStep === 3 && createKeluarga) {
@@ -543,126 +559,140 @@ export default function EditJemaat() {
           steps={steps.slice(0, getMaxStep())}
         />
 
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
           {/* Step 1: Data Jemaat */}
           {currentStep === 1 && (
             <StepContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextInput
-                  name="nama"
-                  label="Nama Lengkap"
-                  placeholder="Masukkan nama lengkap"
                   required
+                  label="Nama Lengkap"
+                  name="nama"
+                  placeholder="Masukkan nama lengkap"
                 />
 
                 <SelectInput
-                  name="jenisKelamin"
+                  required
                   label="Jenis Kelamin"
-                  placeholder="Pilih jenis kelamin"
+                  name="jenisKelamin"
                   options={[
                     { value: "true", label: "Laki-laki" },
-                    { value: "false", label: "Perempuan" }
+                    { value: "false", label: "Perempuan" },
                   ]}
-                  required
+                  placeholder="Pilih jenis kelamin"
                 />
 
                 <DatePicker
                   label="Tanggal Lahir"
+                  name="tanggalLahir"
                   placeholder="Pilih tanggal lahir"
                   required={true}
-                  value={form.watch("tanggalLahir")}
-                  onChange={(value) => form.setValue("tanggalLahir", value)}
                 />
 
                 <SelectInput
-                  name="golonganDarah"
                   label="Golongan Darah"
-                  placeholder="Pilih golongan darah"
+                  name="golonganDarah"
                   options={[
                     { value: "A", label: "A" },
                     { value: "B", label: "B" },
                     { value: "AB", label: "AB" },
-                    { value: "O", label: "O" }
+                    { value: "O", label: "O" },
                   ]}
+                  placeholder="Pilih golongan darah"
                 />
 
                 <AutoCompleteInput
-                  name="idStatusDalamKeluarga"
-                  label="Status Dalam Keluarga"
-                  placeholder="Pilih status"
-                  options={statusDalamKeluarga?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.status
-                  })) || []}
                   required
+                  label="Status Dalam Keluarga"
+                  name="idStatusDalamKeluarga"
+                  options={
+                    statusDalamKeluarga?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.status,
+                    })) || []
+                  }
+                  placeholder="Pilih status"
                 />
 
                 {!isKepalaKeluarga && (
                   <AutoCompleteInput
-                    name="idKeluarga"
-                    label="Keluarga"
-                    placeholder="Pilih keluarga"
-                    options={keluargaList?.data?.items?.map((item) => ({
-                      value: item.id,
-                      label: `${item.rayon?.namaRayon} - ${item.noBagungan}`
-                    })) || []}
                     required
+                    label="Keluarga"
+                    name="idKeluarga"
+                    options={
+                      keluargaList?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
+                      })) || []
+                    }
+                    placeholder="Pilih keluarga"
                   />
                 )}
 
                 <AutoCompleteInput
-                  name="idSuku"
+                  required
                   label="Suku"
+                  name="idSuku"
+                  options={
+                    suku?.data?.map((item) => ({
+                      value: item.id,
+                      label: item.namaSuku,
+                    })) || []
+                  }
                   placeholder="Pilih suku"
-                  options={suku?.data?.map((item) => ({
-                    value: item.id,
-                    label: item.namaSuku
-                  })) || []}
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPendidikan"
+                  required
                   label="Pendidikan"
+                  name="idPendidikan"
+                  options={
+                    pendidikan?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.jenjang,
+                    })) || []
+                  }
                   placeholder="Pilih pendidikan"
-                  options={pendidikan?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.jenjang
-                  })) || []}
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPekerjaan"
+                  required
                   label="Pekerjaan"
+                  name="idPekerjaan"
+                  options={
+                    pekerjaan?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.namaPekerjaan,
+                    })) || []
+                  }
                   placeholder="Pilih pekerjaan"
-                  options={pekerjaan?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.namaPekerjaan
-                  })) || []}
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idPendapatan"
+                  required
                   label="Pendapatan"
+                  name="idPendapatan"
+                  options={
+                    pendapatan?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.label,
+                    })) || []
+                  }
                   placeholder="Pilih pendapatan"
-                  options={pendapatan?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.label
-                  })) || []}
-                  required
                 />
 
                 <AutoCompleteInput
-                  name="idJaminanKesehatan"
-                  label="Jaminan Kesehatan"
-                  placeholder="Pilih jaminan kesehatan"
-                  options={jaminanKesehatan?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.jenisJaminan
-                  })) || []}
                   required
+                  label="Jaminan Kesehatan"
+                  name="idJaminanKesehatan"
+                  options={
+                    jaminanKesehatan?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.jenisJaminan,
+                    })) || []
+                  }
+                  placeholder="Pilih jaminan kesehatan"
                 />
               </div>
             </StepContent>
@@ -695,39 +725,50 @@ export default function EditJemaat() {
               {createUserAccount && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <TextInput
-                    name="email"
-                    type="email"
                     label="Email"
+                    name="email"
                     placeholder="contoh@email.com"
                     required={createUserAccount}
+                    type="email"
                   />
 
                   <SelectInput
-                    name="role"
                     label="Role"
-                    placeholder="Pilih role"
+                    name="role"
                     options={[
                       { value: "JEMAAT", label: "Jemaat" },
                       { value: "MAJELIS", label: "Majelis" },
-                      { value: "EMPLOYEE", label: "Employee" }
+                      { value: "EMPLOYEE", label: "Employee" },
                     ]}
+                    placeholder="Pilih role"
                   />
 
                   <TextInput
+                    label={
+                      hasExistingUser
+                        ? "Password Baru (kosongkan jika tidak diubah)"
+                        : "Password"
+                    }
                     name="password"
-                    type="password"
-                    label={hasExistingUser ? "Password Baru (kosongkan jika tidak diubah)" : "Password"}
-                    placeholder={hasExistingUser ? "Kosongkan jika tidak diubah" : "Minimal 8 karakter"}
+                    placeholder={
+                      hasExistingUser
+                        ? "Kosongkan jika tidak diubah"
+                        : "Minimal 8 karakter"
+                    }
                     required={!hasExistingUser && createUserAccount}
+                    type="password"
                   />
 
                   {(!hasExistingUser || form.watch("password")) && (
                     <TextInput
-                      name="confirmPassword"
-                      type="password"
                       label="Konfirmasi Password"
+                      name="confirmPassword"
                       placeholder="Ulangi password"
-                      required={(!hasExistingUser && createUserAccount) || !!form.watch("password")}
+                      required={
+                        (!hasExistingUser && createUserAccount) ||
+                        !!form.watch("password")
+                      }
+                      type="password"
                     />
                   )}
                 </div>
@@ -750,55 +791,63 @@ export default function EditJemaat() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AutoCompleteInput
-                  name="idStatusKeluarga"
                   label="Status Keluarga"
+                  name="idStatusKeluarga"
+                  options={
+                    statusKeluarga?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.status,
+                    })) || []
+                  }
                   placeholder="Pilih status keluarga"
-                  options={statusKeluarga?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.status
-                  })) || []}
                   required={createKeluarga}
                 />
 
                 <AutoCompleteInput
-                  name="idStatusKepemilikanRumah"
                   label="Status Kepemilikan Rumah"
+                  name="idStatusKepemilikanRumah"
+                  options={
+                    statusKepemilikanRumah?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.status,
+                    })) || []
+                  }
                   placeholder="Pilih status kepemilikan"
-                  options={statusKepemilikanRumah?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.status
-                  })) || []}
                   required={createKeluarga}
                 />
 
                 <AutoCompleteInput
-                  name="idKeadaanRumah"
                   label="Keadaan Rumah"
+                  name="idKeadaanRumah"
+                  options={
+                    keadaanRumah?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.keadaan,
+                    })) || []
+                  }
                   placeholder="Pilih keadaan rumah"
-                  options={keadaanRumah?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.keadaan
-                  })) || []}
                   required={createKeluarga}
                 />
 
                 <AutoCompleteInput
-                  name="idRayon"
                   label="Rayon"
+                  name="idRayon"
+                  options={
+                    rayon?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.namaRayon,
+                    })) || []
+                  }
                   placeholder="Pilih rayon"
-                  options={rayon?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.namaRayon
-                  })) || []}
                   required={createKeluarga}
                 />
 
                 <TextInput
-                  name="noBagungan"
-                  type="number"
                   label="No. Bagungan"
+                  name="noBagungan"
                   placeholder="Masukkan nomor bagungan"
                   required={createKeluarga}
+                  type="number"
                 />
               </div>
 
@@ -825,37 +874,41 @@ export default function EditJemaat() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AutoCompleteInput
-                  name="idKelurahan"
                   label="Kelurahan"
+                  name="idKelurahan"
+                  options={
+                    kelurahan?.data?.items?.map((item) => ({
+                      value: item.id,
+                      label: item.kodepos
+                        ? `${item.nama} - ${item.kodepos}`
+                        : item.nama,
+                    })) || []
+                  }
                   placeholder="Pilih kelurahan"
-                  options={kelurahan?.data?.items?.map((item) => ({
-                    value: item.id,
-                    label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
-                  })) || []}
                   required={createKeluarga}
                 />
 
                 <TextInput
-                  name="jalan"
                   label="Jalan"
+                  name="jalan"
                   placeholder="Nama jalan / kampung"
                   required={createKeluarga}
                 />
 
                 <TextInput
-                  name="rt"
-                  type="number"
                   label="RT"
+                  name="rt"
                   placeholder="001"
                   required={createKeluarga}
+                  type="number"
                 />
 
                 <TextInput
-                  name="rw"
-                  type="number"
                   label="RW"
+                  name="rw"
                   placeholder="001"
                   required={createKeluarga}
+                  type="number"
                 />
               </div>
             </StepContent>
@@ -872,7 +925,8 @@ export default function EditJemaat() {
             onPrevious={handlePrevious}
             onSubmit={handleSubmit}
           />
-        </form>
+          </form>
+        </FormProvider>
       </Card>
     </div>
   );
