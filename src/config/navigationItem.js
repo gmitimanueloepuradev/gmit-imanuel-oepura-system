@@ -48,6 +48,11 @@ export const roleConfigs = {
       { href: "/admin/dashboard", label: "Dashboard", icon: Home },
       { href: "/admin/users", label: "Kelola Akun", icon: Users },
       { href: "/admin/jemaat", label: "Jemaat", icon: Users },
+      {
+        href: "/admin/dokumen-jemaat",
+        label: "Dokumen Jemaat",
+        icon: FileText,
+      },
       { href: "/admin/keluarga", label: "Keluarga", icon: UsersRound },
       { href: "/admin/majelis", label: "Majelis", icon: UserCheck },
       // { href: "/admin/kegiatan", label: "Kegiatan", icon: Calendar },
