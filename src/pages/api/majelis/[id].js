@@ -61,23 +61,75 @@ async function handleGet(req, res) {
 async function handlePatch(req, res) {
   try {
     const { id } = req.query;
-    const { namaLengkap, mulai, selesai, idRayon, jenisJabatanId } = req.body;
+    const {
+      namaLengkap,
+      mulai,
+      selesai,
+      idRayon,
+      jenisJabatanId,
+      isUtama,
+      canView,
+      canEdit,
+      canCreate,
+      canDelete,
+      canManageRayon,
+    } = req.body;
 
     if (!namaLengkap || !mulai || !jenisJabatanId) {
       return res
         .status(400)
-        .json(apiResponse(false, null, "Nama lengkap, tanggal mulai, dan jenis jabatan wajib diisi"));
+        .json(
+          apiResponse(
+            false,
+            null,
+            "Nama lengkap, tanggal mulai, dan jenis jabatan wajib diisi"
+          )
+        );
     }
+
+    // Jika isUtama = true, pastikan hanya 1 majelis utama per rayon
+    if (isUtama === true && idRayon) {
+      const existingUtama = await prisma.majelis.findFirst({
+        where: {
+          idRayon: idRayon,
+          isUtama: true,
+          id: { not: id }, // Exclude current majelis
+        },
+      });
+
+      if (existingUtama) {
+        return res
+          .status(400)
+          .json(
+            apiResponse(
+              false,
+              null,
+              "Sudah ada Majelis Utama di rayon ini. Hanya boleh ada 1 Majelis Utama per rayon."
+            )
+          );
+      }
+    }
+
+    const updateData = {
+      namaLengkap,
+      mulai: new Date(mulai),
+      selesai: selesai ? new Date(selesai) : null,
+      idRayon: idRayon || null,
+      jenisJabatanId: jenisJabatanId || null,
+    };
+
+    // Tambahkan permission fields jika ada
+    if (typeof isUtama === "boolean") updateData.isUtama = isUtama;
+    if (typeof canView === "boolean") updateData.canView = canView;
+    if (typeof canEdit === "boolean") updateData.canEdit = canEdit;
+    if (typeof canCreate === "boolean") updateData.canCreate = canCreate;
+    if (typeof canDelete === "boolean") updateData.canDelete = canDelete;
+    if (typeof canManageRayon === "boolean")
+      updateData.canManageRayon = canManageRayon;
 
     const updatedMajelis = await prisma.majelis.update({
       where: { id: id },
-      data: {
-        namaLengkap,
-        mulai: new Date(mulai),
-        selesai: selesai ? new Date(selesai) : null,
-        idRayon: idRayon || null,
-        jenisJabatanId: jenisJabatanId || null,
-      },
+      data: updateData,
       include: {
         jenisJabatan: {
           select: {
@@ -94,24 +146,13 @@ async function handlePatch(req, res) {
 
     return res
       .status(200)
-      .json(
-        apiResponse(
-          true,
-          updatedMajelis,
-          "Majelis berhasil diperbarui"
-        )
-      );
+      .json(apiResponse(true, updatedMajelis, "Majelis berhasil diperbarui"));
   } catch (error) {
     console.error("Error updating majelis:", error);
     return res
       .status(500)
       .json(
-        apiResponse(
-          false,
-          null,
-          "Gagal memperbarui majelis",
-          error.message
-        )
+        apiResponse(false, null, "Gagal memperbarui majelis", error.message)
       );
   }
 }

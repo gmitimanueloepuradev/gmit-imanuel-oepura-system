@@ -32,6 +32,11 @@ import keluargaService from "@/services/keluargaService";
 function MajelisAkunJemaatPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+
+  // Get majelis permissions
+  const majelisPermissions = user?.majelis || {};
+  const { canView = true, canEdit = false, canCreate = false, canDelete = false } = majelisPermissions;
+
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
@@ -604,6 +609,29 @@ function MajelisAkunJemaatPage() {
     });
   };
 
+  // Check if user has permission to view
+  if (!canView) {
+    return (
+      <ProtectedRoute allowedRoles={["MAJELIS"]}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="text-red-600">Akses Ditolak</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Anda tidak memiliki permission untuk mengelola akun jemaat. Hubungi admin untuk mengatur permission Anda.
+              </p>
+              <Button onClick={() => window.location.href = '/majelis/dashboard'}>
+                Kembali ke Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute allowedRoles={["MAJELIS"]}>
       <ListGrid
@@ -665,18 +693,20 @@ function MajelisAkunJemaatPage() {
         exportable={true}
         filters={userFilters}
         headerActions={[
-          {
-            label: "Download Template",
-            icon: Download,
-            onClick: handleDownloadTemplate,
-            variant: "outline",
-          },
-          {
-            label: "Import Akun",
-            icon: Upload,
-            onClick: () => setShowImportModal(true),
-            variant: "default",
-          },
+          ...(canCreate ? [
+            {
+              label: "Download Template",
+              icon: Download,
+              onClick: handleDownloadTemplate,
+              variant: "outline",
+            },
+            {
+              label: "Import Akun",
+              icon: Upload,
+              onClick: () => setShowImportModal(true),
+              variant: "default",
+            },
+          ] : []),
         ]}
         isLoading={isLoading}
         itemsPerPage={pageSize}
@@ -689,12 +719,12 @@ function MajelisAkunJemaatPage() {
             variant: "outline",
             tooltip: "Lihat detail",
           },
-          {
+          ...(canEdit ? [{
             icon: Edit,
             onClick: (item) => setEditItem(item),
             variant: "outline",
             tooltip: "Edit akun",
-          },
+          }] : []),
           {
             label: "Kirim Self Onboarding",
             icon: MessageCircle,
@@ -702,7 +732,7 @@ function MajelisAkunJemaatPage() {
             variant: "outline",
             tooltip: "Kirim Link Self Onboarding",
             condition: (item) =>
-              item.role === "JEMAAT" && !item.idJemaat && item.noWhatsapp,
+              canEdit && item.role === "JEMAAT" && !item.idJemaat && item.noWhatsapp,
           },
           {
             label: "Kirim Info Akun WA",
@@ -710,21 +740,21 @@ function MajelisAkunJemaatPage() {
             onClick: (item) => handleSendAccountData(item),
             variant: "outline",
             tooltip: "Kirim Info Akun via WhatsApp",
-            condition: (item) => item.noWhatsapp,
+            condition: (item) => canEdit && item.noWhatsapp,
           },
-          {
+          ...(canDelete ? [{
             label: "Hapus",
             icon: Trash2,
             onClick: (item) => setDeleteItem(item),
             variant: "outline",
             tooltip: "Hapus akun",
-          },
+          }] : []),
         ]}
         searchPlaceholder="Cari username, email, nama jemaat..."
         searchable={true}
         showPageSizeSelector={true}
         title="Kelola Akun Jemaat"
-        onAdd={() => setShowCreate(true)}
+        onAdd={canCreate ? () => setShowCreate(true) : undefined}
       />
 
       <ConfirmDialog

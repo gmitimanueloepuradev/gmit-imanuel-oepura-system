@@ -403,7 +403,7 @@ export default function CreateKeluarga() {
                     label="No. Kartu Keluarga (KK)"
                     maxLength={16}
                     name="noKK"
-                    placeholder="Masukkan nomor KK (16 digit)"
+                    placeholder="Masukkan NIK (16 digit)"
                     type="text"
                   />
                 </div>

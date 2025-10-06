@@ -6,18 +6,16 @@ import {
   Clock,
   Cpu,
   Database,
-  HardDrive,
   MemoryStick,
   RefreshCw,
   Server,
-  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import PageTitle from "@/components/ui/PageTitle";
-import SystemInfo from "@/components/system/SystemInfo";
-import DatabaseStats from "@/components/system/DatabaseStats";
 import DatabaseConnectionMonitor from "@/components/system/DatabaseConnectionMonitor";
+import DatabaseStats from "@/components/system/DatabaseStats";
+import SystemInfo from "@/components/system/SystemInfo";
+import PageTitle from "@/components/ui/PageTitle";
 
 export default function SystemInfoPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -100,7 +98,9 @@ export default function SystemInfoPage() {
   } = useQuery({
     queryKey: ["database-realtime"],
     queryFn: async () => {
-      const response = await fetch("/api/admin/database-connections-test?type=realtime");
+      const response = await fetch(
+        "/api/admin/database-connections-test?type=realtime"
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch real-time data");
@@ -305,7 +305,8 @@ export default function SystemInfoPage() {
                   Total Records
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {databaseData?.data?.tables?.summary?.totalRecords?.toLocaleString() || "0"}
+                  {databaseData?.data?.tables?.summary?.totalRecords?.toLocaleString() ||
+                    "0"}
                 </p>
               </div>
               <Database className="w-8 h-8 text-purple-600" />
@@ -355,8 +356,10 @@ export default function SystemInfoPage() {
                   Real-time Database Monitoring
                 </h3>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Live</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Live
+                  </span>
                 </div>
               </div>
               <DatabaseConnectionMonitor
@@ -378,12 +381,12 @@ export default function SystemInfoPage() {
                   Informasi Server
                 </h3>
                 <SystemInfo
-                  systemData={systemData}
-                  formatUptime={formatUptime}
+                  compact={true}
                   formatBytes={formatBytes}
+                  formatUptime={formatUptime}
                   getStatusColor={getStatusColor}
                   getStatusIcon={getStatusIcon}
-                  compact={true}
+                  systemData={systemData}
                 />
               </div>
             </div>
@@ -400,7 +403,7 @@ export default function SystemInfoPage() {
                 <DatabaseStats databaseData={databaseData} />
               </div>
             </div>
-        )}
+          )}
         </div>
 
         {/* Detailed System Information */}

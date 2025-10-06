@@ -12,6 +12,13 @@ async function handlePost(req, res) {
       selesai,
       idRayon,
       jenisJabatanId,
+      // Permission fields
+      isUtama,
+      canView,
+      canEdit,
+      canCreate,
+      canDelete,
+      canManageRayon,
       // User account data
       username,
       email,
@@ -72,18 +79,42 @@ async function handlePost(req, res) {
         if (!rayon) {
           throw new Error("RAYON_NOT_FOUND");
         }
+
+        // 5. Jika isUtama = true, pastikan hanya 1 majelis utama per rayon
+        if (isUtama === true) {
+          const existingUtama = await tx.majelis.findFirst({
+            where: {
+              idRayon: idRayon,
+              isUtama: true,
+            },
+          });
+
+          if (existingUtama) {
+            throw new Error("MAJELIS_UTAMA_EXISTS");
+          }
+        }
       }
 
-
       // 6. Create Majelis
+      const majelisData = {
+        namaLengkap,
+        mulai: new Date(mulai),
+        selesai: selesai ? new Date(selesai) : null,
+        idRayon: idRayon || null,
+        jenisJabatanId: jenisJabatanId || null,
+      };
+
+      // Tambahkan permission fields jika ada
+      if (typeof isUtama === "boolean") majelisData.isUtama = isUtama;
+      if (typeof canView === "boolean") majelisData.canView = canView;
+      if (typeof canEdit === "boolean") majelisData.canEdit = canEdit;
+      if (typeof canCreate === "boolean") majelisData.canCreate = canCreate;
+      if (typeof canDelete === "boolean") majelisData.canDelete = canDelete;
+      if (typeof canManageRayon === "boolean")
+        majelisData.canManageRayon = canManageRayon;
+
       const newMajelis = await tx.majelis.create({
-        data: {
-          namaLengkap,
-          mulai: new Date(mulai),
-          selesai: selesai ? new Date(selesai) : null,
-          idRayon: idRayon || null,
-          jenisJabatanId: jenisJabatanId || null,
-        },
+        data: majelisData,
         include: {
           jenisJabatan: {
             select: {
@@ -164,6 +195,17 @@ async function handlePost(req, res) {
         .json(apiResponse(false, null, "Rayon tidak ditemukan"));
     }
 
+    if (error.message === "MAJELIS_UTAMA_EXISTS") {
+      return res
+        .status(400)
+        .json(
+          apiResponse(
+            false,
+            null,
+            "Sudah ada Majelis Utama di rayon ini. Hanya boleh ada 1 Majelis Utama per rayon."
+          )
+        );
+    }
 
     return res
       .status(500)

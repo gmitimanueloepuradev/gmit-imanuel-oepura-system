@@ -175,21 +175,21 @@ export default function MajelisCreateJemaat() {
 
   const keluargaListOptions =
     keluargaList?.data?.items?.map((item) => {
-      // Find kepala keluarga from jemaats array
-      const kepalaKeluarga = item.jemaats?.find(j =>
-        j.statusDalamKeluarga?.status?.toLowerCase().includes('kepala')
+      const kepalaKeluarga = item.jemaats?.find((j) =>
+        j.statusDalamKeluarga?.status?.toLowerCase().includes("kepala")
       );
+      const kepalaName = kepalaKeluarga?.nama || "Belum ada kepala keluarga";
 
-      const kepalaName = kepalaKeluarga?.nama || 'Belum ada kepala keluarga';
+      const displayNik = item.noKK ? `NIK: ${item.noKK}` : "NIK Belum diisi";
 
       return {
         value: item.id,
-        label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
+        label: `${displayNik} - ${kepalaName} (No. Bagungan: ${item.noBagungan})`,
       };
     }) || [];
 
   const sukuOptions =
-    suku?.data?.map((item) => ({
+    suku?.data?.items?.map((item) => ({
       value: item.id,
       label: item.namaSuku,
     })) || [];
@@ -652,10 +652,10 @@ export default function MajelisCreateJemaat() {
                             <SkeletonInput />
                           ) : (
                             <AutoCompleteInput
-                              label="Keluarga"
+                              label="Keluarga (Cari berdasarkan NIK Kepala Keluarga)"
                               name="idKeluarga"
                               options={keluargaListOptions}
-                              placeholder="Pilih keluarga di rayon Anda"
+                              placeholder="Ketik NIK untuk mencari keluarga..."
                               required={!isKepalaKeluarga && !preSelectedKeluarga}
                             />
                           )}

@@ -15,7 +15,7 @@ async function handleGet(req, res) {
     const items = await prisma.pekerjaan.findMany({
       where,
       skip: pagination.skip,
-      take: pagination.take,
+      take: pagination.limit, // Corrected from .take
       orderBy: {
         [sort.sortBy]: sort.sortOrder,
       },

@@ -126,6 +126,14 @@ export const majelisCreationSchema = z.object({
   idRayon: z.string().optional(),
   jenisJabatanId: z.string().nonempty("Jenis jabatan wajib dipilih"),
 
+  // Permission fields
+  isUtama: z.boolean().default(false),
+  canView: z.boolean().default(true),
+  canEdit: z.boolean().default(false),
+  canCreate: z.boolean().default(false),
+  canDelete: z.boolean().default(false),
+  canManageRayon: z.boolean().default(false),
+
   // User account data
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),

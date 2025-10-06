@@ -1,31 +1,22 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  User,
-  Calendar,
-  MapPin,
-  Phone,
-  Mail,
-  Users,
-  Home,
-  Heart,
-  Briefcase,
-  GraduationCap,
-  DollarSign,
-  Shield,
   ArrowLeft,
   Edit,
-  Baby,
+  GraduationCap,
+  MapPin,
+  Shield,
+  User,
+  Users,
 } from "lucide-react";
+import { useRouter } from "next/router";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PageTitle from "@/components/ui/PageTitle";
-import jemaatService from "@/services/jemaatService";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatDate, calculateAge } from "@/utils/dateUtils";
+import jemaatService from "@/services/jemaatService";
+import { calculateAge, formatDate } from "@/utils/dateUtils";
 
 function DetailJemaatMajelisPage() {
   const router = useRouter();
@@ -36,20 +27,28 @@ function DetailJemaatMajelisPage() {
   const {
     data: jemaatDetail,
     isLoading,
-    error
+    error,
   } = useQuery({
-    queryKey: ['majelis-jemaat-detail', id],
+    queryKey: ["majelis-jemaat-detail", id],
     queryFn: () => jemaatService.getById(id),
     enabled: !!id,
   });
 
   const jemaat = jemaatDetail?.data;
+  // Get majelis permissions
+  const majelisPermissions = user?.majelis || {};
+  const {
+    canView = true,
+    canEdit = false,
+    canCreate = false,
+    canDelete = false,
+  } = majelisPermissions;
 
   // Check if jemaat belongs to current majelis rayon
   const belongsToRayon = jemaat?.keluarga?.idRayon === user?.majelis?.idRayon;
 
   const handleBack = () => {
-    router.push('/majelis/jemaat');
+    router.push("/majelis/jemaat");
   };
 
   const handleEdit = () => {
@@ -102,7 +101,9 @@ function DetailJemaatMajelisPage() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
-              <CardTitle className="text-red-600">Data Tidak Ditemukan</CardTitle>
+              <CardTitle className="text-red-600">
+                Data Tidak Ditemukan
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -172,13 +173,22 @@ function DetailJemaatMajelisPage() {
               </div>
             </div>
 
-            <Button
+            {canEdit && (
+              <Button
+                className="flex items-center space-x-2"
+                onClick={handleEdit}
+              >
+                <Edit className="h-4 w-4" />
+                <span>Edit</span>
+              </Button>
+            )}
+            {/* <Button
               className="flex items-center space-x-2"
               onClick={handleEdit}
             >
               <Edit className="h-4 w-4" />
               <span>Edit</span>
-            </Button>
+            </Button> */}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -207,7 +217,7 @@ function DetailJemaatMajelisPage() {
                         Jenis Kelamin
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.jenisKelamin ? 'Laki-laki' : 'Perempuan'}
+                        {jemaat.jenisKelamin ? "Laki-laki" : "Perempuan"}
                       </p>
                     </div>
                     <div>
@@ -215,7 +225,8 @@ function DetailJemaatMajelisPage() {
                         Tanggal Lahir
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {formatDate(jemaat.tanggalLahir)} ({calculateAge(jemaat.tanggalLahir)} tahun)
+                        {formatDate(jemaat.tanggalLahir)} (
+                        {calculateAge(jemaat.tanggalLahir)} tahun)
                       </p>
                     </div>
                     <div>
@@ -223,7 +234,7 @@ function DetailJemaatMajelisPage() {
                         Golongan Darah
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.golonganDarah || '-'}
+                        {jemaat.golonganDarah || "-"}
                       </p>
                     </div>
                     <div>
@@ -231,18 +242,20 @@ function DetailJemaatMajelisPage() {
                         Suku
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.suku?.namaSuku || '-'}
+                        {jemaat.suku?.namaSuku || "-"}
                       </p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Status
                       </label>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        jemaat.status === 'AKTIF'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          jemaat.status === "AKTIF"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                        }`}
+                      >
                         {jemaat.status}
                       </span>
                     </div>
@@ -265,7 +278,7 @@ function DetailJemaatMajelisPage() {
                         Status dalam Keluarga
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.statusDalamKeluarga?.status || '-'}
+                        {jemaat.statusDalamKeluarga?.status || "-"}
                       </p>
                     </div>
                     <div>
@@ -273,7 +286,7 @@ function DetailJemaatMajelisPage() {
                         Nama Kepala Keluarga
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.keluarga?.namaKepalaKeluarga || '-'}
+                        {jemaat.keluarga?.namaKepalaKeluarga || "-"}
                       </p>
                     </div>
                     <div>
@@ -281,7 +294,7 @@ function DetailJemaatMajelisPage() {
                         No. Kartu Keluarga (KK)
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.keluarga?.noKK || '-'}
+                        {jemaat.keluarga?.noKK || "-"}
                       </p>
                     </div>
                     <div>
@@ -289,7 +302,7 @@ function DetailJemaatMajelisPage() {
                         No. Bangunan
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.keluarga?.noBagungan || '-'}
+                        {jemaat.keluarga?.noBagungan || "-"}
                       </p>
                     </div>
                     <div>
@@ -297,7 +310,7 @@ function DetailJemaatMajelisPage() {
                         Rayon
                       </label>
                       <p className="text-gray-900 dark:text-gray-100">
-                        {jemaat.keluarga?.rayon?.namaRayon || '-'}
+                        {jemaat.keluarga?.rayon?.namaRayon || "-"}
                       </p>
                     </div>
                   </div>
@@ -319,13 +332,23 @@ function DetailJemaatMajelisPage() {
                         {jemaat.keluarga.alamat.jalan}
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        RT {jemaat.keluarga.alamat.rt} / RW {jemaat.keluarga.alamat.rw}
+                        RT {jemaat.keluarga.alamat.rt} / RW{" "}
+                        {jemaat.keluarga.alamat.rw}
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        {jemaat.keluarga.alamat.kelurahan?.nama}, {jemaat.keluarga.alamat.kelurahan?.kecamatan?.nama}
+                        {jemaat.keluarga.alamat.kelurahan?.nama},{" "}
+                        {jemaat.keluarga.alamat.kelurahan?.kecamatan?.nama}
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        {jemaat.keluarga.alamat.kelurahan?.kecamatan?.kotaKab?.nama}, {jemaat.keluarga.alamat.kelurahan?.kecamatan?.kotaKab?.provinsi?.nama}
+                        {
+                          jemaat.keluarga.alamat.kelurahan?.kecamatan?.kotaKab
+                            ?.nama
+                        }
+                        ,{" "}
+                        {
+                          jemaat.keluarga.alamat.kelurahan?.kecamatan?.kotaKab
+                            ?.provinsi?.nama
+                        }
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
                         Kode Pos: {jemaat.keluarga.alamat.kelurahan?.kodePos}
@@ -352,7 +375,7 @@ function DetailJemaatMajelisPage() {
                       Pendidikan
                     </label>
                     <p className="text-gray-900 dark:text-gray-100">
-                      {jemaat.pendidikan?.jenjang || '-'}
+                      {jemaat.pendidikan?.jenjang || "-"}
                     </p>
                   </div>
                   <div>
@@ -360,7 +383,7 @@ function DetailJemaatMajelisPage() {
                       Pekerjaan
                     </label>
                     <p className="text-gray-900 dark:text-gray-100">
-                      {jemaat.pekerjaan?.namaPekerjaan || '-'}
+                      {jemaat.pekerjaan?.namaPekerjaan || "-"}
                     </p>
                   </div>
                   <div>
@@ -368,7 +391,7 @@ function DetailJemaatMajelisPage() {
                       Pendapatan
                     </label>
                     <p className="text-gray-900 dark:text-gray-100">
-                      {jemaat.pendapatan?.label || '-'}
+                      {jemaat.pendapatan?.label || "-"}
                     </p>
                   </div>
                 </CardContent>
@@ -384,7 +407,7 @@ function DetailJemaatMajelisPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-900 dark:text-gray-100">
-                    {jemaat.jaminanKesehatan?.jenisJaminan || '-'}
+                    {jemaat.jaminanKesehatan?.jenisJaminan || "-"}
                   </p>
                 </CardContent>
               </Card>

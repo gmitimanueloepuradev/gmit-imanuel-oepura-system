@@ -47,9 +47,9 @@ const validationSchema = z.object({
   idJaminanKesehatan: z.string().min(1, "Jaminan kesehatan harus dipilih"),
   noKK: z
     .string()
-    .min(16, "Nomor KK harus 16 digit")
-    .max(16, "Nomor KK harus 16 digit")
-    .regex(/^\d+$/, "Nomor KK harus berupa angka"),
+    .min(16, "NIK harus 16 digit")
+    .max(16, "NIK harus 16 digit")
+    .regex(/^\d+$/, "NIK harus berupa angka"),
   golonganDarah: z.string().optional(),
   idPernikahan: z.string().optional(),
 });
@@ -136,8 +136,8 @@ export default function OnboardingPage() {
 
     if (!noKK || noKK.length !== 16) {
       showToast({
-        title: "Nomor KK Tidak Valid",
-        description: "Nomor KK harus 16 digit",
+        title: "NIK Tidak Valid",
+        description: "NIK harus 16 digit",
         color: "warning",
       });
       return;
@@ -166,7 +166,7 @@ export default function OnboardingPage() {
         title: "Keluarga Tidak Ditemukan",
         description:
           error.response?.data?.message ||
-          "Keluarga dengan nomor KK tersebut tidak ditemukan",
+          "Keluarga dengan NIK tersebut tidak ditemukan",
         color: "error",
       });
     } finally {
@@ -355,7 +355,7 @@ export default function OnboardingPage() {
                   <div className="md:col-span-2">
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        ℹ️ Anda akan mencari keluarga sendiri menggunakan Nomor KK saat melengkapi profil
+                        ℹ️ Anda akan mencari keluarga sendiri menggunakan NIK saat melengkapi profil
                       </p>
                     </div>
                   </div>
@@ -465,7 +465,7 @@ export default function OnboardingPage() {
                             type="text"
                             {...methods.register("noKK")}
                             maxLength={16}
-                            placeholder="Masukkan 16 digit nomor KK"
+                            placeholder="Masukkan 16 digit NIK"
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                           />
                           {errors.noKK && (
@@ -530,7 +530,7 @@ export default function OnboardingPage() {
                       <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                         <p className="text-sm text-yellow-700 dark:text-yellow-300">
                           <AlertCircle className="h-4 w-4 inline mr-2" />
-                          Silakan cari keluarga dengan nomor KK terlebih dahulu sebelum menyimpan profil
+                          Silakan cari keluarga dengan NIK terlebih dahulu sebelum menyimpan profil
                         </p>
                       </div>
                     )}

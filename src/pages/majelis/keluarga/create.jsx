@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Home, ArrowLeft, Save } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Home, Save } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import * as z from "zod";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PageTitle from "@/components/ui/PageTitle";
-import TextInput from "@/components/ui/inputs/TextInput";
 import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import { useAuth } from "@/contexts/AuthContext";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
-import { useAuth } from "@/contexts/AuthContext";
 
 // Validation schema for majelis keluarga creation
 const keluargaSchema = z.object({
@@ -51,49 +51,57 @@ function MajelisCreateKeluarga() {
     },
   });
 
-  const { handleSubmit, register, formState: { errors } } = form;
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = form;
 
   // Fetch master data
   const { data: kelurahanData } = useQuery({
-    queryKey: ['kelurahan'],
+    queryKey: ["kelurahan"],
     queryFn: () => masterService.getKelurahan(),
   });
 
   const { data: statusKeluargaData } = useQuery({
-    queryKey: ['status-keluarga'],
+    queryKey: ["status-keluarga"],
     queryFn: () => masterService.getStatusKeluarga(),
   });
 
   const { data: statusKepemilikanRumahData } = useQuery({
-    queryKey: ['status-kepemilikan-rumah'],
+    queryKey: ["status-kepemilikan-rumah"],
     queryFn: () => masterService.getStatusKepemilikanRumah(),
   });
 
   const { data: keadaanRumahData } = useQuery({
-    queryKey: ['keadaan-rumah'],
+    queryKey: ["keadaan-rumah"],
     queryFn: () => masterService.getKeadaanRumah(),
   });
 
   // Transform options data
-  const kelurahanOptions = kelurahanData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama
-  })) || [];
+  const kelurahanOptions =
+    kelurahanData?.data?.items?.map((item) => ({
+      value: item.id,
+      label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
+    })) || [];
 
-  const statusKeluargaOptions = statusKeluargaData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.status
-  })) || [];
+  const statusKeluargaOptions =
+    statusKeluargaData?.data?.items?.map((item) => ({
+      value: item.id,
+      label: item.status,
+    })) || [];
 
-  const statusKepemilikanRumahOptions = statusKepemilikanRumahData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.status
-  })) || [];
+  const statusKepemilikanRumahOptions =
+    statusKepemilikanRumahData?.data?.items?.map((item) => ({
+      value: item.id,
+      label: item.status,
+    })) || [];
 
-  const keadaanRumahOptions = keadaanRumahData?.data?.items?.map(item => ({
-    value: item.id,
-    label: item.keadaan
-  })) || [];
+  const keadaanRumahOptions =
+    keadaanRumahData?.data?.items?.map((item) => ({
+      value: item.id,
+      label: item.keadaan,
+    })) || [];
 
   // Create keluarga mutation
   const createMutation = useMutation({
@@ -124,22 +132,26 @@ function MajelisCreateKeluarga() {
     onSuccess: (data) => {
       showToast({
         title: "Berhasil!",
-        description: "Keluarga berhasil dibuat! Sekarang tambahkan jemaat sebagai kepala keluarga.",
+        description:
+          "Keluarga berhasil dibuat! Sekarang tambahkan jemaat sebagai kepala keluarga.",
         color: "success",
       });
 
       // Invalidate and refetch
-      queryClient.invalidateQueries(['keluarga']);
-      queryClient.invalidateQueries(['majelis-dashboard']);
+      queryClient.invalidateQueries(["keluarga"]);
+      queryClient.invalidateQueries(["majelis-dashboard"]);
 
       // Redirect to specialized page for adding kepala keluarga in the same flow
-      router.push(`/majelis/keluarga/create-jemaat-in-keluarga?keluargaId=${data.data.id}`);
+      router.push(
+        `/majelis/keluarga/create-jemaat-in-keluarga?keluargaId=${data.data.id}`
+      );
     },
     onError: (error) => {
-      console.error('Create keluarga error:', error);
+      console.error("Create keluarga error:", error);
       showToast({
         title: "Error",
-        description: error.response?.data?.message || "Gagal menambahkan data keluarga",
+        description:
+          error.response?.data?.message || "Gagal menambahkan data keluarga",
         color: "error",
       });
     },
@@ -155,7 +167,7 @@ function MajelisCreateKeluarga() {
   };
 
   const handleBack = () => {
-    router.push('/majelis/keluarga');
+    router.push("/majelis/keluarga");
   };
 
   // Check if user has majelis data with rayon
@@ -169,7 +181,8 @@ function MajelisCreateKeluarga() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Anda belum memiliki rayon yang ditugaskan. Hubungi admin untuk mengatur rayon Anda.
+                Anda belum memiliki rayon yang ditugaskan. Hubungi admin untuk
+                mengatur rayon Anda.
               </p>
               <Button onClick={handleBack}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -207,7 +220,7 @@ function MajelisCreateKeluarga() {
                   Tambah Keluarga Baru
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Rayon: {user.majelis?.rayon?.namaRayon || 'Tidak diketahui'}
+                  Rayon: {user.majelis?.rayon?.namaRayon || "Tidak diketahui"}
                 </p>
               </div>
             </div>
@@ -239,9 +252,9 @@ function MajelisCreateKeluarga() {
                       {...register("noKK")}
                       required
                       error={errors.noKK?.message}
-                      label="No. Kartu Keluarga (KK)"
+                      label="NIK Kepala Keluarga"
                       maxLength={16}
-                      placeholder="Masukkan nomor KK (16 digit)"
+                      placeholder="Masukkan NIK (16 digit)"
                     />
                   </div>
 
@@ -286,7 +299,7 @@ function MajelisCreateKeluarga() {
                         label="Kelurahan"
                         options={[
                           { value: "", label: "Pilih Kelurahan" },
-                          ...kelurahanOptions
+                          ...kelurahanOptions,
                         ]}
                       />
                     </div>
@@ -305,7 +318,7 @@ function MajelisCreateKeluarga() {
                         label="Status Keluarga"
                         options={[
                           { value: "", label: "Pilih Status Keluarga" },
-                          ...statusKeluargaOptions
+                          ...statusKeluargaOptions,
                         ]}
                       />
 
@@ -315,7 +328,7 @@ function MajelisCreateKeluarga() {
                         label="Status Kepemilikan Rumah"
                         options={[
                           { value: "", label: "Pilih Status Kepemilikan" },
-                          ...statusKepemilikanRumahOptions
+                          ...statusKepemilikanRumahOptions,
                         ]}
                       />
 
@@ -325,7 +338,7 @@ function MajelisCreateKeluarga() {
                         label="Keadaan Rumah"
                         options={[
                           { value: "", label: "Pilih Keadaan Rumah" },
-                          ...keadaanRumahOptions
+                          ...keadaanRumahOptions,
                         ]}
                       />
                     </div>

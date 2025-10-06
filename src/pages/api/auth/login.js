@@ -1,8 +1,9 @@
-import { apiResponse } from "@/lib/apiHelper";
+import bcrypt from "bcryptjs";
+
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
 import { createToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 async function handlePost(req, res) {
   try {
@@ -11,16 +12,15 @@ async function handlePost(req, res) {
     if (!identifier || !password) {
       return res
         .status(400)
-        .json(apiResponse(false, null, "Email/Username dan password wajib diisi"));
+        .json(
+          apiResponse(false, null, "Email/Username dan password wajib diisi")
+        );
     }
 
     // Find user by email or username
     const user = await prisma.user.findFirst({
       where: {
-        OR: [
-          { email: identifier },
-          { username: identifier }
-        ]
+        OR: [{ email: identifier }, { username: identifier }],
       },
       select: {
         id: true,
@@ -41,14 +41,14 @@ async function handlePost(req, res) {
                 noBagungan: true,
                 rayon: {
                   select: {
-                    namaRayon: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    namaRayon: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -61,7 +61,13 @@ async function handlePost(req, res) {
     if (!user.isActive) {
       return res
         .status(403)
-        .json(apiResponse(false, null, "Akun Anda telah dinonaktifkan. Silakan hubungi pihak gereja untuk informasi lebih lanjut."));
+        .json(
+          apiResponse(
+            false,
+            null,
+            "Akun Anda telah dinonaktifkan. Silakan hubungi pihak gereja untuk informasi lebih lanjut."
+          )
+        );
     }
 
     // Verify password
@@ -78,7 +84,7 @@ async function handlePost(req, res) {
       id: user.id,
       email: user.email,
       username: user.username,
-      role: user.role
+      role: user.role,
     };
 
     const token = createToken(tokenPayload);
@@ -90,11 +96,12 @@ async function handlePost(req, res) {
       email: user.email,
       role: user.role,
       noWhatsapp: user.noWhatsapp,
-      jemaat: user.jemaat
+      jemaat: user.jemaat,
     };
 
     // Determine redirect URL based on role
     let redirectUrl = "/";
+
     switch (user.role) {
       case "ADMIN":
         redirectUrl = "/admin/dashboard";
@@ -112,19 +119,25 @@ async function handlePost(req, res) {
         redirectUrl = "/dashboard";
     }
 
-    return res
-      .status(200)
-      .json(apiResponse(true, {
-        user: userData,
-        token: token,
-        redirect_url: redirectUrl
-      }, "Login berhasil"));
-
+    return res.status(200).json(
+      apiResponse(
+        true,
+        {
+          user: userData,
+          token: token,
+          redirect_url: redirectUrl,
+        },
+        "Login berhasil"
+      )
+    );
   } catch (error) {
     console.error("Error during login:", error);
+
     return res
       .status(500)
-      .json(apiResponse(false, null, "Terjadi kesalahan server", error.message));
+      .json(
+        apiResponse(false, null, "Terjadi kesalahan server", error.message)
+      );
   }
 }
 

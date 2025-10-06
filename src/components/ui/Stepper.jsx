@@ -100,7 +100,6 @@ export function StepperNavigation({
   totalSteps,
   onPrevious,
   onNext,
-  onSubmit,
   isLoading = false,
   canGoNext = true,
   nextButtonText = "Lanjut",
@@ -130,12 +129,11 @@ export function StepperNavigation({
           )}
           {isLastStep ? (
             <Button
-              disabled={!canGoNext}
+              disabled={isLoading}
               isLoading={isLoading}
               loadingText="Menyimpan..."
               size="sm"
-              type="button"
-              onClick={onSubmit}
+              type="submit"
             >
               {submitButtonText}
             </Button>
@@ -169,11 +167,10 @@ export function StepperNavigation({
 
         {isLastStep ? (
           <Button
-            disabled={!canGoNext}
+            disabled={isLoading}
             isLoading={isLoading}
             loadingText="Menyimpan..."
-            type="button"
-            onClick={onSubmit}
+            type="submit"
           >
             {submitButtonText}
           </Button>

@@ -1,12 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  AlertCircle,
   Calendar,
   Crown,
   Lock,
   Mail,
   MapPin,
   Phone,
+  Shield,
   User,
   UserCheck,
 } from "lucide-react";
@@ -34,6 +36,11 @@ const steps = [
     description: "Informasi dasar majelis",
   },
   {
+    id: "permission-info",
+    title: "Permission",
+    description: "Atur hak akses majelis (opsional)",
+  },
+  {
     id: "account-info",
     title: "Data Akun",
     description: "Buat akun login untuk majelis",
@@ -58,8 +65,16 @@ export default function CreateMajelisPage() {
       namaLengkap: "",
       mulai: "",
       selesai: "",
-      idRayon: "",
+      idRayon: router.query.rayon || "",
       jenisJabatanId: "",
+      // Permission fields
+      isUtama: false,
+      canView: true,
+      canEdit: false,
+      canCreate: false,
+      canDelete: false,
+      canManageRayon: false,
+      // Account fields
       username: "",
       email: "",
       password: "",
@@ -118,8 +133,10 @@ export default function CreateMajelisPage() {
       case 1:
         return ["namaLengkap", "mulai", "jenisJabatanId"];
       case 2:
-        return ["username", "email", "password"];
+        return []; // Permission step - optional
       case 3:
+        return ["username", "email", "password"];
+      case 4:
         return []; // No validation needed for confirmation step
       default:
         return [];
@@ -194,11 +211,15 @@ export default function CreateMajelisPage() {
     try {
       setIsLoading(true);
 
-      // Format WhatsApp number if provided
-      const formattedData = {
-        ...data,
-        noWhatsapp: formatWhatsAppNumber(data.noWhatsapp),
-      };
+      // Clean up the data before sending
+      const formattedData = { ...data };
+
+      // Format WhatsApp number with +62 prefix
+      if (formattedData.noWhatsapp && formattedData.noWhatsapp !== "") {
+        formattedData.noWhatsapp = formatWhatsAppNumber(formattedData.noWhatsapp);
+      } else {
+        formattedData.noWhatsapp = null;
+      }
 
       // Clean up empty optional fields
       if (!formattedData.selesai) {
@@ -302,6 +323,128 @@ export default function CreateMajelisPage() {
       case 2:
         return (
           <StepContent>
+            <div className="space-y-6">
+              <div className="flex items-start p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                    Informasi Permission
+                  </h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-200">
+                    <strong>Majelis Utama:</strong> Full akses (CRUD + kelola
+                    rayon) |<strong> Koordinator Rayon:</strong> View + kelola
+                    rayon |<strong> Majelis Biasa:</strong> View only
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
+                    * Hanya boleh 1 Majelis Utama per rayon. Step ini opsional,
+                    bisa dilewati.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <Shield className="h-5 w-5 text-gray-600 mr-2" />
+                  <h3 className="text-lg font-semibold">Atur Hak Akses</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      type="checkbox"
+                      {...methods.register("isUtama")}
+                      onChange={(e) => {
+                        methods.setValue("isUtama", e.target.checked);
+                        if (e.target.checked) {
+                          // Auto-enable all permissions if isUtama
+                          methods.setValue("canView", true);
+                          methods.setValue("canEdit", true);
+                          methods.setValue("canCreate", true);
+                          methods.setValue("canDelete", true);
+                          methods.setValue("canManageRayon", true);
+                        }
+                      }}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">Majelis Utama</span>
+                      <p className="text-xs text-gray-500">Full access</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      disabled={watchedValues.isUtama}
+                      type="checkbox"
+                      {...methods.register("canView")}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">View</span>
+                      <p className="text-xs text-gray-500">Lihat data</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      disabled={watchedValues.isUtama}
+                      type="checkbox"
+                      {...methods.register("canEdit")}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">Edit</span>
+                      <p className="text-xs text-gray-500">Ubah data</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      disabled={watchedValues.isUtama}
+                      type="checkbox"
+                      {...methods.register("canCreate")}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">Create</span>
+                      <p className="text-xs text-gray-500">Tambah data</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      disabled={watchedValues.isUtama}
+                      type="checkbox"
+                      {...methods.register("canDelete")}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">Delete</span>
+                      <p className="text-xs text-gray-500">Hapus data</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <input
+                      className="w-4 h-4"
+                      disabled={watchedValues.isUtama}
+                      type="checkbox"
+                      {...methods.register("canManageRayon")}
+                    />
+                    <div>
+                      <span className="text-sm font-medium">Kelola Rayon</span>
+                      <p className="text-xs text-gray-500">Akses rayon</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </StepContent>
+        );
+
+      case 3:
+        return (
+          <StepContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextInput
                 required
@@ -339,7 +482,7 @@ export default function CreateMajelisPage() {
           </StepContent>
         );
 
-      case 3:
+      case 4:
         return (
           <StepContent>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 transition-colors duration-300">
@@ -417,6 +560,55 @@ export default function CreateMajelisPage() {
                 </div>
               </div>
 
+              {/* Permission Summary if any is set */}
+              {(watchedValues.isUtama ||
+                watchedValues.canEdit ||
+                watchedValues.canCreate ||
+                watchedValues.canDelete ||
+                watchedValues.canManageRayon) && (
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2">
+                    Permission
+                  </h4>
+                  <div className="space-y-1">
+                    {watchedValues.isUtama && (
+                      <p className="text-sm text-purple-600 dark:text-purple-400">
+                        ✓ Majelis Utama (Full Access)
+                      </p>
+                    )}
+                    {!watchedValues.isUtama && (
+                      <>
+                        {watchedValues.canView && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            ✓ View
+                          </p>
+                        )}
+                        {watchedValues.canEdit && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            ✓ Edit
+                          </p>
+                        )}
+                        {watchedValues.canCreate && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            ✓ Create
+                          </p>
+                        )}
+                        {watchedValues.canDelete && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            ✓ Delete
+                          </p>
+                        )}
+                        {watchedValues.canManageRayon && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            ✓ Kelola Rayon
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg transition-colors duration-300">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
                   <strong>Catatan:</strong> Setelah data disimpan, akun majelis
@@ -454,7 +646,7 @@ export default function CreateMajelisPage() {
       />
 
       {/* Form */}
-      <HookForm methods={methods} onSubmit={handleSubmit(onSubmit)}>
+      <HookForm methods={methods} onSubmit={onSubmit}>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 transition-colors duration-300">
           {renderStepContent()}
 
@@ -467,7 +659,6 @@ export default function CreateMajelisPage() {
             totalSteps={steps.length}
             onNext={handleNext}
             onPrevious={handlePrevious}
-            onSubmit={handleSubmit(onSubmit)}
           />
         </div>
       </HookForm>

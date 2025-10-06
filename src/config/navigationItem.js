@@ -55,6 +55,11 @@ export const roleConfigs = {
       },
       { href: "/admin/keluarga", label: "Keluarga", icon: UsersRound },
       { href: "/admin/majelis", label: "Majelis", icon: UserCheck },
+      {
+        href: "/admin/manajemen-rayon-majelis",
+        label: "Manajemen Rayon Majelis",
+        icon: MapPin,
+      },
       // { href: "/admin/kegiatan", label: "Kegiatan", icon: Calendar },
       { href: "/admin/rayon", label: "Rayon", icon: MapPin },
       {

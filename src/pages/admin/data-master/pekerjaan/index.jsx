@@ -1,5 +1,5 @@
-import masterService from "@/services/masterService";
 import MasterDataPage from "@/components/ui/MasterDataPage";
+import masterService from "@/services/masterService";
 
 export default function PekerjaanPage() {
   const columns = [
@@ -24,10 +24,10 @@ export default function PekerjaanPage() {
   const viewFields = [
     { key: "id", label: "ID" },
     { key: "namaPekerjaan", label: "Nama Pekerjaan" },
-    { 
-      key: "isActive", 
-      label: "Status Aktif", 
-      getValue: (item) => item?.isActive ? "Aktif" : "Tidak Aktif" 
+    {
+      key: "isActive",
+      label: "Status Aktif",
+      getValue: (item) => (item?.isActive ? "Aktif" : "Tidak Aktif"),
     },
   ];
 
@@ -37,14 +37,14 @@ export default function PekerjaanPage() {
       label: "Nama Pekerjaan",
       type: "text",
       required: true,
-      placeholder: "Masukkan nama pekerjaan"
+      placeholder: "Masukkan nama pekerjaan",
     },
     {
       key: "isActive",
       label: "Status Aktif",
       type: "boolean",
-      defaultValue: true
-    }
+      defaultValue: true,
+    },
   ];
 
   return (
@@ -65,7 +65,7 @@ export default function PekerjaanPage() {
         get: () => masterService.getPekerjaan(),
         create: (data) => masterService.createPekerjaan(data),
         update: (id, data) => masterService.updatePekerjaan(id, data),
-        delete: (id) => masterService.deletePekerjaan(id)
+        delete: (id) => masterService.deletePekerjaan(id),
       }}
       title="Data Pekerjaan"
       viewFields={viewFields}

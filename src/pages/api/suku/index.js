@@ -31,9 +31,18 @@ export default async function handler(req, res) {
 // GET - Ambil semua data suku
 async function handleGet(req, res) {
   try {
-    const { search = "", sortBy = "namaSuku", sortOrder = "asc" } = req.query;
+    const {
+      page = 1,
+      limit = 1000, // Default to a high limit for master data
+      search = "",
+      sortBy = "namaSuku",
+      sortOrder = "asc",
+    } = req.query;
 
-    // Filter untuk search
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
     const where = search
       ? {
           namaSuku: {
@@ -43,18 +52,33 @@ async function handleGet(req, res) {
         }
       : {};
 
-    // Get semua data tanpa pagination (untuk data master yang tidak banyak)
-    const suku = await prisma.suku.findMany({
+    const total = await prisma.suku.count({ where });
+    const items = await prisma.suku.findMany({
       where,
+      skip,
+      take: limitNum,
       orderBy: {
         [sortBy]: sortOrder,
       },
     });
 
-    // Return semua data tanpa pagination
+    const totalPages = Math.ceil(total / limitNum);
+
+    const result = {
+      items,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages,
+        hasNext: pageNum < totalPages,
+        hasPrev: pageNum > 1,
+      },
+    };
+
     return res
       .status(200)
-      .json(apiResponse(true, suku, "Data suku berhasil diambil"));
+      .json(apiResponse(true, result, "Data suku berhasil diambil"));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching suku:", error);

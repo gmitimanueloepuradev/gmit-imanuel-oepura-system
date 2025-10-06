@@ -31,8 +31,12 @@ import { formatDate, calculateAge } from "@/utils/dateUtils";
 function MajelisJemaatPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
   const confirm = useConfirm();
+  
+  const { user } = useAuth();
+  // Get majelis permissions
+  const majelisPermissions = user?.majelis || {};
+  const { canView = true, canEdit = false, canCreate = false, canDelete = false } = majelisPermissions;
 
   // State for filters and pagination
   const [filters, setFilters] = useState({});
@@ -180,6 +184,30 @@ function MajelisJemaatPage() {
   };
 
 
+  // Check if user has permission to view
+  if (!canView) {
+    return (
+      <ProtectedRoute allowedRoles="MAJELIS">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="text-red-600">Akses Ditolak</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Anda tidak memiliki permission untuk melihat data jemaat. Hubungi admin untuk mengatur permission Anda.
+              </p>
+              <Button onClick={handleBack}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Kembali
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   // Check if user has majelis data with rayon
   if (!user?.majelis?.idRayon) {
     return (
@@ -243,13 +271,15 @@ function MajelisJemaatPage() {
                 <Download className="h-4 w-4" />
                 <span>Export</span>
               </Button>
-              <Button
-                className="flex items-center space-x-2"
-                onClick={handleCreate}
-              >
-                <UserPlus className="h-4 w-4" />
-                <span>Tambah Jemaat</span>
-              </Button>
+              {canCreate && (
+                <Button
+                  className="flex items-center space-x-2"
+                  onClick={handleCreate}
+                >
+                  <UserPlus className="h-4 w-4" />
+                  <span>Tambah Jemaat</span>
+                </Button>
+              )}
             </div>
           </div>
 
@@ -313,13 +343,15 @@ function MajelisJemaatPage() {
                       : "Belum ada data jemaat di rayon ini"
                     }
                   </p>
-                  <Button
-                    className="mt-4"
-                    onClick={handleCreate}
-                  >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Tambah Jemaat Pertama
-                  </Button>
+                  {canCreate && (
+                    <Button
+                      className="mt-4"
+                      onClick={handleCreate}
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Tambah Jemaat Pertama
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -390,21 +422,25 @@ function MajelisJemaatPage() {
                               >
                                 <Eye className="h-3 w-3" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(jemaat.id)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDelete(jemaat)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+                              {canEdit && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEdit(jemaat.id)}
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                              )}
+                              {canDelete && (
+                                <Button
+                                  className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDelete(jemaat)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>

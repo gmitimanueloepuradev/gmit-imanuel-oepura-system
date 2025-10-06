@@ -14,6 +14,7 @@ export default function LoginPage() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const { login, isAuthenticated, user } = useAuth();
   const router = useRouter();
@@ -34,21 +35,35 @@ export default function LoginPage() {
       ...prev,
       [name]: value,
     }));
+
+    // Clear error when user starts typing
+    if (loginError) {
+      setLoginError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.identifier.trim() || !formData.password.trim()) {
+      setLoginError("Email/Username dan password wajib diisi");
       toast.error("Email/Username dan password wajib diisi");
 
       return;
     }
 
     setIsLoading(true);
+    setLoginError(""); // Clear any previous error
 
     try {
       await login(formData);
+      // If login is successful, the user will be redirected by the useEffect hook
+    } catch (error) {
+      // Handle login error without refreshing the page
+      const errorMessage = error.message || "Login gagal. Silakan coba lagi.";
+
+      setLoginError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +111,11 @@ export default function LoginPage() {
                 <input
                   required
                   autoComplete="username"
-                  className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
+                  className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${
+                    loginError
+                      ? "border-red-300"
+                      : "border-gray-300 dark:border-gray-600"
+                  } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors`}
                   disabled={isLoading}
                   id="identifier"
                   name="identifier"
@@ -123,7 +142,11 @@ export default function LoginPage() {
                 <input
                   required
                   autoComplete="current-password"
-                  className="appearance-none relative block w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
+                  className={`appearance-none relative block w-full pl-10 pr-12 py-3 border ${
+                    loginError
+                      ? "border-red-300"
+                      : "border-gray-300 dark:border-gray-600"
+                  } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors`}
                   disabled={isLoading}
                   id="password"
                   name="password"
@@ -152,6 +175,13 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Error Message */}
+            {loginError && (
+              <div className="text-red-500 text-sm text-center py-2 px-4 bg-red-50 dark:bg-red-900/20 rounded-md">
+                {loginError}
+              </div>
+            )}
+
             {/* Submit Button */}
             <div>
               <button
@@ -173,39 +203,6 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
-
-          {/* Role Info */}
-          {/* <div className="mt-6 border-t border-gray-200 pt-6">
-            <p className="text-xs text-gray-500 text-center">
-              Sistem akan mengarahkan Anda ke dashboard sesuai dengan role:
-            </p>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-600">
-              <div className="text-center">
-                <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 rounded">
-                  Admin
-                </span>
-                <p className="mt-1">Admin Dashboard</p>
-              </div>
-              <div className="text-center">
-                <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded">
-                  Jemaat
-                </span>
-                <p className="mt-1">Jemaat Dashboard</p>
-              </div>
-              <div className="text-center">
-                <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                  Majelis
-                </span>
-                <p className="mt-1">Majelis Dashboard</p>
-              </div>
-              <div className="text-center">
-                <span className="inline-block px-2 py-1 bg-orange-100 text-orange-800 rounded">
-                  Employee
-                </span>
-                <p className="mt-1">Employee Dashboard</p>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

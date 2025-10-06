@@ -14,14 +14,14 @@ import React, { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PageTitle from "@/components/ui/PageTitle";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import keluargaService from "@/services/keluargaService";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Page Header Component
-function PageHeader({ title, description, breadcrumb, onAdd }) {
+function PageHeader({ title, description, breadcrumb, onAdd, showAddButton = true }) {
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-6">
@@ -74,12 +74,14 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
           </div>
 
           {/* Actions */}
-          <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
-            <Button onClick={onAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Keluarga
-            </Button>
-          </div>
+          {showAddButton && (
+            <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
+              <Button onClick={onAdd}>
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Keluarga
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -125,6 +127,11 @@ export default function MajelisKeluargaPage() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Get majelis permissions
+  const majelisPermissions = user?.majelis || {};
+  const { canView = true, canCreate = false } = majelisPermissions;
+
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -164,16 +171,39 @@ export default function MajelisKeluargaPage() {
       onClick: (item) => router.push(`/majelis/keluarga/${item.id}`),
       variant: "outline",
     },
-    {
+    ...(canCreate ? [{
       icon: UserPlus,
       label: "Tambah Jemaat",
       onClick: (item) => router.push(`/majelis/jemaat/create?keluargaId=${item.id}`),
       variant: "default",
-    },
+    }] : []),
   ];
 
   const items = keluargaData?.data?.items || [];
   const paginationInfo = keluargaData?.data?.pagination || {};
+
+  // Check if user has permission to view
+  if (!canView) {
+    return (
+      <ProtectedRoute allowedRoles="MAJELIS">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="text-red-600">Akses Ditolak</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Anda tidak memiliki permission untuk melihat data keluarga. Hubungi admin untuk mengatur permission Anda.
+              </p>
+              <Button onClick={() => router.push('/majelis/dashboard')}>
+                Kembali ke Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
@@ -190,6 +220,7 @@ export default function MajelisKeluargaPage() {
             { label: "Data Keluarga" },
           ]}
           description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
+          showAddButton={canCreate}
           title="Data Keluarga"
           onAdd={() => router.push("/majelis/keluarga/create")}
         />

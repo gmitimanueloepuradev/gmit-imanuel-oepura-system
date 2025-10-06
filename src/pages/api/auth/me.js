@@ -31,11 +31,35 @@ async function handleGet(req, res) {
       try {
         const majelis = await prisma.majelis.findUnique({
           where: { id: user.idMajelis },
-          include: {
-            rayon: true
+          select: {
+            id: true,
+            namaLengkap: true,
+            mulai: true,
+            selesai: true,
+            idRayon: true,
+            // Permission fields
+            isUtama: true,
+            canView: true,
+            canEdit: true,
+            canCreate: true,
+            canDelete: true,
+            canManageRayon: true,
+            // Relations
+            rayon: {
+              select: {
+                id: true,
+                namaRayon: true,
+              }
+            },
+            jenisJabatan: {
+              select: {
+                id: true,
+                namaJabatan: true,
+              }
+            }
           }
         });
-        
+
         if (majelis) {
           userData.majelis = majelis;
         }

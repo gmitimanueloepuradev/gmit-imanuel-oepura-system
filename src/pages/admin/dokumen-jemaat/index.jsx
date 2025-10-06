@@ -1,25 +1,22 @@
-import { useState, useMemo } from "react";
-import { useRouter } from "next/router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Download,
-  Edit,
-  Eye,
-  Plus,
-  Trash2,
-  FileText,
-  Users,
   CheckCircle2,
   Clock,
-  XCircle,
+  Download,
+  Eye,
+  FileText,
+  Plus,
   Search,
+  XCircle,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useMemo, useState } from "react";
 
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
+import { Card, CardContent } from "@/components/ui/Card";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import ListGrid from "@/components/ui/ListGrid";
+import PageTitle from "@/components/ui/PageTitle";
 import useConfirm from "@/hooks/useConfirm";
 import useDebounce from "@/hooks/useDebounce";
 import dokumenJemaatService from "@/services/dokumenJemaatService";
@@ -174,7 +171,8 @@ export default function AdminDokumenJemaatPage() {
       key: "verifiedAt",
       label: "Tanggal Verifikasi",
       type: "date",
-      render: (value) => value ? new Date(value).toLocaleDateString("id-ID") : "-",
+      render: (value) =>
+        value ? new Date(value).toLocaleDateString("id-ID") : "-",
     },
   ];
 
@@ -191,7 +189,8 @@ export default function AdminDokumenJemaatPage() {
       label: "Download",
       icon: Download,
       onClick: (item) => {
-        const link = document.createElement('a');
+        const link = document.createElement("a");
+
         link.href = item.urlFile;
         link.download = item.namaFile;
         link.click();
@@ -199,20 +198,20 @@ export default function AdminDokumenJemaatPage() {
       variant: "outline",
       tooltip: "Download dokumen",
     },
-    {
-      label: "Edit",
-      icon: Edit,
-      onClick: (item) => router.push(`/admin/dokumen-jemaat/edit/${item.id}`),
-      variant: "outline",
-      tooltip: "Edit dokumen",
-    },
-    {
-      label: "Hapus",
-      icon: Trash2,
-      onClick: handleDelete,
-      variant: "destructive",
-      tooltip: "Hapus dokumen",
-    },
+    // {
+    //   label: "Edit",
+    //   icon: Edit,
+    //   onClick: (item) => router.push(`/admin/dokumen-jemaat/edit/${item.id}`),
+    //   variant: "outline",
+    //   tooltip: "Edit dokumen",
+    // },
+    // {
+    //   label: "Hapus",
+    //   icon: Trash2,
+    //   onClick: handleDelete,
+    //   variant: "destructive",
+    //   tooltip: "Hapus dokumen",
+    // },
   ];
 
   // Stats configuration - dynamic from API data
@@ -317,7 +316,9 @@ export default function AdminDokumenJemaatPage() {
           </p>
           <button
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            onClick={() => queryClient.invalidateQueries(["admin-dokumen-jemaat"])}
+            onClick={() =>
+              queryClient.invalidateQueries(["admin-dokumen-jemaat"])
+            }
           >
             Coba Lagi
           </button>
@@ -375,18 +376,6 @@ export default function AdminDokumenJemaatPage() {
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
-              {headerActions.map((action, index) => (
-                <Button
-                  key={index}
-                  onClick={action.onClick}
-                  variant={action.variant}
-                >
-                  {action.icon && <action.icon className="w-4 h-4 mr-2" />}
-                  {action.label}
-                </Button>
-              ))}
-            </div>
           </div>
 
           {/* Stats */}
@@ -420,7 +409,7 @@ export default function AdminDokumenJemaatPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="px-4 sm:px-6 lg:px-8 max-w-full">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-full mt-5">
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">
@@ -442,7 +431,9 @@ export default function AdminDokumenJemaatPage() {
       <div className="px-4 sm:px-6 lg:px-8 max-w-full">
         <ListGrid
           // Basic props that ListGrid supports
+          searchPlaceholder="Cari nama file, jemaat, atau rayon..."
           searchable={false} // Disable since we have custom search above
+          onFiltersChange={handleFiltersChange}
           columns={columns}
           // Row Actions Props
           rowActions={rowActions}
@@ -455,8 +446,6 @@ export default function AdminDokumenJemaatPage() {
           maxVisibleActions={3}
           // Filters
           filters={filterOptions}
-          searchPlaceholder="Cari nama file, jemaat, atau rayon..."
-          onFiltersChange={handleFiltersChange}
         />
 
         {/* Custom Pagination */}
@@ -499,17 +488,19 @@ export default function AdminDokumenJemaatPage() {
                   {/* Navigation Buttons */}
                   <div className="flex items-center space-x-1">
                     <Button
+                      disabled={currentPage <= 1}
                       size="sm"
                       variant="outline"
-                      disabled={currentPage <= 1}
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
                     >
                       ←
                     </Button>
                     <Button
+                      disabled={currentPage >= pagination.totalPages}
                       size="sm"
                       variant="outline"
-                      disabled={currentPage >= pagination.totalPages}
                       onClick={() =>
                         setCurrentPage(
                           Math.min(pagination.totalPages, currentPage + 1)
@@ -528,7 +519,8 @@ export default function AdminDokumenJemaatPage() {
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     Menampilkan{" "}
                     <span className="font-medium">{documents.length}</span> dari{" "}
-                    <span className="font-medium">{pagination.total}</span> dokumen
+                    <span className="font-medium">{pagination.total}</span>{" "}
+                    dokumen
                     {Object.keys(filters).length > 0 && (
                       <span className="text-blue-600 dark:text-blue-400">
                         {` (dengan ${Object.keys(filters).length} filter aktif)`}
@@ -548,20 +540,20 @@ export default function AdminDokumenJemaatPage() {
                     <option value={100}>100 per halaman</option>
                   </select>
                   <Button
-                    variant="outline"
                     disabled={currentPage <= 1}
+                    variant="outline"
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   >
                     ← Sebelumnya
                   </Button>
                   <span className="text-sm text-gray-700 dark:text-gray-300 px-2">
-                    Halaman <span className="font-medium">{pagination.page}</span>{" "}
-                    dari{" "}
+                    Halaman{" "}
+                    <span className="font-medium">{pagination.page}</span> dari{" "}
                     <span className="font-medium">{pagination.totalPages}</span>
                   </span>
                   <Button
-                    variant="outline"
                     disabled={currentPage >= pagination.totalPages}
+                    variant="outline"
                     onClick={() =>
                       setCurrentPage(
                         Math.min(pagination.totalPages, currentPage + 1)

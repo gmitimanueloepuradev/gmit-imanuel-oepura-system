@@ -9,7 +9,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import ExportModal from "./ExportModal";
 import PageTitle from "./PageTitle";
@@ -229,10 +229,10 @@ export default function ListGrid({
     checkIsMobile();
 
     // Add event listener
-    window.addEventListener('resize', checkIsMobile);
+    window.addEventListener("resize", checkIsMobile);
 
     // Cleanup
-    return () => window.removeEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
   // Auto-switch to grid view on mobile/tablet
@@ -658,23 +658,27 @@ export default function ListGrid({
             </div>
           ) : (
             /* Grid View */
-            <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+            <div
+              className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}
+            >
               {paginatedData.map((item, index) => (
                 <Card
                   key={index}
                   className="hover:shadow-md transition-shadow duration-200 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                 >
                   <CardContent className="p-4 space-y-3">
-                    {columns.slice(0, isMobile ? 3 : 4).map((column, colIndex) => (
-                      <div key={colIndex} className="space-y-1">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors duration-200 block">
-                          {column.label}:
-                        </span>
-                        <div className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200 break-words">
-                          {renderCellContent(item, column)}
+                    {columns
+                      .slice(0, isMobile ? 3 : 4)
+                      .map((column, colIndex) => (
+                        <div key={colIndex} className="space-y-1">
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors duration-200 block">
+                            {column.label}:
+                          </span>
+                          <div className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200 break-words">
+                            {renderCellContent(item, column)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                     {allRowActions.length > 0 && (
                       <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
                         <ButtonActions
@@ -704,7 +708,8 @@ export default function ListGrid({
               {isMobile ? (
                 <div className="space-y-3">
                   <div className="text-sm text-gray-700 dark:text-gray-300 text-center">
-                    Halaman {currentPage} dari {totalPages} ({sortedData.length} data)
+                    Halaman {currentPage} dari {totalPages} ({sortedData.length}{" "}
+                    data)
                   </div>
                   <div className="flex justify-center gap-2">
                     <Button
@@ -718,9 +723,9 @@ export default function ListGrid({
                       ←
                     </Button>
                     <Button
+                      className="min-w-[60px]"
                       size="sm"
                       variant="outline"
-                      className="min-w-[60px]"
                     >
                       {currentPage}
                     </Button>
@@ -769,7 +774,9 @@ export default function ListGrid({
                           )}
                           <Button
                             size="sm"
-                            variant={currentPage === page ? "default" : "outline"}
+                            variant={
+                              currentPage === page ? "default" : "outline"
+                            }
                             onClick={() => setCurrentPage(page)}
                           >
                             {page}

@@ -37,7 +37,7 @@ async function handleGet(req, res) {
     const items = await prisma.jemaat.findMany({
       where,
       skip: pagination.skip,
-      take: pagination.take,
+      take: pagination.limit,
       orderBy: {
         [sort.sortBy]: sort.sortOrder,
       },
