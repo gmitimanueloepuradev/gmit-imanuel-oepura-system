@@ -1,9 +1,10 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
-import { parseQueryParams } from "@/lib/queryParams";
-import { createApiHandler } from "@/lib/apiHandler";
-import { adminOnly } from "@/lib/apiMiddleware";
 import bcrypt from "bcryptjs";
+
+import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import { adminOnly } from "@/lib/apiMiddleware";
+import prisma from "@/lib/prisma";
+import { parseQueryParams } from "@/lib/queryParams";
 
 async function handleGet(req, res) {
   try {
@@ -81,6 +82,7 @@ async function handleGet(req, res) {
       .json(apiResponse(true, result, "Data berhasil diambil"));
   } catch (error) {
     console.error("Error fetching users:", error);
+
     return res
       .status(500)
       .json(
@@ -94,8 +96,8 @@ async function handlePost(req, res) {
     let { username, email, password, role, idJemaat, noWhatsapp } = req.body;
 
     // Convert empty strings to null for optional fields
-    idJemaat = idJemaat && idJemaat.trim() !== '' ? idJemaat : null;
-    noWhatsapp = noWhatsapp && noWhatsapp.trim() !== '' ? noWhatsapp : null;
+    idJemaat = idJemaat && idJemaat.trim() !== "" ? idJemaat : null;
+    noWhatsapp = noWhatsapp && noWhatsapp.trim() !== "" ? noWhatsapp : null;
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
@@ -152,6 +154,7 @@ async function handlePost(req, res) {
         }
       } catch (jemaatError) {
         console.error("Error validating jemaat:", jemaatError);
+
         return res
           .status(500)
           .json(apiResponse(false, null, "Gagal memvalidasi data jemaat"));
@@ -192,9 +195,6 @@ async function handlePost(req, res) {
       .status(201)
       .json(apiResponse(true, newUser, "User berhasil ditambahkan"));
   } catch (error) {
-    console.error("Error creating user:", error);
-    console.error("Request body:", req.body);
-    console.error("Processed idJemaat:", idJemaat);
     return res
       .status(500)
       .json(apiResponse(false, null, "Gagal menambahkan user", error.message));
@@ -202,7 +202,9 @@ async function handlePost(req, res) {
 }
 
 // Apply admin-only middleware to user management endpoints
-export default adminOnly(createApiHandler({
-  GET: handleGet,
-  POST: handlePost,
-}));
+export default adminOnly(
+  createApiHandler({
+    GET: handleGet,
+    POST: handlePost,
+  })
+);

@@ -104,10 +104,13 @@ export default function EditJemaat() {
     queryKey: ["status-dalam-keluarga"],
     queryFn: async () => {
       const response = await masterService.getStatusDalamKeluarga();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.status,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || []
+      );
     },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -117,10 +120,13 @@ export default function EditJemaat() {
     queryKey: ["keluarga-list"],
     queryFn: async () => {
       const response = await masterService.getKeluarga();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: `${item.rayon?.namaRayon} - ${item.noBagungan}`,
+        })) || []
+      );
     },
     staleTime: 3 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
@@ -130,11 +136,14 @@ export default function EditJemaat() {
     queryKey: ["suku"],
     queryFn: async () => {
       const response = await masterService.getSuku();
-      return response.data?.map((item) => ({
-        value: item.id,
-        label: item.namaSuku,
-      })) || [];
-    },
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaSuku,
+        })) || []
+      );
+    }, 
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
   });
@@ -143,10 +152,13 @@ export default function EditJemaat() {
     queryKey: ["pendidikan"],
     queryFn: async () => {
       const response = await masterService.getPendidikan();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.jenjang,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenjang,
+        })) || []
+      );
     },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -156,10 +168,13 @@ export default function EditJemaat() {
     queryKey: ["pekerjaan"],
     queryFn: async () => {
       const response = await masterService.getPekerjaan();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.namaPekerjaan,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaPekerjaan,
+        })) || []
+      );
     },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -169,10 +184,13 @@ export default function EditJemaat() {
     queryKey: ["pendapatan"],
     queryFn: async () => {
       const response = await masterService.getPendapatan();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.label,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.label,
+        })) || []
+      );
     },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -182,10 +200,13 @@ export default function EditJemaat() {
     queryKey: ["jaminan-kesehatan"],
     queryFn: async () => {
       const response = await masterService.getJaminanKesehatan();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.jenisJaminan,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.jenisJaminan,
+        })) || []
+      );
     },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -195,10 +216,13 @@ export default function EditJemaat() {
     queryKey: ["status-keluarga"],
     queryFn: async () => {
       const response = await masterService.getStatusKeluarga();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.status,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || []
+      );
     },
     enabled: createKeluarga,
     staleTime: 10 * 60 * 1000,
@@ -209,10 +233,13 @@ export default function EditJemaat() {
     queryKey: ["status-kepemilikan-rumah"],
     queryFn: async () => {
       const response = await masterService.getStatusKepemilikanRumah();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.status,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.status,
+        })) || []
+      );
     },
     enabled: createKeluarga,
     staleTime: 10 * 60 * 1000,
@@ -223,10 +250,13 @@ export default function EditJemaat() {
     queryKey: ["keadaan-rumah"],
     queryFn: async () => {
       const response = await masterService.getKeadaanRumah();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.keadaan,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.keadaan,
+        })) || []
+      );
     },
     enabled: createKeluarga,
     staleTime: 10 * 60 * 1000,
@@ -237,10 +267,13 @@ export default function EditJemaat() {
     queryKey: ["rayon"],
     queryFn: async () => {
       const response = await masterService.getRayon();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.namaRayon,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.namaRayon,
+        })) || []
+      );
     },
     enabled: createKeluarga,
     staleTime: 10 * 60 * 1000,
@@ -251,10 +284,13 @@ export default function EditJemaat() {
     queryKey: ["kelurahan"],
     queryFn: async () => {
       const response = await masterService.getKelurahan();
-      return response.data?.items?.map((item) => ({
-        value: item.id,
-        label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
-      })) || [];
+
+      return (
+        response.data?.items?.map((item) => ({
+          value: item.id,
+          label: item.kodepos ? `${item.nama} - ${item.kodepos}` : item.nama,
+        })) || []
+      );
     },
     enabled: createKeluarga,
     staleTime: 10 * 60 * 1000,
@@ -301,7 +337,9 @@ export default function EditJemaat() {
       }
 
       // Check if kepala keluarga and has keluarga data
-      const isKepala = jemaat.statusDalamKeluarga?.status?.toLowerCase().includes("kepala");
+      const isKepala = jemaat.statusDalamKeluarga?.status
+        ?.toLowerCase()
+        .includes("kepala");
 
       if (isKepala) {
         setIsKepalaKeluarga(true);
@@ -657,308 +695,308 @@ export default function EditJemaat() {
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-          {/* Step 1: Data Jemaat */}
-          {currentStep === 1 && (
-            <StepContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TextInput
-                  required
-                  label="Nama Lengkap"
-                  name="nama"
-                  placeholder="Masukkan nama lengkap"
-                />
-
-                <SelectInput
-                  required
-                  label="Jenis Kelamin"
-                  name="jenisKelamin"
-                  options={[
-                    { value: "true", label: "Laki-laki" },
-                    { value: "false", label: "Perempuan" },
-                  ]}
-                  placeholder="Pilih jenis kelamin"
-                />
-
-                <DatePicker
-                  label="Tanggal Lahir"
-                  name="tanggalLahir"
-                  placeholder="Pilih tanggal lahir"
-                  required={true}
-                />
-
-                <SelectInput
-                  label="Golongan Darah"
-                  name="golonganDarah"
-                  options={[
-                    { value: "A", label: "A" },
-                    { value: "B", label: "B" },
-                    { value: "AB", label: "AB" },
-                    { value: "O", label: "O" },
-                  ]}
-                  placeholder="Pilih golongan darah"
-                />
-
-                <AutoCompleteInput
-                  required
-                  label="Status Dalam Keluarga"
-                  name="idStatusDalamKeluarga"
-                  options={statusDalamKeluarga || []}
-                  placeholder="Pilih status"
-                />
-
-                {!isKepalaKeluarga && (
-                  <AutoCompleteInput
-                    required
-                    label="Keluarga"
-                    name="idKeluarga"
-                    options={keluargaList || []}
-                    placeholder="Pilih keluarga"
-                  />
-                )}
-
-                <AutoCompleteInput
-                  required
-                  label="Suku"
-                  name="idSuku"
-                  options={suku || []}
-                  placeholder="Pilih suku"
-                />
-
-                <AutoCompleteInput
-                  required
-                  label="Pendidikan"
-                  name="idPendidikan"
-                  options={pendidikan || []}
-                  placeholder="Pilih pendidikan"
-                />
-
-                <AutoCompleteInput
-                  required
-                  label="Pekerjaan"
-                  name="idPekerjaan"
-                  options={pekerjaan || []}
-                  placeholder="Pilih pekerjaan"
-                />
-
-                <AutoCompleteInput
-                  required
-                  label="Pendapatan"
-                  name="idPendapatan"
-                  options={pendapatan || []}
-                  placeholder="Pilih pendapatan"
-                />
-
-                <AutoCompleteInput
-                  required
-                  label="Jaminan Kesehatan"
-                  name="idJaminanKesehatan"
-                  options={jaminanKesehatan || []}
-                  placeholder="Pilih jaminan kesehatan"
-                />
-              </div>
-            </StepContent>
-          )}
-
-          {/* Step 2: User Account */}
-          {currentStep === 2 && (
-            <StepContent>
-              <div className="mb-6">
-                <label className="flex items-center">
-                  <input
-                    checked={createUserAccount}
-                    className="mr-2"
-                    type="checkbox"
-                    onChange={(e) => setCreateUserAccount(e.target.checked)}
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    {hasExistingUser
-                      ? "Perbarui akun user"
-                      : "Buatkan akun user untuk jemaat ini"}
-                  </span>
-                </label>
-                {hasExistingUser && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    Jemaat ini sudah memiliki akun user
-                  </p>
-                )}
-              </div>
-
-              {createUserAccount && (
+            {/* Step 1: Data Jemaat */}
+            {currentStep === 1 && (
+              <StepContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <TextInput
-                    label="Email"
-                    name="email"
-                    placeholder="contoh@email.com"
-                    required={createUserAccount}
-                    type="email"
+                    required
+                    label="Nama Lengkap"
+                    name="nama"
+                    placeholder="Masukkan nama lengkap"
                   />
 
                   <SelectInput
-                    label="Role"
-                    name="role"
+                    required
+                    label="Jenis Kelamin"
+                    name="jenisKelamin"
                     options={[
-                      { value: "JEMAAT", label: "Jemaat" },
-                      { value: "MAJELIS", label: "Majelis" },
-                      { value: "EMPLOYEE", label: "Employee" },
+                      { value: "true", label: "Laki-laki" },
+                      { value: "false", label: "Perempuan" },
                     ]}
-                    placeholder="Pilih role"
+                    placeholder="Pilih jenis kelamin"
+                  />
+
+                  <DatePicker
+                    label="Tanggal Lahir"
+                    name="tanggalLahir"
+                    placeholder="Pilih tanggal lahir"
+                    required={true}
+                  />
+
+                  <SelectInput
+                    label="Golongan Darah"
+                    name="golonganDarah"
+                    options={[
+                      { value: "A", label: "A" },
+                      { value: "B", label: "B" },
+                      { value: "AB", label: "AB" },
+                      { value: "O", label: "O" },
+                    ]}
+                    placeholder="Pilih golongan darah"
+                  />
+
+                  <AutoCompleteInput
+                    required
+                    label="Status Dalam Keluarga"
+                    name="idStatusDalamKeluarga"
+                    options={statusDalamKeluarga || []}
+                    placeholder="Pilih status"
+                  />
+
+                  {!isKepalaKeluarga && (
+                    <AutoCompleteInput
+                      required
+                      label="Keluarga"
+                      name="idKeluarga"
+                      options={keluargaList || []}
+                      placeholder="Pilih keluarga"
+                    />
+                  )}
+
+                  <AutoCompleteInput
+                    required
+                    label="Suku"
+                    name="idSuku"
+                    options={suku || []}
+                    placeholder="Pilih suku"
+                  />
+
+                  <AutoCompleteInput
+                    required
+                    label="Pendidikan"
+                    name="idPendidikan"
+                    options={pendidikan || []}
+                    placeholder="Pilih pendidikan"
+                  />
+
+                  <AutoCompleteInput
+                    required
+                    label="Pekerjaan"
+                    name="idPekerjaan"
+                    options={pekerjaan || []}
+                    placeholder="Pilih pekerjaan"
+                  />
+
+                  <AutoCompleteInput
+                    required
+                    label="Pendapatan"
+                    name="idPendapatan"
+                    options={pendapatan || []}
+                    placeholder="Pilih pendapatan"
+                  />
+
+                  <AutoCompleteInput
+                    required
+                    label="Jaminan Kesehatan"
+                    name="idJaminanKesehatan"
+                    options={jaminanKesehatan || []}
+                    placeholder="Pilih jaminan kesehatan"
+                  />
+                </div>
+              </StepContent>
+            )}
+
+            {/* Step 2: User Account */}
+            {currentStep === 2 && (
+              <StepContent>
+                <div className="mb-6">
+                  <label className="flex items-center">
+                    <input
+                      checked={createUserAccount}
+                      className="mr-2"
+                      type="checkbox"
+                      onChange={(e) => setCreateUserAccount(e.target.checked)}
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      {hasExistingUser
+                        ? "Perbarui akun user"
+                        : "Buatkan akun user untuk jemaat ini"}
+                    </span>
+                  </label>
+                  {hasExistingUser && (
+                    <p className="text-sm text-blue-600 mt-1">
+                      Jemaat ini sudah memiliki akun user
+                    </p>
+                  )}
+                </div>
+
+                {createUserAccount && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TextInput
+                      label="Email"
+                      name="email"
+                      placeholder="contoh@email.com"
+                      required={createUserAccount}
+                      type="email"
+                    />
+
+                    <SelectInput
+                      label="Role"
+                      name="role"
+                      options={[
+                        { value: "JEMAAT", label: "Jemaat" },
+                        { value: "MAJELIS", label: "Majelis" },
+                        { value: "EMPLOYEE", label: "Employee" },
+                      ]}
+                      placeholder="Pilih role"
+                    />
+
+                    <TextInput
+                      label={
+                        hasExistingUser
+                          ? "Password Baru (kosongkan jika tidak diubah)"
+                          : "Password"
+                      }
+                      name="password"
+                      placeholder={
+                        hasExistingUser
+                          ? "Kosongkan jika tidak diubah"
+                          : "Minimal 8 karakter"
+                      }
+                      required={!hasExistingUser && createUserAccount}
+                      type="password"
+                    />
+
+                    {(!hasExistingUser || form.watch("password")) && (
+                      <TextInput
+                        label="Konfirmasi Password"
+                        name="confirmPassword"
+                        placeholder="Ulangi password"
+                        required={
+                          (!hasExistingUser && createUserAccount) ||
+                          !!form.watch("password")
+                        }
+                        type="password"
+                      />
+                    )}
+                  </div>
+                )}
+              </StepContent>
+            )}
+
+            {/* Step 3: Keluarga Data */}
+            {currentStep === 3 && createKeluarga && (
+              <StepContent>
+                <div className="mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-700">
+                      {isKepalaKeluarga
+                        ? "Jemaat ini adalah kepala keluarga. Silakan lengkapi data keluarga."
+                        : "Perbarui data keluarga untuk jemaat ini."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <AutoCompleteInput
+                    label="Status Keluarga"
+                    name="idStatusKeluarga"
+                    options={statusKeluarga || []}
+                    placeholder="Pilih status keluarga"
+                    required={createKeluarga}
+                  />
+
+                  <AutoCompleteInput
+                    label="Status Kepemilikan Rumah"
+                    name="idStatusKepemilikanRumah"
+                    options={statusKepemilikanRumah || []}
+                    placeholder="Pilih status kepemilikan"
+                    required={createKeluarga}
+                  />
+
+                  <AutoCompleteInput
+                    label="Keadaan Rumah"
+                    name="idKeadaanRumah"
+                    options={keadaanRumah || []}
+                    placeholder="Pilih keadaan rumah"
+                    required={createKeluarga}
+                  />
+
+                  <AutoCompleteInput
+                    label="Rayon"
+                    name="idRayon"
+                    options={rayon || []}
+                    placeholder="Pilih rayon"
+                    required={createKeluarga}
                   />
 
                   <TextInput
-                    label={
-                      hasExistingUser
-                        ? "Password Baru (kosongkan jika tidak diubah)"
-                        : "Password"
-                    }
-                    name="password"
-                    placeholder={
-                      hasExistingUser
-                        ? "Kosongkan jika tidak diubah"
-                        : "Minimal 8 karakter"
-                    }
-                    required={!hasExistingUser && createUserAccount}
-                    type="password"
+                    label="No. Bagungan"
+                    name="noBagungan"
+                    placeholder="Masukkan nomor bagungan"
+                    required={createKeluarga}
+                    type="number"
+                  />
+                </div>
+
+                <div className="mt-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-sm text-yellow-700">
+                      Alamat akan diperbarui untuk keluarga ini.
+                    </p>
+                  </div>
+                </div>
+              </StepContent>
+            )}
+
+            {/* Step 4: Alamat */}
+            {currentStep === 4 && createKeluarga && (
+              <StepContent>
+                <div className="mb-6">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-sm text-green-700">
+                      Perbarui alamat untuk keluarga ini.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <AutoCompleteInput
+                    label="Kelurahan"
+                    name="idKelurahan"
+                    options={kelurahan || []}
+                    placeholder="Pilih kelurahan"
+                    required={createKeluarga}
                   />
 
-                  {(!hasExistingUser || form.watch("password")) && (
-                    <TextInput
-                      label="Konfirmasi Password"
-                      name="confirmPassword"
-                      placeholder="Ulangi password"
-                      required={
-                        (!hasExistingUser && createUserAccount) ||
-                        !!form.watch("password")
-                      }
-                      type="password"
-                    />
-                  )}
+                  <TextInput
+                    label="Jalan"
+                    name="jalan"
+                    placeholder="Nama jalan / kampung"
+                    required={createKeluarga}
+                  />
+
+                  <TextInput
+                    label="RT"
+                    name="rt"
+                    placeholder="001"
+                    required={createKeluarga}
+                    type="number"
+                  />
+
+                  <TextInput
+                    label="RW"
+                    name="rw"
+                    placeholder="001"
+                    required={createKeluarga}
+                    type="number"
+                  />
                 </div>
-              )}
-            </StepContent>
-          )}
+              </StepContent>
+            )}
 
-          {/* Step 3: Keluarga Data */}
-          {currentStep === 3 && createKeluarga && (
-            <StepContent>
-              <div className="mb-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-700">
-                    {isKepalaKeluarga
-                      ? "Jemaat ini adalah kepala keluarga. Silakan lengkapi data keluarga."
-                      : "Perbarui data keluarga untuk jemaat ini."}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AutoCompleteInput
-                  label="Status Keluarga"
-                  name="idStatusKeluarga"
-                  options={statusKeluarga || []}
-                  placeholder="Pilih status keluarga"
-                  required={createKeluarga}
-                />
-
-                <AutoCompleteInput
-                  label="Status Kepemilikan Rumah"
-                  name="idStatusKepemilikanRumah"
-                  options={statusKepemilikanRumah || []}
-                  placeholder="Pilih status kepemilikan"
-                  required={createKeluarga}
-                />
-
-                <AutoCompleteInput
-                  label="Keadaan Rumah"
-                  name="idKeadaanRumah"
-                  options={keadaanRumah || []}
-                  placeholder="Pilih keadaan rumah"
-                  required={createKeluarga}
-                />
-
-                <AutoCompleteInput
-                  label="Rayon"
-                  name="idRayon"
-                  options={rayon || []}
-                  placeholder="Pilih rayon"
-                  required={createKeluarga}
-                />
-
-                <TextInput
-                  label="No. Bagungan"
-                  name="noBagungan"
-                  placeholder="Masukkan nomor bagungan"
-                  required={createKeluarga}
-                  type="number"
-                />
-              </div>
-
-              <div className="mt-6">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-700">
-                    Alamat akan diperbarui untuk keluarga ini.
-                  </p>
-                </div>
-              </div>
-            </StepContent>
-          )}
-
-          {/* Step 4: Alamat */}
-          {currentStep === 4 && createKeluarga && (
-            <StepContent>
-              <div className="mb-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-sm text-green-700">
-                    Perbarui alamat untuk keluarga ini.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AutoCompleteInput
-                  label="Kelurahan"
-                  name="idKelurahan"
-                  options={kelurahan || []}
-                  placeholder="Pilih kelurahan"
-                  required={createKeluarga}
-                />
-
-                <TextInput
-                  label="Jalan"
-                  name="jalan"
-                  placeholder="Nama jalan / kampung"
-                  required={createKeluarga}
-                />
-
-                <TextInput
-                  label="RT"
-                  name="rt"
-                  placeholder="001"
-                  required={createKeluarga}
-                  type="number"
-                />
-
-                <TextInput
-                  label="RW"
-                  name="rw"
-                  placeholder="001"
-                  required={createKeluarga}
-                  type="number"
-                />
-              </div>
-            </StepContent>
-          )}
-
-          <StepperNavigation
-            canGoNext={canGoNext()}
-            currentStep={currentStep}
-            isLoading={updateJemaatMutation.isPending}
-            nextButtonText="Lanjut"
-            submitButtonText="Perbarui Jemaat"
-            totalSteps={getMaxStep()}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-            onSubmit={handleSubmit}
-          />
+            <StepperNavigation
+              canGoNext={canGoNext()}
+              currentStep={currentStep}
+              isLoading={updateJemaatMutation.isPending}
+              nextButtonText="Lanjut"
+              submitButtonText="Perbarui Jemaat"
+              totalSteps={getMaxStep()}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              onSubmit={handleSubmit}
+            />
           </form>
         </FormProvider>
       </Card>

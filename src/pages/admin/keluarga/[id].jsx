@@ -32,8 +32,8 @@ export default function KeluargaDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Error</h2>
-          <p className="text-gray-600">Gagal memuat data keluarga</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Error</h2>
+          <p className="text-gray-600 dark:text-gray-300">Gagal memuat data keluarga</p>
         </div>
       </div>
     );
@@ -45,10 +45,10 @@ export default function KeluargaDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Data Tidak Ditemukan
           </h2>
-          <p className="text-gray-600">Keluarga tidak ditemukan</p>
+          <p className="text-gray-600 dark:text-gray-300">Keluarga tidak ditemukan</p>
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function KeluargaDetailPage() {
         {/* Informasi Keluarga */}
         <div className="lg:col-span-1">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
+            <h2 className="text-lg font-semibold mb-4 flex items-center dark:text-white">
               <Home className="w-5 h-5 mr-2 text-blue-500" />
               Informasi Keluarga
             </h2>
@@ -180,11 +180,11 @@ export default function KeluargaDetailPage() {
 
               {keluarga.alamat && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <MapPin className="w-4 h-4 inline mr-1" />
                     Alamat
                   </label>
-                  <div className="text-gray-900 text-sm">
+                  <div className="text-gray-900 dark:text-gray-100 text-sm">
                     <p>{keluarga.alamat.jalan}</p>
                     <p>
                       RT {keluarga.alamat.rt}/RW {keluarga.alamat.rw}
@@ -202,7 +202,7 @@ export default function KeluargaDetailPage() {
         {/* Anggota Keluarga */}
         <div className="lg:col-span-2">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
+            <h2 className="text-lg font-semibold mb-4 flex items-center dark:text-white">
               <Users className="w-5 h-5 mr-2 text-green-500" />
               Anggota Keluarga ({keluarga.jemaats?.length || 0} orang)
             </h2>
@@ -210,37 +210,37 @@ export default function KeluargaDetailPage() {
             {/* Kepala Keluarga */}
             {kepalaKeluarga && (
               <div className="mb-6">
-                <h3 className="text-md font-medium text-gray-900 mb-3 flex items-center">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                   <User className="w-4 h-4 mr-2 text-blue-500" />
                   Kepala Keluarga
                 </h3>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Nama:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.nama}
                           </span>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Jenis Kelamin:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.jenisKelamin
                               ? "Laki-laki"
                               : "Perempuan"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Tanggal Lahir:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.tanggalLahir
                               ? new Date(
                                   kepalaKeluarga.tanggalLahir
@@ -253,26 +253,26 @@ export default function KeluargaDetailPage() {
                     <div>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Pekerjaan:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.pekerjaan?.namaPekerjaan || "-"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Pendidikan:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.pendidikan?.jenjang || "-"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             No. HP:
                           </span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="ml-2 text-gray-900 dark:text-gray-100">
                             {kepalaKeluarga.noHp || "-"}
                           </span>
                         </div>
@@ -286,7 +286,7 @@ export default function KeluargaDetailPage() {
             {/* Anggota Keluarga Lainnya */}
             {anggotaKeluarga && anggotaKeluarga.length > 0 && (
               <div>
-                <h3 className="text-md font-medium text-gray-900 mb-3 flex items-center">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                   <Users className="w-4 h-4 mr-2 text-green-500" />
                   Anggota Keluarga Lainnya ({anggotaKeluarga.length} orang)
                 </h3>
@@ -294,42 +294,42 @@ export default function KeluargaDetailPage() {
                   {anggotaKeluarga.map((jemaat, index) => (
                     <div
                       key={jemaat.id}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-4"
+                      className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
                     >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <div className="space-y-2">
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Nama:
                               </span>
-                              <span className="ml-2 text-gray-900 font-medium">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100 font-medium">
                                 {jemaat.nama}
                               </span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Status:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.statusDalamKeluarga?.status || "-"}
                               </span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Jenis Kelamin:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.jenisKelamin
                                   ? "Laki-laki"
                                   : "Perempuan"}
                               </span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Tanggal Lahir:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.tanggalLahir
                                   ? new Date(
                                       jemaat.tanggalLahir
@@ -342,35 +342,35 @@ export default function KeluargaDetailPage() {
                         <div>
                           <div className="space-y-2">
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Pekerjaan:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.pekerjaan?.namaPekerjaan || "-"}
                               </span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Pendidikan:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.pendidikan?.jenjang || "-"}
                               </span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 No. HP:
                               </span>
-                              <span className="ml-2 text-gray-900">
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">
                                 {jemaat.noHp || "-"}
                               </span>
                             </div>
                             {jemaat.statusNikah && (
                               <div>
-                                <span className="text-sm font-medium text-gray-700">
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Status Nikah:
                                 </span>
-                                <span className="ml-2 text-gray-900">
+                                <span className="ml-2 text-gray-900 dark:text-gray-100">
                                   {jemaat.statusNikah?.status || "-"}
                                 </span>
                               </div>
@@ -385,8 +385,8 @@ export default function KeluargaDetailPage() {
             )}
 
             {(!keluarga.jemaats || keluarga.jemaats.length === 0) && (
-              <div className="text-center py-8 text-gray-500">
-                <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
                 <p>Belum ada anggota keluarga terdaftar</p>
               </div>
             )}

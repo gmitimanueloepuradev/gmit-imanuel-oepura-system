@@ -1,14 +1,16 @@
-import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
 
 async function handlePost(req, res) {
   try {
     const { userId, whatsappNumber, tempPassword, keluargaId } = req.body;
 
     if (!userId || !whatsappNumber) {
-      return res.status(400).json(
-        apiResponse(false, null, "User ID dan nomor WhatsApp harus diisi")
-      );
+      return res
+        .status(400)
+        .json(
+          apiResponse(false, null, "User ID dan nomor WhatsApp harus diisi")
+        );
     }
 
     // Get user data from database
@@ -20,16 +22,17 @@ async function handlePost(req, res) {
         username: true,
         email: true,
         role: true,
-      }
+      },
     });
 
     if (!user) {
-      return res.status(404).json(
-        apiResponse(false, null, "User tidak ditemukan")
-      );
+      return res
+        .status(404)
+        .json(apiResponse(false, null, "User tidak ditemukan"));
     }
 
     let keluargaInfo = "";
+
     if (user.role === "JEMAAT" && keluargaId) {
       const keluarga = await prisma.keluarga.findUnique({
         where: { id: keluargaId },
@@ -37,31 +40,31 @@ async function handlePost(req, res) {
           noBagungan: true,
           rayon: {
             select: {
-              namaRayon: true
-            }
+              namaRayon: true,
+            },
           },
           jemaats: {
             where: {
               statusDalamKeluarga: {
-                status: "Kepala Keluarga"
-              }
+                status: "Kepala Keluarga",
+              },
             },
             select: {
-              nama: true
+              nama: true,
             },
-            take: 1
-          }
-        }
+            take: 1,
+          },
+        },
       });
 
       if (keluarga) {
         const kepalaKeluarga = keluarga.jemaats?.[0]?.nama || "Belum diketahui";
-        
+
         keluargaInfo = `
 
 👨‍👩‍👧‍👦 *Informasi Keluarga:*
 - Kepala Keluarga: ${kepalaKeluarga || `Bangunan ${keluarga.noBagungan}`}
-- Rayon: ${keluarga.rayon?.namaRayon || '-'}
+- Rayon: ${keluarga.rayon?.namaRayon || "-"}
 
 📝 *Catatan untuk Role Jemaat:*
 - Setelah login pertama, Anda akan diminta melengkapi profil pribadi
@@ -76,10 +79,10 @@ Halo! Berikut adalah data akun Anda:
 
 👤 *Username:* ${user.username}
 📧 *Email:* ${user.email}
-🔑 *Password:* ${tempPassword || 'Password123'}
+🔑 *Password:* ${tempPassword || "oepura78"}
 👥 *Role:* ${user.role}${keluargaInfo}
 
-🌐 *Link Login:* ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login
+🌐 *Link Login:* ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login
 
 ⚠️ *Penting:*
 - Harap segera login dan ubah password Anda
@@ -102,22 +105,20 @@ GMIT Imanuel Oepura`;
           user: {
             username: user.username,
             email: user.email,
-            role: user.role
-          }
+            role: user.role,
+          },
         },
         "Data akun berhasil disiapkan untuk dikirim via WhatsApp"
       )
     );
   } catch (error) {
     console.error("Error sending account data:", error);
-    return res.status(500).json(
-      apiResponse(
-        false,
-        null,
-        "Gagal mengirim data akun",
-        error.message
-      )
-    );
+
+    return res
+      .status(500)
+      .json(
+        apiResponse(false, null, "Gagal mengirim data akun", error.message)
+      );
   }
 }
 

@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
 import { staffOnly } from "@/lib/apiMiddleware";
+import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
@@ -128,11 +128,12 @@ async function handleGet(req, res) {
     };
 
     const currentDate = new Date();
+
     membersByAge.forEach((member) => {
       if (member.tanggalLahir) {
         const birthDate = new Date(member.tanggalLahir);
         const age = currentDate.getFullYear() - birthDate.getFullYear();
-        
+
         if (age <= 12) {
           ageGroups.children += 1;
         } else if (age <= 25) {
@@ -146,26 +147,26 @@ async function handleGet(req, res) {
     });
 
     // Process rayon distribution
-    const rayonDistribution = rayonList.map(rayon => ({
+    const rayonDistribution = rayonList.map((rayon) => ({
       rayon: rayon.namaRayon,
       families: rayon._count.keluargas,
       // For now, we'll use the family count as an approximation
       // In a real implementation, you'd need a more complex query
-      members: rayon._count.keluargas * 3 // Approximate 3 members per family
+      members: rayon._count.keluargas * 3, // Approximate 3 members per family
     }));
 
     // Process education distribution
     const educationDistribution = membersByEducation
-      .filter(edu => edu._count.jemaats > 0)
-      .map(edu => ({
+      .filter((edu) => edu._count.jemaats > 0)
+      .map((edu) => ({
         education: edu.jenjang,
         count: edu._count.jemaats,
       }));
 
     // Process job distribution
     const jobDistribution = membersByPekerjaan
-      .filter(job => job._count.jemaats > 0)
-      .map(job => ({
+      .filter((job) => job._count.jemaats > 0)
+      .map((job) => ({
         job: job.namaPekerjaan,
         count: job._count.jemaats,
       }));
@@ -178,7 +179,7 @@ async function handleGet(req, res) {
         female: femaleMembers,
       },
       totalFamilies,
-      
+
       // Sacraments
       sacraments: {
         baptis: {
@@ -206,18 +207,23 @@ async function handleGet(req, res) {
       year: currentYear,
     };
 
-    return res.status(200).json(
-      apiResponse(true, overview, "Statistik berhasil diambil")
-    );
+    return res
+      .status(200)
+      .json(apiResponse(true, overview, "Statistik berhasil diambil"));
   } catch (error) {
     console.error("Error fetching statistics:", error);
-    return res.status(500).json(
-      apiResponse(false, null, "Gagal mengambil statistik", error.message)
-    );
+
+    return res
+      .status(500)
+      .json(
+        apiResponse(false, null, "Gagal mengambil statistik", error.message)
+      );
   }
 }
 
 // Apply staff-only middleware (Admin, Majelis, Employee)
-export default staffOnly(createApiHandler({
-  GET: handleGet,
-}));
+export default staffOnly(
+  createApiHandler({
+    GET: handleGet,
+  })
+);

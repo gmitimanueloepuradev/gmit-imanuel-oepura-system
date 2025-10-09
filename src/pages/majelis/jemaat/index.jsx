@@ -101,10 +101,10 @@ function MajelisJemaatPage() {
         ...exportConfig.filters // Additional filters from selected values in export modal
       };
 
-      const exportData = await jemaatService.exportData(
-        mergedFilters, // Use merged filters
-        exportConfig
-      );
+      delete mergedFilters.page;
+      delete mergedFilters.limit;
+
+      const exportData = await jemaatService.getAll(mergedFilters);
 
       // Use export service to generate file
       await exportService.exportJemaat(exportData.data.items, exportConfig);

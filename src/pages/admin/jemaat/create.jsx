@@ -6,6 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Card } from "@/components/ui/Card";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import DatePicker from "@/components/ui/inputs/DatePicker";
+import SwitchInput from "@/components/ui/inputs/SwitchInput";
 import TextInput from "@/components/ui/inputs/TextInput";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
@@ -159,7 +160,7 @@ export default function CreateJemaat() {
       const response = await masterService.getSuku();
 
       return (
-        response.data?.map((item) => ({
+        response.data?.items?.map((item) => ({
           value: item.id,
           label: item.namaSuku,
         })) || []
@@ -169,7 +170,6 @@ export default function CreateJemaat() {
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
   });
-
   const {
     data: pendidikanData,
     isLoading: isLoadingPendidikan,
@@ -547,8 +547,8 @@ export default function CreateJemaat() {
   });
 
   const handleNext = () => {
+    // Simpan data form ke state sesuai step
     if (currentStep === 1) {
-      // Validate jemaat data
       const jemaatData = {
         nama: form.getValues("nama"),
         jenisKelamin: form.getValues("jenisKelamin"),
@@ -567,34 +567,30 @@ export default function CreateJemaat() {
       }
 
       setFormData((prev) => ({ ...prev, jemaat: jemaatData }));
-    } else if (currentStep === 2) {
-      // Validate user data
-      if (createUserAccount) {
-        const password = form.getValues("password");
-        const confirmPassword = form.getValues("confirmPassword");
+    } else if (currentStep === 2 && createUserAccount) {
+      const password = form.getValues("password");
+      const confirmPassword = form.getValues("confirmPassword");
 
-        if (password !== confirmPassword) {
-          showToast({
-            title: "Error",
-            description: "Password dan konfirmasi password tidak cocok",
-            color: "error",
-          });
+      if (password !== confirmPassword) {
+        showToast({
+          title: "Error",
+          description: "Password dan konfirmasi password tidak cocok",
+          color: "error",
+        });
 
-          return;
-        }
-
-        const userData = {
-          username: form.getValues("username"),
-          email: form.getValues("email"),
-          password: form.getValues("password"),
-          noWhatsapp: form.getValues("noWhatsapp") || null,
-          role: form.getValues("role"),
-        };
-
-        setFormData((prev) => ({ ...prev, user: userData }));
+        return;
       }
+
+      const userData = {
+        username: form.getValues("username"),
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        noWhatsapp: form.getValues("noWhatsapp") || null,
+        role: form.getValues("role"),
+      };
+
+      setFormData((prev) => ({ ...prev, user: userData }));
     } else if (currentStep === 3 && createKeluarga) {
-      // Validate keluarga data
       const keluargaData = {
         idStatusKeluarga: form.getValues("idStatusKeluarga"),
         idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
@@ -607,6 +603,7 @@ export default function CreateJemaat() {
       setFormData((prev) => ({ ...prev, keluarga: keluargaData }));
     }
 
+    // HANYA lanjut jika belum mencapai step terakhir
     if (currentStep < getMaxStep()) {
       setCurrentStep(currentStep + 1);
     }
@@ -620,22 +617,30 @@ export default function CreateJemaat() {
 
   const handleGenerateDefaultPassword = () => {
     const defaultPassword = "oepura78";
-
     form.setValue("password", defaultPassword);
     form.setValue("confirmPassword", defaultPassword);
-    showToast({
-      title: "Password Generated",
-      description: `Password default "${defaultPassword}" berhasil diisi`,
-      color: "success",
-    });
   };
 
+  // FIXED: Fungsi untuk menentukan step maksimal yang tersedia
   const getMaxStep = () => {
-    if (!createUserAccount) return 1;
-    if (!createKeluarga) return 2;
+    let maxStep = 1; // Minimal step 1 (Data Jemaat)
 
-    // Alamat is always required when creating keluarga
-    return 4;
+    // Jika membuat akun user, tambah step 2
+    if (createUserAccount) {
+      maxStep = 2;
+    }
+
+    // Jika kepala keluarga, tambah step 3 dan 4
+    if (isKepalaKeluarga) {
+      maxStep = 4;
+    }
+
+    return maxStep;
+  };
+
+  // FIXED: Fungsi untuk menentukan apakah ini step terakhir
+  const isLastStep = () => {
+    return currentStep === getMaxStep();
   };
 
   // Watch form values for real-time validation
@@ -697,13 +702,19 @@ export default function CreateJemaat() {
       );
     }
 
-    if (currentStep === 2 && createUserAccount) {
-      return (
-        values.username &&
-        values.email &&
-        values.password &&
-        values.confirmPassword
-      );
+    if (currentStep === 2) {
+      // If not creating user account, can proceed
+      if (!createUserAccount) {
+        return true;
+      }
+
+      // If creating user account, validate required fields
+      const hasUsername = values.username && values.username.trim() !== '';
+      const hasEmail = values.email && values.email.trim() !== '';
+      const hasPassword = values.password && values.password.length >= 1;
+      const hasConfirmPassword = values.confirmPassword && values.confirmPassword.length >= 1;
+
+      return hasUsername && hasEmail && hasPassword && hasConfirmPassword;
     }
 
     if (currentStep === 3 && createKeluarga) {
@@ -734,24 +745,40 @@ export default function CreateJemaat() {
     return true;
   };
 
-  const handleSubmit = async () => {
-    // Get user data directly from form (in case user clicked submit without clicking "next" on step 2)
-    const userData = createUserAccount
-      ? {
-          username: form.getValues("username"),
-          email: form.getValues("email"),
-          password: form.getValues("password"),
-          noWhatsapp: form.getValues("noWhatsapp") || null,
-          role: form.getValues("role"),
-        }
-      : {};
+  const handleFormSubmit = async () => {
+    // Get latest data from form for current step
+    let latestKeluargaData = formData.keluarga;
+    let latestUserData = formData.user;
+
+    // Collect keluarga data if on step 3 or step 4
+    if ((currentStep === 3 || currentStep === 4) && createKeluarga) {
+      latestKeluargaData = {
+        idStatusKeluarga: form.getValues("idStatusKeluarga"),
+        idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
+        idKeadaanRumah: form.getValues("idKeadaanRumah"),
+        idRayon: form.getValues("idRayon"),
+        noBagungan: parseInt(form.getValues("noBagungan")),
+        noKK: form.getValues("noKK"),
+      };
+    }
+
+    // Get user data if creating account (in case user clicked submit without clicking "next" on step 2)
+    if (createUserAccount) {
+      latestUserData = {
+        username: form.getValues("username"),
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        noWhatsapp: form.getValues("noWhatsapp") || null,
+        role: form.getValues("role"),
+      };
+    }
 
     const submitData = {
       ...formData.jemaat,
       createUser: createUserAccount,
-      ...userData, // Use fresh data from form instead of formData.user
+      ...(createUserAccount && latestUserData),
       createKeluarga,
-      ...(createKeluarga && { keluargaData: formData.keluarga }),
+      ...(createKeluarga && { keluargaData: latestKeluargaData }),
       createAlamat: createKeluarga, // Always create alamat when creating keluarga
       ...(createKeluarga && {
         alamatData: {
@@ -799,7 +826,7 @@ export default function CreateJemaat() {
         />
 
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <form onSubmit={(e) => e.preventDefault()}>
             {/* Step 1: Data Jemaat */}
             {currentStep === 1 && (
               <StepContent>
@@ -959,17 +986,11 @@ export default function CreateJemaat() {
             {currentStep === 2 && (
               <StepContent>
                 <div className="mb-6">
-                  <label className="flex items-center">
-                    <input
-                      checked={createUserAccount}
-                      className="mr-2"
-                      type="checkbox"
-                      onChange={(e) => setCreateUserAccount(e.target.checked)}
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Buatkan akun user untuk jemaat ini
-                    </span>
-                  </label>
+                  <SwitchInput
+                    label="Buatkan akun user untuk jemaat ini"
+                    value={createUserAccount}
+                    onChange={(value) => setCreateUserAccount(value)}
+                  />
                 </div>
 
                 {createUserAccount && (
@@ -1025,8 +1046,8 @@ export default function CreateJemaat() {
                         <TextInput
                           label="No. WhatsApp"
                           name="noWhatsapp"
-                          placeholder="08123456789"
-                          required={true}
+                          placeholder="08123456789 (opsional)"
+                          required={false}
                           type="tel"
                         />
                       </div>
@@ -1223,17 +1244,27 @@ export default function CreateJemaat() {
                 </div>
               </StepContent>
             )}
-
             <StepperNavigation
-              canGoNext={canGoNext()}
+              canGoNext={(() => {
+                const result = canGoNext();
+                console.log('[DEBUG] canGoNext:', result, {
+                  currentStep,
+                  maxStep: getMaxStep(),
+                  isLastStep: isLastStep(),
+                  createUserAccount,
+                  formValues: form.getValues(),
+                });
+                return result;
+              })()}
               currentStep={currentStep}
+              isLastStep={isLastStep()}
               isLoading={createJemaatMutation.isPending}
               nextButtonText="Lanjut"
               submitButtonText="Simpan Jemaat"
               totalSteps={getMaxStep()}
               onNext={handleNext}
               onPrevious={handlePrevious}
-              onSubmit={handleSubmit}
+              onSubmit={handleFormSubmit}
             />
           </form>
         </FormProvider>

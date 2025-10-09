@@ -253,7 +253,7 @@ export default function MajelisDokumenJemaatPage() {
                 Dashboard
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   Verifikasi Dokumen Jemaat
                 </h1>
                 <div className="flex items-center text-gray-600">
@@ -277,7 +277,7 @@ export default function MajelisDokumenJemaatPage() {
                   <p className="text-sm font-medium text-gray-600">
                     Total Dokumen
                   </p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {stats.total}
                   </p>
                 </div>
@@ -293,7 +293,7 @@ export default function MajelisDokumenJemaatPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Menunggu</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {stats.pending}
                   </p>
                 </div>
@@ -309,7 +309,7 @@ export default function MajelisDokumenJemaatPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Disetujui</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {stats.approved}
                   </p>
                 </div>
@@ -325,7 +325,7 @@ export default function MajelisDokumenJemaatPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Ditolak</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {stats.rejected}
                   </p>
                 </div>

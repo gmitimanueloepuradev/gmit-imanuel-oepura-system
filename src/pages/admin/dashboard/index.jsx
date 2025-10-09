@@ -108,16 +108,7 @@ export default function DashboardPageAdmin() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
-          <p className="text-gray-600">Memuat dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+
 
   if (error) {
     return (
@@ -154,10 +145,21 @@ export default function DashboardPageAdmin() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.sacraments?.pernikahan?.total || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">Total Pernikahan</p>
+              {loading ? (
+                <div className="space-y-2 animate-pulse">
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {stats.sacraments?.pernikahan?.total || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Total Pernikahan
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -169,12 +171,21 @@ export default function DashboardPageAdmin() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.ageGroups?.youth || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Jemaat Remaja (13-25)
-              </p>
+              {loading ? (
+                <div className="space-y-2 animate-pulse">
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {stats.ageGroups?.youth || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Jemaat Remaja (13-25)
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -194,22 +205,39 @@ export default function DashboardPageAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">{activity.member}</p>
-                      <p className="text-sm text-gray-500 capitalize">
-                        {activity.type} • {activity.date}
-                      </p>
+              {loading ? (
+                <div className="space-y-4 animate-pulse">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                      </div>
+                      <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                     </div>
-                    {getStatusBadge(activity.status)}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentActivities.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium">{activity.member}</p>
+                        <p className="text-sm text-gray-500 capitalize">
+                          {activity.type} • {activity.date}
+                        </p>
+                      </div>
+                      {getStatusBadge(activity.status)}
+                    </div>
+                  ))}
+                </div>
+              )}
               {/* <div className="mt-4">
                 <Button className="w-full" variant="outline">
                   Lihat Semua Aktivitas
@@ -227,74 +255,85 @@ export default function DashboardPageAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="max-h-96 overflow-y-auto space-y-3">
-                {upcomingEvents.length > 0 ? (
-                  upcomingEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm">{event.title}</h4>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {event.date} • {event.time}
-                          </p>
-                          {event.location && (
-                            <p className="text-xs text-gray-600 mt-1">
-                              <PinIcon /> {event.location}
-                            </p>
-                          )}
-                          {event.speaker &&
-                            event.speaker !== "Belum ditentukan" && (
-                              <p className="text-xs text-gray-600">
-                                👤 {event.speaker}
-                              </p>
-                            )}
-                          {event.tema && (
-                            <p className="text-xs text-blue-600 font-medium mt-1">
-                              {event.tema}
-                            </p>
-                          )}
-                          {event.firman && (
-                            <p className="text-xs text-green-600">
-                              📖 {event.firman}
-                            </p>
-                          )}
-                          {event.rayon && (
-                            <p className="text-xs text-purple-600">
-                              🏘️ Rayon {event.rayon}
-                            </p>
-                          )}
+              {loading ? (
+                <div className="space-y-3 animate-pulse">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="p-4 border rounded-lg">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2 flex-1">
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
                         </div>
-                        <div className="flex flex-col gap-1">
-                          {getEventTypeBadge(event.type)}
-                          {event.kategori && (
-                            <Badge className="text-xs" variant="outline">
-                              {event.kategori}
-                            </Badge>
-                          )}
-                        </div>
+                        <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-sm">Tidak ada jadwal ibadah mendatang</p>
-                    <p className="text-xs mt-1">
-                      Hubungi administrator untuk menambah jadwal
-                    </p>
-                  </div>
-                )}
-              </div>
-              {/* <div className="mt-4 flex gap-2">
-                <Button className="flex-1" variant="outline">
-                  Kelola Jadwal
-                </Button>
-                <Button size="sm" variant="outline">
-                  Lihat Semua
-                </Button>
-              </div> */}
+                  ))}
+                </div>
+              ) : (
+                <div className="max-h-96 overflow-y-auto space-y-3">
+                  {upcomingEvents.length > 0 ? (
+                    upcomingEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm">{event.title}</h4>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {event.date} • {event.time}
+                            </p>
+                            {event.location && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                <PinIcon /> {event.location}
+                              </p>
+                            )}
+                            {event.speaker &&
+                              event.speaker !== "Belum ditentukan" && (
+                                <p className="text-xs text-gray-600">
+                                  👤 {event.speaker}
+                                </p>
+                              )}
+                            {event.tema && (
+                              <p className="text-xs text-blue-600 font-medium mt-1">
+                                {event.tema}
+                              </p>
+                            )}
+                            {event.firman && (
+                              <p className="text-xs text-green-600">
+                                📖 {event.firman}
+                              </p>
+                            )}
+                            {event.rayon && (
+                              <p className="text-xs text-purple-600">
+                                🏘️ Rayon {event.rayon}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            {getEventTypeBadge(event.type)}
+                            {event.kategori && (
+                              <Badge className="text-xs" variant="outline">
+                                {event.kategori}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p className="text-sm">
+                        Tidak ada jadwal ibadah mendatang
+                      </p>
+                      <p className="text-xs mt-1">
+                        Hubungi administrator untuk menambah jadwal
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

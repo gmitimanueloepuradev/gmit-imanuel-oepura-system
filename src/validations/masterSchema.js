@@ -138,32 +138,7 @@ export const majelisCreationSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
-  noWhatsapp: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val === "") return true; // Optional field
-        // Check if it's a valid Indonesian phone number format
-        const cleaned = val.replace(/\D/g, "");
-
-        if (cleaned.startsWith("62")) {
-          const afterCountryCode = cleaned.substring(2);
-
-          return (
-            afterCountryCode.startsWith("8") &&
-            afterCountryCode.length >= 9 &&
-            afterCountryCode.length <= 13
-          );
-        }
-
-        return false;
-      },
-      {
-        message:
-          "Format nomor WhatsApp tidak valid. Gunakan format +6281234567890",
-      }
-    ),
+  noWhatsapp: z.string().optional(),
 });
 
 // Majelis Edit Schema (without user account data)

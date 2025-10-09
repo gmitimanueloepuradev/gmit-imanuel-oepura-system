@@ -75,15 +75,15 @@ export function privateEndpoint(handler, allowedRoles = []) {
 
 // Middleware untuk admin only
 export function adminOnly(handler) {
-  return privateEndpoint(handler, ["ADMIN"]);
+  return privateEndpoint(handler, ["ADMIN", "PENDETA"]);
 }
 
 // Middleware untuk majelis dan admin
 export function majelisOrAdmin(handler) {
-  return privateEndpoint(handler, ["ADMIN", "MAJELIS"]);
+  return privateEndpoint(handler, ["ADMIN", "MAJELIS", "PENDETA"]);
 }
 
 // Middleware untuk employee, majelis, dan admin
 export function staffOnly(handler) {
-  return privateEndpoint(handler, ["ADMIN", "MAJELIS", "EMPLOYEE"]);
+  return privateEndpoint(handler, ["ADMIN", "MAJELIS", "EMPLOYEE", "PENDETA"]);
 }

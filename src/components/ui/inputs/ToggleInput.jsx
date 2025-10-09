@@ -10,8 +10,8 @@ export default function ToggleInput({
   // Try to get form context, but handle case where it doesn't exist
   const formContext = useFormContext();
 
-  // If we have form context, use react-hook-form
-  if (formContext) {
+  // If we have form context AND name is provided, use react-hook-form
+  if (formContext && name) {
     const { control } = formContext;
     const {
       field: { value: fieldValue, onChange: fieldOnChange },

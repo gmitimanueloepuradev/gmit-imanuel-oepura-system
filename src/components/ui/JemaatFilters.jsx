@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Filter, X, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
+import NumberInput from '@/components/ui/inputs/NumberInput';
+import TextInput from '@/components/ui/inputs/TextInput';
 import masterService from '@/services/masterService';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -400,20 +402,16 @@ const JemaatFilters = ({ onFiltersChange, initialFilters = {} }) => {
         );
       case 'number':
         return (
-          <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors duration-200"
+          <NumberInput
             placeholder={filter.placeholder}
-            type="number"
             value={filters[filter.key] || ''}
-            onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+            onChange={(value) => handleFilterChange(filter.key, value)}
           />
         );
       default:
         return (
-          <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors duration-200"
+          <TextInput
             placeholder={filter.placeholder}
-            type="text"
             value={filters[filter.key] || ''}
             onChange={(e) => handleFilterChange(filter.key, e.target.value)}
           />

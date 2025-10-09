@@ -65,6 +65,7 @@ const authService = {
   getRoleRedirectUrl: (role) => {
     switch (role) {
       case "ADMIN":
+      case "PENDETA": // PENDETA has same access as ADMIN
         return "/admin/dashboard";
       case "JEMAAT":
         return "/jemaat/dashboard";

@@ -13,7 +13,7 @@ export default function AdminProfilPendetaPage() {
   };
 
   return (
-    <ProtectedRoute allowedRoles="ADMIN">
+    <ProtectedRoute allowedRoles={["ADMIN", "PENDETA"]}>
       <PageTitle title="Kelola Profil Pendeta" />
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

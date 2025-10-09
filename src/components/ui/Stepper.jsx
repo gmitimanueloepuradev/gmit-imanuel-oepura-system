@@ -100,13 +100,15 @@ export function StepperNavigation({
   totalSteps,
   onPrevious,
   onNext,
+  onSubmit,
   isLoading = false,
   canGoNext = true,
   nextButtonText = "Lanjut",
   submitButtonText = "Simpan",
+  isLastStep: externalIsLastStep,
 }) {
   const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === totalSteps;
+  const isLastStep = externalIsLastStep !== undefined ? externalIsLastStep : currentStep === totalSteps;
 
   return (
     <div className="pt-6 border-t">
@@ -129,11 +131,12 @@ export function StepperNavigation({
           )}
           {isLastStep ? (
             <Button
-              disabled={isLoading}
+              disabled={!canGoNext || isLoading}
               isLoading={isLoading}
               loadingText="Menyimpan..."
               size="sm"
-              type="submit"
+              type="button"
+              onClick={onSubmit}
             >
               {submitButtonText}
             </Button>
@@ -167,10 +170,11 @@ export function StepperNavigation({
 
         {isLastStep ? (
           <Button
-            disabled={isLoading}
+            disabled={!canGoNext || isLoading}
             isLoading={isLoading}
             loadingText="Menyimpan..."
-            type="submit"
+            type="button"
+            onClick={onSubmit}
           >
             {submitButtonText}
           </Button>

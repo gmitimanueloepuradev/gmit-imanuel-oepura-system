@@ -104,6 +104,7 @@ async function handlePost(req, res) {
 
     switch (user.role) {
       case "ADMIN":
+      case "PENDETA": // PENDETA has same access as ADMIN
         redirectUrl = "/admin/dashboard";
         break;
       case "JEMAAT":

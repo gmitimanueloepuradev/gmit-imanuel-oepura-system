@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Upload, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import TextInput from "@/components/ui/inputs/TextInput";
 import profilPendetaService from "@/services/profilPendetaService";
 import { showToast } from "@/utils/showToast";
 
@@ -169,26 +170,19 @@ const ProfilPendetaModal = ({
 
           {/* Nama Pendeta */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Nama Pendeta <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                required
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                disabled={mutation.isPending}
-                maxLength={100}
-                placeholder="Masukkan nama lengkap pendeta"
-                type="text"
-                value={formData.nama}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, nama: e.target.value }))
-                }
-              />
-            </div>
+            <TextInput
+              label="Nama Pendeta *"
+              required
+              leftIcon={<User className="h-5 w-5 text-gray-400" />}
+              disabled={mutation.isPending}
+              maxLength={100}
+              placeholder="Masukkan nama lengkap pendeta"
+              type="text"
+              value={formData.nama}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, nama: e.target.value }))
+              }
+            />
           </div>
 
           {/* Foto Pendeta */}

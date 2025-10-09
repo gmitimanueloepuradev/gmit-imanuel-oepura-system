@@ -21,6 +21,7 @@ export default function RoleGuard({
   function getRoleBasedRedirect(userRole) {
     const roleRedirects = {
       ADMIN: "/admin/dashboard",
+      PENDETA: "/admin/dashboard", // PENDETA has same access as ADMIN
       MAJELIS: "/majelis/dashboard",
       EMPLOYEE: "/employee/dashboard",
       JEMAAT: "/jemaat/dashboard",
@@ -91,7 +92,7 @@ export default function RoleGuard({
  * Higher-order component for protecting admin routes
  */
 export function AdminGuard({ children }) {
-  return <RoleGuard allowedRoles={["ADMIN"]}>{children}</RoleGuard>;
+  return <RoleGuard allowedRoles={["ADMIN", "PENDETA"]}>{children}</RoleGuard>;
 }
 
 /**

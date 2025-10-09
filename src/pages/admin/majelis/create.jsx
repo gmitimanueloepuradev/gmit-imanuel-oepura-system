@@ -4,6 +4,7 @@ import {
   AlertCircle,
   Calendar,
   Crown,
+  Key,
   Lock,
   Mail,
   MapPin,
@@ -87,6 +88,7 @@ export default function CreateMajelisPage() {
     watch,
     trigger,
     getValues,
+    setValue,
     formState: { errors },
   } = methods;
 
@@ -216,7 +218,9 @@ export default function CreateMajelisPage() {
 
       // Format WhatsApp number with +62 prefix
       if (formattedData.noWhatsapp && formattedData.noWhatsapp !== "") {
-        formattedData.noWhatsapp = formatWhatsAppNumber(formattedData.noWhatsapp);
+        formattedData.noWhatsapp = formatWhatsAppNumber(
+          formattedData.noWhatsapp
+        );
       } else {
         formattedData.noWhatsapp = null;
       }
@@ -445,39 +449,77 @@ export default function CreateMajelisPage() {
       case 3:
         return (
           <StepContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TextInput
-                required
-                label="Username"
-                leftIcon={<UserCheck className="w-4 h-4" />}
-                name="username"
-                placeholder="Masukkan username"
-              />
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <TextInput
+                  required
+                  label="Username"
+                  leftIcon={<UserCheck className="w-4 h-4" />}
+                  name="username"
+                  placeholder="Masukkan username"
+                />
 
-              <TextInput
-                required
-                label="Email"
-                leftIcon={<Mail className="w-4 h-4" />}
-                name="email"
-                placeholder="Masukkan email"
-                type="email"
-              />
+                <TextInput
+                  required
+                  label="Email"
+                  leftIcon={<Mail className="w-4 h-4" />}
+                  name="email"
+                  placeholder="Masukkan email"
+                  type="email"
+                />
 
-              <TextInput
-                required
-                label="Password"
-                leftIcon={<Lock className="w-4 h-4" />}
-                name="password"
-                placeholder="Masukkan password"
-                type="password"
-              />
+                <div className="md:col-span-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <TextInput
+                        required
+                        label="Password"
+                        leftIcon={<Lock className="w-4 h-4" />}
+                        name="password"
+                        placeholder="Masukkan password"
+                        type="password"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <button
+                      className="px-4 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-4 whitespace-nowrap h-[42px]"
+                      type="button"
+                      onClick={() => setValue("password", "oepura78")}
+                    >
+                      <Key className="w-4 h-4" />
+                      Generate Password
+                    </button>
+                  </div>
+                </div>
 
-              <TextInput
-                label="No. WhatsApp"
-                leftIcon={<Phone className="w-4 h-4" />}
-                name="noWhatsapp"
-                placeholder="Masukkan nomor WhatsApp (opsional)"
-              />
+                <TextInput
+                  label="No. WhatsApp"
+                  leftIcon={<Phone className="w-4 h-4" />}
+                  name="noWhatsapp"
+                  placeholder="Contoh: 085298343432"
+                />
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-800 dark:text-blue-200">
+                    <p className="font-medium mb-1">
+                      Informasi Password & WhatsApp:
+                    </p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>
+                        Password default: <strong>oepura78</strong>
+                      </li>
+                      <li>
+                        Nomor WhatsApp akan otomatis diformat dengan prefix +62
+                      </li>
+                      <li>Contoh: 085298343432 akan menjadi +6285298343432</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </StepContent>
         );
@@ -659,6 +701,7 @@ export default function CreateMajelisPage() {
             totalSteps={steps.length}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onSubmit={handleSubmit(onSubmit)}
           />
         </div>
       </HookForm>

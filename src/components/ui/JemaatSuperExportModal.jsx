@@ -7,16 +7,17 @@ import {
   FileText,
   Filter,
   Home,
+  Lock,
   MapPin,
   Settings,
-  Table,
   Users,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { useAuth } from "@/contexts/AuthContext";
 import masterService from "@/services/masterService";
 
 const JemaatSuperExportModal = ({
@@ -26,6 +27,9 @@ const JemaatSuperExportModal = ({
   totalRecords = 0,
   onExport,
 }) => {
+  const { user } = useAuth();
+  const isMajelis = user?.role === "MAJELIS";
+
   const [exportConfig, setExportConfig] = useState({
     format: "pdf",
     layout: "table", // table, cards, detailed
@@ -153,6 +157,19 @@ const JemaatSuperExportModal = ({
     },
     enabled: isOpen,
   });
+
+  // Effect to auto-select rayon for Majelis user
+  useEffect(() => {
+    if (isMajelis && user?.idRayon) {
+      setExportConfig((prev) => ({
+        ...prev,
+        selectedValues: {
+          ...prev.selectedValues,
+          idRayon: [user.idRayon],
+        },
+      }));
+    }
+  }, [isMajelis, user, masterData]);
 
   // Calculate selected fields count
   const getSelectedFieldsCount = () => {
@@ -363,14 +380,21 @@ const JemaatSuperExportModal = ({
   const getFilterOptions = () => {
     if (!masterData) return {};
 
+    const allRayons =
+      masterData.rayon?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.namaRayon,
+      })) || [];
+
+    const rayonOptions =
+      isMajelis && user?.idRayon
+        ? allRayons.filter((r) => r.value === user.idRayon)
+        : allRayons;
+
     return {
-      idRayon:
-        masterData.rayon?.data?.items?.map((item) => ({
-          value: item.id,
-          label: item.namaRayon,
-        })) || [],
+      idRayon: rayonOptions,
       idSuku:
-        masterData.suku?.data?.map((item) => ({
+        masterData.suku?.data?.items?.map((item) => ({
           value: item.id,
           label: item.namaSuku,
         })) || [],
@@ -457,7 +481,12 @@ const JemaatSuperExportModal = ({
         title: "Data Keluarga",
         icon: Home,
         filters: [
-          { key: "idRayon", label: "Rayon", options: filterOptions.idRayon },
+          {
+            key: "idRayon",
+            label: "Rayon",
+            options: filterOptions.idRayon,
+            locked: isMajelis,
+          },
           {
             key: "idStatusDalamKeluarga",
             label: "Status Dalam Keluarga",
@@ -568,78 +597,104 @@ const JemaatSuperExportModal = ({
                   {category.title}
                 </h4>
               </div>
-              <div className="space-y-4">
-                {category.filters.map((filter) => (
-                  <div key={filter.key}>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {filter.label}
-                      </label>
-                      <div className="flex gap-2">
-                        <button
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                          type="button"
-                          onClick={() =>
-                            selectAllFilterValues(filter.key, filter.options)
-                          }
-                        >
-                          Pilih Semua
-                        </button>
-                        <button
-                          className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                          type="button"
-                          onClick={() => clearFilterValues(filter.key)}
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    </div>
-                    <div className="max-h-32 overflow-y-auto overflow-x-hidden border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
-                      <div className="p-2 space-y-1">
-                        {filter.options?.map((option) => {
-                          const isSelected =
-                            exportConfig.selectedValues[filter.key]?.includes(
-                              option.value
-                            ) || false;
 
-                          return (
-                            <label
-                              key={option.value}
-                              className="flex items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded"
-                            >
-                              <input
-                                checked={isSelected}
-                                className="mr-2"
-                                type="checkbox"
-                                onChange={(e) =>
-                                  handleValueSelection(
-                                    filter.key,
-                                    option.value,
-                                    e.target.checked
-                                  )
-                                }
-                              />
-                              <span className="text-gray-700 dark:text-gray-300 truncate">
-                                {option.label}
-                              </span>
-                            </label>
-                          );
-                        })}
-                        {(!filter.options || filter.options.length === 0) && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 p-2">
-                            Tidak ada data tersedia
-                          </p>
-                        )}
-                      </div>
+              {category.title === "Data Keluarga" && isMajelis && (
+                <div className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center">
+                    <Lock className="h-4 w-4 mr-3 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        Filter Rayon Terkunci
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Anda hanya dapat mengekspor data untuk rayon Anda:{" "}
+                        <span className="font-semibold">
+                          {masterData?.rayon?.data?.items?.find(
+                            (r) => r.id === user.idRayon,
+                          )?.namaRayon || "..."}
+                        </span>
+                      </p>
                     </div>
-                    {exportConfig.selectedValues[filter.key]?.length > 0 && (
-                      <div className="mt-1 text-xs text-green-600 dark:text-green-400">
-                        {exportConfig.selectedValues[filter.key].length} nilai
-                        dipilih
-                      </div>
-                    )}
                   </div>
-                ))}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {category.filters.map((filter) => {
+                  if (filter.locked) return null;
+
+                  return (
+                    <div key={filter.key}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                          {filter.label}
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                            type="button"
+                            onClick={() =>
+                              selectAllFilterValues(filter.key, filter.options)
+                            }
+                          >
+                            Pilih Semua
+                          </button>
+                          <button
+                            className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                            type="button"
+                            onClick={() => clearFilterValues(filter.key)}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                      <div className="max-h-32 overflow-y-auto overflow-x-hidden border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <div className="p-2 space-y-1">
+                          {filter.options?.map((option) => {
+                            const isSelected =
+                              exportConfig.selectedValues[filter.key]?.includes(
+                                option.value
+                              ) || false;
+
+                            return (
+                              <label
+                                key={option.value}
+                                className="flex items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded"
+                              >
+                                <input
+                                  checked={isSelected}
+                                  className="mr-2"
+                                  type="checkbox"
+                                  onChange={(e) =>
+                                    handleValueSelection(
+                                      filter.key,
+                                      option.value,
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="text-gray-700 dark:text-gray-300 truncate">
+                                  {option.label}
+                                </span>
+                              </label>
+                            );
+                          })}
+                          {(!filter.options || filter.options.length === 0) && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 p-2">
+                              Tidak ada data tersedia
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {exportConfig.selectedValues[filter.key]?.length > 0 && (
+                        <div className="mt-1 text-xs text-green-600 dark:text-green-400">
+                          {exportConfig.selectedValues[filter.key].length} nilai
+                          dipilih
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -918,7 +973,6 @@ const JemaatSuperExportModal = ({
                 ))}
               </div>
             </div>
-
 
             {/* Value Selection for Filters */}
             <div className="mb-6">

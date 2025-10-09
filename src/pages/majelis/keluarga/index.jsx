@@ -5,123 +5,130 @@ import {
   Home,
   MapPin,
   Search,
+  UserPlus,
   Users,
-  Plus,
-  UserPlus
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import keluargaService from "@/services/keluargaService";
+import { TableSkeleton } from "@/components/ui/skeletons/SkeletonTable";
 import { useAuth } from "@/contexts/AuthContext";
+import keluargaService from "@/services/keluargaService";
 
 // Page Header Component
-function PageHeader({ title, description, breadcrumb, onAdd, showAddButton = true }) {
-  return (
-    <div className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Breadcrumb */}
-        {breadcrumb && (
-          <nav aria-label="Breadcrumb" className="flex mb-4">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              {breadcrumb.map((item, index) => (
-                <li key={index} className="inline-flex items-center">
-                  {index > 0 && (
-                    <svg
-                      className="w-6 h-6 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        clipRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        fillRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  {item.href ? (
-                    <a
-                      className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
-                      href={item.href}
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                      {item.label}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
+// function PageHeader({
+//   title,
+//   description,
+//   breadcrumb,
+//   onAdd,
+//   showAddButton = true,
+// }) {
+//   return (
+//     <div className="bg-white border-b border-gray-200">
+//       <div className="max-w-7xl mx-auto px-6 py-6">
+//         {/* Breadcrumb */}
+//         {breadcrumb && (
+//           <nav aria-label="Breadcrumb" className="flex mb-4">
+//             <ol className="inline-flex items-center space-x-1 md:space-x-3">
+//               {breadcrumb.map((item, index) => (
+//                 <li key={index} className="inline-flex items-center">
+//                   {index > 0 && (
+//                     <svg
+//                       className="w-6 h-6 text-gray-400"
+//                       fill="currentColor"
+//                       viewBox="0 0 20 20"
+//                     >
+//                       <path
+//                         clipRule="evenodd"
+//                         d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+//                         fillRule="evenodd"
+//                       />
+//                     </svg>
+//                   )}
+//                   {item.href ? (
+//                     <a
+//                       className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+//                       href={item.href}
+//                     >
+//                       {item.label}
+//                     </a>
+//                   ) : (
+//                     <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+//                       {item.label}
+//                     </span>
+//                   )}
+//                 </li>
+//               ))}
+//             </ol>
+//           </nav>
+//         )}
 
-        {/* Header Content */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-              {title}
-            </h1>
-            {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
-            )}
-          </div>
+//         {/* Header Content */}
+//         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+//           <div className="flex-1 min-w-0">
+//             <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+//               {title}
+//             </h1>
+//             {description && (
+//               <p className="mt-1 text-sm text-gray-500">{description}</p>
+//             )}
+//           </div>
 
-          {/* Actions */}
-          {showAddButton && (
-            <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
-              <Button onClick={onAdd}>
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Keluarga
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+//           {/* Actions */}
+//           {showAddButton && (
+//             <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
+//               <Button onClick={onAdd}>
+//                 <Plus className="w-4 h-4 mr-2" />
+//                 Tambah Keluarga
+//               </Button>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 // Loading Skeleton
-function TableSkeleton() {
-  return (
-    <>
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="bg-white p-6 rounded-lg shadow animate-pulse">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center mb-3">
-                <div className="h-5 w-5 bg-gray-300 rounded mr-2" />
-                <div className="h-5 bg-gray-300 rounded w-32" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <div className="h-4 bg-gray-300 rounded w-24 mb-1" />
-                  <div className="h-6 bg-gray-300 rounded w-full" />
-                </div>
-                <div>
-                  <div className="h-4 bg-gray-300 rounded w-20 mb-1" />
-                  <div className="h-6 bg-gray-300 rounded w-16" />
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <div className="h-8 w-8 bg-gray-300 rounded" />
-              <div className="h-8 w-8 bg-gray-300 rounded" />
-              <div className="h-8 w-8 bg-gray-300 rounded" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
+// function TableSkeleton() {
+//   return (
+//     <>
+//       {[...Array(5)].map((_, i) => (
+//         <div key={i} className="bg-white p-6 rounded-lg shadow animate-pulse">
+//           <div className="flex items-start justify-between">
+//             <div className="flex-1">
+//               <div className="flex items-center mb-3">
+//                 <div className="h-5 w-5 bg-gray-300 rounded mr-2" />
+//                 <div className="h-5 bg-gray-300 rounded w-32" />
+//               </div>
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                 <div>
+//                   <div className="h-4 bg-gray-300 rounded w-24 mb-1" />
+//                   <div className="h-6 bg-gray-300 rounded w-full" />
+//                 </div>
+//                 <div>
+//                   <div className="h-4 bg-gray-300 rounded w-20 mb-1" />
+//                   <div className="h-6 bg-gray-300 rounded w-16" />
+//                 </div>
+//               </div>
+//             </div>
+//             <div className="flex gap-2">
+//               <div className="h-8 w-8 bg-gray-300 rounded" />
+//               <div className="h-8 w-8 bg-gray-300 rounded" />
+//               <div className="h-8 w-8 bg-gray-300 rounded" />
+//             </div>
+//           </div>
+//         </div>
+//       ))}
+//     </>
+//   );
+// }
 
 export default function MajelisKeluargaPage() {
   const router = useRouter();
@@ -144,12 +151,17 @@ export default function MajelisKeluargaPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["keluarga-majelis", pagination, searchTerm, user?.majelis?.idRayon],
+    queryKey: [
+      "keluarga-majelis",
+      pagination,
+      searchTerm,
+      user?.majelis?.idRayon,
+    ],
     queryFn: () =>
       keluargaService.getAll({
         ...pagination,
         search: searchTerm,
-        idRayon: user?.majelis?.idRayon // Filter by majelis's rayon
+        idRayon: user?.majelis?.idRayon, // Filter by majelis's rayon
       }),
     keepPreviousData: true,
     enabled: !!user?.majelis?.idRayon, // Only fetch if majelis has rayon
@@ -171,12 +183,17 @@ export default function MajelisKeluargaPage() {
       onClick: (item) => router.push(`/majelis/keluarga/${item.id}`),
       variant: "outline",
     },
-    ...(canCreate ? [{
-      icon: UserPlus,
-      label: "Tambah Jemaat",
-      onClick: (item) => router.push(`/majelis/jemaat/create?keluargaId=${item.id}`),
-      variant: "default",
-    }] : []),
+    ...(canCreate
+      ? [
+          {
+            icon: UserPlus,
+            label: "Tambah Jemaat",
+            onClick: (item) =>
+              router.push(`/majelis/jemaat/create?keluargaId=${item.id}`),
+            variant: "default",
+          },
+        ]
+      : []),
   ];
 
   const items = keluargaData?.data?.items || [];
@@ -193,9 +210,10 @@ export default function MajelisKeluargaPage() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Anda tidak memiliki permission untuk melihat data keluarga. Hubungi admin untuk mengatur permission Anda.
+                Anda tidak memiliki permission untuk melihat data keluarga.
+                Hubungi admin untuk mengatur permission Anda.
               </p>
-              <Button onClick={() => router.push('/majelis/dashboard')}>
+              <Button onClick={() => router.push("/majelis/dashboard")}>
                 Kembali ke Dashboard
               </Button>
             </CardContent>
@@ -208,21 +226,33 @@ export default function MajelisKeluargaPage() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'} - GMIT Imanuel Oepura`}
+        description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || "rayon Anda"} - GMIT Imanuel Oepura`}
         title="Data Keluarga"
       />
 
       <div className="space-y-6 p-4">
         {/* Page Header */}
         <PageHeader
+          actions={[
+            canCreate && {
+              icon: UserPlus,
+              label: "Tambah Keluarga",
+              onClick: () => router.push("/majelis/keluarga/create"),
+              variant: "default",
+            },
+          ].filter(Boolean)}
           breadcrumb={[
             { label: "Majelis", href: "/majelis" },
             { label: "Data Keluarga" },
           ]}
-          description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
           showAddButton={canCreate}
+          //               <Button onClick={onAdd}>
+          //                 <Plus className="w-4 h-4 mr-2" />
+          //                 Tambah Keluarga
+          //               </Button>
+          description={`Kelola data keluarga di ${user?.majelis?.rayon?.namaRayon || "rayon Anda"}`}
           title="Data Keluarga"
-          onAdd={() => router.push("/majelis/keluarga/create")}
+          // onAdd={() => router.push("/majelis/keluarga/create")}
         />
 
         {/* Search and Filters */}
@@ -259,10 +289,10 @@ export default function MajelisKeluargaPage() {
                       {/* Header */}
                       <div className="flex items-center mb-3">
                         <Home className="h-5 w-5 text-blue-600 mr-2" />
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">
                           Bangunan {item.noBagungan}
                         </h3>
-                        <span className="ml-2 text-sm text-gray-500">
+                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-200">
                           • {item.rayon?.namaRayon}
                         </span>
                       </div>
@@ -273,7 +303,7 @@ export default function MajelisKeluargaPage() {
                           <label className="text-sm font-medium text-gray-500">
                             Kepala Keluarga
                           </label>
-                          <p className="text-sm text-gray-900">
+                          <p className="text-sm text-gray-900  dark:text-gray-200">
                             {item.jemaats?.[0]?.nama || "-"}
                           </p>
                         </div>
@@ -284,7 +314,7 @@ export default function MajelisKeluargaPage() {
                           </label>
                           <div className="flex items-center">
                             <Users className="h-4 w-4 text-gray-400 mr-1" />
-                            <span className="text-sm text-gray-900">
+                            <span className="text-sm text-gray-900  dark:text-gray-200">
                               {item.totalJemaat || item.jemaats?.length || 0}{" "}
                               orang
                             </span>
@@ -292,12 +322,12 @@ export default function MajelisKeluargaPage() {
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium text-gray-500">
+                          <label className="text-sm font-medium text-gray-500  dark:text-gray-200">
                             Alamat
                           </label>
                           <div className="flex items-start">
                             <MapPin className="h-4 w-4 text-gray-400 mr-1 mt-0.5" />
-                            <p className="text-sm text-gray-900 line-clamp-2">
+                            <p className="text-sm text-gray-900 line-clamp-2  dark:text-gray-200">
                               {typeof item.alamat === "string"
                                 ? item.alamat
                                 : item.alamat

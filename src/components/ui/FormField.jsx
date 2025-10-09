@@ -1,23 +1,32 @@
 // components/ui/FormField.jsx
-import { useId } from "react";
+import { Children, cloneElement, useId } from "react";
 import { useController, useFormContext } from "react-hook-form";
 
 export default function FormField({
   name,
   label,
-  placeholder,
-  type = "text",
   required = false,
-  value,
-  onChange,
   error: externalError,
-  className = "",
+  isLoading = false,
+  children, // Accept children
   ...props
 }) {
   const inputId = useId();
 
   // Try to get form context, but handle case where it doesn't exist
   const formContext = useFormContext();
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="form-control w-full mb-4">
+        {label && (
+          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2 animate-pulse" />
+        )}
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+    );
+  }
 
   // If we have form context, use react-hook-form
   if (formContext) {
@@ -27,6 +36,9 @@ export default function FormField({
       fieldState: { error },
     } = useController({ name, control });
 
+    // Clone the child element and spread field props
+    const childElement = Children.only(children);
+
     return (
       <div className="form-control w-full mb-4">
         {label && (
@@ -34,27 +46,33 @@ export default function FormField({
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             htmlFor={inputId}
           >
-            {label} {required && <span className="text-red-500 dark:text-red-400">*</span>}
+            {label}{" "}
+            {required && (
+              <span className="text-red-500 dark:text-red-400">*</span>
+            )}
           </label>
         )}
-        <input
-          id={inputId}
-          type={type}
-          {...field}
-          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
-            error ? "border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500" : ""
-          } ${className}`}
-          placeholder={placeholder}
-          {...props}
-        />
+        {cloneElement(childElement, {
+          ...field,
+          ...childElement.props,
+          id: inputId,
+          ...props,
+          className: `${childElement.props.className || ""} ${
+            error ? "border-red-500 focus:ring-red-500" : ""
+          }`.trim(),
+        })}
         {error && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error.message}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {error.message}
+          </p>
         )}
       </div>
     );
   }
 
   // Fallback to regular input when no form context
+  const childElement = Children.only(children);
+
   return (
     <div className="form-control w-full mb-4">
       {label && (
@@ -62,23 +80,25 @@ export default function FormField({
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           htmlFor={inputId}
         >
-          {label} {required && <span className="text-red-500 dark:text-red-400">*</span>}
+          {label}{" "}
+          {required && (
+            <span className="text-red-500 dark:text-red-400">*</span>
+          )}
         </label>
       )}
-      <input
-        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
-          externalError ? "border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500" : ""
-        } ${className}`}
-        id={inputId}
-        name={name}
-        placeholder={placeholder}
-        type={type}
-        value={value || ""}
-        onChange={(e) => onChange?.(e.target.value)}
-        {...props}
-      />
+      {cloneElement(childElement, {
+        ...childElement.props,
+        id: inputId,
+        name: name,
+        ...props,
+        className: `${childElement.props.className || ""} ${
+          externalError ? "border-red-500 focus:ring-red-500" : ""
+        }`.trim(),
+      })}
       {externalError && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{externalError}</p>
+        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+          {externalError}
+        </p>
       )}
     </div>
   );

@@ -1,23 +1,23 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, ArrowLeft, Save, Users } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, User, Users } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import PageTitle from "@/components/ui/PageTitle";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
 import TextInput from "@/components/ui/inputs/TextInput";
+import PageTitle from "@/components/ui/PageTitle";
 import PhoneInput from "@/components/ui/PhoneInput";
+import { useAuth } from "@/contexts/AuthContext";
 import jemaatService from "@/services/jemaatService";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
-import { jemaatCreateSchema } from "@/validations/masterSchema";
 import { showToast } from "@/utils/showToast";
-import { useAuth } from "@/contexts/AuthContext";
+import { jemaatCreateSchema } from "@/validations/masterSchema";
 
 function MajelisCreateJemaatInKeluarga() {
   const router = useRouter();
@@ -49,48 +49,55 @@ function MajelisCreateJemaatInKeluarga() {
     },
   });
 
-  const { handleSubmit, register, setValue, watch, formState: { errors } } = form;
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
 
   // Fetch keluarga data to show context
   const { data: keluargaData, isLoading: isLoadingKeluarga } = useQuery({
-    queryKey: ['keluarga', keluargaId],
+    queryKey: ["keluarga", keluargaId],
     queryFn: () => keluargaService.getById(keluargaId),
     enabled: !!keluargaId,
   });
 
   // Fetch master data
-  const { data: statusDalamKeluargaData, isLoading: isLoadingStatusKeluarga } = useQuery({
-    queryKey: ['status-dalam-keluarga'],
-    queryFn: () => masterService.getStatusDalamKeluarga(),
-  });
+  const { data: statusDalamKeluargaData, isLoading: isLoadingStatusKeluarga } =
+    useQuery({
+      queryKey: ["status-dalam-keluarga"],
+      queryFn: () => masterService.getStatusDalamKeluarga(),
+    });
 
   const { data: sukuData, isLoading: isLoadingSuku } = useQuery({
-    queryKey: ['suku'],
+    queryKey: ["suku"],
     queryFn: () => masterService.getSuku(),
   });
 
   const { data: pendidikanData, isLoading: isLoadingPendidikan } = useQuery({
-    queryKey: ['pendidikan'],
+    queryKey: ["pendidikan"],
     queryFn: () => masterService.getPendidikan(),
   });
 
   const { data: pekerjaanData, isLoading: isLoadingPekerjaan } = useQuery({
-    queryKey: ['pekerjaan'],
+    queryKey: ["pekerjaan"],
     queryFn: () => masterService.getPekerjaan(),
   });
 
   const { data: pendapatanData, isLoading: isLoadingPendapatan } = useQuery({
-    queryKey: ['pendapatan'],
+    queryKey: ["pendapatan"],
     queryFn: () => masterService.getPendapatan(),
   });
 
   const { data: jaminanKesehatanData, isLoading: isLoadingJaminan } = useQuery({
-    queryKey: ['jaminan-kesehatan'],
+    queryKey: ["jaminan-kesehatan"],
     queryFn: () => masterService.getJaminanKesehatan(),
   });
 
   const { data: pernikahanData, isLoading: isLoadingPernikahan } = useQuery({
-    queryKey: ['pernikahan'],
+    queryKey: ["pernikahan"],
     queryFn: () => masterService.getPernikahan(),
   });
 
@@ -102,100 +109,101 @@ function MajelisCreateJemaatInKeluarga() {
         ? statusDalamKeluargaData.data
         : statusDalamKeluargaData.data?.items || [];
 
-      const kepalaKeluargaOption = dataArray.find(item =>
-        item.status?.toLowerCase().includes('kepala keluarga') ||
-        item.status?.toLowerCase().includes('kepala')
+      const kepalaKeluargaOption = dataArray.find(
+        (item) =>
+          item.status?.toLowerCase().includes("kepala keluarga") ||
+          item.status?.toLowerCase().includes("kepala")
       );
 
-      if (kepalaKeluargaOption && !watch('idStatusDalamKeluarga')) {
-        setValue('idStatusDalamKeluarga', kepalaKeluargaOption.id);
+      if (kepalaKeluargaOption && !watch("idStatusDalamKeluarga")) {
+        setValue("idStatusDalamKeluarga", kepalaKeluargaOption.id);
       }
     }
   }, [statusDalamKeluargaData, setValue, watch]);
 
   // Transform options data for AutoCompleteInput based on actual API response structure
-  const statusDalamKeluargaOptions = statusDalamKeluargaData?.data?.map ?
-    statusDalamKeluargaData.data.map(item => ({
-      value: item.id,
-      label: item.status
-    })) :
-    statusDalamKeluargaData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.status
-    })) || [];
+  const statusDalamKeluargaOptions = statusDalamKeluargaData?.data?.map
+    ? statusDalamKeluargaData.data.map((item) => ({
+        value: item.id,
+        label: item.status,
+      }))
+    : statusDalamKeluargaData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.status,
+      })) || [];
 
-  const sukuOptions = sukuData?.data?.map ?
-    sukuData.data.map(item => ({
-      value: item.id,
-      label: item.namaSuku
-    })) :
-    sukuData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.namaSuku
-    })) || [];
+  const sukuOptions = sukuData?.data?.map
+    ? sukuData.data.map((item) => ({
+        value: item.id,
+        label: item.namaSuku,
+      }))
+    : sukuData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.namaSuku,
+      })) || [];
 
-  const pendidikanOptions = pendidikanData?.data?.map ?
-    pendidikanData.data.map(item => ({
-      value: item.id,
-      label: item.jenjang
-    })) :
-    pendidikanData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.jenjang
-    })) || [];
+  const pendidikanOptions = pendidikanData?.data?.map
+    ? pendidikanData.data.map((item) => ({
+        value: item.id,
+        label: item.jenjang,
+      }))
+    : pendidikanData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.jenjang,
+      })) || [];
 
-  const pekerjaanOptions = pekerjaanData?.data?.map ?
-    pekerjaanData.data.map(item => ({
-      value: item.id,
-      label: item.namaPekerjaan
-    })) :
-    pekerjaanData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.namaPekerjaan
-    })) || [];
+  const pekerjaanOptions = pekerjaanData?.data?.map
+    ? pekerjaanData.data.map((item) => ({
+        value: item.id,
+        label: item.namaPekerjaan,
+      }))
+    : pekerjaanData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.namaPekerjaan,
+      })) || [];
 
-  const pendapatanOptions = pendapatanData?.data?.map ?
-    pendapatanData.data.map(item => ({
-      value: item.id,
-      label: item.label
-    })) :
-    pendapatanData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.label
-    })) || [];
+  const pendapatanOptions = pendapatanData?.data?.map
+    ? pendapatanData.data.map((item) => ({
+        value: item.id,
+        label: item.label,
+      }))
+    : pendapatanData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.label,
+      })) || [];
 
-  const jaminanKesehatanOptions = jaminanKesehatanData?.data?.map ?
-    jaminanKesehatanData.data.map(item => ({
-      value: item.id,
-      label: item.jenisJaminan
-    })) :
-    jaminanKesehatanData?.data?.items?.map(item => ({
-      value: item.id,
-      label: item.jenisJaminan
-    })) || [];
+  const jaminanKesehatanOptions = jaminanKesehatanData?.data?.map
+    ? jaminanKesehatanData.data.map((item) => ({
+        value: item.id,
+        label: item.jenisJaminan,
+      }))
+    : jaminanKesehatanData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: item.jenisJaminan,
+      })) || [];
 
-  const pernikahanOptions = pernikahanData?.data?.map ?
-    pernikahanData.data.map(item => ({
-      value: item.id,
-      label: `${item.tanggal} - ${item.klasis?.nama || 'Unknown'}`
-    })) :
-    pernikahanData?.data?.items?.map(item => ({
-      value: item.id,
-      label: `${item.tanggal} - ${item.klasis?.nama || 'Unknown'}`
-    })) || [];
+  const pernikahanOptions = pernikahanData?.data?.map
+    ? pernikahanData.data.map((item) => ({
+        value: item.id,
+        label: `${item.tanggal} - ${item.klasis?.nama || "Unknown"}`,
+      }))
+    : pernikahanData?.data?.items?.map((item) => ({
+        value: item.id,
+        label: `${item.tanggal} - ${item.klasis?.nama || "Unknown"}`,
+      })) || [];
 
   // Golongan Darah options
   const golonganDarahOptions = [
-    { value: 'A', label: 'A' },
-    { value: 'B', label: 'B' },
-    { value: 'AB', label: 'AB' },
-    { value: 'O', label: 'O' },
+    { value: "A", label: "A" },
+    { value: "B", label: "B" },
+    { value: "AB", label: "AB" },
+    { value: "O", label: "O" },
   ];
 
   // Jenis Kelamin options
   const jenisKelaminOptions = [
-    { value: true, label: 'Laki-laki' },
-    { value: false, label: 'Perempuan' },
+    { value: true, label: "Laki-laki" },
+    { value: false, label: "Perempuan" },
   ];
 
   // Create jemaat mutation
@@ -205,7 +213,8 @@ function MajelisCreateJemaatInKeluarga() {
       const jemaatData = {
         // Basic info
         nama: data.nama,
-        jenisKelamin: data.jenisKelamin === 'true' || data.jenisKelamin === true, // Convert to Boolean
+        jenisKelamin:
+          data.jenisKelamin === "true" || data.jenisKelamin === true, // Convert to Boolean
         tanggalLahir: data.tanggalLahir,
         tempatLahir: data.tempatLahir,
         golonganDarah: data.golonganDarah || null,
@@ -225,7 +234,7 @@ function MajelisCreateJemaatInKeluarga() {
         idPernikahan: data.idPernikahan || null,
 
         // Status (default AKTIF)
-        status: 'AKTIF',
+        status: "AKTIF",
 
         // For user account creation
         username: data.username,
@@ -244,18 +253,19 @@ function MajelisCreateJemaatInKeluarga() {
       });
 
       // Invalidate and refetch
-      queryClient.invalidateQueries(['keluarga']);
-      queryClient.invalidateQueries(['jemaat']);
-      queryClient.invalidateQueries(['majelis-dashboard']);
+      queryClient.invalidateQueries(["keluarga"]);
+      queryClient.invalidateQueries(["jemaat"]);
+      queryClient.invalidateQueries(["majelis-dashboard"]);
 
       // Redirect back to keluarga list
-      router.push('/majelis/keluarga');
+      router.push("/majelis/keluarga");
     },
     onError: (error) => {
-      console.error('Create jemaat error:', error);
+      console.error("Create jemaat error:", error);
       showToast({
         title: "Error",
-        description: error.response?.data?.message || "Gagal menambahkan kepala keluarga",
+        description:
+          error.response?.data?.message || "Gagal menambahkan kepala keluarga",
         color: "error",
       });
     },
@@ -271,16 +281,17 @@ function MajelisCreateJemaatInKeluarga() {
   };
 
   const handleBack = () => {
-    router.push('/majelis/keluarga');
+    router.push("/majelis/keluarga");
   };
 
   const handleSkip = () => {
     showToast({
       title: "Informasi",
-      description: "Keluarga berhasil dibuat. Anda dapat menambahkan jemaat nanti.",
+      description:
+        "Keluarga berhasil dibuat. Anda dapat menambahkan jemaat nanti.",
       color: "info",
     });
-    router.push('/majelis/keluarga');
+    router.push("/majelis/keluarga");
   };
 
   // Check if user has majelis data with rayon
@@ -294,7 +305,8 @@ function MajelisCreateJemaatInKeluarga() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Anda belum memiliki rayon yang ditugaskan. Hubungi admin untuk mengatur rayon Anda.
+                Anda belum memiliki rayon yang ditugaskan. Hubungi admin untuk
+                mengatur rayon Anda.
               </p>
               <Button onClick={handleBack}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -348,7 +360,7 @@ function MajelisCreateJemaatInKeluarga() {
                   Tambah Kepala Keluarga
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Rayon: {user.majelis?.rayon?.namaRayon || 'Tidak diketahui'}
+                  Rayon: {user.majelis?.rayon?.namaRayon || "Tidak diketahui"}
                 </p>
               </div>
             </div>
@@ -366,13 +378,19 @@ function MajelisCreateJemaatInKeluarga() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">No. Bangunan:</span> {keluargaData.data.noBagungan}
+                    <span className="font-medium">No. Bangunan:</span>{" "}
+                    {keluargaData.data.noBagungan}
                   </div>
                   <div>
-                    <span className="font-medium">Rayon:</span> {keluargaData.data.rayon?.namaRayon}
+                    <span className="font-medium">Rayon:</span>{" "}
+                    {keluargaData.data.rayon?.namaRayon}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-medium">Alamat:</span> {keluargaData.data.alamat?.jalan}, RT {keluargaData.data.alamat?.rt}, RW {keluargaData.data.alamat?.rw}, {keluargaData.data.alamat?.kelurahan?.nama}
+                    <span className="font-medium">Alamat:</span>{" "}
+                    {keluargaData.data.alamat?.jalan}, RT{" "}
+                    {keluargaData.data.alamat?.rt}, RW{" "}
+                    {keluargaData.data.alamat?.rw},{" "}
+                    {keluargaData.data.alamat?.kelurahan?.nama}
                   </div>
                 </div>
               </CardContent>
@@ -387,7 +405,8 @@ function MajelisCreateJemaatInKeluarga() {
                 <span>Data Kepala Keluarga</span>
               </CardTitle>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Lengkapi data kepala keluarga. Akun user akan otomatis dibuat dengan username dan password yang digenerate.
+                Lengkapi data kepala keluarga. Akun user akan otomatis dibuat
+                dengan username dan password yang digenerate.
               </p>
             </CardHeader>
             <CardContent>
@@ -424,7 +443,9 @@ function MajelisCreateJemaatInKeluarga() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       {errors.tanggalLahir && (
-                        <p className="text-red-600 text-xs mt-1">{errors.tanggalLahir.message}</p>
+                        <p className="text-red-600 text-xs mt-1">
+                          {errors.tanggalLahir.message}
+                        </p>
                       )}
                     </div>
 
@@ -569,11 +590,16 @@ function MajelisCreateJemaatInKeluarga() {
                       Data Akun User (Wajib)
                     </h3>
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <h4 className="font-medium text-blue-800 mb-2">Informasi</h4>
+                      <h4 className="font-medium text-blue-800 mb-2">
+                        Informasi
+                      </h4>
                       <p className="text-sm text-blue-700">
-                        • Akun ini akan digunakan kepala keluarga untuk login ke sistem<br/>
-                        • Role otomatis: JEMAAT<br/>
-                        • Email, nomor WhatsApp, username dan password harus diisi manual
+                        • Akun ini akan digunakan kepala keluarga untuk login ke
+                        sistem
+                        <br />
+                        • Role otomatis: JEMAAT
+                        <br />• Email, nomor WhatsApp, username dan password
+                        harus diisi manual
                       </p>
                     </div>
 
@@ -643,7 +669,9 @@ function MajelisCreateJemaatInKeluarga() {
                       >
                         <Save className="h-4 w-4" />
                         <span>
-                          {isSubmitting ? "Menyimpan..." : "Simpan Kepala Keluarga"}
+                          {isSubmitting
+                            ? "Menyimpan..."
+                            : "Simpan Kepala Keluarga"}
                         </span>
                       </Button>
                     </div>

@@ -1,18 +1,18 @@
-import { useRouter } from "next/router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Home } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-import { keluargaEditSchema } from "@/validations/masterSchema";
+import HookForm from "@/components/form/HookForm";
+import { Card } from "@/components/ui/Card";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
-import { Card } from "@/components/ui/Card";
-import HookForm from "@/components/form/HookForm";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
+import { keluargaEditSchema } from "@/validations/masterSchema";
 
 export default function EditKeluargaPage() {
   const router = useRouter();
@@ -31,7 +31,11 @@ export default function EditKeluargaPage() {
     },
   });
 
-  const { reset, handleSubmit, formState: { errors } } = methods;
+  const {
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   // Fetch keluarga data
   const { data: keluargaData, isLoading } = useQuery({
@@ -89,6 +93,7 @@ export default function EditKeluargaPage() {
   useEffect(() => {
     if (keluargaData?.data) {
       const keluarga = keluargaData.data;
+
       reset({
         noBagungan: keluarga.noBagungan || "",
         noKK: keluarga.noKK || "",
@@ -101,7 +106,10 @@ export default function EditKeluargaPage() {
   }, [keluargaData, reset]);
 
   const onSubmit = (data) => {
-    updateMutation.mutate(data);
+    updateMutation.mutate({
+      ...data,
+      noBagungan: parseInt(data.noBagungan, 10),
+    });
   };
 
   if (isLoading) {
@@ -113,12 +121,14 @@ export default function EditKeluargaPage() {
   }
 
   const keluarga = keluargaData?.data;
-  
+
   if (!keluarga) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Data Tidak Ditemukan</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Data Tidak Ditemukan
+          </h2>
           <p className="text-gray-600">Keluarga tidak ditemukan</p>
         </div>
       </div>
@@ -137,12 +147,10 @@ export default function EditKeluargaPage() {
           Kembali
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Edit Keluarga - No. Bangunan {keluarga.noBagungan}
           </h1>
-          <p className="text-gray-600 mt-1">
-            Perbarui informasi data keluarga
-          </p>
+          <p className="text-gray-600 mt-1">Perbarui informasi data keluarga</p>
         </div>
       </div>
 
@@ -164,6 +172,7 @@ export default function EditKeluargaPage() {
 
             <TextInput
               label="No. Kartu Keluarga (KK)"
+              maxLength={16}
               name="noKK"
               placeholder="Masukkan no. kartu keluarga"
             />
@@ -172,40 +181,48 @@ export default function EditKeluargaPage() {
               required
               label="Rayon"
               name="idRayon"
-              options={rayonData?.data?.items?.map((item) => ({
-                value: item.id,
-                label: item.namaRayon,
-              })) || []}
+              options={
+                rayonData?.data?.items?.map((item) => ({
+                  value: item.id,
+                  label: item.namaRayon,
+                })) || []
+              }
               placeholder="Pilih rayon"
             />
 
             <SelectInput
               label="Status Keluarga"
               name="idStatusKeluarga"
-              options={statusKeluargaData?.data?.items?.map((item) => ({
-                value: item.id,
-                label: item.status,
-              })) || []}
+              options={
+                statusKeluargaData?.data?.items?.map((item) => ({
+                  value: item.id,
+                  label: item.status,
+                })) || []
+              }
               placeholder="Pilih status keluarga (opsional)"
             />
 
             <SelectInput
               label="Status Kepemilikan Rumah"
               name="idStatusKepemilikanRumah"
-              options={statusKepemilikanRumahData?.data?.items?.map((item) => ({
-                value: item.id,
-                label: item.status,
-              })) || []}
+              options={
+                statusKepemilikanRumahData?.data?.items?.map((item) => ({
+                  value: item.id,
+                  label: item.status,
+                })) || []
+              }
               placeholder="Pilih status kepemilikan rumah (opsional)"
             />
 
             <SelectInput
               label="Keadaan Rumah"
               name="idKeadaanRumah"
-              options={keadaanRumahData?.data?.items?.map((item) => ({
-                value: item.id,
-                label: item.keadaan,
-              })) || []}
+              options={
+                keadaanRumahData?.data?.items?.map((item) => ({
+                  value: item.id,
+                  label: item.keadaan,
+                })) || []
+              }
               placeholder="Pilih keadaan rumah (opsional)"
             />
           </div>
