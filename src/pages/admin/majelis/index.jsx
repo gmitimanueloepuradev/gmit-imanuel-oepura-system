@@ -21,6 +21,7 @@ import CreateOrEditModal from "@/components/common/CreateOrEditModal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
 import useModalForm from "@/hooks/useModalForm";
+import { useUser } from "@/hooks/useUser";
 
 export default function MajelisPage() {
   const router = useRouter();
@@ -28,6 +29,8 @@ export default function MajelisPage() {
   const modal = useModalForm();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["majelis"],
@@ -187,28 +190,36 @@ export default function MajelisPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
-          {
-            icon: Pen,
-            onClick: (item) => modal.open(item),
-            variant: "outline",
-            tooltip: "Edit majelis",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Pen,
+                  onClick: (item) => modal.open(item),
+                  variant: "outline",
+                  tooltip: "Edit majelis",
+                },
+              ]
+            : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
-          {
-            icon: Trash,
-            onClick: handleDelete,
-            variant: "outline",
-            tooltip: "Hapus majelis",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Trash,
+                  onClick: handleDelete,
+                  variant: "outline",
+                  tooltip: "Hapus majelis",
+                },
+              ]
+            : []),
         ]}
         searchPlaceholder="Cari nama majelis..."
         title="Manajemen Majelis"
-        onAdd={handleCreate}
+        onAdd={authData?.isAdmin ? handleCreate : undefined}
       />
 
       <CreateOrEditModal

@@ -16,10 +16,13 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { useUser } from "@/hooks/useUser";
 
 export default function KeuanganSetupPage() {
   const queryClient = useQueryClient();
   const [showClearDialog, setShowClearDialog] = useState(false);
+
+  const { user: authData } = useUser();
 
   // Query untuk cek status data
   const { data: statusData, isLoading } = useQuery({
@@ -170,37 +173,39 @@ export default function KeuanganSetupPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Seed Data Section */}
-          <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-2">Data Seed (Contoh)</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              Buat data contoh untuk memulai. Akan membuat kategori PENERIMAAN &
-              PENGELUARAN beserta beberapa item standar seperti Perpuluhan,
-              Operasional, dll.
-            </p>
+          {authData?.isAdmin && (
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-lg mb-2">Data Seed (Contoh)</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Buat data contoh untuk memulai. Akan membuat kategori PENERIMAAN &
+                PENGELUARAN beserta beberapa item standar seperti Perpuluhan,
+                Operasional, dll.
+              </p>
 
-            <div className="flex gap-3">
-              <Button
-                className="flex items-center gap-2"
-                disabled={seedMutation.isPending}
-                onClick={() => seedMutation.mutate(false)}
-              >
-                <Download className="w-4 h-4" />
-                {seedMutation.isPending ? "Membuat..." : "Buat Data Seed"}
-              </Button>
-
-              {hasData && (
+              <div className="flex gap-3">
                 <Button
                   className="flex items-center gap-2"
                   disabled={seedMutation.isPending}
-                  variant="outline"
-                  onClick={() => seedMutation.mutate(true)}
+                  onClick={() => seedMutation.mutate(false)}
                 >
                   <Download className="w-4 h-4" />
-                  Force Seed (Timpa)
+                  {seedMutation.isPending ? "Membuat..." : "Buat Data Seed"}
                 </Button>
-              )}
+
+                {hasData && (
+                  <Button
+                    className="flex items-center gap-2"
+                    disabled={seedMutation.isPending}
+                    variant="outline"
+                    onClick={() => seedMutation.mutate(true)}
+                  >
+                    <Download className="w-4 h-4" />
+                    Force Seed (Timpa)
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Manual Setup Section */}
           <div className="border rounded-lg p-4">
@@ -236,7 +241,7 @@ export default function KeuanganSetupPage() {
           </div>
 
           {/* Danger Zone */}
-          {hasData && (
+          {authData?.isAdmin && hasData && (
             <div className="border-red-200 border rounded-lg p-4 bg-red-50">
               <h3 className="font-semibold text-lg mb-2 text-red-800">
                 Danger Zone

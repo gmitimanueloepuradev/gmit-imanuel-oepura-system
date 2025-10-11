@@ -23,6 +23,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import pengumumanService from "@/services/pengumumanService";
 import { showToast } from "@/utils/showToast";
 import PageTitle from "@/components/ui/PageTitle";
+import { useUser } from "@/hooks/useUser";
 
 // Loading Skeleton
 function TableSkeleton() {
@@ -125,6 +126,8 @@ export default function PengumumanPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  const { user: authData } = useUser();
+
   // Fetch pengumuman data
   const {
     data: pengumumanData,
@@ -219,18 +222,26 @@ export default function PengumumanPage() {
       variant: "outline",
       show: (item) => true, // Selalu tampilkan, nanti di halaman attachments baru cek ada atau tidak
     },
-    {
-      icon: Edit,
-      label: "Edit",
-      onClick: (item) => router.push(`/admin/pengumuman/${item.id}/edit`),
-      variant: "outline",
-    },
-    {
-      icon: Trash2,
-      label: "Hapus",
-      onClick: (item) => handleDelete(item),
-      variant: "outline",
-    },
+    ...(authData?.isAdmin
+      ? [
+          {
+            icon: Edit,
+            label: "Edit",
+            onClick: (item) => router.push(`/admin/pengumuman/${item.id}/edit`),
+            variant: "outline",
+          },
+        ]
+      : []),
+    ...(authData?.isAdmin
+      ? [
+          {
+            icon: Trash2,
+            label: "Hapus",
+            onClick: (item) => handleDelete(item),
+            variant: "outline",
+          },
+        ]
+      : []),
   ];
 
   const items = pengumumanData?.data?.items || [];
@@ -244,13 +255,17 @@ export default function PengumumanPage() {
       <PageTitle title="Daftar Pengumuman" />
       {/* Page Header */}
       <PageHeader
-        actions={[
-          {
-            label: "Buat Pengumuman",
-            onClick: () => router.push("/admin/pengumuman/create"),
-            icon: Plus,
-          },
-        ]}
+        actions={
+          authData?.isAdmin
+            ? [
+                {
+                  label: "Buat Pengumuman",
+                  onClick: () => router.push("/admin/pengumuman/create"),
+                  icon: Plus,
+                },
+              ]
+            : []
+        }
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
           { label: "Pengumuman" },

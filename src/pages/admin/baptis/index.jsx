@@ -20,6 +20,7 @@ import CreateOrEditModal from "@/components/common/CreateOrEditModal";
 import ListGrid from "@/components/ui/ListGrid";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
+import { useUser } from "@/hooks/useUser";
 
 const baptisFields = [
   {
@@ -57,6 +58,8 @@ export default function BaptisPage() {
   const confirm = useConfirm();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["baptis"],
@@ -258,29 +261,37 @@ export default function BaptisPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
-          {
-            icon: Pen,
-            onClick: (item) => modal.open(item),
-            variant: "outline",
-            tooltip: "Edit data baptis",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Pen,
+                  onClick: (item) => modal.open(item),
+                  variant: "outline",
+                  tooltip: "Edit data baptis",
+                },
+              ]
+            : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
-          {
-            icon: Trash,
-            onClick: handleDelete,
-            variant: "outline",
-            tooltip: "Hapus data baptis",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Trash,
+                  onClick: handleDelete,
+                  variant: "outline",
+                  tooltip: "Hapus data baptis",
+                },
+              ]
+            : []),
         ]}
         searchPlaceholder="Cari nama jemaat..."
         stats={stats}
         title="Manajemen Data Baptis"
-        onAdd={() => modal.open()}
+        onAdd={authData?.isAdmin ? () => modal.open() : undefined}
       />
 
       <CreateOrEditModal

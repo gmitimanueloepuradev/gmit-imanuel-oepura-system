@@ -23,6 +23,7 @@ import EditModal from "@/components/ui/EditModal";
 import ListGrid from "@/components/ui/ListGrid";
 import PhoneInput from "@/components/ui/PhoneInput";
 import ViewModal from "@/components/ui/ViewModal";
+import { useUser } from "@/hooks/useUser";
 import axios from "@/lib/axios";
 import jemaatService from "@/services/jemaatService";
 import keluargaService from "@/services/keluargaService";
@@ -49,6 +50,9 @@ export default function UsersPage() {
   const [importFile, setImportFile] = useState(null);
   const [importResults, setImportResults] = useState(null);
   const fileInputRef = useRef(null);
+
+  const { user: authData } = useUser();
+
   // const [showAssignRayonModal, setShowAssignRayonModal] = useState(false);
   // const [selectedUserForRayon, setSelectedUserForRayon] = useState(null);
 
@@ -613,31 +617,6 @@ export default function UsersPage() {
     setEditItem(item);
   };
 
-  // const assignRayonMutation = useMutation({
-  //   mutationFn: async ({ userId, idRayon }) => {
-  //     const response = await axios.patch(`/users/${userId}/rayon`, {
-  //       idRayon,
-  //     });
-
-  //     return response.data;
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["users"] });
-  //     toast.success("Rayon berhasil ditetapkan!");
-  //     setShowAssignRayonModal(false);
-  //     setSelectedUserForRayon(null);
-  //   },
-  //   onError: (error) => {
-  //     console.error("Assign rayon error:", error);
-  //     toast.error(error?.response?.data?.message || "Gagal menetapkan rayon");
-  //   },
-  // });
-
-  // const handleAssignRayon = (user) => {
-  //   setSelectedUserForRayon(user);
-  //   setShowAssignRayonModal(true);
-  // };
-
   // Assign rayon mutation
   const assignRayonMutation = useMutation({
     mutationFn: async ({ userId, idRayon }) => {
@@ -899,18 +878,26 @@ export default function UsersPage() {
         exportable={true}
         filters={userFilters}
         headerActions={[
-          {
-            label: "Download Template",
-            icon: Download,
-            onClick: handleDownloadTemplate,
-            variant: "outline",
-          },
-          {
-            label: "Import Users",
-            icon: Upload,
-            onClick: () => setShowImportModal(true),
-            variant: "default",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Download Template",
+                  icon: Download,
+                  onClick: handleDownloadTemplate,
+                  variant: "outline",
+                },
+              ]
+            : []),
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Import Users",
+                  icon: Upload,
+                  onClick: () => setShowImportModal(true),
+                  variant: "default",
+                },
+              ]
+            : []),
         ]}
         isLoading={isLoading}
         itemsPerPage={pageSize}
@@ -923,50 +910,76 @@ export default function UsersPage() {
             variant: "outline",
             tooltip: "Lihat detail",
           },
-          {
-            icon: Edit,
-            onClick: handleEditClick,
-            variant: "outline",
-            tooltip: "Edit user",
-          },
-          {
-            label: "Kirim Self Onboarding",
-            icon: MessageCircle,
-            onClick: (item) => handleSendInvitation(item),
-            variant: "outline",
-            tooltip: "Kirim Link Self Onboarding",
-            condition: (item) =>
-              item.role === "JEMAAT" && !item.idJemaat && item.noWhatsapp,
-          },
-          {
-            label: "Kirim Info Akun WA",
-            icon: Send,
-            onClick: (item) => handleSendAccountData(item),
-            variant: "outline",
-            tooltip: "Kirim Info Akun via WhatsApp",
-            condition: (item) => item.noWhatsapp,
-          },
-          {
-            label: "Atur Rayon",
-            icon: User,
-            onClick: (item) => handleAssignRayon(item),
-            variant: "outline",
-            tooltip: "Atur Rayon untuk User",
-            condition: (item) => item.role === "JEMAAT",
-          },
-          {
-            label: "Hapus",
-            icon: Trash2,
-            onClick: (item) => setDeleteItem(item),
-            variant: "outline",
-            tooltip: "Hapus user",
-          },
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Edit,
+                  onClick: handleEditClick,
+                  variant: "outline",
+                  tooltip: "Edit user",
+                },
+              ]
+            : []),
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Kirim Self Onboarding",
+                  icon: MessageCircle,
+                  onClick: (item) => handleSendInvitation(item),
+                  variant: "outline",
+                  tooltip: "Kirim Link Self Onboarding",
+                  condition: (item) =>
+                    item.role === "JEMAAT" && !item.idJemaat && item.noWhatsapp,
+                },
+              ]
+            : []),
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Kirim Info Akun WA",
+                  icon: Send,
+                  onClick: (item) => handleSendAccountData(item),
+                  variant: "outline",
+                  tooltip: "Kirim Info Akun via WhatsApp",
+                  condition: (item) => item.noWhatsapp,
+                },
+              ]
+            : []),
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Atur Rayon",
+                  icon: User,
+                  onClick: (item) => handleAssignRayon(item),
+                  variant: "outline",
+                  tooltip: "Atur Rayon untuk User",
+                  condition: (item) => item.role === "JEMAAT",
+                },
+              ]
+            : []),
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Hapus",
+                  icon: Trash2,
+                  onClick: (item) => setDeleteItem(item),
+                  variant: "outline",
+                  tooltip: "Hapus user",
+                },
+              ]
+            : []),
         ]}
         searchPlaceholder="Cari username, email, nama jemaat, role, rayon..."
         searchable={true}
         showPageSizeSelector={true}
         title="Manajemen Users"
-        onAdd={() => setShowCreate(true)}
+        //Conditional Prop Spread for Add Button
+        {...(authData?.isAdmin && { onAdd: () => setShowCreate(true) })}
       />
 
       <ConfirmDialog

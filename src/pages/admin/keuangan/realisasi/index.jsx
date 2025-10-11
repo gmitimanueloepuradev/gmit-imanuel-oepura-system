@@ -22,6 +22,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
+import { useUser } from "@/hooks/useUser";
 
 export default function RealisasiKeuanganPage() {
   const router = useRouter();
@@ -34,6 +35,8 @@ export default function RealisasiKeuanganPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchItemSummary, setSearchItemSummary] = useState("");
   const [searchRealisasi, setSearchRealisasi] = useState("");
+
+  const { user: authData } = useUser();
 
   // Query untuk get periode list
   const { data: periodeList } = useQuery({
@@ -266,16 +269,18 @@ export default function RealisasiKeuanganPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-end gap-2">
-              <Button
-                className="flex items-center gap-2"
-                disabled={!selectedPeriode}
-                onClick={() => router.push("/admin/keuangan/realisasi/create")}
-              >
-                <Plus className="h-4 w-4" />
-                Tambah
-              </Button>
-            </div>
+            {authData?.isAdmin && (
+              <div className="flex items-end gap-2">
+                <Button
+                  className="flex items-center gap-2"
+                  disabled={!selectedPeriode}
+                  onClick={() => router.push("/admin/keuangan/realisasi/create")}
+                >
+                  <Plus className="h-4 w-4" />
+                  Tambah
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -701,26 +706,28 @@ export default function RealisasiKeuanganPage() {
                             </span>
                           </td>
                           <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center">
-                            <div className="flex justify-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  router.push(
-                                    `/admin/keuangan/realisasi/edit/${realisasi.id}`
-                                  )
-                                }
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => setRealisasiToDelete(realisasi)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            {authData?.isAdmin && (
+                              <div className="flex justify-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    router.push(
+                                      `/admin/keuangan/realisasi/edit/${realisasi.id}`
+                                    )
+                                  }
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => setRealisasiToDelete(realisasi)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            )}
                           </td>
                           </tr>
                         ))
@@ -797,30 +804,32 @@ export default function RealisasiKeuanganPage() {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() =>
-                            router.push(
-                              `/admin/keuangan/realisasi/edit/${realisasi.id}`
-                            )
-                          }
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          className="flex-1"
-                          onClick={() => setRealisasiToDelete(realisasi)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Hapus
-                        </Button>
-                      </div>
+                      {authData?.isAdmin && (
+                        <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() =>
+                              router.push(
+                                `/admin/keuangan/realisasi/edit/${realisasi.id}`
+                              )
+                            }
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="flex-1"
+                            onClick={() => setRealisasiToDelete(realisasi)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Hapus
+                          </Button>
+                        </div>
+                      )}
                       </div>
                     ))
                   ) : (

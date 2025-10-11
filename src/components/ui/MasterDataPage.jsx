@@ -9,6 +9,7 @@ import CreateModal from "@/components/ui/CreateModal";
 import EditModal from "@/components/ui/EditModal";
 import ListGrid from "@/components/ui/ListGrid";
 import ViewModal from "@/components/ui/ViewModal";
+import { useUser } from "@/hooks/useUser";
 
 export default function MasterDataPage({
   title,
@@ -31,6 +32,8 @@ export default function MasterDataPage({
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
+
+  const { user: authData } = useUser();
 
   // Load all available data without pagination
   const { data, isLoading } = useQuery({
@@ -119,23 +122,31 @@ export default function MasterDataPage({
             variant: "outline",
             tooltip: "Lihat detail",
           },
-          {
-            icon: Edit,
-            onClick: (item) => setEditItem(item),
-            variant: "outline",
-            tooltip: "Edit detail",
-          },
-          {
-            icon: Trash2,
-            onClick: (item) => setDeleteItem(item),
-            variant: "outline",
-            tooltip: "Hapus data",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Edit,
+                  onClick: (item) => setEditItem(item),
+                  variant: "outline",
+                  tooltip: "Edit detail",
+                },
+              ]
+            : []),
+          ...(authData?.isAdmin
+            ? [
+                {
+                  icon: Trash2,
+                  onClick: (item) => setDeleteItem(item),
+                  variant: "outline",
+                  tooltip: "Hapus data",
+                },
+              ]
+            : []),
         ]}
         searchPlaceholder={`Cari ${title.toLowerCase()}...`}
         searchable={searchFields.length > 0}
         title={title}
-        onAdd={() => setShowCreate(true)}
+        onAdd={authData?.isAdmin ? () => setShowCreate(true) : undefined}
       />
 
       <ConfirmDialog

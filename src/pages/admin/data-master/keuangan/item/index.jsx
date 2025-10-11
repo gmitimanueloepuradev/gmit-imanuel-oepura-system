@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import ViewModal from "@/components/ui/ViewModal";
 import PageTitle from "@/components/ui/PageTitle";
+import { useUser } from "@/hooks/useUser";
 
 // Service untuk API calls
 const itemKeuanganService = {
@@ -54,6 +55,8 @@ export default function ItemKeuanganPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
   const [selectedPeriode, setSelectedPeriode] = useState("all");
+
+  const { user: authData } = useUser();
 
   // Format rupiah helper
   const formatRupiah = (amount) => {
@@ -226,13 +229,15 @@ export default function ItemKeuanganPage() {
             >
               <Eye className="w-4 h-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setDeleteItem(item)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            {authData?.isAdmin && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setDeleteItem(item)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -320,20 +325,22 @@ export default function ItemKeuanganPage() {
             Kelola item keuangan dengan struktur hierarkis untuk sistem anggaran
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => {}}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button
-            onClick={() =>
-              router.push("/admin/data-master/keuangan/item/create")
-            }
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Item
-          </Button>
-        </div>
+        {authData?.isAdmin && (
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => {}}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <Button
+              onClick={() =>
+                router.push("/admin/data-master/keuangan/item/create")
+              }
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Item
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
@@ -419,7 +426,7 @@ export default function ItemKeuanganPage() {
               <CardTitle>
                 Item Keuangan - {getPeriodeInfo(selectedPeriode)?.label} ({items.length})
               </CardTitle>
-              {items.length > 0 && (
+              {authData?.isAdmin && items.length > 0 && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -462,17 +469,19 @@ export default function ItemKeuanganPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          const kategoriId = periodeItems[0]?.kategoriId;
-                          router.push(`/admin/data-master/keuangan/item/edit?periodeId=${periodeId}&kategoriId=${kategoriId}`);
-                        }}
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit Periode
-                      </Button>
+                      {authData?.isAdmin && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const kategoriId = periodeItems[0]?.kategoriId;
+                            router.push(`/admin/data-master/keuangan/item/edit?periodeId=${periodeId}&kategoriId=${kategoriId}`);
+                          }}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit Periode
+                        </Button>
+                      )}
                       <Badge variant="outline">
                         {periodeInfo?.status || 'Unknown'}
                       </Badge>

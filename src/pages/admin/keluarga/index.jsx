@@ -1,14 +1,17 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Edit, Eye, Trash2, Users, Plus } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Edit, Eye, Plus, Trash2, Users } from "lucide-react";
 
-import ListGrid from "@/components/ui/ListGrid";
-import keluargaService from "@/services/keluargaService";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import { showToast } from "@/utils/showToast";
+import ListGrid from "@/components/ui/ListGrid";
 import useConfirm from "@/hooks/useConfirm";
+import { useUser } from "@/hooks/useUser";
+import keluargaService from "@/services/keluargaService";
+import { showToast } from "@/utils/showToast";
 
 export default function KeluargaPage() {
   const confirm = useConfirm();
+
+  const { user: authData } = useUser();
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["keluarga"],
@@ -70,6 +73,7 @@ export default function KeluargaPage() {
         const kepalaKeluarga = row.jemaats?.find(
           (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga"
         );
+
         return kepalaKeluarga?.nama || "-";
       },
     },
@@ -85,6 +89,7 @@ export default function KeluargaPage() {
       type: "text",
       render: (value) => {
         const count = value?.length || 0;
+
         return (
           <span className="flex items-center text-sm">
             <Users className="w-4 h-4 mr-1 text-blue-500" />
@@ -109,12 +114,16 @@ export default function KeluargaPage() {
         exportFilename="keluarga"
         exportable={true}
         headerActions={[
-          {
-            label: "Tambah Keluarga",
-            icon: Plus,
-            href: "/admin/keluarga/create",
-            variant: "primary",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Tambah Keluarga",
+                  icon: Plus,
+                  href: "/admin/keluarga/create",
+                  variant: "primary",
+                },
+              ]
+            : []),
         ]}
         isLoading={isLoading}
         rowActionType="vertical"
@@ -125,18 +134,27 @@ export default function KeluargaPage() {
             href: (row) => `/admin/keluarga/${row.id}`,
             variant: "info",
           },
-          {
-            label: "Edit",
-            icon: Edit,
-            href: (row) => `/admin/keluarga/${row.id}/edit`,
-            variant: "warning",
-          },
-          {
-            label: "Hapus",
-            icon: Trash2,
-            onClick: handleDelete,
-            variant: "danger",
-          },
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Edit",
+                  icon: Edit,
+                  href: (row) => `/admin/keluarga/${row.id}/edit`,
+                  variant: "warning",
+                },
+              ]
+            : []),
+
+          ...(authData?.isAdmin
+            ? [
+                {
+                  label: "Hapus",
+                  icon: Trash2,
+                  onClick: handleDelete,
+                  variant: "danger",
+                },
+              ]
+            : []),
         ]}
         searchPlaceholder="Cari berdasarkan alamat, kepala keluarga..."
         searchable={true}

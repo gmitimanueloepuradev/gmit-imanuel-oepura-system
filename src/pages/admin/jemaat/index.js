@@ -19,6 +19,7 @@ import ListGrid from "@/components/ui/ListGrid";
 import PageTitle from "@/components/ui/PageTitle";
 import useConfirm from "@/hooks/useConfirm";
 import useDebounce from "@/hooks/useDebounce";
+import { useUser } from "@/hooks/useUser";
 import exportService from "@/services/exportService";
 import jemaatService from "@/services/jemaatService";
 import { showToast } from "@/utils/showToast";
@@ -27,6 +28,8 @@ export default function MembersManagement() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+
+  const { user: authData } = useUser();
 
   // State for filters and pagination
   const [filters, setFilters] = useState({});
@@ -221,21 +224,30 @@ export default function MembersManagement() {
       variant: "outline",
       tooltip: "Lihat detail lengkap jemaat",
     },
-    {
-      label: "Edit",
-      icon: Edit,
-      onClick: (item) => router.push(`/admin/jemaat/edit/${item.id}`),
-      variant: "outline",
-      tooltip: "Edit informasi jemaat",
-    },
 
-    {
-      label: "Hapus",
-      icon: Trash2,
-      onClick: handleDelete,
-      variant: "destructive",
-      tooltip: "Hapus data jemaat",
-    },
+    ...(authData?.isAdmin
+      ? [
+          {
+            label: "Edit",
+            icon: Edit,
+            onClick: (item) => router.push(`/admin/jemaat/edit/${item.id}`),
+            variant: "outline",
+            tooltip: "Edit informasi jemaat",
+          },
+        ]
+      : []),
+
+    ...(authData?.isAdmin
+      ? [
+          {
+            label: "Hapus",
+            icon: Trash2,
+            onClick: handleDelete,
+            variant: "destructive",
+            tooltip: "Hapus data jemaat",
+          },
+        ]
+      : []),
   ];
 
   // Stats configuration - dynamic from API data
@@ -270,7 +282,12 @@ export default function MembersManagement() {
     },
   ];
 
-  // Header actions
+  /*
+    The spread syntax ...() allows conditional inclusion.
+    If authData?.isAdmin is false, the “Tambah Jemaat” button is added.
+    If the user is an admin, the array spreads an empty array ([]), so nothing is added.
+  */
+  //Header actions
   const headerActions = [
     {
       label: "Super Export",
@@ -278,12 +295,17 @@ export default function MembersManagement() {
       onClick: () => setShowExportModal(true),
       variant: "outline",
     },
-    {
-      label: "Tambah Jemaat",
-      icon: Plus,
-      onClick: () => router.push("/admin/jemaat/create"),
-      variant: "default",
-    },
+    // Only add this item if the user is NOT admin
+    ...(authData?.isAdmin
+      ? [
+          {
+            label: "Tambah Jemaat",
+            icon: Plus,
+            onClick: () => router.push("/admin/jemaat/create"),
+            variant: "default",
+          },
+        ]
+      : []),
   ];
 
   // Breadcrumb
@@ -387,10 +409,10 @@ export default function MembersManagement() {
                         <div className="ml-5 w-0 flex-1">
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
                             </dt>
                             <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                              <div className="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+                              <div className="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded mt-1" />
                             </dd>
                           </dl>
                         </div>
@@ -470,11 +492,11 @@ export default function MembersManagement() {
         <ListGrid
           // Basic props that ListGrid supports
           columns={columns}
+          pageSizeOptions={[]}
+          showPageSizeSelector={false}
           exportFilename="jemaat"
           // Pagination Props
           itemsPerPage={itemsPerPage}
-          showPageSizeSelector={false}
-          pageSizeOptions={[]}
           isLoading={isLoading}
           // Data Props
           data={members}

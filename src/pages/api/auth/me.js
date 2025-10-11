@@ -1,12 +1,12 @@
-import { apiResponse } from "@/lib/apiHelper";
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
 import { requireAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 async function handleGet(req, res) {
   try {
     const authResult = await requireAuth(req, res);
-    
+
     if (authResult.error) {
       return res
         .status(authResult.status)
@@ -14,17 +14,25 @@ async function handleGet(req, res) {
     }
 
     const user = authResult.user;
-    
+
     // Check if jemaat user has profile data
     let isHasProfile = true;
+
     if (user.role === "JEMAAT" && !user.idJemaat) {
       isHasProfile = false;
+    }
+
+    let isAdmin = false;
+
+    if (user.role === "ADMIN") {
+      isAdmin = true;
     }
 
     // Include majelis data if user has idMajelis
     let userData = {
       ...user,
-      isHasProfile
+      isHasProfile,
+      isAdmin,
     };
 
     if (user.idMajelis) {
@@ -49,15 +57,15 @@ async function handleGet(req, res) {
               select: {
                 id: true,
                 namaRayon: true,
-              }
+              },
             },
             jenisJabatan: {
               select: {
                 id: true,
                 namaJabatan: true,
-              }
-            }
-          }
+              },
+            },
+          },
         });
 
         if (majelis) {
@@ -72,12 +80,14 @@ async function handleGet(req, res) {
     return res
       .status(200)
       .json(apiResponse(true, userData, "Data user berhasil diambil"));
-
   } catch (error) {
     console.error("Error getting user data:", error);
+
     return res
       .status(500)
-      .json(apiResponse(false, null, "Terjadi kesalahan server", error.message));
+      .json(
+        apiResponse(false, null, "Terjadi kesalahan server", error.message)
+      );
   }
 }
 

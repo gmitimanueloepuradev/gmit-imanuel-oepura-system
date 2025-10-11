@@ -25,9 +25,10 @@ import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
+import { useUser } from "@/hooks/useUser";
 
 // Page Header Component
-function PageHeader({ title, description, breadcrumb, onAdd }) {
+function PageHeader({ title, description, breadcrumb, onAdd, showAddButton }) {
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors">
       <div className="max-w-7xl mx-auto px-6 py-6">
@@ -80,12 +81,14 @@ function PageHeader({ title, description, breadcrumb, onAdd }) {
           </div>
 
           {/* Actions */}
-          <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
-            <Button onClick={onAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Galeri
-            </Button>
-          </div>
+          {showAddButton && (
+            <div className="mt-4 flex space-x-3 lg:mt-0 lg:ml-4">
+              <Button onClick={onAdd}>
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Galeri
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -137,7 +140,7 @@ function StatusBadge({ isPublished }) {
 }
 
 // Galeri Card Component
-function GaleriCard({ item, onView, onEdit, onDelete }) {
+function GaleriCard({ item, onView, onEdit, onDelete, showEditDelete }) {
   const fotos = item.fotos ? JSON.parse(item.fotos) : [];
   const displayPhotos = fotos.slice(0, 4);
   const remainingCount = fotos.length - 4;
@@ -214,23 +217,27 @@ function GaleriCard({ item, onView, onEdit, onDelete }) {
             <Eye className="h-4 w-4 mr-1" />
             Detail
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onEdit(item)}
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Edit
-          </Button>
-          <Button
-            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-            size="sm"
-            variant="outline"
-            onClick={() => onDelete(item.id)}
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Hapus
-          </Button>
+          {showEditDelete && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onEdit(item)}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <Button
+                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                size="sm"
+                variant="outline"
+                onClick={() => onDelete(item.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Hapus
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -249,6 +256,8 @@ export default function GaleriPage() {
   const [filters, setFilters] = useState({
     isPublished: "",
   });
+
+  const { user: authData } = useUser();
 
   // Fetch galeri data
   const {
@@ -326,6 +335,7 @@ export default function GaleriPage() {
           { label: "Galeri" },
         ]}
         description="Kelola dokumentasi foto kegiatan gereja"
+        showAddButton={authData?.isAdmin}
         title="Galeri Kegiatan"
         onAdd={() => router.push("/admin/galeri/create")}
       />
@@ -383,6 +393,7 @@ export default function GaleriPage() {
                 <GaleriCard
                   key={item.id}
                   item={item}
+                  showEditDelete={authData?.isAdmin}
                   onDelete={handleDelete}
                   onEdit={(item) => router.push(`/admin/galeri/${item.id}/edit`)}
                   onView={(item) => router.push(`/admin/galeri/${item.id}`)}
@@ -400,10 +411,12 @@ export default function GaleriPage() {
                   <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors">
                     Mulai dokumentasikan kegiatan gereja dengan membuat galeri pertama
                   </p>
-                  <Button onClick={() => router.push("/admin/galeri/create")}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah Galeri
-                  </Button>
+                  {authData?.isAdmin && (
+                    <Button onClick={() => router.push("/admin/galeri/create")}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah Galeri
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
