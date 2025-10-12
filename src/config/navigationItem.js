@@ -29,8 +29,190 @@ import {
   UsersRound,
 } from "lucide-react";
 
+// ======================
+// Base Admin Navigation
+// ======================
+const adminNavigation = [
+  { href: "/admin/dashboard", label: "Dashboard", icon: Home },
+  { href: "/admin/users", label: "Kelola Akun", icon: Users },
+  { href: "/admin/jemaat", label: "Jemaat", icon: Users },
+  { href: "/admin/dokumen-jemaat", label: "Dokumen Jemaat", icon: FileText },
+  { href: "/admin/keluarga", label: "Keluarga", icon: UsersRound },
+  { href: "/admin/majelis", label: "Majelis", icon: UserCheck },
+  {
+    href: "/admin/manajemen-rayon-majelis",
+    label: "Manajemen Rayon Majelis",
+    icon: MapPin,
+  },
+  { href: "/admin/rayon", label: "Rayon", icon: MapPin },
+  { href: "/admin/pengumuman", label: "Pengumuman", icon: Bell },
+  { href: "/admin/sidi", label: "Sidi", icon: GraduationCap },
+  { href: "/admin/baptis", label: "Baptis", icon: Baby },
+  { href: "/admin/pernikahan", label: "Pernikahan", icon: Heart },
+  { href: "/admin/galeri", label: "Galeri", icon: Image },
+  {
+    href: "/admin/data-master",
+    label: "Data Master",
+    icon: Database,
+    children: [
+      {
+        href: "/admin/data-master/wilayah-administratif",
+        label: "Wilayah Administratif",
+        icon: Map,
+      },
+      {
+        href: "/admin/data-master/status-keluarga",
+        label: "Status Keluarga",
+        icon: MapPin,
+      },
+      {
+        href: "/admin/data-master/jenis-ibadah",
+        label: "Jenis Ibadah",
+        icon: MapPin,
+      },
+      { href: "/admin/data-master/klasis", label: "Klasis", icon: Church },
+      {
+        href: "/admin/data-master/keadaan-rumah",
+        label: "Keadaan Rumah",
+        icon: Building,
+      },
+      {
+        href: "/admin/data-master/status-kepemilikan-rumah",
+        label: "Status Kepemilikan Rumah",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/status-dalam-keluarga",
+        label: "Status Dalam Keluarga",
+        icon: UserCog,
+      },
+      { href: "/admin/data-master/suku", label: "Suku", icon: Tag },
+      {
+        href: "/admin/data-master/kategori-jadwal",
+        label: "Kategori Jadwal",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/jenis-jabatan",
+        label: "Jenis Jabatan",
+        icon: Crown,
+      },
+      { href: "/admin/data-master/pekerjaan", label: "Pekerjaan", icon: Tag },
+      { href: "/admin/data-master/pendidikan", label: "Pendidikan", icon: Tag },
+      { href: "/admin/data-master/pendapatan", label: "Pendapatan", icon: Tag },
+      {
+        href: "/admin/data-master/profil-pendeta",
+        label: "Profil Pendeta",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/jaminan-kesehatan",
+        label: "Jaminan Kesehatan",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/kategori-pengumuman",
+        label: "Kategori Pengumuman",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/jenis-pengumuman",
+        label: "Jenis Pengumuman",
+        icon: Tag,
+      },
+    ],
+  },
+  { href: "/admin/keuangan", label: "Statistik Keuangan", icon: DollarSign },
+  {
+    href: "/admin/keuangan/realisasi",
+    label: "Realisasi Keuangan ",
+    icon: List,
+  },
+  {
+    href: "/admin/data-master-keuangan",
+    label: "Data Master Keuangan",
+    icon: DollarSign,
+    children: [
+      {
+        href: "/admin/data-master/keuangan/kategori",
+        label: "Kategori Keuangan",
+        icon: Tag,
+      },
+      {
+        href: "/admin/data-master/keuangan/item",
+        label: "Rancangan Item Keuangan",
+        icon: List,
+      },
+      {
+        href: "/admin/data-master/keuangan/periode",
+        label: "Periode Anggaran",
+        icon: Calendar,
+      },
+    ],
+  },
+  { href: "/admin/laporan", label: "Laporan", icon: FileText },
+  { href: "/admin/analytics", label: "Analitik", icon: BarChart3 },
+  { href: "/admin/system-info", label: "Informasi Sistem", icon: Monitor },
+];
+
+// ======================
+// Mapping Label Pendeta
+// ======================
+// kalau kamu ingin ubah label khusus pendeta, tinggal mapping di sini
+const pendetaLabelMap = {
+  "Kelola Akun": "Data Akun Jemaat",
+  Jemaat: "Data Jemaat",
+  "Dokumen Jemaat": "Dokumen Pelayanan",
+  Keluarga: "Data Keluarga",
+  Majelis: "Majelis Gereja",
+  "Manajemen Rayon Majelis": "Rayon Pelayanan",
+  Rayon: "Rayon Jemaat",
+  Pengumuman: "Informasi Pelayanan",
+  Sidi: "Data Sidi",
+  Baptis: "Data Baptis",
+  Pernikahan: "Data Pernikahan",
+  Galeri: "Galeri Kegiatan",
+  "Data Master": "Referensi Data",
+  "Statistik Keuangan": "Laporan Keuangan",
+  "Realisasi Keuangan ": "Realisasi Anggaran",
+  "Data Master Keuangan": "Data Keuangan",
+  Laporan: "Laporan Pelayanan",
+  Analitik: "Analitik Data",
+  "Informasi Sistem": "Info Sistem",
+};
+
+// Helper untuk ubah label pendeta tanpa ubah href
+const mapPendetaNavigation = (items) =>
+  items.map((item) => ({
+    ...item,
+    label: pendetaLabelMap[item.label] || item.label,
+    children: item.children ? mapPendetaNavigation(item.children) : undefined,
+  }));
+
 // Role-based configurations
 export const roleConfigs = {
+  pendeta: {
+    roleTitle: "Pendeta",
+    fullTitle: "JIO | Pendeta",
+    description:
+      "Sistem pelayanan gereja untuk mendukung tugas pendeta dalam pelayanan jemaat dan kegiatan gereja.",
+    baseRoute: "/pendeta",
+    dashboardRoute: "/pendeta/dashboard",
+    logoIcon: Shield,
+    userInfo: {
+      name: "Pendeta GMIT",
+      email: "pendeta@gmit-imanuel.org",
+      organization: "Imanuel Oepura",
+    },
+
+    navigation: mapPendetaNavigation(adminNavigation), // pakai admin tapi label diubah
+    footerLinks: [
+      { href: "/admin/dashboard", label: "Dashboard" },
+      { href: "/admin/members", label: "Manajemen Jemaat" },
+      { href: "/admin/events", label: "Manajemen Acara" },
+      { href: "/admin/finance", label: "Keuangan" },
+    ],
+  },
   admin: {
     roleTitle: "Admin",
     fullTitle: "JIO | Admin",

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import AppNavbar from "@/components/partials/AppNavbar";
 import AppFooter from "@/components/partials/AppFooter";
+import AppNavbar from "@/components/partials/AppNavbar";
 
 export default function RoleLayout({
   children,
@@ -10,6 +10,8 @@ export default function RoleLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // console.log();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">

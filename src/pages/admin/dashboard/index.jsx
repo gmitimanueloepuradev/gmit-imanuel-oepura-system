@@ -125,10 +125,10 @@ export default function DashboardPageAdmin() {
     <>
       <PageTitle title="Dashboard Admin" />
       <PageHeader
-        breadcrumb={[
-          { label: "Admin", href: "/admin" },
-          { label: "Dashboard" },
-        ]}
+        // breadcrumb={[
+        //   // { label: "Admin", href: "/admin" },
+        //   { label: "Dashboard" },
+        // ]}
         description="Ringkasan sistem administrasi GMIT Imanuel Oepura"
         stats={headerStats}
         title="Dashboard"
