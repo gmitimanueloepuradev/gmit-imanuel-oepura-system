@@ -54,7 +54,7 @@ export default function UppCategory() {
         description={`Unit Pelayanan Persekutuan (UPP) ${categoryData.nama} di GMIT Jemaat Imanuel Oepura Kupang, Nusa Tenggara Timur.`}
         keywords={`UPP ${categoryData.nama}, Unit Pelayanan Persekutuan, Pelayanan Gereja, GMIT Imanuel Oepura, Gereja Kupang, Pelayanan Jemaat`}
       />
-      <div className="flex justify-center items-center h-screen">
+      <div className="relative flex justify-center items-center h-screen">
         <Image
           fill
           priority
@@ -63,16 +63,24 @@ export default function UppCategory() {
           sizes="100vw"
           src="/header/anak.webp"
         />
-        <h1 className="absolute text-6xl md:text-8xl text-white font-bold mt-4">
-          UPP {categoryData.nama}
-        </h1>
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute text-center px-4">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl text-white font-bold">
+            UPP {categoryData.nama}
+          </h1>
+          {categoryData.deskripsi && (
+            <p className="text-white text-sm sm:text-lg md:text-xl mt-4 max-w-3xl mx-auto">
+              {categoryData.deskripsi}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Show subcategories if available, otherwise show all pengumuman from this category */}
       {hasSubcategories ? (
-        <div className="min-h-screen bg-gray-100 p-8">
+        <div className="min-h-screen bg-gray-100 p-4 sm:p-8">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center">
               Pilih Kategori {categoryData.nama}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -94,7 +102,10 @@ export default function UppCategory() {
           </div>
         </div>
       ) : (
-        <UppCardContainer kategoriId={categoryData.id} />
+        <UppCardContainer
+          kategoriId={categoryData.id}
+          emptyStateMessage={`Belum ada pengumuman untuk kategori ${categoryData.nama}.`}
+        />
       )}
     </div>
   );

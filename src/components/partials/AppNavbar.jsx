@@ -1,14 +1,12 @@
 import {
-  Bell,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Home,
+  Globe,
   LogOut,
   Menu,
   User,
   X,
-  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -33,9 +31,13 @@ export default function AppNavbar({
   const [expandedMenus, setExpandedMenus] = useState({});
   const router = useRouter();
   const { logout } = useAuth();
+
   const { user: authUser } = useUser();
-  const config = getRoleConfig(role);
+  const config = getRoleConfig(
+    authUser ? authUser.role.toLowerCase() : role.toLowerCase(),
+  );
   const LogoIcon = config.logoIcon;
+  // console.log(authUser)
 
   // Use real user data, fallback to provided userInfo, then config default
   const currentUser = authUser || userInfo || config.userInfo;
