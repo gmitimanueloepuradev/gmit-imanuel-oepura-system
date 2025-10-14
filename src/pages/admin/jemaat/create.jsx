@@ -596,7 +596,7 @@ export default function CreateJemaat() {
         idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
         idKeadaanRumah: form.getValues("idKeadaanRumah"),
         idRayon: form.getValues("idRayon"),
-        noBagungan: parseInt(form.getValues("noBagungan")),
+        noBagungan: Number(form.getValues("noBagungan")) || 0, // Use Number() with fallback
         noKK: form.getValues("noKK"),
       };
 
@@ -617,6 +617,7 @@ export default function CreateJemaat() {
 
   const handleGenerateDefaultPassword = () => {
     const defaultPassword = "oepura78";
+
     form.setValue("password", defaultPassword);
     form.setValue("confirmPassword", defaultPassword);
   };
@@ -709,10 +710,11 @@ export default function CreateJemaat() {
       }
 
       // If creating user account, validate required fields
-      const hasUsername = values.username && values.username.trim() !== '';
-      const hasEmail = values.email && values.email.trim() !== '';
+      const hasUsername = values.username && values.username.trim() !== "";
+      const hasEmail = values.email && values.email.trim() !== "";
       const hasPassword = values.password && values.password.length >= 1;
-      const hasConfirmPassword = values.confirmPassword && values.confirmPassword.length >= 1;
+      const hasConfirmPassword =
+        values.confirmPassword && values.confirmPassword.length >= 1;
 
       return hasUsername && hasEmail && hasPassword && hasConfirmPassword;
     }
@@ -757,7 +759,7 @@ export default function CreateJemaat() {
         idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
         idKeadaanRumah: form.getValues("idKeadaanRumah"),
         idRayon: form.getValues("idRayon"),
-        noBagungan: parseInt(form.getValues("noBagungan")),
+        noBagungan: Number(form.getValues("noBagungan")) || 0, // Use Number() with fallback
         noKK: form.getValues("noKK"),
       };
     }
@@ -1247,13 +1249,15 @@ export default function CreateJemaat() {
             <StepperNavigation
               canGoNext={(() => {
                 const result = canGoNext();
-                console.log('[DEBUG] canGoNext:', result, {
+
+                console.log("[DEBUG] canGoNext:", result, {
                   currentStep,
                   maxStep: getMaxStep(),
                   isLastStep: isLastStep(),
                   createUserAccount,
                   formValues: form.getValues(),
                 });
+
                 return result;
               })()}
               currentStep={currentStep}
