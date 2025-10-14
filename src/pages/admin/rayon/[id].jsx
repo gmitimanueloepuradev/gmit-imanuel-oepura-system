@@ -40,7 +40,7 @@ export default function RayonDetailPage() {
           </p>
           <button
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            onClick={() => router.back()}
+            onClick={() => router.push("/admin/rayon")}
           >
             Kembali
           </button>
