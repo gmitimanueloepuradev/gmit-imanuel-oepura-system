@@ -339,7 +339,7 @@ export default function MajelisCreateJemaat() {
                 Anda belum memiliki akses ke rayon manapun. Silakan hubungi
                 administrator.
               </p>
-              <Button variant="outline" onClick={() => router.push("/majelis")}>
+              <Button variant="outline" onClick={() => router.push("/majelis/dashboard")}>
                 Kembali ke Dashboard
               </Button>
             </CardContent>
