@@ -84,7 +84,7 @@ export default function EditJenisIbadah() {
       label: "Kembali",
       icon: ArrowLeft,
       variant: "outline",
-      onClick: () => router.back(),
+      onClick: () => router.push("/admin/jenis-ibadah"),
     },
     {
       label: "Update",
