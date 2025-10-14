@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
-import { atestasiSchema } from "@/validations/masterSchema";
+import { Button } from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
 import atestasiService from "@/services/atestasiService";
 import { showToast } from "@/utils/showToast";
-import { Button } from "@/components/ui/Button";
-import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { atestasiSchema } from "@/validations/masterSchema";
 
 export default function CreateAtestasiPage() {
   const router = useRouter();
@@ -71,7 +71,8 @@ export default function CreateAtestasiPage() {
     } catch (error) {
       showToast({
         title: "Gagal",
-        description: error.response?.data?.message || "Gagal membuat data atestasi",
+        description:
+          error.response?.data?.message || "Gagal membuat data atestasi",
         color: "error",
       });
     } finally {
@@ -114,7 +115,10 @@ export default function CreateAtestasiPage() {
               Tambah data atestasi jemaat masuk atau keluar
             </p>
           </div>
-          <Button variant="outline" onClick={() => router.back()}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/employee/lainnya/atestasi")}
+          >
             ← Kembali
           </Button>
         </div>
@@ -242,7 +246,7 @@ export default function CreateAtestasiPage() {
                 disabled={isSubmitting}
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={() => router.push("/employee/lainnya/atestasi")}
               >
                 Batal
               </Button>
