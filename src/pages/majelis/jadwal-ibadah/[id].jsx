@@ -109,7 +109,7 @@ export default function DetailJadwalIbadah() {
           <p className="text-red-600 mb-4">
             Error: {error.response?.data?.message || error.message}
           </p>
-          <Button onClick={() => router.back()}>
+          <Button onClick={() => router.push("/majelis/jadwal-ibadah")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
           </Button>
@@ -125,7 +125,7 @@ export default function DetailJadwalIbadah() {
       <div className="flex justify-center items-center min-h-64">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Jadwal ibadah tidak ditemukan</p>
-          <Button onClick={() => router.back()}>
+          <Button onClick={() => router.push("/majelis/jadwal-ibadah")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
           </Button>
@@ -145,7 +145,7 @@ export default function DetailJadwalIbadah() {
         <PageHeader
           subtitle="Informasi lengkap jadwal ibadah"
           title="Detail Jadwal Ibadah"
-          onBack={() => router.back()}
+          onBack={() => router.push("/majelis/jadwal-ibadah")}
         />
 
         {/* Header Actions */}
