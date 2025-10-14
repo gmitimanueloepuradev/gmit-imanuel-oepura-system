@@ -9,6 +9,10 @@ import HookForm from "@/components/form/HookForm";
 import { Card } from "@/components/ui/Card";
 import SelectInput from "@/components/ui/inputs/SelectInput";
 import TextInput from "@/components/ui/inputs/TextInput";
+import {
+  KeluargaEditButtonsSkeleton,
+  KeluargaEditFormSkeleton,
+} from "@/components/ui/KeluargaEditSkeleton";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
@@ -31,11 +35,7 @@ export default function EditKeluargaPage() {
     },
   });
 
-  const {
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = methods;
+  const { reset, handleSubmit } = methods;
 
   // Fetch keluarga data
   const { data: keluargaData, isLoading } = useQuery({
@@ -106,16 +106,38 @@ export default function EditKeluargaPage() {
   }, [keluargaData, reset]);
 
   const onSubmit = (data) => {
-    updateMutation.mutate({
-      ...data,
-      noBagungan: parseInt(data.noBagungan, 10),
-    });
+    // No need to parse noBagungan anymore since Zod coerce handles it
+    updateMutation.mutate(data);
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
+      <div className="max-w-4xl mx-auto p-6">
+        {/* Header */}
+        <div className="flex items-center mb-6">
+          <button
+            className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+            onClick={() => router.push("/admin/keluarga")}
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Kembali
+          </button>
+          <div>
+            <div className="h-8 w-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Form Skeleton */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center">
+            <Home className="w-5 h-5 mr-2 text-blue-500" />
+            Informasi Keluarga
+          </h2>
+
+          <KeluargaEditFormSkeleton />
+          <KeluargaEditButtonsSkeleton />
+        </Card>
       </div>
     );
   }
