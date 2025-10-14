@@ -143,7 +143,7 @@ export default function EditJemaat() {
           label: item.namaSuku,
         })) || []
       );
-    }, 
+    },
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
   });
@@ -504,7 +504,7 @@ export default function EditJemaat() {
         idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
         idKeadaanRumah: form.getValues("idKeadaanRumah"),
         idRayon: form.getValues("idRayon"),
-        noBagungan: parseInt(form.getValues("noBagungan")),
+        noBagungan: Number(form.getValues("noBagungan")) || 0,
       };
 
       setFormData((prev) => ({ ...prev, keluarga: keluargaData }));
