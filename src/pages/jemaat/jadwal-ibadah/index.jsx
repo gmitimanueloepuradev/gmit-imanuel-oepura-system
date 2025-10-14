@@ -129,7 +129,7 @@ export default function JemaatJadwalIbadahPage() {
             <div className="flex items-center py-6">
               <button
                 className="mr-4 p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200"
-                onClick={() => router.back()}
+                onClick={() => router.push("/jemaat/dashboard")}
               >
                 <ArrowLeft className="h-5 w-5 text-slate-600" />
               </button>
