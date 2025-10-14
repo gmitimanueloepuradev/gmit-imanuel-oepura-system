@@ -399,7 +399,7 @@ export default function CreateGaleri() {
               disabled={isSubmitting}
               type="button"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => router.push("/admin/galeri")}
             >
               Batal
             </Button>
