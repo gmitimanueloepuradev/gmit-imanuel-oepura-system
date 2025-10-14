@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import {
+  AlertCircle,
   ArrowLeft,
   Download,
+  Eye,
   FileText,
   Image as ImageIcon,
-  Eye,
-  X,
-  AlertCircle,
   Paperclip,
+  X,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
-import pengumumanService from "@/services/pengumumanService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
+import pengumumanService from "@/services/pengumumanService";
 
 // Loading Skeleton
 function AttachmentsSkeleton() {
@@ -43,7 +43,7 @@ function AttachmentsSkeleton() {
 function FilePreviewModal({ file, isOpen, onClose }) {
   if (!isOpen || !file) return null;
 
-  const isImage = file.fileType?.startsWith('image/');
+  const isImage = file.fileType?.startsWith("image/");
   const fileUrl = pengumumanService.getFileUrl(file);
 
   return (
@@ -58,7 +58,7 @@ function FilePreviewModal({ file, isOpen, onClose }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="p-4">
           {isImage ? (
             <div className="max-h-96 overflow-hidden flex justify-center">
@@ -66,7 +66,7 @@ function FilePreviewModal({ file, isOpen, onClose }) {
                 alt={file.fileName}
                 className="max-w-full h-auto rounded-lg"
                 src={fileUrl}
-                style={{ maxHeight: '24rem' }}
+                style={{ maxHeight: "24rem" }}
               />
             </div>
           ) : (
@@ -105,13 +105,14 @@ function FilePreviewModal({ file, isOpen, onClose }) {
 
 // File Card Component
 function FileCard({ file, onPreview, onDownload }) {
-  const isImage = file.fileType?.startsWith('image/');
+  const isImage = file.fileType?.startsWith("image/");
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -124,10 +125,10 @@ function FileCard({ file, onPreview, onDownload }) {
             <FileText className="h-5 w-5 text-red-500" />
           )}
           <span className="text-sm font-medium text-gray-700">
-            {isImage ? 'Gambar' : 'PDF'}
+            {isImage ? "Gambar" : "PDF"}
           </span>
         </div>
-        
+
         <div className="flex gap-2">
           {isImage && (
             <Button
@@ -204,7 +205,7 @@ export default function AttachmentsPage() {
           ]}
           title="Lampiran Pengumuman"
         />
-        
+
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -212,11 +213,12 @@ export default function AttachmentsPage() {
               Gagal Memuat Lampiran
             </h3>
             <p className="text-gray-600 mb-4">
-              {error.response?.data?.message || "Terjadi kesalahan saat memuat lampiran"}
+              {error.response?.data?.message ||
+                "Terjadi kesalahan saat memuat lampiran"}
             </p>
-            <Button 
-              variant="outline" 
-              onClick={() => router.back()}
+            <Button
+              variant="outline"
+              onClick={() => router.push("/majelis/pengumuman")}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Kembali
@@ -240,14 +242,14 @@ export default function AttachmentsPage() {
           { label: "Lampiran" },
         ]}
         description={`${totalAttachments} file lampiran`}
-        title={`Lampiran: ${pengumuman.judul || 'Loading...'}`}
+        title={`Lampiran: ${pengumuman.judul || "Loading..."}`}
       />
 
       {/* Back Button */}
       <div>
-        <Button 
-          variant="outline" 
-          onClick={() => router.back()}
+        <Button
+          variant="outline"
+          onClick={() => router.push("/majelis/pengumuman")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Kembali ke Daftar Pengumuman
@@ -263,7 +265,9 @@ export default function AttachmentsPage() {
                 <Paperclip className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">{pengumuman.judul}</h3>
+                <h3 className="font-medium text-gray-900">
+                  {pengumuman.judul}
+                </h3>
                 <p className="text-sm text-gray-600">
                   {pengumuman.kategori?.nama}
                   {pengumuman.jenis?.nama && ` • ${pengumuman.jenis.nama}`}
@@ -304,8 +308,11 @@ export default function AttachmentsPage() {
                   <Button
                     className="inline-flex items-center gap-2"
                     onClick={() => {
-                      attachments.forEach(file => {
-                        setTimeout(() => pengumumanService.downloadFile(file), 100);
+                      attachments.forEach((file) => {
+                        setTimeout(
+                          () => pengumumanService.downloadFile(file),
+                          100
+                        );
                       });
                     }}
                   >
