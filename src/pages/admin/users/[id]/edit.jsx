@@ -133,7 +133,7 @@ export default function EditUser() {
       label: "Kembali",
       icon: ArrowLeft,
       variant: "outline",
-      onClick: () => router.back(),
+      onClick: () => router.push("/admin/users"),
     },
     {
       label: "Update",

@@ -85,7 +85,7 @@ export default function PernikahanDetailPage() {
           <p className="text-red-600 dark:text-red-400 mb-2">
             Gagal memuat detail pernikahan
           </p>
-          <Button onClick={() => router.back()}>Kembali</Button>
+          <Button onClick={() => router.push("/employee/lainnya/pernikahan")}>Kembali</Button>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function PernikahanDetailPage() {
           <Button
             className="flex items-center"
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => router.push("/employee/lainnya/pernikahan")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali

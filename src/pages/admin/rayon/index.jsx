@@ -12,15 +12,13 @@ export default function RayonPage() {
       key: "namaRayon",
       label: "Nama Rayon",
       type: "text",
+      sortable: false, // Disable frontend sorting, rely on backend
     },
     {
-      key: "_count.keluargas",
+      key: "totalKeluarga",
       label: "Jumlah Keluarga",
-      type: "custom",
-      render: (item) =>
-        item && item._count && typeof item._count.keluargas === "number"
-          ? `${item._count.keluargas} keluarga`
-          : "0 keluarga",
+      type: "text",
+      sortable: false, // Disable frontend sorting
     },
   ];
 
@@ -28,11 +26,11 @@ export default function RayonPage() {
     { key: "id", label: "ID" },
     { key: "namaRayon", label: "Nama Rayon" },
     {
-      key: "_count.keluargas",
+      key: "totalKeluarga",
       label: "Jumlah Keluarga",
       render: (item) =>
-        item && item._count && typeof item._count.keluargas === "number"
-          ? `${item._count.keluargas} keluarga`
+        typeof item?.totalKeluarga === "number"
+          ? `${item.totalKeluarga} keluarga`
           : "0 keluarga",
     },
   ];
@@ -65,14 +63,16 @@ export default function RayonPage() {
         { label: "Rayon" },
       ]}
       columns={columns}
+      defaultSort={{ sortBy: "namaRayon", sortOrder: "asc" }} // Set default sort
       description="Kelola data rayon untuk pembagian wilayah jemaat"
+      disableSorting={true}
       exportable={true}
       formFields={formFields}
       itemNameField="namaRayon"
       queryKey="rayon"
-      searchFields={["namaRayon", "deskripsi"]}
+      searchFields={["namaRayon"]}
       service={{
-        get: () => masterService.getRayon(),
+        get: (params) => masterService.getRayon(params), // Pass params to enable sorting
         create: (data) => masterService.createRayon(data),
         update: (id, data) => masterService.updateRayon(id, data),
         delete: (id) => masterService.deleteRayon(id),

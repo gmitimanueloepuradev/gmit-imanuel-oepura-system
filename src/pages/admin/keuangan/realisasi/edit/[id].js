@@ -306,7 +306,7 @@ export default function EditRealisasiPage() {
                     className="flex items-center gap-2"
                     type="button"
                     variant="outline"
-                    onClick={() => router.back()}
+                    onClick={() => router.push("/admin/keuangan/realisasi")}
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Kembali

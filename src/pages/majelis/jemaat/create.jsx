@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ArrowLeft } from "lucide-react";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/Button";
@@ -142,7 +142,7 @@ export default function MajelisCreateJemaat() {
       queryKey: ["status-keluarga"],
       queryFn: () => masterService.getStatusKeluarga(),
       enabled: createKeluarga,
-    },
+    }
   );
 
   const {
@@ -258,7 +258,7 @@ export default function MajelisCreateJemaat() {
       // Auto-set kepala keluarga status
       if (statusDalamKeluarga?.data?.items) {
         const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-          (status) => status.status.toLowerCase().includes("kepala"),
+          (status) => status.status.toLowerCase().includes("kepala")
         );
 
         if (kepalaKeluargaStatus) {
@@ -271,7 +271,7 @@ export default function MajelisCreateJemaat() {
   useEffect(() => {
     if (statusDalamKeluarga?.data?.items) {
       const kepalaKeluargaStatus = statusDalamKeluarga.data.items.find(
-        (status) => status.status.toLowerCase().includes("kepala"),
+        (status) => status.status.toLowerCase().includes("kepala")
       );
 
       if (
@@ -336,9 +336,10 @@ export default function MajelisCreateJemaat() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Anda belum memiliki akses ke rayon manapun. Silakan hubungi administrator.
+                Anda belum memiliki akses ke rayon manapun. Silakan hubungi
+                administrator.
               </p>
-              <Button variant="outline" onClick={() => router.push('/majelis')}>
+              <Button variant="outline" onClick={() => router.push("/majelis/dashboard")}>
                 Kembali ke Dashboard
               </Button>
             </CardContent>
@@ -380,6 +381,7 @@ export default function MajelisCreateJemaat() {
           description: "Password dan konfirmasi password tidak cocok",
           color: "error",
         });
+
         return;
       }
 
@@ -399,7 +401,7 @@ export default function MajelisCreateJemaat() {
         idStatusKepemilikanRumah: form.getValues("idStatusKepemilikanRumah"),
         idKeadaanRumah: form.getValues("idKeadaanRumah"),
         idRayon: user?.majelis?.idRayon, // Force to majelis's rayon
-        noBagungan: parseInt(form.getValues("noBagungan")),
+        noBagungan: Number(form.getValues("noBagungan")) || 0, // Use Number() with fallback
       };
 
       setFormData((prev) => ({ ...prev, keluarga: keluargaData }));
@@ -418,6 +420,7 @@ export default function MajelisCreateJemaat() {
 
   const handleGenerateDefaultPassword = () => {
     const defaultPassword = "oepura78";
+
     form.setValue("password", defaultPassword);
     form.setValue("confirmPassword", defaultPassword);
     showToast({
@@ -429,6 +432,7 @@ export default function MajelisCreateJemaat() {
 
   const getMaxStep = () => {
     if (!createKeluarga) return 2; // Always include user account step
+
     // Alamat is always required when creating keluarga
     return 4;
   };
@@ -493,7 +497,12 @@ export default function MajelisCreateJemaat() {
 
     if (currentStep === 2) {
       // User account is MANDATORY
-      return values.username && values.email && values.password && values.confirmPassword;
+      return (
+        values.username &&
+        values.email &&
+        values.password &&
+        values.confirmPassword
+      );
     }
 
     if (currentStep === 3 && createKeluarga) {
@@ -555,7 +564,7 @@ export default function MajelisCreateJemaat() {
   return (
     <ProtectedRoute allowedRoles="MAJELIS">
       <PageTitle
-        description={`Tambah jemaat baru untuk ${user?.majelis?.rayon?.namaRayon || 'rayon Anda'}`}
+        description={`Tambah jemaat baru untuk ${user?.majelis?.rayon?.namaRayon || "rayon Anda"}`}
         title="Tambah Jemaat Baru"
       />
 
@@ -567,7 +576,7 @@ export default function MajelisCreateJemaat() {
               <Button
                 className="flex items-center space-x-2"
                 variant="outline"
-                onClick={() => router.push('/majelis/jemaat')}
+                onClick={() => router.push("/majelis/jemaat")}
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Kembali</span>
@@ -577,7 +586,7 @@ export default function MajelisCreateJemaat() {
                   Tambah Jemaat Baru
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Rayon: {user?.majelis?.rayon?.namaRayon || 'Tidak diketahui'}
+                  Rayon: {user?.majelis?.rayon?.namaRayon || "Tidak diketahui"}
                 </p>
               </div>
             </div>
@@ -656,7 +665,9 @@ export default function MajelisCreateJemaat() {
                               name="idKeluarga"
                               options={keluargaListOptions}
                               placeholder="Ketik NIK untuk mencari keluarga..."
-                              required={!isKepalaKeluarga && !preSelectedKeluarga}
+                              required={
+                                !isKepalaKeluarga && !preSelectedKeluarga
+                              }
                             />
                           )}
                         </div>
@@ -667,7 +678,8 @@ export default function MajelisCreateJemaat() {
                           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                             <p className="text-sm text-blue-700 dark:text-blue-300">
                               <strong>Kepala Keluarga</strong> - Jemaat ini akan
-                              menjadi kepala keluarga untuk keluarga yang sudah dibuat.
+                              menjadi kepala keluarga untuk keluarga yang sudah
+                              dibuat.
                             </p>
                           </div>
                         </div>
@@ -752,33 +764,35 @@ export default function MajelisCreateJemaat() {
                     <div className="mb-6">
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                          <strong>Akun User Wajib</strong> - Semua jemaat harus memiliki akun untuk login ke sistem.
+                          <strong>Akun User Wajib</strong> - Semua jemaat harus
+                          memiliki akun untuk login ke sistem.
                         </p>
                       </div>
                     </div>
 
                     <div className="mb-4">
                       <button
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
                         type="button"
                         onClick={handleGenerateDefaultPassword}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
                       >
                         <svg
-                          xmlns="http://www.w3.org/2000/svg"
                           className="h-4 w-4"
-                          viewBox="0 0 20 20"
                           fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            fillRule="evenodd"
-                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                             clipRule="evenodd"
+                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                            fillRule="evenodd"
                           />
                         </svg>
                         Generate Password Default (oepura78)
                       </button>
                       <p className="text-xs text-gray-500 mt-2">
-                        Klik tombol di atas untuk mengisi password dengan default <strong>oepura78</strong>
+                        Klik tombol di atas untuk mengisi password dengan
+                        default <strong>oepura78</strong>
                       </p>
                     </div>
 
@@ -817,9 +831,13 @@ export default function MajelisCreateJemaat() {
                             Role <span className="text-red-500">*</span>
                           </label>
                           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
-                            <span className="text-sm text-gray-700 dark:text-gray-300">JEMAAT</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              JEMAAT
+                            </span>
                           </div>
-                          <p className="text-xs text-gray-500">Role otomatis diset ke JEMAAT</p>
+                          <p className="text-xs text-gray-500">
+                            Role otomatis diset ke JEMAAT
+                          </p>
                         </div>
                       </div>
 
@@ -852,7 +870,8 @@ export default function MajelisCreateJemaat() {
                     <div className="mb-6">
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                          Jemaat ini adalah kepala keluarga. Silakan lengkapi data keluarga.
+                          Jemaat ini adalah kepala keluarga. Silakan lengkapi
+                          data keluarga.
                         </p>
                       </div>
                     </div>
@@ -907,10 +926,12 @@ export default function MajelisCreateJemaat() {
                           </label>
                           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
                             <span className="text-sm text-gray-700 dark:text-gray-300">
-                              {user?.majelis?.rayon?.namaRayon || 'Rayon Anda'}
+                              {user?.majelis?.rayon?.namaRayon || "Rayon Anda"}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-500">Rayon otomatis diset sesuai dengan tugas Anda</p>
+                          <p className="text-xs text-gray-500">
+                            Rayon otomatis diset sesuai dengan tugas Anda
+                          </p>
                         </div>
                       </div>
 

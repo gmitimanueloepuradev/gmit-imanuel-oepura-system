@@ -330,7 +330,7 @@ export default function KeluargaDetailPage() {
   });
 
   const handleBack = () => {
-    router.back();
+    router.push("/majelis/keluarga");
   };
 
   if (error) {

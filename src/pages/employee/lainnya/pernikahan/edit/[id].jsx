@@ -119,7 +119,7 @@ export default function EditPernikahanPage() {
           <p className="text-red-600 dark:text-red-400 mb-2">
             Data pernikahan tidak ditemukan
           </p>
-          <Button onClick={() => router.back()}>Kembali</Button>
+          <Button onClick={() => router.push("/employee/lainnya/pernikahan")}>Kembali</Button>
         </div>
       </div>
     );
@@ -135,7 +135,7 @@ export default function EditPernikahanPage() {
             label: "Kembali",
             icon: ArrowLeft,
             variant: "outline",
-            onClick: () => router.back(),
+            onClick: () => router.push("/employee/lainnya/pernikahan"),
           },
         ]}
         breadcrumb={[
@@ -328,7 +328,7 @@ export default function EditPernikahanPage() {
               disabled={updateMutation.isLoading}
               type="button"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => router.push("/employee/lainnya/pernikahan")}
             >
               Batal
             </Button>

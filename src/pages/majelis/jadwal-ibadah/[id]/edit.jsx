@@ -312,7 +312,7 @@ export default function EditJadwalIbadah() {
           <p className="text-gray-600 mb-4">Jadwal ibadah tidak ditemukan</p>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => router.back()}
+            onClick={() => router.push("/majelis/jadwal-ibadah")}
           >
             Kembali
           </button>
@@ -529,7 +529,7 @@ export default function EditJadwalIbadah() {
         <PageHeader
           subtitle="Perbarui informasi jadwal ibadah"
           title="Edit Jadwal Ibadah"
-          onBack={() => router.back()}
+          onBack={() => router.push("/majelis/jadwal-ibadah")}
         />
 
         <Card className="p-6">

@@ -3,6 +3,11 @@ import { ArrowLeft, Home, MapPin, User, Users } from "lucide-react";
 import { useRouter } from "next/router";
 
 import { Card } from "@/components/ui/Card";
+import {
+  AnggotaKeluargaSkeleton,
+  KeluargaInfoSkeleton,
+  KepalaKeluargaSkeleton,
+} from "@/components/ui/KeluargaDetailSkeleton";
 import PageTitle from "@/components/ui/PageTitle";
 import keluargaService from "@/services/keluargaService";
 
@@ -22,8 +27,63 @@ export default function KeluargaDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
+      <div className="max-w-6xl mx-auto p-6">
+        <PageTitle title="Detail Keluarga" />
+        {/* Header */}
+        <div className="flex items-center mb-6">
+          <button
+            className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+            onClick={() => router.push("/admin/keluarga")}
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Kembali
+          </button>
+          <div>
+            <div className="h-8 w-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Informasi Keluarga Skeleton */}
+          <div className="lg:col-span-1">
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center dark:text-white">
+                <Home className="w-5 h-5 mr-2 text-blue-500" />
+                Informasi Keluarga
+              </h2>
+              <KeluargaInfoSkeleton />
+            </Card>
+          </div>
+
+          {/* Anggota Keluarga Skeleton */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center dark:text-white">
+                <Users className="w-5 h-5 mr-2 text-green-500" />
+                Anggota Keluarga
+              </h2>
+
+              {/* Kepala Keluarga Skeleton */}
+              <div className="mb-6">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+                  <User className="w-4 h-4 mr-2 text-blue-500" />
+                  Kepala Keluarga
+                </h3>
+                <KepalaKeluargaSkeleton />
+              </div>
+
+              {/* Anggota Lainnya Skeleton */}
+              <div>
+                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+                  <Users className="w-4 h-4 mr-2 text-green-500" />
+                  Anggota Keluarga Lainnya
+                </h3>
+                <AnggotaKeluargaSkeleton count={2} />
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -32,8 +92,12 @@ export default function KeluargaDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Error</h2>
-          <p className="text-gray-600 dark:text-gray-300">Gagal memuat data keluarga</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Error
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300">
+            Gagal memuat data keluarga
+          </p>
         </div>
       </div>
     );
@@ -48,17 +112,19 @@ export default function KeluargaDetailPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Data Tidak Ditemukan
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">Keluarga tidak ditemukan</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Keluarga tidak ditemukan
+          </p>
         </div>
       </div>
     );
   }
 
-  const kepalaKeluarga = keluarga.jemaats?.find(
+  const kepalaKeluarga = keluarga?.jemaats?.find(
     (jemaat) => jemaat.statusDalamKeluarga?.status === "Kepala Keluarga"
   );
 
-  const anggotaKeluarga = keluarga.jemaats?.filter(
+  const anggotaKeluarga = keluarga?.jemaats?.filter(
     (jemaat) => jemaat.statusDalamKeluarga?.status !== "Kepala Keluarga"
   );
 
@@ -71,7 +137,7 @@ export default function KeluargaDetailPage() {
       <div className="flex items-center mb-6">
         <button
           className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
-          onClick={() => router.back()}
+          onClick={() => router.push("/admin/keluarga")}
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
           Kembali
@@ -109,7 +175,9 @@ export default function KeluargaDetailPage() {
                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   No. Kartu Keluarga (KK)
                 </label>
-                <p className="text-gray-900 dark:text-gray-100">{keluarga.noKK || "-"}</p>
+                <p className="text-gray-900 dark:text-gray-100">
+                  {keluarga.noKK || "-"}
+                </p>
               </div>
 
               <div>
@@ -291,7 +359,7 @@ export default function KeluargaDetailPage() {
                   Anggota Keluarga Lainnya ({anggotaKeluarga.length} orang)
                 </h3>
                 <div className="space-y-4">
-                  {anggotaKeluarga.map((jemaat, index) => (
+                  {anggotaKeluarga.map((jemaat) => (
                     <div
                       key={jemaat.id}
                       className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"

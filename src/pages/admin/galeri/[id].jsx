@@ -129,7 +129,7 @@ export default function GaleriDetailPage() {
           <p className="text-red-600 dark:text-red-400 mb-2">
             Gagal memuat detail galeri
           </p>
-          <Button onClick={() => router.back()}>Kembali</Button>
+          <Button onClick={() => router.push("/admin/galeri")}>Kembali</Button>
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ export default function GaleriDetailPage() {
           <Button
             className="flex items-center"
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => router.push("/admin/galeri")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali

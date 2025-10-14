@@ -58,7 +58,7 @@ export default function JenisIbadahDetail() {
       label: "Kembali",
       icon: ArrowLeft,
       variant: "outline",
-      onClick: () => router.back(),
+      onClick: () => router.push("/admin/jenis-ibadah"),
     },
     {
       label: "Edit Jenis Ibadah",
@@ -74,7 +74,7 @@ export default function JenisIbadahDetail() {
           <p className="text-red-600">Gagal memuat data jenis ibadah</p>
           <button 
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
-            onClick={() => router.back()}
+            onClick={() => router.push("/admin/jenis-ibadah")}
           >
             Kembali
           </button>

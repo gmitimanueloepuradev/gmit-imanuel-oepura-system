@@ -216,7 +216,7 @@ export default function AttachmentsPage() {
             </p>
             <Button 
               variant="outline" 
-              onClick={() => router.back()}
+              onClick={() => router.push("/majelis/pengumuman")}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Kembali
@@ -247,7 +247,7 @@ export default function AttachmentsPage() {
       <div>
         <Button 
           variant="outline" 
-          onClick={() => router.back()}
+          onClick={() => router.push("/majelis/pengumuman")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Kembali ke Daftar Pengumuman

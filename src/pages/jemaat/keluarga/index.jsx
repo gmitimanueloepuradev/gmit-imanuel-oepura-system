@@ -50,7 +50,7 @@ export default function JemaatKeluargaPage() {
             <div className="flex items-center py-6">
               <button
                 className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                onClick={() => router.back()}
+                onClick={() => router.push("/jemaat/dashboard")}
               >
                 <ArrowLeft className="h-6 w-6 text-gray-600" />
               </button>

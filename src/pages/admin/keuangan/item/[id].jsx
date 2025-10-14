@@ -77,7 +77,7 @@ export default function ItemKeuanganDetailPage() {
       <AdminLayout>
         <div className="text-center py-12">
           <p className="text-gray-500">Item tidak ditemukan</p>
-          <Button className="mt-4" onClick={() => router.back()}>
+          <Button className="mt-4" onClick={() => router.push("/admin/keuangan/item")}>
             Kembali
           </Button>
         </div>
@@ -95,7 +95,7 @@ export default function ItemKeuanganDetailPage() {
             <Button
               className="flex items-center gap-2"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => router.push("/admin/keuangan/item")}
             >
               <ArrowLeft className="h-4 w-4" />
               Kembali

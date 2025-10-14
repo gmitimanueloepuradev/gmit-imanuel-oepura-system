@@ -112,7 +112,7 @@ export default function AnggaranPeriodePage() {
               </p>
               <Button 
                 className="mt-4" 
-                onClick={() => router.back()}
+                onClick={() => router.push("/admin/data-master/keuangan/periode")}
               >
                 Kembali
               </Button>
@@ -138,7 +138,7 @@ export default function AnggaranPeriodePage() {
               </p>
               <Button 
                 className="mt-4" 
-                onClick={() => router.back()}
+                onClick={() => router.push("/admin/data-master/keuangan/periode")}
               >
                 Kembali
               </Button>

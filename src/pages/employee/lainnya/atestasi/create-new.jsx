@@ -105,7 +105,7 @@ export default function CreateAtestasiPage() {
           <button
             className="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push("/employee/lainnya/atestasi")}
           >
             ← Kembali
           </button>
@@ -324,7 +324,7 @@ export default function CreateAtestasiPage() {
               className="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
               disabled={isSubmitting}
               type="button"
-              onClick={() => router.back()}
+              onClick={() => router.push("/employee/lainnya/atestasi")}
             >
               Batal
             </button>

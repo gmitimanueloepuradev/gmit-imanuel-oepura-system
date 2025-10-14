@@ -451,7 +451,7 @@ export default function CreateJadwalIbadah() {
         <PageHeader
           subtitle="Buat jadwal ibadah baru untuk rayon Anda"
           title="Tambah Jadwal Ibadah"
-          onBack={() => router.back()}
+          onBack={() => router.push("/majelis/jadwal-ibadah")}
         />
 
         <Card className={"p-6"}>

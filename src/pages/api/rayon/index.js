@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma";
-import { apiResponse } from "@/lib/apiHelper";
-import { parseQueryParams } from "@/lib/queryParams";
 import { createApiHandler } from "@/lib/apiHandler";
+import { apiResponse } from "@/lib/apiHelper";
+import prisma from "@/lib/prisma";
+import { parseQueryParams } from "@/lib/queryParams";
 
 async function handleGet(req, res) {
   try {
@@ -16,22 +16,12 @@ async function handleGet(req, res) {
       where,
       skip: pagination.skip,
       take: pagination.take,
-      include: {
-        keluargas: {
-          select: {
-            id: true,
-            noBagungan: true,
-            jemaats: {
-              select: {
-                id: true,
-                nama: true,
-              },
-            },
-          },
-        },
+      select: {
+        id: true,
+        namaRayon: true,
         _count: {
           select: {
-            keluargas: true,
+            keluargas: true, // hanya hitung jumlah keluarga
           },
         },
       },
@@ -39,18 +29,20 @@ async function handleGet(req, res) {
 
     // Sort berdasarkan angka di dalam nama rayon jika sortBy adalah namaRayon
     let sortedItems = items;
+
     if (sort.sortBy === "namaRayon") {
       sortedItems = items.sort((a, b) => {
         const numA = parseInt(a.namaRayon.match(/\d+/)?.[0] || "0");
         const numB = parseInt(b.namaRayon.match(/\d+/)?.[0] || "0");
+
         return sort.sortOrder === "asc" ? numA - numB : numB - numA;
       });
     } else {
-      // Untuk sort field lain, gunakan orderBy Prisma
       sortedItems = items.sort((a, b) => {
         if (sort.sortOrder === "asc") {
           return a[sort.sortBy] > b[sort.sortBy] ? 1 : -1;
         }
+
         return a[sort.sortBy] < b[sort.sortBy] ? 1 : -1;
       });
     }
@@ -58,7 +50,11 @@ async function handleGet(req, res) {
     const totalPages = Math.ceil(total / pagination.limit);
 
     const result = {
-      items: sortedItems,
+      items: sortedItems.map((item) => ({
+        id: item.id,
+        namaRayon: item.namaRayon,
+        totalKeluarga: item._count.keluargas, // ubah nama field untuk lebih jelas
+      })),
       pagination: {
         ...pagination,
         total,
