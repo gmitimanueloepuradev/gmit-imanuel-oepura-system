@@ -25,6 +25,8 @@ export default function MasterDataPage({
   allowBulkDelete = false,
   searchFields = [],
   filterFields = [],
+  defaultSort = null,
+  disableSorting = false,
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -38,7 +40,17 @@ export default function MasterDataPage({
   // Load all available data without pagination
   const { data, isLoading } = useQuery({
     queryKey: [queryKey, "all-data"],
-    queryFn: () => service.get(), // Get all data without pagination parameters
+    queryFn: () => {
+      // Pass sorting parameters if defaultSort is provided
+      const params = defaultSort
+        ? {
+            sortBy: defaultSort.sortBy,
+            sortOrder: defaultSort.sortOrder,
+          }
+        : {};
+
+      return service.get(params);
+    },
     staleTime: 5 * 60 * 1000,
   });
 
@@ -109,6 +121,7 @@ export default function MasterDataPage({
         columns={columns}
         data={Array.isArray(data?.data) ? data.data : data?.data?.items || []}
         description={description}
+        disableSorting={disableSorting}
         exportFilename={title?.toLowerCase().replace(/\s+/g, "-")}
         exportable={exportable}
         filters={filterFields}
