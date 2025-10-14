@@ -152,7 +152,9 @@ export const majelisEditSchema = z.object({
 
 // Keluarga Edit Schema
 export const keluargaEditSchema = z.object({
-  noBagungan: z.string().min(1, "No. Bangunan wajib diisi"),
+  noBagungan: z.coerce
+    .number()
+    .min(1, "No. Bangunan wajib diisi dan harus berupa angka"),
   noKK: z.string().optional(),
   idRayon: z.string().nonempty("Rayon wajib dipilih"),
   idStatusKeluarga: z.string().optional(),
