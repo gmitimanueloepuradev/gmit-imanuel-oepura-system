@@ -123,7 +123,7 @@ export default function DashboardPageAdmin() {
 
   return (
     <>
-      <PageTitle title="Dashboard Admin" />
+      <PageTitle title="Dashboard Utama Gereja" />
       <PageHeader
         // breadcrumb={[
         //   // { label: "Admin", href: "/admin" },

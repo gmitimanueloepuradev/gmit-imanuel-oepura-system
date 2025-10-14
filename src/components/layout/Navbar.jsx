@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  ChevronRight,
-  FileText,
-  Home,
-  LogOut,
-  User,
-} from "lucide-react";
+import { ChevronRight, FileText, Home, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -100,6 +93,7 @@ export default function Navbar({
         </li>
         {/* Profile Dropdown */}
         {/* Profile Dropdown */}
+        {/* Profile Dropdown */}
         <li className="flex items-center">
           {user ? (
             <details className="relative">
@@ -122,7 +116,11 @@ export default function Navbar({
                   <li>
                     <Link
                       className="flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                      href={`/${user?.role?.toLowerCase() || "admin"}/dashboard`}
+                      href={
+                        user?.role?.toLowerCase() === "pendeta"
+                          ? "/admin/dashboard"
+                          : `/${user?.role?.toLowerCase() || "admin"}/dashboard`
+                      }
                     >
                       <Home className="w-4 h-4 mr-2" />
                       Kembali ke Dashboard
@@ -133,7 +131,11 @@ export default function Navbar({
                 <li>
                   <Link
                     className="flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                    href={`/${user?.role?.toLowerCase() || "admin"}/profile`}
+                    href={
+                      user?.role?.toLowerCase() === "pendeta"
+                        ? "/admin/profile"
+                        : `/${user?.role?.toLowerCase() || "admin"}/profile`
+                    }
                   >
                     <User className="w-4 h-4 mr-2" />
                     Profil
