@@ -198,7 +198,7 @@ export default function EditPernikahanPage() {
             label: "Kembali",
             icon: ArrowLeft,
             variant: "outline",
-            onClick: () => router.back(),
+            onClick: () => router.push("/admin/pernikahan"),
           },
         ]}
         breadcrumb={[
@@ -417,7 +417,7 @@ export default function EditPernikahanPage() {
               disabled={updateMutation.isLoading}
               type="button"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => router.push("/admin/pernikahan")}
             >
               Batal
             </Button>
