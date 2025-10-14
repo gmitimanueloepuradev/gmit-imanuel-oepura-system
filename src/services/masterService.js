@@ -457,8 +457,8 @@ const masterService = {
     const res = await axios.get("/keluarga", {
       params: {
         ...params,
-        idRayon: rayonId
-      }
+        idRayon: rayonId,
+      },
     });
 
     return res.data;
@@ -466,7 +466,13 @@ const masterService = {
 
   // =================== RAYON ===================
   getRayon: async (params = {}) => {
-    const res = await axios.get("/rayon", { params });
+    // Always ensure proper sorting for rayon
+    const sortedParams = {
+      ...params,
+      sortBy: params.sortBy || "namaRayon",
+      sortOrder: params.sortOrder || "asc",
+    };
+    const res = await axios.get("/rayon", { params: sortedParams });
 
     return res.data;
   },
