@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { MoreVertical } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { Button } from "./Button";
 
@@ -31,6 +31,7 @@ export default function ButtonActions({
       if (typeof action.condition === "function") {
         return action.condition(item);
       }
+
       // If condition is a boolean value
       return action.condition;
     }
@@ -76,37 +77,86 @@ export default function ButtonActions({
     return (
       <div className={`flex items-center ${spacing} ${className}`}>
         {/* Visible Actions */}
-        {visibleActions.map((action, index) => (
-          <Button
-            key={index}
-            className={`
-              flex items-center
-              ${action.className || ""}
-              ${
-                action.variant === "destructive"
-                  ? "text-red-600 hover:bg-red-50"
-                  : ""
-              }
-              ${action.hideLabel ? "p-2" : ""}
-            `}
-            disabled={
-              action.disabled && typeof action.disabled === "function"
-                ? action.disabled(item)
-                : action.disabled
-            }
-            size={size}
-            title={action.tooltip || action.label}
-            variant={action.variant || "outline"}
-            onClick={() => action.onClick(item)}
-          >
-            {action.icon && (
-              <action.icon
-                className={`h-4 w-4 ${!action.hideLabel ? "mr-1" : ""}`}
-              />
-            )}
-            {!action.hideLabel && action.label}
-          </Button>
-        ))}
+        {visibleActions.map((action, index) => {
+          const isDisabled =
+            action.disabled && typeof action.disabled === "function"
+              ? action.disabled(item)
+              : action.disabled;
+
+          // Handle href actions
+          if (action.href && !isDisabled) {
+            const href =
+              typeof action.href === "function"
+                ? action.href(item)
+                : action.href;
+
+            return (
+              <Button
+                key={index}
+                asChild
+                className={`
+                  flex items-center
+                  ${action.className || ""}
+                  ${
+                    action.variant === "destructive"
+                      ? "text-red-600 hover:bg-red-50"
+                      : ""
+                  }
+                  ${action.hideLabel ? "p-2" : ""}
+                `}
+                size={size}
+                title={action.tooltip || action.label}
+                variant={action.variant || "outline"}
+              >
+                <a href={href}>
+                  {action.icon && (
+                    <action.icon
+                      className={`h-4 w-4 ${!action.hideLabel ? "sm:mr-1" : ""}`}
+                    />
+                  )}
+                  {!action.hideLabel && (
+                    <span className="hidden sm:inline">{action.label}</span>
+                  )}
+                </a>
+              </Button>
+            );
+          }
+
+          // Handle onClick actions (buttons)
+          return (
+            <Button
+              key={index}
+              className={`
+                flex items-center
+                ${action.className || ""}
+                ${
+                  action.variant === "destructive"
+                    ? "text-red-600 hover:bg-red-50"
+                    : ""
+                }
+                ${action.hideLabel ? "p-2" : ""}
+              `}
+              disabled={isDisabled}
+              size={size}
+              title={action.tooltip || action.label}
+              variant={action.variant || "outline"}
+              onClick={() => {
+                if (!isDisabled && action.onClick) {
+                  action.onClick(item);
+                }
+              }}
+            >
+              {action.icon && (
+                <action.icon
+                  className={`h-4 w-4 ${!action.hideLabel ? "sm:mr-1" : ""}`}
+                />
+              )}
+              {!action.hideLabel && (
+                <span className="hidden sm:inline">{action.label}</span>
+              )}
+            </Button>
+          );
+        })}
 
         {/* Overflow Dropdown */}
         {hiddenActions.length > 0 && (
@@ -167,9 +217,10 @@ export default function ButtonActions({
 
                   // Handle href actions
                   if (action.href && !isDisabled) {
-                    const href = typeof action.href === 'function'
-                      ? action.href(item)
-                      : action.href;
+                    const href =
+                      typeof action.href === "function"
+                        ? action.href(item)
+                        : action.href;
 
                     return (
                       <a
