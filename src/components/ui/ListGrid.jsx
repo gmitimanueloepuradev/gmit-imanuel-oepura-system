@@ -184,6 +184,8 @@ export default function ListGrid({
   filters = [],
   customFilterFunction,
   customSearchFunction,
+  customSortFunction,
+  disableSorting = false,
   searchable = true,
   searchPlaceholder = "Cari data...",
 
@@ -293,24 +295,13 @@ export default function ListGrid({
   // Sorting function
   const sortData = (data, sortConfig) => {
     if (!sortConfig.key) {
-      // Default sorting: find the first text column and sort A-Z
-      const firstTextColumn = columns.find(
-        (col) =>
-          col.type !== "boolean" &&
-          col.type !== "date" &&
-          col.type !== "currency"
-      );
-
-      if (firstTextColumn) {
-        return [...data].sort((a, b) => {
-          const aVal = String(a[firstTextColumn.key] || "").toLowerCase();
-          const bVal = String(b[firstTextColumn.key] || "").toLowerCase();
-
-          return aVal.localeCompare(bVal);
-        });
-      }
-
+      // No default sorting - return data as-is from backend
       return data;
+    }
+
+    // Use custom sort function if provided
+    if (customSortFunction) {
+      return customSortFunction(data, sortConfig);
     }
 
     return [...data].sort((a, b) => {
@@ -375,7 +366,9 @@ export default function ListGrid({
   });
 
   // Sort the filtered data
-  const sortedData = sortData(filteredData, sortConfig);
+  const sortedData = disableSorting
+    ? filteredData
+    : sortData(filteredData, sortConfig);
 
   // Pagination
   const totalPages = Math.ceil(sortedData.length / pageSize);
@@ -592,29 +585,39 @@ export default function ListGrid({
                     {columns.map((column, index) => (
                       <th
                         key={index}
-                        className="text-left p-4 font-medium text-gray-600 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 select-none transition-colors duration-200"
-                        onClick={() => handleSort(column.key)}
+                        className={`text-left p-4 font-medium text-gray-600 dark:text-gray-300 transition-colors duration-200 ${
+                          !disableSorting && column.sortable !== false
+                            ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 select-none"
+                            : ""
+                        }`}
+                        onClick={
+                          !disableSorting && column.sortable !== false
+                            ? () => handleSort(column.key)
+                            : undefined
+                        }
                       >
                         <div className="flex items-center gap-2">
                           {column.label}
-                          <div className="flex flex-col">
-                            <ChevronUp
-                              className={`h-3 w-3 transition-colors duration-200 ${
-                                sortConfig.key === column.key &&
-                                sortConfig.direction === "asc"
-                                  ? "text-blue-600 dark:text-blue-400"
-                                  : "text-gray-300 dark:text-gray-600"
-                              }`}
-                            />
-                            <ChevronDown
-                              className={`h-3 w-3 -mt-1 transition-colors duration-200 ${
-                                sortConfig.key === column.key &&
-                                sortConfig.direction === "desc"
-                                  ? "text-blue-600 dark:text-blue-400"
-                                  : "text-gray-300 dark:text-gray-600"
-                              }`}
-                            />
-                          </div>
+                          {!disableSorting && column.sortable !== false && (
+                            <div className="flex flex-col">
+                              <ChevronUp
+                                className={`h-3 w-3 transition-colors duration-200 ${
+                                  sortConfig.key === column.key &&
+                                  sortConfig.direction === "asc"
+                                    ? "text-blue-600 dark:text-blue-400"
+                                    : "text-gray-300 dark:text-gray-600"
+                                }`}
+                              />
+                              <ChevronDown
+                                className={`h-3 w-3 -mt-1 transition-colors duration-200 ${
+                                  sortConfig.key === column.key &&
+                                  sortConfig.direction === "desc"
+                                    ? "text-blue-600 dark:text-blue-400"
+                                    : "text-gray-300 dark:text-gray-600"
+                                }`}
+                              />
+                            </div>
+                          )}
                         </div>
                       </th>
                     ))}
