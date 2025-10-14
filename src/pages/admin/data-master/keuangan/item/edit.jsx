@@ -1044,7 +1044,7 @@ export default function EditItemKeuanganPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => router.back()}>
+          <Button variant="outline" onClick={() => router.push("/admin/data-master/keuangan/item")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
           </Button>
