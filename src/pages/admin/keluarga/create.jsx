@@ -5,6 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { Card } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
+import PageTitle from "@/components/ui/PageTitle";
 import Stepper, {
   StepContent,
   StepperNavigation,
@@ -16,7 +17,6 @@ import SkeletonInput from "@/components/ui/skeletons/SkeletonInput";
 import keluargaService from "@/services/keluargaService";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
-import PageTitle from "@/components/ui/PageTitle";
 
 const steps = [
   {
@@ -291,7 +291,7 @@ export default function CreateKeluarga() {
       idStatusKepemilikanRumah: values.idStatusKepemilikanRumah,
       idKeadaanRumah: values.idKeadaanRumah,
       idRayon: values.idRayon,
-      noBagungan: parseInt(values.noBagungan),
+      noBagungan: Number(values.noBagungan) || 0, // Use Number() with fallback
       noKK: values.noKK,
       alamat: alamatData,
     };
