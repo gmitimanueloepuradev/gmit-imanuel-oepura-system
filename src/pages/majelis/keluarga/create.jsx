@@ -19,7 +19,9 @@ import { showToast } from "@/utils/showToast";
 
 // Validation schema for majelis keluarga creation
 const keluargaSchema = z.object({
-  noBagungan: z.string().min(1, "No. Bangunan wajib diisi"),
+  noBagungan: z.coerce
+    .number()
+    .min(1, "No. Bangunan wajib diisi dan harus berupa angka"),
   noKK: z.string().min(1, "No. Kartu Keluarga (KK) wajib diisi"),
   rt: z.string().min(1, "RT wajib diisi"),
   rw: z.string().min(1, "RW wajib diisi"),
@@ -118,7 +120,7 @@ function MajelisCreateKeluarga() {
 
       // Then create keluarga with the alamat ID and majelis's rayon
       const keluargaData = {
-        noBagungan: parseInt(data.noBagungan),
+        noBagungan: data.noBagungan, // No need to parse, Zod coerce handles it
         noKK: data.noKK,
         idAlamat: alamatResponse.data.id,
         idRayon: user.majelis?.idRayon, // Use majelis's rayon automatically
