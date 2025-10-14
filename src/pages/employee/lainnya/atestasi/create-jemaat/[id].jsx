@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, User } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import jemaatService from "@/services/jemaatService";
-import atestasiService from "@/services/atestasiService";
-import masterService from "@/services/masterService";
-import { showToast } from "@/utils/showToast";
+import { Card } from "@/components/ui/Card";
+import DatePicker from "@/components/ui/inputs/DatePicker";
+import SelectInput from "@/components/ui/inputs/SelectInput";
+import TextInput from "@/components/ui/inputs/TextInput";
+import PageHeader from "@/components/ui/PageHeader";
 import Stepper, {
   StepContent,
   StepperNavigation,
 } from "@/components/ui/Stepper";
-import { Card } from "@/components/ui/Card";
-import DatePicker from "@/components/ui/inputs/DatePicker";
-import PageHeader from "@/components/ui/PageHeader";
-import TextInput from "@/components/ui/inputs/TextInput";
-import SelectInput from "@/components/ui/inputs/SelectInput";
-import ToggleInput from "@/components/ui/inputs/ToggleInput";
+import atestasiService from "@/services/atestasiService";
+import masterService from "@/services/masterService";
+import { showToast } from "@/utils/showToast";
 
 const steps = [
   {
@@ -172,6 +170,7 @@ export default function CreateJemaatFromAtestasi() {
         atestasiId,
         data
       );
+
       return response;
     },
     onSuccess: () => {
@@ -244,7 +243,7 @@ export default function CreateJemaatFromAtestasi() {
             idStatusKepemilikanRumah: data.idStatusKepemilikanRumah,
             idKeadaanRumah: data.idKeadaanRumah,
             idRayon: data.idRayon,
-            noBagungan: parseInt(data.noBagungan),
+            noBagungan: Number(data.noBagungan) || 0, // Use Number() with fallback
           }
         : null,
       alamat: createAlamat
@@ -263,6 +262,7 @@ export default function CreateJemaatFromAtestasi() {
   const getMaxStep = () => {
     if (!createUserAccount) return 1;
     if (!createKeluarga) return 2;
+
     return 4; // Keluarga + Alamat
   };
 
@@ -321,7 +321,7 @@ export default function CreateJemaatFromAtestasi() {
             label: "Kembali",
             icon: ArrowLeft,
             variant: "outline",
-            onClick: () => router.back(),
+            onClick: () => router.push("/employee/lainnya/atestasi"),
           },
         ]}
         breadcrumb={[
@@ -423,15 +423,17 @@ export default function CreateJemaatFromAtestasi() {
                       {...form.register("idStatusDalamKeluarga", {
                         required: true,
                         onChange: (e) => {
-                          const selectedStatus = statusDalamKeluarga?.data?.items?.find(
-                            (s) => s.id === e.target.value
-                          );
+                          const selectedStatus =
+                            statusDalamKeluarga?.data?.items?.find(
+                              (s) => s.id === e.target.value
+                            );
                           const isKepalaKeluarga = selectedStatus?.status
                             ?.toLowerCase()
                             .includes("kepala");
+
                           setIsKepalaKeluarga(isKepalaKeluarga);
                           setCreateKeluarga(isKepalaKeluarga);
-                        }
+                        },
                       })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
@@ -547,11 +549,12 @@ export default function CreateJemaatFromAtestasi() {
                       </span>
                     </label>
                   )}
-                  
+
                   {isKepalaKeluarga && (
                     <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <p className="text-sm text-blue-700">
-                        Jemaat ini adalah kepala keluarga. Keluarga baru akan otomatis dibuat.
+                        Jemaat ini adalah kepala keluarga. Keluarga baru akan
+                        otomatis dibuat.
                       </p>
                     </div>
                   )}
@@ -599,49 +602,49 @@ export default function CreateJemaatFromAtestasi() {
 
                 {createUserAccount && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <TextInput
-                          required
-                          label="Email"
-                          placeholder="user@example.com"
-                          type="email"
-                          {...form.register("email")}
-                          error={form.formState.errors.email?.message}
-                        />
+                    <TextInput
+                      required
+                      label="Email"
+                      placeholder="user@example.com"
+                      type="email"
+                      {...form.register("email")}
+                      error={form.formState.errors.email?.message}
+                    />
 
-                        <SelectInput
-                          disabled
-                          label="Role"
-                          options={[{ value: "JEMAAT", label: "Jemaat" }]}
-                          value={form.watch("role")}
-                          onChange={(value) => form.setValue("role", value)}
-                        />
+                    <SelectInput
+                      disabled
+                      label="Role"
+                      options={[{ value: "JEMAAT", label: "Jemaat" }]}
+                      value={form.watch("role")}
+                      onChange={(value) => form.setValue("role", value)}
+                    />
 
-                        <TextInput
-                          required
-                          label="Password"
-                          placeholder="Masukkan password"
-                          type="password"
-                          {...form.register("password")}
-                          error={form.formState.errors.password?.message}
-                        />
+                    <TextInput
+                      required
+                      label="Password"
+                      placeholder="Masukkan password"
+                      type="password"
+                      {...form.register("password")}
+                      error={form.formState.errors.password?.message}
+                    />
 
-                        <TextInput
-                          required
-                          label="Konfirmasi Password"
-                          placeholder="Konfirmasi password"
-                          type="password"
-                          {...form.register("confirmPassword")}
-                          error={form.formState.errors.confirmPassword?.message}
-                        />
-                      </div>
-                    )}
+                    <TextInput
+                      required
+                      label="Konfirmasi Password"
+                      placeholder="Konfirmasi password"
+                      type="password"
+                      {...form.register("confirmPassword")}
+                      error={form.formState.errors.confirmPassword?.message}
+                    />
+                  </div>
+                )}
 
-                    {!createUserAccount && (
-                      <p className="text-gray-600 text-sm">
-                        Jemaat akan dibuat tanpa akun login. Akun dapat dibuat
-                        nanti melalui halaman manajemen jemaat.
-                      </p>
-                    )}
+                {!createUserAccount && (
+                  <p className="text-gray-600 text-sm">
+                    Jemaat akan dibuat tanpa akun login. Akun dapat dibuat nanti
+                    melalui halaman manajemen jemaat.
+                  </p>
+                )}
               </StepContent>
             )}
 
@@ -651,94 +654,88 @@ export default function CreateJemaatFromAtestasi() {
                 <div className="mb-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-700">
-                      Jemaat ini adalah kepala keluarga. Silakan lengkapi data keluarga.
+                      Jemaat ini adalah kepala keluarga. Silakan lengkapi data
+                      keluarga.
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <SelectInput
-                          required
-                          error={
-                            form.formState.errors.idStatusKeluarga?.message
-                          }
-                          label="Status Keluarga"
-                          options={
-                            statusKeluarga?.data?.items?.map((item) => ({
-                              value: item.id,
-                              label: item.status,
-                            })) || []
-                          }
-                          placeholder="Pilih status keluarga"
-                          value={form.watch("idStatusKeluarga")}
-                          onChange={(value) =>
-                            form.setValue("idStatusKeluarga", value)
-                          }
-                        />
+                  <SelectInput
+                    required
+                    error={form.formState.errors.idStatusKeluarga?.message}
+                    label="Status Keluarga"
+                    options={
+                      statusKeluarga?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: item.status,
+                      })) || []
+                    }
+                    placeholder="Pilih status keluarga"
+                    value={form.watch("idStatusKeluarga")}
+                    onChange={(value) =>
+                      form.setValue("idStatusKeluarga", value)
+                    }
+                  />
 
-                        <SelectInput
-                          required
-                          error={
-                            form.formState.errors.idStatusKepemilikanRumah
-                              ?.message
-                          }
-                          label="Status Kepemilikan Rumah"
-                          options={
-                            statusKepemilikanRumah?.data?.items?.map(
-                              (item) => ({
-                                value: item.id,
-                                label: item.status,
-                              })
-                            ) || []
-                          }
-                          placeholder="Pilih status kepemilikan"
-                          value={form.watch("idStatusKepemilikanRumah")}
-                          onChange={(value) =>
-                            form.setValue("idStatusKepemilikanRumah", value)
-                          }
-                        />
+                  <SelectInput
+                    required
+                    error={
+                      form.formState.errors.idStatusKepemilikanRumah?.message
+                    }
+                    label="Status Kepemilikan Rumah"
+                    options={
+                      statusKepemilikanRumah?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: item.status,
+                      })) || []
+                    }
+                    placeholder="Pilih status kepemilikan"
+                    value={form.watch("idStatusKepemilikanRumah")}
+                    onChange={(value) =>
+                      form.setValue("idStatusKepemilikanRumah", value)
+                    }
+                  />
 
-                        <SelectInput
-                          required
-                          error={form.formState.errors.idKeadaanRumah?.message}
-                          label="Keadaan Rumah"
-                          options={
-                            keadaanRumah?.data?.items?.map((item) => ({
-                              value: item.id,
-                              label: item.keadaan,
-                            })) || []
-                          }
-                          placeholder="Pilih keadaan rumah"
-                          value={form.watch("idKeadaanRumah")}
-                          onChange={(value) =>
-                            form.setValue("idKeadaanRumah", value)
-                          }
-                        />
+                  <SelectInput
+                    required
+                    error={form.formState.errors.idKeadaanRumah?.message}
+                    label="Keadaan Rumah"
+                    options={
+                      keadaanRumah?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: item.keadaan,
+                      })) || []
+                    }
+                    placeholder="Pilih keadaan rumah"
+                    value={form.watch("idKeadaanRumah")}
+                    onChange={(value) => form.setValue("idKeadaanRumah", value)}
+                  />
 
-                        <SelectInput
-                          required
-                          error={form.formState.errors.idRayon?.message}
-                          label="Rayon"
-                          options={
-                            rayon?.data?.items?.map((item) => ({
-                              value: item.id,
-                              label: item.namaRayon,
-                            })) || []
-                          }
-                          placeholder="Pilih rayon"
-                          value={form.watch("idRayon")}
-                          onChange={(value) => form.setValue("idRayon", value)}
-                        />
+                  <SelectInput
+                    required
+                    error={form.formState.errors.idRayon?.message}
+                    label="Rayon"
+                    options={
+                      rayon?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: item.namaRayon,
+                      })) || []
+                    }
+                    placeholder="Pilih rayon"
+                    value={form.watch("idRayon")}
+                    onChange={(value) => form.setValue("idRayon", value)}
+                  />
 
-                        <TextInput
-                          required
-                          label="No. Bagungan"
-                          placeholder="Masukkan nomor bagungan"
-                          type="number"
-                          {...form.register("noBagungan")}
-                          error={form.formState.errors.noBagungan?.message}
-                        />
-                      </div>
+                  <TextInput
+                    required
+                    label="No. Bagungan"
+                    placeholder="Masukkan nomor bagungan"
+                    type="number"
+                    {...form.register("noBagungan")}
+                    error={form.formState.errors.noBagungan?.message}
+                  />
+                </div>
 
                 <div className="mt-6">
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -762,49 +759,47 @@ export default function CreateJemaatFromAtestasi() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <SelectInput
-                          required
-                          error={form.formState.errors.idKelurahan?.message}
-                          label="Kelurahan/Desa"
-                          options={
-                            kelurahan?.data?.items?.map((item) => ({
-                              value: item.id,
-                              label: item.nama,
-                            })) || []
-                          }
-                          placeholder="Pilih kelurahan/desa"
-                          value={form.watch("idKelurahan")}
-                          onChange={(value) =>
-                            form.setValue("idKelurahan", value)
-                          }
-                        />
+                  <SelectInput
+                    required
+                    error={form.formState.errors.idKelurahan?.message}
+                    label="Kelurahan/Desa"
+                    options={
+                      kelurahan?.data?.items?.map((item) => ({
+                        value: item.id,
+                        label: item.nama,
+                      })) || []
+                    }
+                    placeholder="Pilih kelurahan/desa"
+                    value={form.watch("idKelurahan")}
+                    onChange={(value) => form.setValue("idKelurahan", value)}
+                  />
 
-                        <TextInput
-                          required
-                          label="Nama Jalan"
-                          placeholder="Masukkan nama jalan"
-                          {...form.register("jalan")}
-                          error={form.formState.errors.jalan?.message}
-                        />
+                  <TextInput
+                    required
+                    label="Nama Jalan"
+                    placeholder="Masukkan nama jalan"
+                    {...form.register("jalan")}
+                    error={form.formState.errors.jalan?.message}
+                  />
 
-                        <TextInput
-                          required
-                          label="RT"
-                          placeholder="RT"
-                          type="number"
-                          {...form.register("rt")}
-                          error={form.formState.errors.rt?.message}
-                        />
+                  <TextInput
+                    required
+                    label="RT"
+                    placeholder="RT"
+                    type="number"
+                    {...form.register("rt")}
+                    error={form.formState.errors.rt?.message}
+                  />
 
-                        <TextInput
-                          required
-                          label="RW"
-                          placeholder="RW"
-                          type="number"
-                          {...form.register("rw")}
-                          error={form.formState.errors.rw?.message}
-                        />
-                      </div>
+                  <TextInput
+                    required
+                    label="RW"
+                    placeholder="RW"
+                    type="number"
+                    {...form.register("rw")}
+                    error={form.formState.errors.rw?.message}
+                  />
+                </div>
               </StepContent>
             )}
 
