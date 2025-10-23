@@ -19,6 +19,7 @@ const renderCustomizedLabel = ({
   innerRadius,
   outerRadius,
   percent,
+  value,
 }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN);
@@ -33,7 +34,7 @@ const renderCustomizedLabel = ({
       x={x}
       y={y}
     >
-      {`${((percent ?? 1) * 100).toFixed(0)}%`}
+      {value}
     </text>
   );
 };

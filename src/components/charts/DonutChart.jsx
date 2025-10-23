@@ -31,7 +31,7 @@ const DonutChart = ({
     return null;
   };
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -40,16 +40,16 @@ const DonutChart = ({
     if (percent < 0.05) return null; // Don't show label for very small slices
 
     return (
-      <text 
-        dominantBaseline="central" 
-        fill="white" 
-        fontSize="11" 
-        fontWeight="bold" 
+      <text
+        dominantBaseline="central"
+        fill="white"
+        fontSize="11"
+        fontWeight="bold"
         textAnchor={x > cx ? 'start' : 'end'}
         x={x}
         y={y}
       >
-        {`${(percent * 100).toFixed(0)}%`}
+        {value}
       </text>
     );
   };
