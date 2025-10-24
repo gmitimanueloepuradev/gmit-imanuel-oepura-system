@@ -4,25 +4,25 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658', '#ff7c7c'];
 
 const CustomPieChart = ({ data, title, height = 300, showLegend = true, showLabels = true }) => {
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, value }) => {
     if (!showLabels) return null;
-    
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        dominantBaseline="central" 
-        fill="white" 
-        fontSize="12" 
-        fontWeight="bold" 
+      <text
+        dominantBaseline="central"
+        fill="white"
+        fontSize="12"
+        fontWeight="bold"
         textAnchor={x > cx ? 'start' : 'end'}
         x={x}
         y={y}
       >
-        {`${(percent * 100).toFixed(0)}%`}
+        {value}
       </text>
     );
   };
