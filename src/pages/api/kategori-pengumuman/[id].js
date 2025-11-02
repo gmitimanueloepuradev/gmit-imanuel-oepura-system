@@ -104,7 +104,7 @@ async function handlePatch(req, res, id) {
       );
     }
 
-    const { nama, deskripsi, isActive } = req.body;
+    const { nama, deskripsi, pasalDeskripsi, isActive } = req.body;
 
     // Cek apakah data exists
     const existingKategori = await prisma.kategoriPengumuman.findUnique({
@@ -119,7 +119,6 @@ async function handlePatch(req, res, id) {
 
     // Prepare update data
     const updateData = {};
-
 
     if (nama !== undefined) {
       if (!nama || nama.trim() === "") {
@@ -170,6 +169,10 @@ async function handlePatch(req, res, id) {
 
     if (deskripsi !== undefined) {
       updateData.deskripsi = deskripsi ? deskripsi.trim() : null;
+    }
+
+    if (pasalDeskripsi !== undefined) {
+      updateData.pasalDeskripsi = pasalDeskripsi || null;
     }
 
     if (isActive !== undefined) {

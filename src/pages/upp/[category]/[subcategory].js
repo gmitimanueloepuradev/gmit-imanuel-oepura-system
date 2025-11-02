@@ -2,8 +2,9 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import UppCardContainer from "@/components/upp/uppCardContainer";
 import PageTitle from "@/components/ui/PageTitle";
+import PasalSection from "@/components/upp/PasalSection";
+import UppCardContainer from "@/components/upp/uppCardContainer";
 import useKategoriPengumuman from "@/hooks/useKategoriPengumuman";
 
 export default function UppSubcategory() {
@@ -50,9 +51,9 @@ export default function UppSubcategory() {
   return (
     <div>
       <PageTitle
-        title={`UPP ${categoryData.nama} - ${subcategoryData.nama} - GMIT Imanuel Oepura`}
         description={`Unit Pelayanan Persekutuan (UPP) ${categoryData.nama} - ${subcategoryData.nama} di GMIT Jemaat Imanuel Oepura Kupang, Nusa Tenggara Timur.`}
         keywords={`UPP ${categoryData.nama}, ${subcategoryData.nama}, Unit Pelayanan Persekutuan, Pelayanan Gereja, GMIT Imanuel Oepura, Gereja Kupang`}
+        title={`UPP ${categoryData.nama} - ${subcategoryData.nama} - GMIT Imanuel Oepura`}
       />
       <div className="relative flex justify-center items-center h-screen">
         <Image
@@ -63,7 +64,7 @@ export default function UppSubcategory() {
           sizes="100vw"
           src="/header/anak.webp"
         />
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-black opacity-50" />
         <div className="absolute text-center px-4">
           <h1 className="text-4xl sm:text-6xl md:text-8xl text-white font-bold">
             UPP {categoryData.nama}
@@ -79,10 +80,16 @@ export default function UppSubcategory() {
         </div>
       </div>
 
+      {/* Pasal Section - Show category pasal if exists, otherwise show subcategory pasal */}
+      <PasalSection
+        pasalDeskripsi={categoryData.pasalDeskripsi || subcategoryData.pasalDeskripsi}
+        categoryName={`${categoryData.nama} - ${subcategoryData.nama}`}
+      />
+
       {/* UPP cards filtered by jenisId */}
       <UppCardContainer
-        jenisId={subcategoryData.id}
         emptyStateMessage={`Belum ada pengumuman untuk ${subcategoryData.nama}.`}
+        jenisId={subcategoryData.id}
       />
     </div>
   );

@@ -4,6 +4,8 @@ import { ChevronRight, FileText, Home, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import SkeletonUppDropdown from "../ui/skeletons/SkeletonUppDropdown";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -46,9 +48,7 @@ export default function Navbar({
             </summary>
             <ul className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-none p-2 dropdown-content right-0 mt-3 w-72 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 max-h-96 overflow-y-auto">
               {uppLoading ? (
-                <li className="text-center py-2">
-                  <span className="loading loading-spinner loading-sm" />
-                </li>
+                <SkeletonUppDropdown />
               ) : uppItems.length > 0 ? (
                 uppItems.map((kategori) => (
                   <li key={kategori.id}>
@@ -56,7 +56,9 @@ export default function Navbar({
                     <div className="font-semibold px-2 py-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
                       <Link
                         className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                        href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}`}
+                        href={`/upp/${kategori.nama
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")}`}
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         {kategori.nama}
@@ -71,7 +73,11 @@ export default function Navbar({
                             <li key={jenis.id}>
                               <Link
                                 className="flex items-center px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
-                                href={`/upp/${kategori.nama.toLowerCase().replace(/\s+/g, "-")}/${jenis.nama.toLowerCase().replace(/\s+/g, "-")}`}
+                                href={`/upp/${kategori.nama
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")}/${jenis.nama
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")}`}
                               >
                                 <ChevronRight className="w-3 h-3 mr-2" />
                                 {jenis.nama}

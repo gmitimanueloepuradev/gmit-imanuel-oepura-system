@@ -138,7 +138,7 @@ async function handleGet(req, res) {
 // POST - Tambah data kategori pengumuman baru
 async function handlePost(req, res) {
   try {
-    const { nama, deskripsi, isActive = true } = req.body;
+    const { nama, deskripsi, pasalDeskripsi, isActive = true } = req.body;
 
     // Validasi input
     if (!nama || nama.trim() === "") {
@@ -180,6 +180,7 @@ async function handlePost(req, res) {
       data: {
         nama: nama.trim(),
         deskripsi: deskripsi ? deskripsi.trim() : null,
+        pasalDeskripsi: pasalDeskripsi || null,
         isActive: Boolean(isActive),
       },
     });
@@ -211,7 +212,7 @@ async function handlePost(req, res) {
 // PUT - Update data kategori pengumuman
 async function handlePut(req, res) {
   try {
-    const { id, nama, deskripsi, isActive } = req.body;
+    const { id, nama, deskripsi, pasalDeskripsi, isActive } = req.body;
 
     // Validasi input
     if (!id) {
@@ -282,6 +283,7 @@ async function handlePut(req, res) {
       data: {
         nama: nama.trim(),
         deskripsi: deskripsi ? deskripsi.trim() : null,
+        pasalDeskripsi: pasalDeskripsi || null,
         isActive: typeof isActive !== 'undefined' ? Boolean(isActive) : existingKategori.isActive,
       },
     });
