@@ -18,6 +18,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import ListGrid from "@/components/ui/ListGrid";
 import PageTitle from "@/components/ui/PageTitle";
 import TextInput from "@/components/ui/inputs/TextInput";
+import SkeletonDokumenJemaat from "@/components/ui/skeletons/SkeletonDokumenJemaat";
 import useConfirm from "@/hooks/useConfirm";
 import useDebounce from "@/hooks/useDebounce";
 import dokumenJemaatService from "@/services/dokumenJemaatService";
@@ -298,14 +299,7 @@ export default function AdminDokumenJemaatPage() {
 
   // Handle loading and error states
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Memuat data dokumen...</p>
-        </div>
-      </div>
-    );
+    return <SkeletonDokumenJemaat />;
   }
 
   if (error) {
@@ -414,11 +408,11 @@ export default function AdminDokumenJemaatPage() {
         {/* Search Bar */}
         <div className="mb-6">
           <TextInput
+            leftIcon={<Search className="h-5 w-5 text-gray-400" />}
             placeholder="Cari nama file, jemaat, atau rayon..."
             type="text"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            leftIcon={<Search className="h-5 w-5 text-gray-400" />}
           />
         </div>
       </div>
@@ -519,7 +513,9 @@ export default function AdminDokumenJemaatPage() {
                     dokumen
                     {Object.keys(filters).length > 0 && (
                       <span className="text-blue-600 dark:text-blue-400">
-                        {` (dengan ${Object.keys(filters).length} filter aktif)`}
+                        {` (dengan ${
+                          Object.keys(filters).length
+                        } filter aktif)`}
                       </span>
                     )}
                   </span>
