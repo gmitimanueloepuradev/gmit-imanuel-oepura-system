@@ -10,6 +10,7 @@ import useModalForm from "@/hooks/useModalForm";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
 import { jenisJabatanSchema } from "@/validations/masterSchema";
+import { useUser } from "@/hooks/useUser";
 
 const jenisJabatanFields = [
   {
@@ -26,6 +27,7 @@ export default function JenisJabatanPage() {
   const confirm = useConfirm();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["jenis-jabatan"],
@@ -114,28 +116,34 @@ export default function JenisJabatanPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             icon: Pen,
             onClick: (item) => modal.open(item),
             variant: "outline",
             tooltip: "Edit jenis jabatan",
           },
+          ] : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
+           ...(authData?.isAdmin ? [
           {
             icon: Trash,
             onClick: handleDelete,
             variant: "outline",
             tooltip: "Hapus jenis jabatan",
           },
+          ] : []),
         ]}
         searchPlaceholder="Cari nama jenis jabatan..."
         title="Manajemen Jenis Jabatan"
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin ? () => modal.open() : undefined  
+        }
         onExport={() => {}}
       />
 

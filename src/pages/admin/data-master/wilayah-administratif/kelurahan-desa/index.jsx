@@ -9,6 +9,7 @@ import CreateOrEditModal from "@/components/common/CreateOrEditModal";
 import ListGrid from "@/components/ui/ListGrid";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
+import { useUser } from "@/hooks/useUser";
 
 const kelurahanDesaFields = [
   {
@@ -41,6 +42,7 @@ export default function KelurahanDesaPage() {
   const queryClient = useQueryClient();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["kelurahanDesa"],
@@ -144,6 +146,7 @@ export default function KelurahanDesaPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             label: "Edit",
             icon: Pen,
@@ -151,6 +154,7 @@ export default function KelurahanDesaPage() {
             variant: "outline",
             tooltip: "Edit kelurahan/desa",
           },
+          ] : []),
           {
             label: "View",
             icon: Eye,
@@ -158,6 +162,8 @@ export default function KelurahanDesaPage() {
             variant: "outline",
             tooltip: "Lihat detail kelurahan/desa",
           },
+          ...(authData?.isAdmin ? [
+
           {
             label: "Delete",
             icon: Trash,
@@ -165,10 +171,17 @@ export default function KelurahanDesaPage() {
             variant: "outline",
             tooltip: "Hapus kelurahan/desa",
           },
+          ] : []),
         ]}
         searchPlaceholder="Cari kelurahan/desa..."
         title={"Daftar Kelurahan / Desa"}
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin
+            ? () => {
+                modal.open();
+              }
+            : undefined
+        }
       />
 
       <CreateOrEditModal

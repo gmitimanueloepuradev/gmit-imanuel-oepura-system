@@ -6,9 +6,11 @@ import { useState } from "react";
 import ListGrid from "@/components/ui/ListGrid";
 import pernikahanService from "@/services/pernikahanService";
 import { showToast } from "@/utils/showToast";
+import { useUser } from "@/hooks/useUser";
 
 export default function PernikahanManagement() {
   const router = useRouter();
+  const { user: authData } = useUser()
   const queryClient = useQueryClient();
   const [pagination, setPagination] = useState({
     page: 1,
@@ -127,6 +129,7 @@ export default function PernikahanManagement() {
 
   // Define actions
   const actions = [
+        ...(authData?.isAdmin ? [
     {
       icon: Eye,
       label: "Lihat Detail",
@@ -149,6 +152,7 @@ export default function PernikahanManagement() {
         "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300",
       loading: deleteMutation.isLoading,
     },
+    ] : []),
   ];
 
   return (
@@ -174,12 +178,15 @@ export default function PernikahanManagement() {
       exportFilename="pernikahan"
       exportable={true}
       headerActions={[
-        {
-          label: "Tambah Pernikahan",
-          onClick: () => router.push("/admin/pernikahan/create"),
-          icon: Plus,
-          primary: true,
-        },
+        ...(authData?.isAdmin ? [ 
+
+          {
+            label: "Tambah Pernikahan",
+            onClick: () => router.push("/admin/pernikahan/create"),
+            icon: Plus,
+            primary: true,
+          },
+        ] : []),
       ]}
       icon={Heart}
       isLoading={isLoading}

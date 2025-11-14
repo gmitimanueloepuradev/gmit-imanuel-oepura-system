@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageHeader from "@/components/ui/PageHeader";
 import { showToast } from "@/utils/showToast";
+import { useUser } from "@/hooks/useUser";
 
 export default function GaleriDetailPage() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function GaleriDetailPage() {
   const { id } = router.query;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const { user: authData } = useUser();
 
   const {
     data: galeri,
@@ -158,12 +160,14 @@ export default function GaleriDetailPage() {
             Kembali
           </Button>
 
+            {...(authData?.isAdmin ? [
+              <>
           <div className="flex items-center gap-2">
             <Button
               className="flex items-center"
               variant="outline"
               onClick={handleTogglePublish}
-            >
+              >
               {galeri.isPublished ? (
                 <>
                   <EyeOff className="h-4 w-4 mr-2" />
@@ -180,7 +184,7 @@ export default function GaleriDetailPage() {
               className="flex items-center"
               variant="outline"
               onClick={() => router.push(`/admin/galeri/${id}/edit`)}
-            >
+              >
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
@@ -188,11 +192,13 @@ export default function GaleriDetailPage() {
               className="flex items-center"
               variant="destructive"
               onClick={() => setShowDeleteDialog(true)}
-            >
+              >
               <Trash2 className="h-4 w-4 mr-2" />
               Hapus
             </Button>
           </div>
+            </>
+            ] : [])}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

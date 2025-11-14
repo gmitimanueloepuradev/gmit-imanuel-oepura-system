@@ -198,7 +198,7 @@ export default function SejarahPage() {
             <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
               <a
                 className="inline-block bg-white text-blue-900 font-semibold px-8 py-3 rounded-full hover:bg-gray-100 transform hover:scale-105 transition-all duration-300"
-                href="/about"
+                href="/tentang"
               >
                 Pelajari Lebih Lanjut
               </a>

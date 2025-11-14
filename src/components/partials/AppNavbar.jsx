@@ -2,6 +2,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Command,
   Globe,
   LogOut,
   Menu,
@@ -13,6 +14,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 import HeaderDateTimeWidget from "../HeaderDateTimeWidget";
+import CommandPalette from "@/components/CommandPalette";
 
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { getRoleConfig } from "@/config/navigationItem";
@@ -29,6 +31,7 @@ export default function AppNavbar({
 }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState({});
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const router = useRouter();
   const { logout } = useAuth();
 
@@ -38,6 +41,20 @@ export default function AppNavbar({
   );
   const LogoIcon = config.logoIcon;
   // console.log(authUser)
+
+  // Keyboard shortcut for Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Check for Ctrl+K or Cmd+K
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Use real user data, fallback to provided userInfo, then config default
   const currentUser = authUser || userInfo || config.userInfo;
@@ -145,11 +162,11 @@ export default function AppNavbar({
           <Tooltip content={item.label} show={isCollapsed}>
             <div
               className={`
-                flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group
+                flex items-center ${isCollapsed ? "justify-center" : "justify-between"} px-3 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer group
                 ${
                   isParentActiveState
-                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
+                    ? "bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/40 dark:to-blue-900/20 text-blue-700 dark:text-blue-200 shadow-sm"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100/50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/20"
                 }
               `}
               onClick={() => !isCollapsed && toggleSubmenu(item.href)}
@@ -157,30 +174,43 @@ export default function AppNavbar({
               <div
                 className={`flex items-center ${isCollapsed ? "justify-center w-full" : ""}`}
               >
-                <IconComponent
-                  className={`
-                    w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors duration-200
-                    ${
-                      isParentActiveState
-                        ? "text-blue-700 dark:text-blue-300"
-                        : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-                    }
-                  `}
-                />
-                {!isCollapsed && item.label}
+                <div
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    isParentActiveState
+                      ? "bg-blue-600/10 dark:bg-blue-600/20"
+                      : "bg-gray-200 dark:bg-gray-600 group-hover:bg-blue-200/50 dark:group-hover:bg-blue-600/30"
+                  }`}
+                >
+                  <IconComponent
+                    className={`
+                      w-5 h-5 transition-colors duration-200
+                      ${
+                        isParentActiveState
+                          ? "text-blue-600 dark:text-blue-300"
+                          : "text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                      }
+                    `}
+                  />
+                </div>
+                {!isCollapsed && <span className="ml-2">{item.label}</span>}
               </div>
-              {!isCollapsed &&
-                (isExpanded ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                ))}
+              {!isCollapsed && (
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    isExpanded ? "rotate-180" : ""
+                  } ${
+                    isParentActiveState
+                      ? "text-blue-600 dark:text-blue-300"
+                      : "text-gray-400 dark:text-gray-500"
+                  }`}
+                />
+              )}
             </div>
           </Tooltip>
 
           {/* Submenu Items */}
           {isExpanded && !isCollapsed && (
-            <ul className="ml-6 mt-2 space-y-1">
+            <ul className="ml-2 mt-1.5 space-y-0.5">
               {item.children.map((child) => {
                 const ChildIconComponent = child.icon;
                 const isChildActive = isActiveRoute(child.href);
@@ -189,27 +219,30 @@ export default function AppNavbar({
                   <li key={child.href}>
                     <Link
                       className={`
-                        flex items-center p-2 text-sm rounded-lg transition-all duration-200 group
+                        flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 group relative
                         ${
                           isChildActive
-                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-400"
-                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
+                            ? "bg-blue-600/10 dark:bg-blue-600/20 text-blue-700 dark:text-blue-300 font-medium"
+                            : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
                         }
                       `}
                       href={child.href}
                       onClick={() => setSidebarOpen(false)}
                     >
+                      {isChildActive && (
+                        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-600 to-blue-500 dark:from-blue-400 dark:to-blue-500 rounded-r" />
+                      )}
                       <ChildIconComponent
                         className={`
-                          w-4 h-4 mr-3 transition-colors duration-200
+                          w-4 h-4 mr-2.5 transition-colors duration-200
                           ${
                             isChildActive
-                              ? "text-blue-700 dark:text-blue-300"
+                              ? "text-blue-600 dark:text-blue-300"
                               : "text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                           }
                         `}
                       />
-                      {child.label}
+                      <span className="truncate">{child.label}</span>
                     </Link>
                   </li>
                 );
@@ -226,27 +259,40 @@ export default function AppNavbar({
         <Tooltip content={item.label} show={isCollapsed}>
           <Link
             className={`
-              flex items-center ${isCollapsed ? "justify-center" : ""} p-3 text-sm font-medium rounded-lg transition-all duration-200 group
+              flex items-center ${isCollapsed ? "justify-center" : ""} px-3 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 group relative
               ${
                 isActive
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-400"
-                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
+                  ? "bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/40 dark:to-blue-900/20 text-blue-700 dark:text-blue-200 shadow-sm"
+                  : "text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100/50 dark:hover:from-gray-700/50 dark:hover:to-gray-700/20"
               }
             `}
             href={item.href}
             onClick={() => setSidebarOpen(false)}
           >
-            <IconComponent
-              className={`
-                w-5 h-5 ${isCollapsed ? "" : "mr-3"} transition-colors duration-200
-                ${
-                  isActive
-                    ? "text-blue-700 dark:text-blue-300"
-                    : "text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-                }
-              `}
-            />
-            {!isCollapsed && item.label}
+            {isActive && (
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-400/5 dark:from-blue-600/10 dark:to-blue-400/10 rounded-lg " />
+            )}
+            <div
+              className={`p-2 rounded-md transition-all duration-200 relative z-10 ${
+                isActive
+                  ? "bg-blue-600/10 dark:bg-blue-600/20"
+                  : "bg-gray-200 dark:bg-gray-600 group-hover:bg-blue-200/50 dark:group-hover:bg-blue-600/30"
+              }`}
+            >
+              <IconComponent
+                className={`
+                  w-5 h-5 transition-colors duration-200
+                  ${
+                    isActive
+                      ? "text-blue-600 dark:text-blue-300"
+                      : "text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                  }
+                `}
+              />
+            </div>
+            {!isCollapsed && (
+              <span className="ml-2 relative z-10">{item.label}</span>
+            )}
           </Link>
         </Tooltip>
       </li>
@@ -288,6 +334,18 @@ export default function AppNavbar({
 
             {/* Right side */}
             <div className="flex items-center gap-2">
+              {/* Command Palette Button */}
+              <button
+                className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
+                onClick={() => setIsCommandPaletteOpen(true)}
+                title="Tekan Ctrl+K untuk membuka pencarian"
+              >
+                <Command className="w-4 h-4" />
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Ctrl+K
+                </span>
+              </button>
+
               {/* View Public Website Button */}
               <Link
                 className="p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-colors duration-200"
@@ -384,10 +442,14 @@ export default function AppNavbar({
         lg:translate-x-0
       `}
       >
-        <div className="h-full px-3 overflow-y-auto bg-white dark:bg-gray-800 custom-scrollbar transition-colors duration-300 flex flex-col">
+        <div className="h-full px-3 overflow-y-auto bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 custom-scrollbar transition-colors duration-300 flex flex-col">
           {/* Sidebar Header */}
           <div
-            className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} p-4 border-b border-gray-200 dark:border-gray-700 lg:border-none transition-colors duration-300`}
+            className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} px-3 py-4 rounded-lg transition-all duration-300 ${
+              isCollapsed
+                ? ""
+                : "bg-gradient-to-r from-blue-500/5 to-blue-600/5 dark:from-blue-600/10 dark:to-blue-700/10 border border-blue-100 dark:border-blue-900/30 mb-2"
+            }`}
           >
             <Link
               className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
@@ -395,13 +457,13 @@ export default function AppNavbar({
             >
               <Tooltip content={config.fullTitle} show={isCollapsed}>
                 <div
-                  className={`w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center ${isCollapsed ? "" : "mr-3"}`}
+                  className={`w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md ${isCollapsed ? "" : "mr-3"} transition-all duration-200`}
                 >
                   <LogoIcon className="w-5 h-5 text-white" />
                 </div>
               </Tooltip>
               {!isCollapsed && (
-                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">
+                <span className="text-base font-bold bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-400 dark:to-blue-500 bg-clip-text text-transparent transition-colors duration-300">
                   {config.fullTitle}
                 </span>
               )}
@@ -411,16 +473,18 @@ export default function AppNavbar({
               <>
                 {/* Collapse button for desktop */}
                 <button
-                  className="hidden lg:block p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="hidden lg:block p-1.5 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                   onClick={() => setIsCollapsed(true)}
+                  title="Simpan sidebar"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
 
                 {/* Close button for mobile */}
                 <button
-                  className="lg:hidden p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="lg:hidden p-1.5 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                   onClick={() => setSidebarOpen(false)}
+                  title="Tutup sidebar"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -430,8 +494,9 @@ export default function AppNavbar({
             {/* Expand button when collapsed */}
             {isCollapsed && (
               <button
-                className="hidden lg:block absolute top-4 left-12 p-2 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="hidden lg:block absolute top-4 left-12 p-1.5 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                 onClick={() => setIsCollapsed(false)}
+                title="Perluas sidebar"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -439,33 +504,35 @@ export default function AppNavbar({
           </div>
 
           {/* Navigation Menu */}
-          <nav className="mt-1 flex-1">
-            <ul className="space-y-2">
+          <nav className="mt-2 flex-1">
+            <ul className="space-y-1">
               {config.navigation.map((item) => renderMenuItem(item))}
             </ul>
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="mt-auto p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
+          <div className="mt-auto p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50/50 to-blue-50/30 dark:from-gray-900/50 dark:to-blue-900/20 transition-all duration-300">
             {isCollapsed ? (
               <Tooltip
                 content={`${currentUser.name} - ${currentUser.organization}`}
                 show={isCollapsed}
               >
                 <div className="flex justify-center">
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center transition-colors duration-300">
-                    <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-md transition-all duration-200">
+                    <User className="w-4 h-4 text-white" />
                   </div>
                 </div>
               </Tooltip>
             ) : (
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 transition-colors duration-300">
-                  <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center flex-shrink-0 shadow-md transition-all duration-200">
+                  <User className="w-4 h-4 text-white" />
                 </div>
-                <div>
-                  <div className="font-medium">{currentUser.name}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {currentUser.name}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {currentUser.organization}
                   </div>
                 </div>
@@ -474,6 +541,13 @@ export default function AppNavbar({
           </div>
         </div>
       </aside>
+
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        userRole={authUser?.role}
+      />
     </>
   );
 }

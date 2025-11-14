@@ -15,6 +15,7 @@ import {
   kotaKabupatenSchema,
   provinsiSchema,
 } from "@/validations/masterSchema";
+import { useUser } from "@/hooks/useUser";
 
 // Konfigurasi field input di modal provinsi
 const provinsiFields = [
@@ -46,6 +47,8 @@ export default function ProvinsiPage() {
   const queryClient = useQueryClient();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const { user : authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["provinsi"],
@@ -166,19 +169,16 @@ export default function ProvinsiPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
-          {
-            label: "Edit",
-            icon: Edit,
-            onClick: (item) => modal.open(item),
-            variant: "outline",
-          },
-          {
-            label: "View",
-            icon: Eye,
-            onClick: handleView,
-            variant: "outline",
-            tooltip: "Lihat detail lengkap provinsi",
-          },
+
+          ...(authData?.isAdmin ? [
+
+            {
+              label: "Edit",
+              icon: Edit,
+              onClick: (item) => modal.open(item),
+              variant: "outline",
+            },
+
           {
             label: "Delete",
             icon: Trash,
@@ -193,6 +193,17 @@ export default function ProvinsiPage() {
             variant: "outline",
             tooltip: "Tambah kota / kabupaten baru",
           },
+
+        ] : []),
+
+          {
+            label: "View",
+            icon: Eye,
+            onClick: handleView,
+            variant: "outline",
+            tooltip: "Lihat detail lengkap provinsi",
+          },
+
           {
             label: "Lihat kota / Kabupaten",
             icon: Eye,
@@ -203,7 +214,15 @@ export default function ProvinsiPage() {
         ]}
         searchPlaceholder="Cari provinsi..."
         title={"Daftar Provinsi"}
-        onAdd={() => modal.open()}
+          // ...(authData?.isAdmin ? [] : [])
+        onAdd={
+           
+            authData?.isAdmin
+            ? () => {
+              modal.open()
+            }
+            : undefined
+        }
       />
 
       {/* Provinsi Modal */}

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import {
@@ -8,9 +8,7 @@ import {
   Edit,
   Eye,
   Pin,
-  Plus,
   Search,
-  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -18,11 +16,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import ButtonActions from "@/components/ui/ButtonActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageHeader from "@/components/ui/PageHeader";
-import useConfirm from "@/hooks/useConfirm";
 import pengumumanService from "@/services/pengumumanService";
-import { showToast } from "@/utils/showToast";
 
 // Loading Skeleton
 function TableSkeleton() {
@@ -147,43 +142,6 @@ export default function PengumumanPage() {
     queryFn: () => pengumumanService.getOptions(),
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: pengumumanService.delete,
-    onSuccess: () => {
-      showToast({
-        title: "Berhasil",
-        description: "Pengumuman berhasil dihapus",
-        color: "success",
-      });
-      queryClient.invalidateQueries(["pengumuman"]);
-    },
-    onError: (error) => {
-      showToast({
-        title: "Gagal",
-        description:
-          error.response?.data?.message || "Gagal menghapus pengumuman",
-        color: "danger",
-      });
-    },
-  });
-
-  const handleDelete = (item) => {
-    confirm.showConfirm({
-      title: "Hapus Pengumuman",
-      message: `Apakah Anda yakin ingin menghapus pengumuman "${item.judul}"? Data yang sudah dihapus tidak dapat dikembalikan.`,
-      confirmText: "Ya, Hapus",
-      cancelText: "Batal",
-      variant: "danger",
-      onConfirm: async () => {
-        try {
-          await deleteMutation.mutateAsync(item.id);
-        } catch (error) {
-          console.error("Error deleting pengumuman:", error);
-        }
-      },
-    });
-  };
 
   const formatDate = (dateString) => {
     try {
@@ -215,24 +173,18 @@ export default function PengumumanPage() {
       variant: "outline",
     },
     {
-      icon: Download,
-      label: "Lampiran",
-      onClick: (item) =>
-        router.push(`/employee/pengumuman/${item.id}/attachments`),
-      variant: "outline",
-      show: (item) => true, // Selalu tampilkan, nanti di halaman attachments baru cek ada atau tidak
-    },
-    {
       icon: Edit,
       label: "Edit",
       onClick: (item) => router.push(`/employee/pengumuman/${item.id}/edit`),
       variant: "outline",
     },
     {
-      icon: Trash2,
-      label: "Hapus",
-      onClick: handleDelete,
+      icon: Download,
+      label: "Lampiran",
+      onClick: (item) =>
+        router.push(`/employee/pengumuman/${item.id}/attachments`),
       variant: "outline",
+      show: (item) => true, // Selalu tampilkan, nanti di halaman attachments baru cek ada atau tidak
     },
   ];
 
@@ -246,18 +198,11 @@ export default function PengumumanPage() {
     <div className="space-y-6 p-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
       {/* Page Header */}
       <PageHeader
-        actions={[
-          {
-            label: "Buat Pengumuman",
-            onClick: () => router.push("/employee/pengumuman/create"),
-            icon: Plus,
-          },
-        ]}
         breadcrumb={[
           { label: "Employee", href: "/employee/dashboard" },
           { label: "Pengumuman" },
         ]}
-        description="Kelola pengumuman untuk jemaat dan majelis gereja"
+        description="Lihat pengumuman untuk jemaat dan majelis gereja"
         title="Daftar Pengumuman"
       />
 
@@ -497,17 +442,6 @@ export default function PengumumanPage() {
           )}
         </CardContent>
       </Card>
-
-      <ConfirmDialog
-        cancelText={confirm.config.cancelText}
-        confirmText={confirm.config.confirmText}
-        isOpen={confirm.isOpen}
-        message={confirm.config.message}
-        title={confirm.config.title}
-        variant={confirm.config.variant}
-        onClose={confirm.hideConfirm}
-        onConfirm={confirm.handleConfirm}
-      />
     </div>
   );
 }

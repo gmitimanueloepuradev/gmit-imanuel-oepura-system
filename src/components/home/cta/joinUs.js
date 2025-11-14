@@ -22,9 +22,9 @@ export default function JoinUs() {
             <span>GMIT Imanuel Oepura</span>
           </div>
         </div>
-        <button className="btn btn-success btn-wide self-start rounded-full">
+        {/* <button className="btn btn-success btn-wide self-start rounded-full">
           Info Lebih Lanjut
-        </button>
+        </button> */}
       </div>
 
       {/* image */}

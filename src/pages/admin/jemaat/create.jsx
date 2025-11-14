@@ -61,6 +61,7 @@ export default function CreateJemaat() {
   const [createKeluarga, setCreateKeluarga] = useState(false);
   const [createAlamat, setCreateAlamat] = useState(false);
   const [preSelectedKeluarga, setPreSelectedKeluarga] = useState(null);
+  const [selectedKeluargaRayon, setSelectedKeluargaRayon] = useState(null); // Track selected keluarga's rayon
 
   const form = useForm({
     defaultValues: {
@@ -141,6 +142,8 @@ export default function CreateJemaat() {
           return {
             value: item.id,
             label: `${kepalaName} - No. ${item.noBagungan} (${item.rayon?.namaRayon})`,
+            rayonId: item.idRayon, // Include rayon ID for auto-fill
+            rayonName: item.rayon?.namaRayon,
           };
         }) || []
       );
@@ -460,12 +463,15 @@ export default function CreateJemaat() {
 
   // Load options when navigating to steps
   useEffect(() => {
-    if (currentStep === 3 && createKeluarga) {
+    if (currentStep === 2 && isKepalaKeluarga && rayonOptions.length === 0) {
+      // Load rayon options in step 2 if creating new keluarga
+      refetchRayon();
+    } else if (currentStep === 3 && createKeluarga) {
       loadStep3Options();
     } else if (currentStep === 4 && createAlamat) {
       loadStep4Options();
     }
-  }, [currentStep, createKeluarga, createAlamat]);
+  }, [currentStep, createKeluarga, createAlamat, isKepalaKeluarga, rayonOptions]);
 
   // Watch status dalam keluarga to determine if user is kepala keluarga
   const watchStatusDalamKeluarga = form.watch("idStatusDalamKeluarga");
@@ -487,8 +493,34 @@ export default function CreateJemaat() {
           setIsKepalaKeluarga(true);
         }
       }
+
+      // Auto-fill rayon from selected keluarga
+      if (keluargaListOptions.length > 0) {
+        const selectedKeluarga = keluargaListOptions.find(
+          (k) => k.value === keluargaId
+        );
+        if (selectedKeluarga?.rayonId) {
+          setSelectedKeluargaRayon(selectedKeluarga.rayonId);
+          form.setValue("idRayon", selectedKeluarga.rayonId);
+        }
+      }
     }
-  }, [keluargaId, isKepalaKeluargaParam, statusDalamKeluargaOptions, form]);
+  }, [keluargaId, isKepalaKeluargaParam, statusDalamKeluargaOptions, keluargaListOptions, form]);
+
+  // Watch keluarga selection and auto-fill rayon
+  const watchIdKeluarga = form.watch("idKeluarga");
+  useEffect(() => {
+    if (watchIdKeluarga && !isKepalaKeluarga) {
+      // If selecting existing keluarga (not creating new)
+      const selectedKeluarga = keluargaListOptions.find(
+        (k) => k.value === watchIdKeluarga
+      );
+      if (selectedKeluarga?.rayonId) {
+        setSelectedKeluargaRayon(selectedKeluarga.rayonId);
+        form.setValue("idRayon", selectedKeluarga.rayonId);
+      }
+    }
+  }, [watchIdKeluarga, keluargaListOptions, isKepalaKeluarga, form]);
 
   useEffect(() => {
     if (statusDalamKeluargaOptions.length > 0) {
@@ -1063,6 +1095,23 @@ export default function CreateJemaat() {
                         />
                       </div>
 
+                      {/* Show rayon selector only if creating new keluarga */}
+                      {isKepalaKeluarga && (
+                        <div>
+                          {isLoadingRayon ? (
+                            <SkeletonInput />
+                          ) : (
+                            <AutoCompleteInput
+                              label="Rayon"
+                              name="idRayon"
+                              options={rayonOptions}
+                              placeholder="Pilih rayon"
+                              required={isKepalaKeluarga}
+                            />
+                          )}
+                        </div>
+                      )}
+
                       <div>
                         <TextInput
                           label="Password"
@@ -1144,17 +1193,28 @@ export default function CreateJemaat() {
                   </div>
 
                   <div>
-                    {isLoadingRayon ? (
-                      <SkeletonInput />
-                    ) : (
-                      <AutoCompleteInput
-                        label="Rayon"
-                        name="idRayon"
-                        options={rayonOptions}
-                        placeholder="Pilih rayon"
-                        required={createKeluarga}
-                      />
-                    )}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Rayon <span className="text-red-500">*</span>
+                      </label>
+                      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {selectedKeluargaRayon
+                            ? rayonOptions.find(
+                                (r) => r.value === selectedKeluargaRayon
+                              )?.label || "Rayon tidak ditemukan"
+                            : form.getValues("idRayon")
+                            ? rayonOptions.find(
+                                (r) => r.value === form.getValues("idRayon")
+                              )?.label || "Rayon tidak ditemukan"
+                            : "Rayon belum dipilih"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Rayon otomatis terisi dari keluarga atau pilihan di langkah
+                        sebelumnya
+                      </p>
+                    </div>
                   </div>
 
                   <div>

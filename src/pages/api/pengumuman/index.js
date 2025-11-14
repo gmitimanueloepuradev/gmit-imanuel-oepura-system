@@ -237,21 +237,22 @@ async function handlePost(req, res) {
       );
     }
 
-    // Validasi jenis jika ada
-    if (jenisId) {
+    // Validasi jenis jika ada - PENTING: set null jika tidak valid
+    let validJenisId = null;
+    if (jenisId && jenisId.trim() !== "") {
       const jenisExists = await prisma.jenisPengumuman.findFirst({
-        where: { 
+        where: {
           id: jenisId,
-          kategoriId: kategoriId 
+          kategoriId: kategoriId,
+          isActive: true  // Tambahan: pastikan jenis masih aktif
         },
       });
 
-      if (!jenisExists) {
-        return res.status(400).json(
-          apiResponse(false, null, "Validasi gagal", {
-            jenisId: "Jenis pengumuman tidak valid atau tidak sesuai kategori",
-          })
-        );
+      if (jenisExists) {
+        validJenisId = jenisId;
+      } else {
+        // Log warning tapi jangan error - set ke null saja
+        console.warn(`Jenis pengumuman ${jenisId} tidak valid atau tidak sesuai kategori, menggunakan null`);
       }
     }
 
@@ -271,7 +272,7 @@ async function handlePost(req, res) {
       data: {
         judul: judul.trim(),
         kategoriId,
-        jenisId,
+        jenisId: validJenisId,  // Gunakan validJenisId yang sudah divalidasi
         konten: typeof konten === 'object' ? konten : JSON.parse(konten),
         tanggalPengumuman: new Date(tanggalPengumuman),
         status,
@@ -374,24 +375,6 @@ async function handlePut(req, res) {
       }
     }
 
-    // Validasi jenis jika ada
-    if (jenisId) {
-      const jenisExists = await prisma.jenisPengumuman.findFirst({
-        where: { 
-          id: jenisId,
-          kategoriId: kategoriId || existingPengumuman.kategoriId 
-        },
-      });
-
-      if (!jenisExists) {
-        return res.status(400).json(
-          apiResponse(false, null, "Validasi gagal", {
-            jenisId: "Jenis pengumuman tidak valid atau tidak sesuai kategori",
-          })
-        );
-      }
-    }
-
     // Validasi attachments jika ada
     if (attachments) {
       try {
@@ -412,7 +395,21 @@ async function handlePut(req, res) {
 
     if (judul !== undefined) updateData.judul = judul.trim();
     if (kategoriId !== undefined) updateData.kategoriId = kategoriId;
-    if (jenisId !== undefined) updateData.jenisId = jenisId;
+    if (jenisId !== undefined) {
+      // Validasi jenisId sebelum set
+      if (jenisId && jenisId.trim() !== "") {
+        const jenisExists = await prisma.jenisPengumuman.findFirst({
+          where: {
+            id: jenisId,
+            kategoriId: kategoriId || existingPengumuman.kategoriId,
+            isActive: true
+          },
+        });
+        updateData.jenisId = jenisExists ? jenisId : null;
+      } else {
+        updateData.jenisId = null;
+      }
+    }
     if (konten !== undefined) updateData.konten = typeof konten === 'object' ? konten : JSON.parse(konten);
     if (tanggalPengumuman !== undefined) updateData.tanggalPengumuman = new Date(tanggalPengumuman);
     if (status !== undefined) {

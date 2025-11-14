@@ -14,6 +14,7 @@ import useDrawer from "@/hooks/useDrawer";
 import Drawer from "@/components/ui/Drawer";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
+import { useUser } from "@/hooks/useUser";
 
 const kecamatanFields = [
   {
@@ -58,6 +59,7 @@ export default function KecamatanPage() {
   const queryClient = useQueryClient();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["kecamatan"],
@@ -184,6 +186,7 @@ export default function KecamatanPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             label: "Edit",
             icon: Pen,
@@ -191,6 +194,7 @@ export default function KecamatanPage() {
             variant: "outline",
             tooltip: "Edit kecamatan",
           },
+          ] : []),
           {
             label: "View",
             icon: Eye,
@@ -198,6 +202,7 @@ export default function KecamatanPage() {
             variant: "outline",
             tooltip: "Lihat detail kecamatan",
           },
+          ...(authData?.isAdmin ? [
           {
             label: "Delete",
             icon: Trash,
@@ -205,6 +210,7 @@ export default function KecamatanPage() {
             variant: "outline",
             tooltip: "Hapus kecamatan",
           },
+          
           {
             label: "Tambah Kelurahan/Desa",
             icon: PlusIcon,
@@ -212,6 +218,7 @@ export default function KecamatanPage() {
             variant: "outline",
             tooltip: "Tambah kelurahan/desa baru",
           },
+        ] : []),
           {
             label: "Lihat Kelurahan/Desa",
             icon: Eye,
@@ -222,7 +229,9 @@ export default function KecamatanPage() {
         ]}
         searchPlaceholder="Cari kecamatan..."
         title={"Daftar Kecamatan"}
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin ? () => modal.open() : undefined  
+        }
       />
 
       <CreateOrEditModal

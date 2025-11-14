@@ -64,15 +64,31 @@ export default function AutoCompleteInput({
   }, [apiEndpoint]);
 
   // Use API options if available, otherwise use provided options
-  const finalOptions = apiEndpoint ? apiOptions : options || [];
+  // Ensure finalOptions is always an array
+  const finalOptions = (() => {
+    const opts = apiEndpoint ? apiOptions : options;
+
+    // Handle various data structures
+    if (!opts) return [];
+    if (Array.isArray(opts)) return opts;
+
+    // If opts is an object with 'items' property (from API response)
+    if (opts.items && Array.isArray(opts.items)) return opts.items;
+
+    // If opts is an object with 'data' property
+    if (opts.data && Array.isArray(opts.data)) return opts.data;
+
+    // Otherwise return empty array
+    return [];
+  })();
 
   // Update input value when field value changes
   useEffect(() => {
     const currentValue = field ? field.value : value;
 
-    if (currentValue) {
+    if (currentValue && Array.isArray(finalOptions)) {
       const selectedOption = finalOptions.find(
-        (option) => option.value === currentValue
+        (option) => option && option.value === currentValue
       );
 
       setInputValue(
@@ -87,16 +103,20 @@ export default function AutoCompleteInput({
 
   // Filter options based on input
   useEffect(() => {
-    if (inputValue && finalOptions.length > 0) {
-      const filtered = finalOptions.filter((option) =>
-        (option.label || option.value)
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      );
+    if (
+      inputValue &&
+      Array.isArray(finalOptions) &&
+      finalOptions.length > 0
+    ) {
+      const filtered = finalOptions.filter((option) => {
+        if (!option) return false;
+        const displayText = (option.label || option.value || "").toString();
+        return displayText.toLowerCase().includes(inputValue.toLowerCase());
+      });
 
       setFilteredOptions(filtered);
     } else {
-      setFilteredOptions(finalOptions);
+      setFilteredOptions(Array.isArray(finalOptions) ? finalOptions : []);
     }
   }, [inputValue, finalOptions]);
 
@@ -108,10 +128,12 @@ export default function AutoCompleteInput({
     setShowDropdown(true);
 
     // If input matches an option exactly, set the field value
-    const exactMatch = finalOptions.find(
-      (option) =>
-        (option.label || option.value).toLowerCase() === newValue.toLowerCase()
-    );
+    const exactMatch = Array.isArray(finalOptions)
+      ? finalOptions.find((option) => {
+          const optionText = (option?.label || option?.value || "").toString();
+          return optionText.toLowerCase() === newValue.toLowerCase();
+        })
+      : null;
 
     const valueToSet = exactMatch ? exactMatch.value : newValue;
 
@@ -229,27 +251,34 @@ export default function AutoCompleteInput({
         </button>
 
         {/* Dropdown */}
-        {showDropdown && !isLoading && filteredOptions.length > 0 && (
-          <div
-            ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto"
-          >
-            {filteredOptions.map((option, index) => (
-              <div
-                key={option.value || index}
-                className="px-3 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 text-sm text-gray-900 dark:text-gray-100 transition-colors"
-                onClick={() => handleOptionSelect(option)}
-              >
-                {option.label || option.value}
-              </div>
-            ))}
-          </div>
-        )}
+        {showDropdown &&
+          !isLoading &&
+          Array.isArray(filteredOptions) &&
+          filteredOptions.length > 0 && (
+            <div
+              ref={dropdownRef}
+              className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto"
+            >
+              {filteredOptions.map((option, index) => {
+                if (!option) return null;
+                return (
+                  <div
+                    key={option.value || index}
+                    className="px-3 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 text-sm text-gray-900 dark:text-gray-100 transition-colors"
+                    onClick={() => handleOptionSelect(option)}
+                  >
+                    {option.label || option.value}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
         {/* No results message */}
         {showDropdown &&
           !isLoading &&
           inputValue &&
+          Array.isArray(filteredOptions) &&
           filteredOptions.length === 0 && (
             <div
               ref={dropdownRef}

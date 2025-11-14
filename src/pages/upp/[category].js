@@ -67,7 +67,7 @@ export default function UppCategory() {
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="absolute text-center px-4">
           <h1 className="text-4xl sm:text-6xl md:text-8xl text-white font-bold">
-            UPP {categoryData.nama}
+            {categoryData.nama}
           </h1>
           {categoryData.deskripsi && (
             <p className="text-white text-sm sm:text-lg md:text-xl mt-4 max-w-3xl mx-auto">
