@@ -34,7 +34,8 @@ export class DocumentUploadService {
       const fileExtension = ALLOWED_FILE_TYPES[file.mimetype];
       const s3Key = `dokumen-jemaat/${jemaatId}/${tipeDokumen}/${fileName}${fileExtension}`;
 
-      const result = await uploadFileToS3(file, s3Key);
+      // Pass file.buffer and mimeType separately to uploadFileToS3
+      const result = await uploadFileToS3(file.buffer, s3Key, file.mimetype);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -223,6 +224,7 @@ export class DocumentUploadService {
       const fileName = `${existingDokumen.tipeDokumen.toLowerCase()}_${Date.now()}_${uuidv4()}`;
 
       // Upload new file to S3
+      // Note: file here is a multer file object with buffer, mimetype properties
       const s3Data = await this.uploadToS3(
         file,
         fileName,

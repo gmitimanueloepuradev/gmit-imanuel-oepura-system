@@ -180,8 +180,14 @@ export default function MajelisPage() {
         ]}
         columns={columns}
         customAddButton={{
-          icon: <UserPlus className="w-4 h-4 mr-2" />,
-          text: "Tambah Majelis + Akun",
+              ...(authData?.isAdmin
+            ? {
+                onClick: handleCreate,
+                variant: "primary",
+                icon: <UserPlus className="w-4 h-4 mr-2" />,
+                text: "Tambah Majelis + Akun",
+              }
+            : {}),
         }}
         data={data?.data?.items || []}
         description="Kelola data majelis dan akun login mereka"
@@ -202,7 +208,7 @@ export default function MajelisPage() {
             : []),
           {
             icon: Eye,
-            onClick: handleView,
+          onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },

@@ -10,6 +10,7 @@ import useModalForm from "@/hooks/useModalForm";
 import masterService from "@/services/masterService";
 import { showToast } from "@/utils/showToast";
 import { kategoriJadwalSchema } from "@/validations/masterSchema";
+import { useUser } from "@/hooks/useUser";
 
 const kategoriJadwalFields = [
   {
@@ -26,6 +27,7 @@ export default function KategoriJadwalPage() {
   const confirm = useConfirm();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["kategori-jadwal"],
@@ -117,28 +119,34 @@ export default function KategoriJadwalPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             icon: Pen,
             onClick: (item) => modal.open(item),
             variant: "outline",
             tooltip: "Edit kategori jadwal",
           },
+          ] : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
+          ...(authData?.isAdmin ? [
           {
             icon: Trash,
             onClick: handleDelete,
             variant: "outline",
             tooltip: "Hapus kategori jadwal",
           },
+           ] : []),
         ]}
         searchPlaceholder="Cari nama kategori..."
         title="Manajemen Kategori Jadwal"
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin ? () => modal.open() : undefined  
+        }
       />
 
       <CreateOrEditModal

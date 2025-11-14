@@ -15,6 +15,7 @@ import ProfilPendetaModal from "./ProfilPendetaModal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import profilPendetaService from "@/services/profilPendetaService";
 import { showToast } from "@/utils/showToast";
+import { useUser } from "@/hooks/useUser";
 
 const ProfilPendetaList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +25,8 @@ const ProfilPendetaList = () => {
   const [showToggleConfirm, setShowToggleConfirm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toggleTarget, setToggleTarget] = useState(null);
+
+  const { user: authData } = useUser();
 
   const queryClient = useQueryClient();
 
@@ -168,6 +171,7 @@ const ProfilPendetaList = () => {
             Kelola profil pendeta untuk ditampilkan di website
           </p>
         </div>
+        {...(authData?.isAdmin ? [
         <button
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           onClick={handleCreateNew}
@@ -175,6 +179,7 @@ const ProfilPendetaList = () => {
           <Plus className="w-5 h-5" />
           <span>Tambah Profil</span>
         </button>
+        ] : [])}
       </div>
 
       {/* Profiles List */}
@@ -184,12 +189,14 @@ const ProfilPendetaList = () => {
           <p className="text-gray-500 dark:text-gray-400 mb-4">
             Belum ada profil pendeta
           </p>
-          <button
+          {...(authData?.isAdmin ? [
+            <button
             className="text-blue-600 hover:text-blue-700 font-medium"
             onClick={handleCreateNew}
-          >
+            >
             Tambah profil pertama
           </button>
+          ] : [])}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,6 +252,8 @@ const ProfilPendetaList = () => {
 
                 {/* Actions */}
                 <div className="flex items-center justify-center space-x-2">
+                   {...(authData?.isAdmin ? [
+                     <>
                   <button
                     className={`flex items-center space-x-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                       profile.isActive
@@ -258,6 +267,8 @@ const ProfilPendetaList = () => {
                     <span>{profile.isActive ? "Nonaktifkan" : "Aktifkan"}</span>
                   </button>
 
+
+                 
                   <button
                     className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
                     onClick={() => handleEdit(profile)}
@@ -265,15 +276,16 @@ const ProfilPendetaList = () => {
                     <Edit2 className="w-3 h-3" />
                     <span>Edit</span>
                   </button>
-
                   <button
-                    className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
-                    disabled={deleteMutation.isPending}
-                    onClick={() => handleDelete(profile)}
+                  className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => handleDelete(profile)}
                   >
                     <Trash2 className="w-3 h-3" />
                     <span>Hapus</span>
                   </button>
+                    </>
+                  ] : [])}
                 </div>
               </div>
             </div>

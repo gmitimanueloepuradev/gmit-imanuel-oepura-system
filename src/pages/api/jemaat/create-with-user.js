@@ -60,6 +60,21 @@ async function handlePost(req, res) {
       alamatData,
     } = req.body;
 
+    // Get rayon ID - from keluargaData (new keluarga) or from existing keluarga
+    let rayonIdForUser = null;
+    if (createKeluarga && keluargaData?.idRayon) {
+      rayonIdForUser = keluargaData.idRayon;
+    } else if (idKeluarga) {
+      // Get rayon from existing keluarga
+      const existingKeluarga = await prisma.keluarga.findUnique({
+        where: { id: idKeluarga },
+        select: { idRayon: true },
+      });
+      if (existingKeluarga?.idRayon) {
+        rayonIdForUser = existingKeluarga.idRayon;
+      }
+    }
+
     // Hash password outside transaction to reduce transaction time
     let hashedPassword = null;
 
@@ -152,7 +167,7 @@ async function handlePost(req, res) {
               noWhatsapp: noWhatsapp || null,
               role,
               idJemaat: newJemaat.id,
-              idRayon: rayonId, // Auto-assign rayon from majelis
+              idRayon: rayonIdForUser || rayonId, // Auto-assign rayon from keluarga or majelis
             },
             select: {
               id: true,

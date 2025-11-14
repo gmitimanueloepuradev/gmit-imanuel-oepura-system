@@ -10,6 +10,7 @@ import useModalForm from "@/hooks/useModalForm";
 import klasisService from "@/services/klasisService";
 import { showToast } from "@/utils/showToast";
 import { klasisSchema } from "@/validations/masterSchema";
+import { useUser } from "@/hooks/useUser";
 
 const klasisFields = [
   {
@@ -26,6 +27,7 @@ export default function KlasisPage() {
   const confirm = useConfirm();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["klasis"],
@@ -152,28 +154,34 @@ export default function KlasisPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             icon: Pen,
             onClick: (item) => modal.open(item),
             variant: "outline",
             tooltip: "Edit klasis",
           },
+          ] : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
+          ...(authData?.isAdmin ? [
           {
             icon: Trash,
             onClick: handleDelete,
             variant: "outline",
             tooltip: "Hapus klasis",
           },
+          ] : []),
         ]}
         searchPlaceholder="Cari nama klasis..."
         title="Manajemen Klasis"
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin ? () => modal.open() : undefined  
+        }
       />
 
       <CreateOrEditModal

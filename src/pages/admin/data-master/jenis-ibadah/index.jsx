@@ -17,6 +17,7 @@ import ListGrid from "@/components/ui/ListGrid";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import useConfirm from "@/hooks/useConfirm";
 import { showToast } from "@/utils/showToast";
+import { useUser } from "@/hooks/useUser";
 
 const jenisIbadahFields = [
   {
@@ -34,6 +35,7 @@ export default function JenisIbadahPage() {
   const queryClient = useQueryClient();
   const [viewData, setViewData] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user: authData } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["jenis-ibadah"],
@@ -159,28 +161,34 @@ export default function JenisIbadahPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+          ...(authData?.isAdmin ? [
           {
             icon: Pen,
             onClick: (item) => modal.open(item),
             variant: "outline",
             tooltip: "Edit jenis ibadah",
           },
+          ] : []),
           {
             icon: Eye,
             onClick: handleView,
             variant: "outline",
             tooltip: "Lihat detail lengkap",
           },
+          ...(authData?.isAdmin ? [
           {
             icon: Trash,
             onClick: handleDelete,
             variant: "outline",
             tooltip: "Hapus jenis ibadah",
           },
+          ] : []),
         ]}
         searchPlaceholder="Cari nama ibadah..."
         title="Manajemen Jenis Ibadah"
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin ? () => modal.open() : undefined  
+        }
       />
 
       <CreateOrEditModal

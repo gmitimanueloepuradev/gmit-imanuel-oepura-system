@@ -14,6 +14,7 @@ import {
   kecamatanSchema,
   kotaKabupatenSchema,
 } from "@/validations/masterSchema";
+import { useUser } from "@/hooks/useUser";
 
 const kotaKabupatenFields = [
   {
@@ -50,6 +51,8 @@ export default function KotaKabupatenPage() {
   const confirm = useConfirm();
   const queryClient = useQueryClient();
   const [viewData, setViewData] = useState(null);
+
+  const { user: authData } = useUser();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
@@ -184,6 +187,8 @@ export default function KotaKabupatenPage() {
         isLoading={isLoading}
         rowActionType="horizontal"
         rowActions={[
+
+          ...(authData?.isAdmin ? [
           {
             label: "Edit",
             icon: Pen,
@@ -191,6 +196,7 @@ export default function KotaKabupatenPage() {
             variant: "outline",
             tooltip: "Edit kota/kabupaten",
           },
+          ] : []),
           {
             label: "View",
             icon: Eye,
@@ -198,6 +204,8 @@ export default function KotaKabupatenPage() {
             variant: "outline",
             tooltip: "Lihat detail kota/kabupaten",
           },
+
+          ...(authData?.isAdmin ? [
           {
             label: "Delete",
             icon: Trash,
@@ -205,6 +213,7 @@ export default function KotaKabupatenPage() {
             variant: "outline",
             tooltip: "Hapus kota/kabupaten",
           },
+           ] : []),
           {
             label: "Tambah Kecamatan",
             icon: PlusIcon,
@@ -222,7 +231,13 @@ export default function KotaKabupatenPage() {
         ]}
         searchPlaceholder="Cari kota kabupaten..."
         title={"Daftar Kota / Kabupaten"}
-        onAdd={() => modal.open()}
+        onAdd={
+          authData?.isAdmin
+            ? () => {
+                modal.open();
+              }
+            : undefined
+        }
       />
 
       <CreateOrEditModal
