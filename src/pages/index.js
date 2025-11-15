@@ -9,8 +9,7 @@ import ScheduleRow from "@/components/home/schedule/scheduleRow";
 import ChurchStatistics from "@/components/home/statistics/churchStatistics";
 import ChurchStatisticsHorizontal from "@/components/home/statistics/churchStatisticsHorizontal";
 import PageTitle from "@/components/ui/PageTitle";
-import { Analytics } from '@vercel/analytics/react';
-
+ 
 export default function Home() {
   return (
     <>
@@ -44,8 +43,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Analytics />
-
+ 
 
           {/* Mobile Statistics - Vertical */}
           <ChurchStatistics />
