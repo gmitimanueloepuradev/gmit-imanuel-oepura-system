@@ -186,6 +186,7 @@ export default function Document() {
           }}
           type="application/ld+json"
         />
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="aaaf6ef3-0eb3-43f0-a9c3-938de6e18ad1"></script>
 
         <script
           dangerouslySetInnerHTML={{
