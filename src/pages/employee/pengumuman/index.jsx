@@ -107,7 +107,6 @@ function PriorityBadge({ priority }) {
 export default function PengumumanPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const confirm = useConfirm();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
