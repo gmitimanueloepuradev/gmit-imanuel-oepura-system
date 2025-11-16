@@ -401,6 +401,11 @@ export const roleConfigs = {
 
       { href: "/admin/analytics", label: "Analitik", icon: BarChart3 },
       { href: "/admin/system-info", label: "Informasi Sistem", icon: Monitor },
+      {
+        href: "/admin/traffic-monitor",
+        label: "Monitor Traffic Web",
+        icon: Monitor,
+      },
       // { href: "/admin/settings", label: "Pengaturan", icon: Settings },
     ],
     footerLinks: [
