@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import RealisasiModal from "@/components/ui/modals/RealisasiModal";
 
 export default function RealisasiList({ itemKeuangan, periodeId }) {
@@ -89,7 +89,7 @@ export default function RealisasiList({ itemKeuangan, periodeId }) {
   };
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingScreen isLoading={true} message="Memuat data realisasi..." />;
   }
 
   return (

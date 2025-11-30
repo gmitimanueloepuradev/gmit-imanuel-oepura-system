@@ -14,9 +14,8 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
-// import LoadingSpinner from "@/components/ui/";
 
 export default function AnggaranIndexPage() {
   const router = useRouter();
@@ -58,11 +57,7 @@ export default function AnggaranIndexPage() {
   const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat data periode anggaran..." />;
   }
 
   if (error) {

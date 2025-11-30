@@ -800,3 +800,49 @@ model ProfilPendeta {
   @@index([isActive], name: "idx_profil_pendeta_active")
   @@map("profil_pendeta")
 }
+
+// === KONTEN LANDING PAGE ===
+
+// Enum untuk tipe section konten
+enum TipeSection {
+  VISI
+  MISI
+  SEJARAH
+  HERO
+  TENTANG
+}
+
+// Model untuk konten landing page (visi, misi, sejarah, dll)
+model KontenLandingPage {
+  id      String      @id @default(dbgenerated("concat('klp_', gen_random_uuid())")) @db.VarChar(80)
+  section TipeSection // VISI, MISI, SEJARAH, HERO, TENTANG
+
+  // Konten fields
+  judul     String  @db.VarChar(255)
+  konten    String  @db.Text // Bisa berisi teks panjang atau HTML
+  deskripsi String? @db.Text // Deskripsi tambahan
+
+  // Untuk konten yang berurutan (misal: timeline sejarah)
+  urutan Int @default(0)
+
+  // Metadata tambahan dalam JSON (fleksibel untuk kebutuhan custom)
+  metadata Json? // Bisa berisi data tambahan seperti list misi, timeline, dll
+
+  // Status dan visibility
+  isActive    Boolean @default(true) @map("is_active")
+  isPublished Boolean @default(false) @map("is_published")
+
+  // Audit trail
+  createdBy String? @map("created_by") @db.VarChar(80) // ID user yang membuat
+  updatedBy String? @map("updated_by") @db.VarChar(80) // ID user yang update
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+
+  @@unique([section, urutan], name: "unique_section_urutan")
+  @@index([section], name: "idx_konten_section")
+  @@index([isActive], name: "idx_konten_active")
+  @@index([isPublished], name: "idx_konten_published")
+  @@map("konten_landing_page")
+}

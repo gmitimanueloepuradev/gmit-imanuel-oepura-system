@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
+import LoadingScreen from "../ui/LoadingScreen";
+
 import { useAuth } from "@/contexts/AuthContext";
 
 /**
@@ -76,10 +78,11 @@ export default function RoleGuard({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+          {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
           <p className="text-gray-600 dark:text-gray-400">
             Memverifikasi akses...
-          </p>
+          </p> */}
+          <LoadingScreen isLoading={loading} />
         </div>
       </div>
     );

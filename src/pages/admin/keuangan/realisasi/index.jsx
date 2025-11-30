@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
 import { useUser } from "@/hooks/useUser";
@@ -390,7 +390,7 @@ export default function RealisasiKeuanganPage() {
           </CardHeader>
           <CardContent>
             {summaryLoading ? (
-              <LoadingSpinner />
+              <LoadingScreen isLoading={true} message="Memuat ringkasan realisasi..." />
             ) : (
               <>
                 {/* Desktop View */}
@@ -636,7 +636,7 @@ export default function RealisasiKeuanganPage() {
           </CardHeader>
           <CardContent>
             {realisasiLoading ? (
-              <LoadingSpinner />
+              <LoadingScreen isLoading={true} message="Memuat data realisasi..." />
             ) : (
               <>
                 {/* Desktop View */}

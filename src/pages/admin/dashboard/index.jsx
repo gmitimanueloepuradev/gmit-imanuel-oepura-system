@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
   BookOpen,
@@ -9,7 +10,6 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 import DailyVerse from "@/components/dashboard/DailyVerse";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
 import { formatNumber } from "@/lib/formatUtils";
@@ -29,63 +30,56 @@ import dashboardService from "@/services/dashboardService";
 import { getEventTypeBadge, getStatusBadge } from "@/utils/common";
 
 export default function DashboardPageAdmin() {
-  const [stats, setStats] = useState({
-    totalMembers: 0,
-    membersByGender: { male: 0, female: 0 },
-    totalFamilies: 0,
-    sacraments: {
-      baptis: { total: 0, thisYear: 0 },
-      sidi: { total: 0, thisYear: 0 },
-      pernikahan: { total: 0, thisYear: 0 },
-    },
-    ageGroups: { children: 0, youth: 0, adults: 0, elderly: 0 },
+  // Query untuk dashboard stats dengan caching
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: dashboardService.getDashboardStats,
+    staleTime: 5 * 60 * 1000, // 5 menit - data dianggap fresh
+    cacheTime: 30 * 60 * 1000, // 30 menit - data tetap di cache
+    refetchOnWindowFocus: false, // Tidak refetch saat window focus
+    refetchOnMount: false, // Tidak refetch saat component mount jika sudah ada cache
   });
-  const [recentActivities, setRecentActivities] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        const [dashboardStats, activities, events] = await Promise.all([
-          dashboardService.getDashboardStats(),
-          dashboardService.getRecentActivities(),
-          dashboardService.getUpcomingEvents(),
-        ]);
+  // Query untuk recent activities dengan caching
+  const { data: recentActivities = [], isLoading: activitiesLoading } = useQuery({
+    queryKey: ["dashboard-activities"],
+    queryFn: dashboardService.getRecentActivities,
+    staleTime: 2 * 60 * 1000, // 2 menit
+    cacheTime: 15 * 60 * 1000, // 15 menit
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
-        setStats(dashboardStats);
-        setRecentActivities(activities);
-        setUpcomingEvents(events);
-      } catch (err) {
-        console.error("Failed to load dashboard data:", err);
-        setError("Gagal memuat data dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Query untuk upcoming events dengan caching
+  const { data: upcomingEvents = [], isLoading: eventsLoading } = useQuery({
+    queryKey: ["dashboard-events"],
+    queryFn: dashboardService.getUpcomingEvents,
+    staleTime: 5 * 60 * 1000, // 5 menit
+    cacheTime: 30 * 60 * 1000, // 30 menit
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
-    loadDashboardData();
-  }, []);
+  const loading = statsLoading || activitiesLoading || eventsLoading;
+  const error = null; // Error handling akan di-handle oleh React Query
 
   const headerStats = [
     {
       label: "Total Jemaat",
-      value: formatNumber(stats.totalMembers || 0),
+      value: formatNumber(stats?.totalMembers || 0),
       icon: Users,
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600",
-      change: `${stats.sacraments?.baptis?.thisYear || 0} baptis tahun ini`,
+      change: `${stats?.sacraments?.baptis?.thisYear || 0} baptis tahun ini`,
       changeType: "positive",
     },
     {
       label: "Total Keluarga",
-      value: formatNumber(stats.totalFamilies || 0),
+      value: formatNumber(stats?.totalFamilies || 0),
       icon: UserCheck,
       iconBg: "bg-green-100",
       iconColor: "text-green-600",
-      change: `${stats.membersByGender?.male || 0}L, ${stats.membersByGender?.female || 0}P`,
+      change: `${stats?.membersByGender?.male || 0}L, ${stats?.membersByGender?.female || 0}P`,
       changeType: "neutral",
     },
     {
@@ -99,7 +93,7 @@ export default function DashboardPageAdmin() {
     },
     {
       label: "Baptis & Sidi",
-      value: `${stats.sacraments?.baptis?.total || 0}/${stats.sacraments?.sidi?.total || 0}`,
+      value: `${stats?.sacraments?.baptis?.total || 0}/${stats?.sacraments?.sidi?.total || 0}`,
       icon: AlertCircle,
       iconBg: "bg-orange-100",
       iconColor: "text-orange-600",
@@ -108,17 +102,9 @@ export default function DashboardPageAdmin() {
     },
   ];
 
-
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 mb-2">{error}</p>
-          <Button onClick={() => window.location.reload()}>Muat Ulang</Button>
-        </div>
-      </div>
-    );
+  // Show loading screen saat pertama kali load
+  if (loading && !stats) {
+    return <LoadingScreen isLoading={true} message="Memuat dashboard..." />;
   }
 
   return (
@@ -145,7 +131,7 @@ export default function DashboardPageAdmin() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {statsLoading ? (
                 <div className="space-y-2 animate-pulse">
                   <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
@@ -153,7 +139,7 @@ export default function DashboardPageAdmin() {
               ) : (
                 <>
                   <div className="text-2xl font-bold">
-                    {stats.sacraments?.pernikahan?.total || 0}
+                    {stats?.sacraments?.pernikahan?.total || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Total Pernikahan
@@ -171,7 +157,7 @@ export default function DashboardPageAdmin() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {statsLoading ? (
                 <div className="space-y-2 animate-pulse">
                   <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
@@ -179,7 +165,7 @@ export default function DashboardPageAdmin() {
               ) : (
                 <>
                   <div className="text-2xl font-bold">
-                    {stats.ageGroups?.youth || 0}
+                    {stats?.ageGroups?.youth || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Jemaat Remaja (13-25)
@@ -205,7 +191,7 @@ export default function DashboardPageAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {activitiesLoading ? (
                 <div className="space-y-4 animate-pulse">
                   {[...Array(3)].map((_, i) => (
                     <div
@@ -255,7 +241,7 @@ export default function DashboardPageAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {eventsLoading ? (
                 <div className="space-y-3 animate-pulse">
                   {[...Array(3)].map((_, i) => (
                     <div key={i} className="p-4 border rounded-lg">

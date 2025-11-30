@@ -77,7 +77,7 @@ function PageHeader({
         {/* Header Content */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 transition-colors duration-200 sm:text-3xl sm:truncate">
+            <h1 className="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 transition-colors duration-200 sm:text-3xl break-words">
               {title}
             </h1>
             {description && (
@@ -542,39 +542,10 @@ export default function ListGrid({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            // Loading Skeleton
             viewMode === "table" ? (
-              <div className="overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      {columns.map((column, index) => (
-                        <th
-                          key={index}
-                          className="text-left p-4 font-medium text-gray-600 dark:text-gray-300 transition-colors duration-200"
-                        >
-                          {column.label}
-                        </th>
-                      ))}
-                      {allRowActions.length > 0 && (
-                        <th className="text-left p-4 font-medium text-gray-600 dark:text-gray-300 transition-colors duration-200">
-                          Aksi
-                        </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <TableSkeleton
-                      columns={columns}
-                      hasActions={allRowActions.length > 0}
-                    />
-                  </tbody>
-                </table>
-              </div>
+              <TableSkeleton columns={columns.length} rows={5} />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <GridSkeleton columns={columns} />
-              </div>
+              <GridSkeleton cards={6} />
             )
           ) : viewMode === "table" ? (
             /* Table View */

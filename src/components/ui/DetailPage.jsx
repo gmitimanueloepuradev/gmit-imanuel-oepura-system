@@ -2,7 +2,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function DetailPage({
   title,
@@ -13,13 +13,7 @@ export default function DetailPage({
   isLoading = false,
 }) {
   if (isLoading) {
-    return (
-      <AdminLayout>
-        <div className="p-6">
-          <LoadingSpinner />
-        </div>
-      </AdminLayout>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat detail..." />;
   }
 
   return (

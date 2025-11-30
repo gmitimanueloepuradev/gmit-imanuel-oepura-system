@@ -11,6 +11,7 @@ import {
   Database,
   DollarSign,
   FileText,
+  Globe,
   GraduationCap,
   Heart,
   Home,
@@ -50,6 +51,11 @@ const adminNavigation = [
   { href: "/admin/baptis", label: "Baptis", icon: Baby },
   { href: "/admin/pernikahan", label: "Pernikahan", icon: Heart },
   { href: "/admin/galeri", label: "Galeri", icon: Image },
+  {
+    href: "/admin/konten-landing-page",
+    label: "Konten Landing Page",
+    icon: Globe,
+  },
   {
     href: "/admin/data-master",
     label: "Data Master",
@@ -269,6 +275,11 @@ export const roleConfigs = {
         href: "/admin/galeri",
         label: "Galeri",
         icon: Image,
+      },
+      {
+        href: "/admin/konten-landing-page",
+        label: "Konten Landing Page",
+        icon: Globe,
       },
 
       {

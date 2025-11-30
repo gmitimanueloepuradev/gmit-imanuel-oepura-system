@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import UppCardContainer from "@/components/upp/uppCardContainer";
 import PasalSection from "@/components/upp/PasalSection";
 import PageTitle from "@/components/ui/PageTitle";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import useKategoriPengumuman from "@/hooks/useKategoriPengumuman";
 
 export default function UppCategory() {
@@ -24,9 +25,10 @@ export default function UppCategory() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <span className="loading loading-spinner loading-lg" />
-      </div>
+      <LoadingScreen
+        isLoading={true}
+        message="Memuat kategori UPP..."
+      />
     );
   }
 

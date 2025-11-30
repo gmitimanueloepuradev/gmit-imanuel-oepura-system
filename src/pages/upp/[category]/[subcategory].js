@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageTitle from "@/components/ui/PageTitle";
 import PasalSection from "@/components/upp/PasalSection";
 import UppCardContainer from "@/components/upp/uppCardContainer";
@@ -27,9 +28,7 @@ export default function UppSubcategory() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <span className="loading loading-spinner loading-lg" />
-      </div>
+      <LoadingScreen isLoading={true} message="Memuat sub-kategori UPP..." />
     );
   }
 
@@ -82,8 +81,10 @@ export default function UppSubcategory() {
 
       {/* Pasal Section - Show category pasal if exists, otherwise show subcategory pasal */}
       <PasalSection
-        pasalDeskripsi={categoryData.pasalDeskripsi || subcategoryData.pasalDeskripsi}
         categoryName={`${categoryData.nama} - ${subcategoryData.nama}`}
+        pasalDeskripsi={
+          categoryData.pasalDeskripsi || subcategoryData.pasalDeskripsi
+        }
       />
 
       {/* UPP cards filtered by jenisId */}

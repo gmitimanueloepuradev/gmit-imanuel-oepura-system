@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-import { useAuth } from '@/contexts/AuthContext';
+import LoadingScreen from "../ui/LoadingScreen";
+
+import { useAuth } from "@/contexts/AuthContext";
 
 const ProtectedRoute = ({ children, allowedRoles = null, fallback = null }) => {
   const { isAuthenticated, user, loading } = useAuth();
@@ -13,20 +15,23 @@ const ProtectedRoute = ({ children, allowedRoles = null, fallback = null }) => {
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
+
       return;
     }
 
     // Check if user has required role
     if (allowedRoles) {
-      const hasRequiredRole = Array.isArray(allowedRoles) 
+      const hasRequiredRole = Array.isArray(allowedRoles)
         ? allowedRoles.includes(user?.role)
         : user?.role === allowedRoles;
 
       if (!hasRequiredRole) {
         // Redirect to appropriate dashboard based on user's role
         const userDashboard = getRoleRedirectUrl(user?.role);
+
         router.push(userDashboard);
+
         return;
       }
     }
@@ -61,13 +66,16 @@ const ProtectedRoute = ({ children, allowedRoles = null, fallback = null }) => {
 
   // Show fallback or nothing while redirecting
   if (!isAuthorized) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Memverifikasi akses...</p>
+    return (
+      fallback || (
+        <div className="min-h-screen flex items-center justify-center">
+          {/* <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600">Memverifikasi akses...</p>
+          </div> */}
+          <LoadingScreen isLoading={loading} />
         </div>
-      </div>
+      )
     );
   }
 
