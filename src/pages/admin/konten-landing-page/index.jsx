@@ -382,8 +382,22 @@ export default function KontenLandingPagePage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <ButtonActions
-                              onDelete={() => handleDelete(item)}
-                              onEdit={() => handleEdit(item.id)}
+                              actions={[
+                                {
+                                  label: "Edit",
+                                  icon: Edit,
+                                  onClick: () => handleEdit(item.id),
+                                  variant: "outline"
+                                },
+                                {
+                                  label: "Hapus",
+                                  icon: Trash2,
+                                  onClick: () => handleDelete(item),
+                                  variant: "destructive"
+                                }
+                              ]}
+                              item={item}
+                              type="horizontal"
                             />
                           </td>
                         </tr>
