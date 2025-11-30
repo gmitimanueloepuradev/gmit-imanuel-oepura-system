@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 
 export default function EditRealisasiPage() {
@@ -143,11 +143,7 @@ export default function EditRealisasiPage() {
   };
 
   if (realisasiLoading || itemLoading) {
-    return (
-      <AdminLayout>
-        <LoadingSpinner />
-      </AdminLayout>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat data realisasi..." />;
   }
 
   if (!realisasiData) {

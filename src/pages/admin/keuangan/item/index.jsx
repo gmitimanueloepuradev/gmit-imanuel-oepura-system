@@ -23,7 +23,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export default function ItemKeuanganPage() {
@@ -260,11 +260,7 @@ export default function ItemKeuanganPage() {
   const selectedPeriodeData = periodeList?.find(p => p.id === selectedPeriode);
 
   if (isLoading && selectedPeriode) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat item keuangan..." />;
   }
 
   return (

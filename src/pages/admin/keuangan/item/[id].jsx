@@ -15,7 +15,7 @@ import RealisasiList from "@/components/keuangan/RealisasiList";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 
 export default function ItemKeuanganDetailPage() {
@@ -65,11 +65,7 @@ export default function ItemKeuanganDetailPage() {
   };
 
   if (isLoading) {
-    return (
-      <AdminLayout>
-        <LoadingSpinner />
-      </AdminLayout>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat detail item keuangan..." />;
   }
 
   if (!itemData) {

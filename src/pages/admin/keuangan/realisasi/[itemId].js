@@ -14,7 +14,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
 
@@ -79,11 +79,7 @@ export default function RealisasiDetailPage() {
   };
 
   if (itemLoading) {
-    return (
-      <AdminLayout>
-        <LoadingSpinner />
-      </AdminLayout>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat detail item realisasi..." />;
   }
 
   if (!itemData) {
@@ -407,7 +403,7 @@ export default function RealisasiDetailPage() {
         </CardHeader>
         <CardContent>
           {summaryLoading || realisasiLoading ? (
-            <LoadingSpinner />
+            <LoadingScreen isLoading={true} message="Memuat history realisasi..." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse border border-gray-300">

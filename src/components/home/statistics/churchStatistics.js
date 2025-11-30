@@ -4,6 +4,7 @@ import { useState } from "react";
 import publicStatisticsService from "../../../services/publicStatisticsService";
 
 import StatPieChart from "./statPieChart";
+import { ChartSkeleton } from "../../ui/skeletons/SkeletonChart";
 
 export default function ChurchStatistics() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,6 +19,7 @@ export default function ChurchStatistics() {
     queryKey: ["churchStatistics"],
     queryFn: async () => {
       const response = await publicStatisticsService.getChurchStatistics();
+
       return publicStatisticsService.formatChartData(response);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -34,6 +36,7 @@ export default function ChurchStatistics() {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % totalSlides);
       }, 10000);
+
       return () => clearInterval(interval);
     }
   });
@@ -41,19 +44,21 @@ export default function ChurchStatistics() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className={`hidden lg:block bg-slate-800 lg:sticky lg:top-0 lg:h-screen overflow-hidden transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-12' : 'w-full lg:w-1/5'
-      }`}>
+      <div
+        className={`hidden lg:block bg-slate-800 lg:sticky lg:top-0 lg:h-screen overflow-hidden transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-12" : "w-full lg:w-1/5"
+        }`}
+      >
         {/* Collapse/Expand Toggle Button */}
         <button
           className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
-            isCollapsed ? 'right-2' : 'right-4'
+            isCollapsed ? "right-2" : "right-4"
           }`}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <svg
             className={`w-4 h-4 transition-transform duration-300 ${
-              isCollapsed ? 'rotate-0' : 'rotate-180'
+              isCollapsed ? "rotate-0" : "rotate-180"
             }`}
             fill="none"
             stroke="currentColor"
@@ -68,14 +73,13 @@ export default function ChurchStatistics() {
           </svg>
         </button>
 
-        <div className={`transition-all duration-300 ease-in-out h-full ${
-          isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}>
+        <div
+          className={`transition-all duration-300 ease-in-out h-full ${
+            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
           <div className="p-4 lg:p-6 lg:py-8 h-full">
-            <div className="flex flex-col h-full w-full items-center justify-center min-h-[300px] lg:min-h-full">
-              <div className="loading loading-spinner loading-lg text-blue-400" />
-              <p className="mt-4 text-sm text-gray-300">Memuat statistik...</p>
-            </div>
+            <ChartSkeleton />
           </div>
         </div>
       </div>
@@ -85,19 +89,21 @@ export default function ChurchStatistics() {
   // Show error state
   if (error) {
     return (
-      <div className={`hidden lg:block bg-slate-800 lg:sticky lg:top-0 lg:h-screen overflow-hidden transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-12' : 'w-full lg:w-1/5'
-      }`}>
+      <div
+        className={`hidden lg:block bg-slate-800 lg:sticky lg:top-0 lg:h-screen overflow-hidden transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-12" : "w-full lg:w-1/5"
+        }`}
+      >
         {/* Collapse/Expand Toggle Button */}
         <button
           className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
-            isCollapsed ? 'right-2' : 'right-4'
+            isCollapsed ? "right-2" : "right-4"
           }`}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <svg
             className={`w-4 h-4 transition-transform duration-300 ${
-              isCollapsed ? 'rotate-0' : 'rotate-180'
+              isCollapsed ? "rotate-0" : "rotate-180"
             }`}
             fill="none"
             stroke="currentColor"
@@ -112,9 +118,11 @@ export default function ChurchStatistics() {
           </svg>
         </button>
 
-        <div className={`transition-all duration-300 ease-in-out h-full ${
-          isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}>
+        <div
+          className={`transition-all duration-300 ease-in-out h-full ${
+            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
           <div className="p-4 lg:p-6 lg:py-8 h-full">
             <div className="flex flex-col h-full w-full items-center justify-center min-h-[300px] lg:min-h-full">
               <div className="text-red-400 text-center">
@@ -131,7 +139,9 @@ export default function ChurchStatistics() {
                     strokeWidth={2}
                   />
                 </svg>
-                <p className="text-sm text-gray-300">Gagal memuat statistik gereja</p>
+                <p className="text-sm text-gray-300">
+                  Gagal memuat statistik gereja
+                </p>
               </div>
             </div>
           </div>
@@ -148,20 +158,20 @@ export default function ChurchStatistics() {
   return (
     <div
       className={`hidden lg:block bg-base-300 lg:sticky lg:top-0 lg:h-screen overflow-hidden transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-12' : 'w-full lg:w-1/5'
+        isCollapsed ? "w-12" : "w-full lg:w-1/5"
       }`}
     >
       {/* Collapse/Expand Toggle Button */}
       <button
         aria-label={isCollapsed ? "Expand statistics" : "Collapse statistics"}
         className={`absolute top-1/2 -translate-y-1/2 z-10 bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 ${
-          isCollapsed ? 'right-2' : 'right-4'
+          isCollapsed ? "right-2" : "right-4"
         }`}
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         <svg
           className={`w-4 h-4 transition-transform duration-300 ${
-            isCollapsed ? 'rotate-0' : 'rotate-180'
+            isCollapsed ? "rotate-0" : "rotate-180"
           }`}
           fill="none"
           stroke="currentColor"
@@ -177,9 +187,11 @@ export default function ChurchStatistics() {
       </button>
 
       {/* Content */}
-      <div className={`transition-all duration-300 ease-in-out h-full ${
-        isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
-      }`}>
+      <div
+        className={`transition-all duration-300 ease-in-out h-full ${
+          isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         <div className="p-4 lg:p-6 lg:py-16 h-full">
           <div className="flex flex-col h-full w-full">
             {/* Chart container */}

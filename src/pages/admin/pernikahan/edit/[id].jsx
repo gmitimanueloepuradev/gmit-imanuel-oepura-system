@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
 import DatePicker from "@/components/ui/inputs/DatePicker";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import jemaatService from "@/services/jemaatService";
 import klasisService from "@/services/klasisService";
 import pernikahanService from "@/services/pernikahanService";
@@ -166,11 +166,7 @@ export default function EditPernikahanPage() {
   );
 
   if (isLoadingPernikahan) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat data pernikahan..." />;
   }
 
   const pernikahan = pernikahanData?.data;

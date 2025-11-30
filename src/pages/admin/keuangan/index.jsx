@@ -21,7 +21,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 import PageTitle from "@/components/ui/PageTitle";
 
@@ -358,9 +358,7 @@ export default function KeuanganDashboard() {
             </CardContent>
           </Card>
         ) : isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
+          <LoadingScreen isLoading={true} message="Memuat dashboard keuangan..." />
         ) : (
           <>
             {/* Realisasi vs Target Comparison Section */}

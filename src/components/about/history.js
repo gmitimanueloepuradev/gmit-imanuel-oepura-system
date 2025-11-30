@@ -1,4 +1,60 @@
+import { useEffect, useState } from "react";
+
+import kontenLandingPageService from "@/services/kontenLandingPageService";
+import LoadingScreen from "@/components/ui/LoadingScreen";
+
 export default function History() {
+  const [sejarahData, setSejarahData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch Sejarah
+        const sejarahResponse =
+          await kontenLandingPageService.getPublicBySection("SEJARAH");
+
+        if (sejarahResponse.success && sejarahResponse.data.length > 0) {
+          setSejarahData(sejarahResponse.data);
+        }
+      } catch (error) {
+        console.error("Error fetching sejarah:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Array warna untuk timeline
+  const colors = [
+    {
+      gradient: "from-blue-400 to-indigo-400",
+      text: "text-blue-300",
+    },
+    {
+      gradient: "from-green-400 to-emerald-400",
+      text: "text-green-300",
+    },
+    {
+      gradient: "from-purple-400 to-pink-400",
+      text: "text-purple-300",
+    },
+    {
+      gradient: "from-orange-400 to-red-400",
+      text: "text-orange-300",
+    },
+    {
+      gradient: "from-cyan-400 to-blue-400",
+      text: "text-cyan-300",
+    },
+  ];
+
+  if (loading) {
+    return <LoadingScreen isLoading={true} message="Memuat Sejarah Gereja..." />;
+  }
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
       {/* Background Pattern */}
@@ -18,89 +74,80 @@ export default function History() {
         </div>
 
         {/* Timeline */}
-        <div className="space-y-12">
-          {/* Timeline Item 1 - Foundation */}
-          <div className="flex flex-col md:flex-row items-center gap-8 group">
-            <div className="flex-1 md:text-right">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 transform group-hover:scale-105 transition-all duration-300">
-                <h3 className="text-2xl font-bold text-blue-300 mb-4">
-                  Awal Mula (1950-an)
-                </h3>
-                <p className="text-lg leading-relaxed text-gray-200">
-                  GMIT Imanuel Oepura didirikan sebagai bagian dari pelayanan
-                  gereja di wilayah Timor. Gereja ini lahir dari semangat
-                  penyebaran Injil dan kebutuhan masyarakat lokal untuk memiliki
-                  tempat ibadah yang dapat melayani komunitas dengan budaya dan
-                  bahasa setempat.
-                </p>
-              </div>
-            </div>
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full flex-shrink-0 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full animate-ping opacity-75" />
-            </div>
-            <div className="flex-1 hidden md:block" />
-          </div>
+        {sejarahData.length > 0 ? (
+          <div className="space-y-12">
+            {sejarahData.map((item, index) => {
+              const color = colors[index % colors.length];
+              const isEven = index % 2 === 0;
 
-          {/* Timeline Item 2 - Growth */}
-          <div className="flex flex-col md:flex-row items-center gap-8 group">
-            <div className="flex-1 hidden md:block" />
-            <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex-shrink-0 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-ping opacity-75" />
-            </div>
-            <div className="flex-1">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 transform group-hover:scale-105 transition-all duration-300">
-                <h3 className="text-2xl font-bold text-green-300 mb-4">
-                  Periode Pertumbuhan (1970-1990)
-                </h3>
-                <p className="text-lg leading-relaxed text-gray-200">
-                  Masa ini ditandai dengan pembangunan gedung gereja yang lebih
-                  besar dan pengembangan berbagai pelayanan. Jemaat mulai
-                  bertumbuh pesat dengan berbagai program pelayanan seperti
-                  sekolah minggu, persekutuan pemuda, dan pelayanan sosial
-                  kepada masyarakat.
-                </p>
-              </div>
-            </div>
-          </div>
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-col md:flex-row items-center gap-8 group"
+                >
+                  {/* Left Content (for even index) */}
+                  {isEven && (
+                    <div className="flex-1 md:text-right">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 transform group-hover:scale-105 transition-all duration-300">
+                        <h3 className={`text-2xl font-bold ${color.text} mb-4`}>
+                          {item.judul}
+                        </h3>
+                        <p className="text-lg leading-relaxed text-gray-200">
+                          {item.konten}
+                        </p>
+                        {item.deskripsi && (
+                          <p className="text-sm leading-relaxed text-gray-300 mt-4">
+                            {item.deskripsi}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-          {/* Timeline Item 3 - Modern Era */}
-          <div className="flex flex-col md:flex-row items-center gap-8 group">
-            <div className="flex-1 md:text-right">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 transform group-hover:scale-105 transition-all duration-300">
-                <h3 className="text-2xl font-bold text-purple-300 mb-4">
-                  Era Modern (1990-Sekarang)
-                </h3>
-                <p className="text-lg leading-relaxed text-gray-200">
-                  Memasuki era modern, GMIT Imanuel Oepura terus berkembang
-                  dengan adopsi teknologi dalam pelayanan, program-program
-                  inovatif untuk berbagai kalangan usia, dan keterlibatan aktif
-                  dalam pembangunan masyarakat lokal serta pelestarian budaya
-                  Timor.
-                </p>
-              </div>
-            </div>
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex-shrink-0 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping opacity-75" />
-            </div>
-            <div className="flex-1 hidden md:block" />
-          </div>
+                  {/* Empty space for odd index */}
+                  {!isEven && <div className="flex-1 hidden md:block" />}
 
-          {/* Current Vision */}
-          <div className="text-center mt-16">
-            <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
-              <h3 className="text-3xl font-bold text-yellow-300 mb-6">
-                Visi Kedepan
-              </h3>
-              <p className="text-xl leading-relaxed text-gray-200 max-w-4xl mx-auto">
-                Hari ini, GMIT Imanuel Oepura terus berkomitmen untuk menjadi
-                gereja yang hidup, relevan, dan melayani dengan kasih. Kami
-                mengintegrasikan nilai-nilai Kristen dengan kearifan lokal,
-                menciptakan ruang dimana setiap orang dapat bertumbuh dalam iman
-                dan memberikan kontribusi nyata bagi masyarakat.
-              </p>
-            </div>
+                  {/* Timeline Dot */}
+                  <div
+                    className={`w-8 h-8 bg-gradient-to-r ${color.gradient} rounded-full flex-shrink-0 relative`}
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r ${color.gradient} rounded-full animate-ping opacity-75`}
+                    />
+                  </div>
+
+                  {/* Right Content (for odd index) */}
+                  {!isEven && (
+                    <div className="flex-1">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 transform group-hover:scale-105 transition-all duration-300">
+                        <h3 className={`text-2xl font-bold ${color.text} mb-4`}>
+                          {item.judul}
+                        </h3>
+                        <p className="text-lg leading-relaxed text-gray-200">
+                          {item.konten}
+                        </p>
+                        {item.deskripsi && (
+                          <p className="text-sm leading-relaxed text-gray-300 mt-4">
+                            {item.deskripsi}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty space for even index */}
+                  {isEven && <div className="flex-1 hidden md:block" />}
+                </div>
+              );
+            })}
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-xl text-gray-300">
+              Belum ada data sejarah yang tersedia
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

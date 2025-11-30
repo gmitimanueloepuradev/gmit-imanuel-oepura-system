@@ -56,11 +56,11 @@ export default function PageHeader({
         {/* Header Content */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
+            <h1 className="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl break-words">
               {title}
             </h1>
             {description && (
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 break-words">
                 {description}
               </p>
             )}

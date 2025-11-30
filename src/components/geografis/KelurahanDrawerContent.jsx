@@ -1,8 +1,7 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import LoadingSpinner from "../ui/loading/LoadingSpinner";
-
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import useModalForm from "@/hooks/useModalForm";
 
 export default function KelurahanDrawerContent({
@@ -14,7 +13,7 @@ export default function KelurahanDrawerContent({
   const router = useRouter();
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingScreen isLoading={true} message="Memuat data kelurahan..." />;
   }
 
   if (!data?.length) {

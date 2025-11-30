@@ -1,9 +1,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-import LoadingSpinner from "../ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import CreateOrEditModal from "../common/CreateOrEditModal";
-
 import useModalForm from "@/hooks/useModalForm";
 const KotaKabupatenDrawerContent = ({ data, isLoading, provinsiName }) => {
   const modal = useModalForm();
@@ -19,7 +18,7 @@ const KotaKabupatenDrawerContent = ({ data, isLoading, provinsiName }) => {
     },
   ];
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingScreen isLoading={true} message="Memuat data kota/kabupaten..." />;
   }
 
   if (!data?.length) {

@@ -9,7 +9,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import AutoCompleteInput from "@/components/ui/inputs/AutoCompleteInput";
-import LoadingSpinner from "@/components/ui/loading/LoadingSpinner";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import PageHeader from "@/components/ui/PageHeader";
 
 export default function CreateRealisasiPage() {
@@ -120,11 +120,7 @@ export default function CreateRealisasiPage() {
   };
 
   if (itemLoading) {
-    return (
-      <AdminLayout>
-        <LoadingSpinner />
-      </AdminLayout>
-    );
+    return <LoadingScreen isLoading={true} message="Memuat form realisasi..." />;
   }
 
   return (
